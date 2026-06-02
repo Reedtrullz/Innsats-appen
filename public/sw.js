@@ -6,6 +6,8 @@ const APP_SHELL = [
   '/under',
   '/etter',
   '/kilder',
+  '/oppdrag',
+  '/oppdrag/ny',
   '/offline',
   '/generated-content/manifest.json',
   '/generated-content/action-cards.json',
