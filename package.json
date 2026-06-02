@@ -1,0 +1,57 @@
+{
+  "name": "beredskapsboka",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings=0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "playwright test",
+    "e2e:prod": "PLAYWRIGHT_PROD=1 playwright test",
+    "import:obsidian": "tsx scripts/import-obsidian.ts",
+    "compile:curated": "tsx scripts/compile-curated.ts",
+    "validate:content": "tsx scripts/validate-content.ts",
+    "build:search": "tsx scripts/build-search-index.ts",
+    "build:content": "npm run import:obsidian && npm run compile:curated && npm run validate:content && npm run build:search",
+    "check": "npm run typecheck && npm run test && npm run build"
+  },
+  "dependencies": {
+    "@next/third-parties": "16.2.7",
+    "gray-matter": "4.0.3",
+    "idb": "8.0.3",
+    "js-yaml": "4.2.0",
+    "minisearch": "7.2.0",
+    "next": "16.2.7",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.60.0",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.1",
+    "@types/js-yaml": "4.0.9",
+    "@types/node": "25.9.1",
+    "@types/react": "19.2.16",
+    "@types/react-dom": "19.2.3",
+    "autoprefixer": "10.5.0",
+    "eslint": "10.4.1",
+    "eslint-config-next": "16.2.7",
+    "fake-indexeddb": "6.2.5",
+    "jsdom": "29.1.1",
+    "postcss": "8.5.15",
+    "tailwindcss": "3.4.19",
+    "tsx": "4.22.4",
+    "typescript": "6.0.3",
+    "vitest": "4.1.8"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
