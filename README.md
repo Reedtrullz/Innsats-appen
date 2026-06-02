@@ -32,8 +32,8 @@ npm run build:content    # import Obsidian, compile curated YAML, validate graph
 npm run typecheck        # TypeScript gate
 npm run test             # Vitest unit/component/integration/security/content tests
 npm run build            # content build + production Next build
-npm run e2e              # Playwright against dev server
-npm run e2e:prod         # Playwright against next start after a production build
+npm run e2e              # production-mode Playwright E2E (service worker/offline checks)
+npm run e2e:prod         # same production-mode E2E alias
 npm run check            # typecheck + Vitest + production build
 ```
 

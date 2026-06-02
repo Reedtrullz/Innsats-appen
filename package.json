@@ -11,7 +11,7 @@
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "playwright test",
+    "e2e": "PLAYWRIGHT_PROD=1 playwright test",
     "e2e:prod": "PLAYWRIGHT_PROD=1 playwright test",
     "import:obsidian": "tsx scripts/import-obsidian.ts",
     "compile:curated": "tsx scripts/compile-curated.ts",
