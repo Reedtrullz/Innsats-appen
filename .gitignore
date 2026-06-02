@@ -6,6 +6,8 @@ out/
 coverage/
 playwright-report/
 test-results/
+tests/.tmp/
+tsconfig.tsbuildinfo
 .env
 .env.*
 !.env.example
@@ -19,6 +21,8 @@ public/content-assets/
 /*.xlsx
 /*.pdf
 /*.png
+/*.jpg
+/*.jpeg
 /*.rtf
 /*.rtfd/
 /deep-research-*.md
