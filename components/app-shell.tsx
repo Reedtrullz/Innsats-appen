@@ -1,4 +1,5 @@
 import { BottomNav } from './bottom-nav';
+import { OfflineStatus } from './offline-status';
 
 export function AppShell({ children, currentPath }: { children: React.ReactNode; currentPath?: string }) {
   return (
@@ -9,6 +10,7 @@ export function AppShell({ children, currentPath }: { children: React.ReactNode;
           <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">Kildebelagt MVP</span>
         </div>
       </header>
+      <OfflineStatus />
       <main className="mx-auto max-w-3xl px-4 pb-28 pt-4">{children}</main>
       <BottomNav currentPath={currentPath} />
     </div>

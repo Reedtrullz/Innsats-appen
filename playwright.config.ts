@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
 const prod = process.env.PLAYWRIGHT_PROD === '1';
 
@@ -14,6 +14,9 @@ export default defineConfig({
   },
   use: {
     baseURL: 'http://127.0.0.1:3000',
-    ...devices['iPhone 13'],
+    browserName: 'chromium',
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
   },
 });
