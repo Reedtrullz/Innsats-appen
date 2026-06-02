@@ -58,6 +58,7 @@ it('keeps coverage backed by both action cards and source documents', () => {
   expect(sources.length).toBeGreaterThan(0);
   expect(cardsText).toContain('tilfluktsrom');
   expect(cardsText).toContain('radiac');
-  expect(sourcesText).toContain('sjekkliste');
-  expect(sourcesText).toContain('psykologisk');
+  expect(cardsText).toContain('sjekkliste');
+  expect(cardsText).toContain('psykologisk');
+  expect(sourcesText).toContain('5-punktsordre');
 });

@@ -69,7 +69,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists 
       <div className="rounded-3xl bg-white p-5 shadow-sm">
         <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Oppdrag</p>
         <h1 className="text-3xl font-black">Lokale oppdrag</h1>
-        <p className="mt-2 text-sm font-semibold text-amber-900">{privacyMessage}</p>
+        <p data-testid="privacy-message" className="mt-2 text-sm font-semibold text-amber-900">{privacyMessage}</p>
         <a href="/oppdrag/ny" className="mt-4 inline-flex min-h-12 items-center rounded-2xl bg-slate-950 px-5 font-bold text-white">Nytt oppdrag</a>
       </div>
       {missions.length === 0 ? <p className="rounded-2xl bg-slate-100 p-4 text-sm font-semibold text-slate-700">Ingen lokale oppdrag.</p> : null}

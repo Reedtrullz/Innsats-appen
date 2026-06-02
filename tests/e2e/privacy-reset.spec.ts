@@ -10,7 +10,7 @@ test('deletes local mission data with explicit privacy copy', async ({ page }) =
   await page.getByRole('button', { name: /Lagre oppdrag/i }).click();
   await expect(page.getByText('Øvelse tilfluktsrom')).toBeVisible();
   await page.getByRole('button', { name: /Slett lokale data/i }).click();
-  await expect(page.getByText(/Beredskapsboka sender ikke oppdrag/i)).toBeVisible();
+  await expect(page.getByTestId('privacy-message')).toHaveText(/Beredskapsboka sender ikke oppdrag/i);
   await page.reload();
   await expect(page.getByText('Øvelse tilfluktsrom')).not.toBeVisible();
 });

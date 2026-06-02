@@ -128,7 +128,7 @@
   warning: Støtteinformasjon, ikke helsefaglig diagnose eller behandling.
 
 - slug: fig-etterinnsats-klargjoring
-  title: Etter innsats – klargjør FIG/FIGP
+  title: Sjekkliste etter innsats – klargjør FIG/FIGP
   phase: etter
   roles: [mannskap, lagforer, materiellansvarlig]
   scenarios: [generelt]
