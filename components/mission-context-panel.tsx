@@ -7,6 +7,7 @@ import { phaseLabels, roleLabels, roles, scenarioLabels, scenarios, phases, type
 import { clearLocalMissionData, listMissions, saveMission } from '@/lib/mission/local-store';
 import type { MissionContext } from '@/lib/mission/schemas';
 import { ChecklistRunner } from './checklist-runner';
+import { ContextSignalPanel, markStoredContextSignalsStale } from './context-signal-panel';
 
 export function MissionContextPanel({ mode = 'list', contentVersion, checklists }: { mode?: 'list' | 'create'; contentVersion: string; checklists: OperationalChecklist[] }) {
   const router = useRouter();
@@ -76,6 +77,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists 
         <article key={mission.id} className="space-y-3 rounded-3xl bg-white p-5 shadow-sm">
           <h2 className="text-2xl font-black">{mission.title}</h2>
           <p className="text-sm text-slate-700">{phaseLabels[mission.phase]} · {roleLabels[mission.role]} · {scenarioLabels[mission.scenario]} · {mission.locationText}</p>
+          {mission.externalSignals.length > 0 ? <ContextSignalPanel signals={markStoredContextSignalsStale(mission.externalSignals)} /> : null}
           {tilfluktChecklist ? <ChecklistRunner checklist={tilfluktChecklist} missionId={mission.id} /> : null}
         </article>
       ))}

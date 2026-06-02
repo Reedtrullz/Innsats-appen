@@ -8,15 +8,23 @@ export const CoordinatesSchema = z.object({
 
 export const ExternalContextSignalSchema = z
   .object({
-    source: z.string().min(1),
-    kind: z.string().optional(),
-    severity: z.string().optional(),
-    title: z.string().optional(),
-    summary: z.string().optional(),
-    fetchedAt: z.string().optional(),
-    staleness: z.enum(['fresh', 'stale', 'unavailable']).default('fresh'),
+    source: z.enum(['kartverket', 'met', 'nve']),
+    kind: z.string().min(1),
+    severity: z.enum(['info', 'yellow', 'orange', 'red', 'unknown']),
+    title: z.string().min(1),
+    summary: z.string().min(1),
+    validFrom: z.string().nullable(),
+    validTo: z.string().nullable(),
+    fetchedAt: z.string().datetime(),
+    staleness: z.enum(['fresh', 'stale', 'unavailable']),
+    upstreamId: z.string().optional(),
+    upstreamVersion: z.string().optional(),
+    etag: z.string().optional(),
+    upstreamHash: z.string().optional(),
+    geometry: z.unknown().optional(),
+    rawRef: z.string().min(1),
   })
-  .passthrough();
+  .strict();
 
 export const MissionContextSchema = z
   .object({

@@ -18,6 +18,24 @@ it('accepts local tilfluktsrom mission context', () => {
   expect(mission.scenario).toBe('tilfluktsrom');
 });
 
+it('rejects partial external context signals in mission storage', () => {
+  const result = MissionContextSchema.safeParse({
+    id: 'mission-1',
+    title: 'Oppdrag',
+    createdAt: '2026-06-02T20:00:00.000Z',
+    updatedAt: '2026-06-02T20:00:00.000Z',
+    phase: 'for',
+    role: 'mannskap',
+    scenario: 'generelt',
+    locationText: 'Trondheim',
+    externalSignals: [{ source: 'met', staleness: 'fresh' }],
+    activeChecklistIds: [],
+    notes: '',
+    contentVersion: 'v1',
+  });
+  expect(result.success).toBe(false);
+});
+
 it('rejects person-identifying fields outside the schema', () => {
   const result = MissionContextSchema.safeParse({
     id: 'mission-1', title: 'Oppdrag', createdAt: '2026-06-02T20:00:00.000Z', updatedAt: '2026-06-02T20:00:00.000Z', phase: 'for', role: 'mannskap', scenario: 'generelt', locationText: 'Trondheim', externalSignals: [], activeChecklistIds: [], notes: '', contentVersion: 'v1', patientName: 'Ola Nordmann', personnummer: '01010112345',
