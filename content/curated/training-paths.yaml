@@ -1,0 +1,39 @@
+- slug: fig10-grunnkurs
+  courseCode: FIG10
+  title: Grunnkurs FIG/FIGP
+  targetRoles: [mannskap]
+  duration: 3 uker
+  prerequisites: []
+  skills: [egensikkerhet, samband, førstehjelp, ordre, HMS]
+  sourceIds: [src-kursplan-grunnkurs-fig10]
+  linkedCardSlugs: [fem-punktsordre, sambandsplan-start, fig-for-innsats]
+
+- slug: rad10-grunnkurs
+  courseCode: RAD10
+  title: Grunnopplæring RADIAC måletjeneste
+  targetRoles: [rad]
+  duration: Etter lokal plan
+  prerequisites: [FIG10]
+  skills: [dosimeter, dosekontroll, målepunkter, rapportering]
+  sourceIds: [src-grunnopplaering-rad-10-mannskap]
+  linkedCardSlugs: [radiac-dosekontroll, jod-atomberedskap]
+
+- slug: mre10-grunnkurs
+  courseCode: MRE10
+  title: Grunnopplæring mobil renseenhet
+  targetRoles: [mre]
+  duration: Etter lokal plan
+  prerequisites: [FIG10]
+  skills: [rens, CBRN, verneutstyr, soneinndeling]
+  sourceIds: [src-opplaering-mannskap-mre10]
+  linkedCardSlugs: [cbrne-startkort, mre-rens-start]
+
+- slug: mfe10-grunnkurs
+  courseCode: MFE10
+  title: Grunnopplæring mobil forsterkningsenhet
+  targetRoles: [mfe]
+  duration: Etter lokal plan
+  prerequisites: [FIG10]
+  skills: [mobilisering, logistikk, ressursstøtte]
+  sourceIds: [src-grunnopplaering-mfe-10-mannskap]
+  linkedCardSlugs: [mfe-anmodning]

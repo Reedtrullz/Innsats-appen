@@ -1,0 +1,87 @@
+- slug: tilfluktsrom-teknisk-status
+  title: Tilfluktsrom teknisk status
+  phase: for
+  roles: [beredskapsvakt, leder, stab-logistikk]
+  scenarios: [tilfluktsrom]
+  items:
+    - id: ansvar
+      label: Avklar ansvar med kommune/eier/DSB-linje
+      required: true
+      sourceIds: [src-deep-research-tilfluktsrom]
+    - id: ventilasjon
+      label: Kontroller ventilasjon og luftinntak
+      required: true
+      sourceIds: [src-deep-research-tilfluktsrom]
+    - id: nodstrom
+      label: Kontroller nødstrøm, vann, sanitær og belysning
+      required: true
+      sourceIds: [src-deep-research-tilfluktsrom]
+    - id: samband
+      label: Avklar samband og rapporteringslinje
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+  sourceIds: [src-deep-research-tilfluktsrom]
+  warning: Bruk bare godkjent informasjon. Ingen private/skjermede lokasjonslister.
+
+- slug: fig-for-innsats
+  title: FIG før innsats
+  phase: for
+  roles: [mannskap, lagforer]
+  scenarios: [generelt]
+  items:
+    - id: utstyr
+      label: Personlig utrustning kontrollert
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: ordre
+      label: Oppdrag og sikkerhet forstått
+      required: true
+      sourceIds: [src-5-punktsordre]
+    - id: samband
+      label: Samband testet
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+  sourceIds: [src-sjekkliste-fig-og-figp]
+  warning: Lokal ordre gjelder.
+
+- slug: fig-etter-innsats
+  title: FIG etter innsats
+  phase: etter
+  roles: [mannskap, lagforer, materiellansvarlig]
+  scenarios: [generelt]
+  items:
+    - id: utstyr-retur
+      label: Utstyr, kjøretøy og forbruk registrert
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: vask
+      label: Vask/vedlikehold eller karantene avklart
+      required: true
+      sourceIds: [src-tiltakskort-etter-innsats]
+    - id: oppfolging
+      label: Behov for psykososial oppfølging vurdert
+      required: false
+      sourceIds: [src-psykososial-oppfolging-og-kollegastotte]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
+  warning: Ikke personjournal.
+
+- slug: radiac-utstyrskontroll
+  title: RADIAC utstyrskontroll
+  phase: for
+  roles: [rad, lagforer]
+  scenarios: [radiac-nedfall]
+  items:
+    - id: dosimeter
+      label: Dosimeter og måleinstrument kontrollert
+      required: true
+      sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
+    - id: skjema
+      label: Dosekontrollskjema klart
+      required: true
+      sourceIds: [src-veileder-radiacmaletjeneste-del-ii]
+    - id: rapportering
+      label: Rapporteringsformat og kontaktpunkt avklart
+      required: true
+      sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
+  sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
+  warning: Følg gjeldende radiacordre.

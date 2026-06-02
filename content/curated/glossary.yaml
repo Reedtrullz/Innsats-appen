@@ -1,0 +1,28 @@
+- term: jod
+  definition: Jodtabletter brukes bare etter råd fra myndighetene ved atomberedskap.
+  synonyms: [jodtabletter, atomberedskap]
+  sourceIds: [src-jodtabletter-i-sivilforsvaret]
+- term: dose
+  definition: Stråledose registreres med metode, tid, sted og usikkerhet.
+  synonyms: [dosimeter, dosekontroll, radiac]
+  sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
+- term: rens
+  definition: Grov-/finrens ved CBRN-hendelser skal skille ren og uren side.
+  synonyms: [sanering, CBRN, MRE]
+  sourceIds: [src-veileder-for-sivilforsvarets-renseenheter-cbrn]
+- term: MFE
+  definition: Mobil forsterkningsenhet som kan støtte distrikter ved større hendelser.
+  synonyms: [mobil forsterkningsenhet, støtte]
+  sourceIds: [src-mobile-forsterkningsenheter-mfe]
+- term: RADIAC
+  definition: Radiologisk måletjeneste for måling, dosekontroll og rapportering.
+  synonyms: [radiacmåling, stråling, dose]
+  sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
+- term: tilfluktsrom
+  definition: Beskyttelsestiltak der bare offentlig/godkjent informasjon skal brukes i MVP.
+  synonyms: [sivile beskyttelsestiltak, offentlig tilfluktsrom]
+  sourceIds: [src-deep-research-tilfluktsrom]
+- term: FIG10
+  definition: Grunnkurs for FIG/FIGP-mannskap.
+  synonyms: [grunnkurs, mannskap, opplæring]
+  sourceIds: [src-kursplan-grunnkurs-fig10]

@@ -1,0 +1,22 @@
+- slug: offentlig-tilfluktsrom
+  title: Offentlig tilfluktsrom
+  kind: tilfluktsrom
+  publicOrRestricted: public
+  responsibleAuthority: Kommune/eier/DSB etter godkjent planverk
+  readinessChecks: [ventilasjon, nødstrøm, vann, sanitær, belysning, samband, adgangskontroll]
+  operationalSteps: [avklar ansvar, klargjør rom, motta publikum, rapporter status, avslutt og etterkontroller]
+  dataWarnings:
+    - Bruk bare offentlig eller eksplisitt godkjent informasjon.
+    - Ingen åpen publisering av private/skjermede tilfluktsromdata.
+  sourceIds: [src-deep-research-tilfluktsrom]
+
+- slug: sivil-beskyttelse-generelt
+  title: Sivile beskyttelsestiltak
+  kind: egenberedskap
+  publicOrRestricted: public
+  responsibleAuthority: Kommune/DSB og lokale myndigheter
+  readinessChecks: [publikumsinformasjon, evakueringsvei, mottak, samband]
+  operationalSteps: [avklar myndighetsråd, formidle godkjent informasjon, støtt publikum, rapporter behov]
+  dataWarnings:
+    - Ekstern kontekst må aldri bli operativ sannhet uten ordre.
+  sourceIds: [src-deep-research-generelt-sivilforsvaret]
