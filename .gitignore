@@ -1,0 +1,25 @@
+.DS_Store
+.hermes/
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.*
+!.env.example
+content/generated/*.json
+public/generated-content/
+public/content-assets/
+
+# Raw source drop from the original Beredskapsboka material.
+# The app imports from Obsidian/generated content; do not commit source artifacts from repo root.
+/*.docx
+/*.xlsx
+/*.pdf
+/*.png
+/*.rtf
+/*.rtfd/
+/deep-research-*.md
+!/public/**/*.png
