@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T22:22:51.742Z",
+  "generatedAt": "2026-06-03T23:20:52.770Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-03T22:22:51.742Z",
+      "updatedAt": "2026-06-03T23:20:52.770Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -2879,7 +2879,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-169",
           "title": "Expand competence taxonomy with FIG10.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 169: Expand competence taxonomy with FIG10."
@@ -2887,7 +2887,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-170",
           "title": "Expand competence taxonomy with FIG20.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 170: Expand competence taxonomy with FIG20."
@@ -2895,7 +2895,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-171",
           "title": "Expand competence taxonomy with FIG30.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 171: Expand competence taxonomy with FIG30."
@@ -2903,7 +2903,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-172",
           "title": "Expand competence taxonomy with FIG31.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 172: Expand competence taxonomy with FIG31."
@@ -2911,7 +2911,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-173",
           "title": "Expand competence taxonomy with MFE10.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 173: Expand competence taxonomy with MFE10."
@@ -2919,7 +2919,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-174",
           "title": "Expand competence taxonomy with MRE10.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 174: Expand competence taxonomy with MRE10."
@@ -2927,7 +2927,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-175",
           "title": "Expand competence taxonomy with MRE30.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 175: Expand competence taxonomy with MRE30."
@@ -2935,7 +2935,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-176",
           "title": "Expand competence taxonomy with RAD10.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 176: Expand competence taxonomy with RAD10."
@@ -2943,7 +2943,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-177",
           "title": "Expand competence taxonomy with RAD30.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 177: Expand competence taxonomy with RAD30."
@@ -2951,7 +2951,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-178",
           "title": "Expand competence taxonomy with ATV.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 178: Expand competence taxonomy with ATV."
@@ -2959,7 +2959,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-179",
           "title": "Expand competence taxonomy with båt.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 179: Expand competence taxonomy with båt."
@@ -2967,7 +2967,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-180",
           "title": "Expand competence taxonomy with lett lastebil.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 180: Expand competence taxonomy with lett lastebil."
@@ -2975,7 +2975,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-181",
           "title": "Expand competence taxonomy with SPS40.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 181: Expand competence taxonomy with SPS40."
@@ -2983,7 +2983,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-182",
           "title": "Expand competence taxonomy with SPS41.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 182: Expand competence taxonomy with SPS41."
@@ -2991,7 +2991,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-183",
           "title": "Add training path detail pages for missing competence codes.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 183: Add training path detail pages for missing competence codes."
@@ -2999,7 +2999,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-184",
           "title": "Add 'trained personnel only' UI treatment for competence-gated cards.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 184: Add 'trained personnel only' UI treatment for competence-gated cards."
@@ -3007,7 +3007,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-185",
           "title": "Add 'do not perform if not trained/equipped' fallback guidance.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 185: Add 'do not perform if not trained/equipped' fallback guidance."
@@ -3015,7 +3015,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-186",
           "title": "Add tests that high-risk cards have competence requirements or explicit rationale.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 186: Add tests that high-risk cards have competence requirements or explicit rationale."
@@ -3023,7 +3023,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-187",
           "title": "Create equipment taxonomy for personal equipment.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 187: Create equipment taxonomy for personal equipment."
@@ -3031,7 +3031,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-188",
           "title": "Create equipment taxonomy for vehicle equipment.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 188: Create equipment taxonomy for vehicle equipment."
@@ -3039,7 +3039,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-189",
           "title": "Create equipment taxonomy for fire/slange equipment.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 189: Create equipment taxonomy for fire/slange equipment."
@@ -3047,7 +3047,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-190",
           "title": "Create equipment taxonomy for tents.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 190: Create equipment taxonomy for tents."
@@ -3055,7 +3055,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-191",
           "title": "Create equipment taxonomy for heaters.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 191: Create equipment taxonomy for heaters."
@@ -3063,7 +3063,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-192",
           "title": "Create equipment taxonomy for pumps.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 192: Create equipment taxonomy for pumps."
@@ -3071,7 +3071,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-193",
           "title": "Create equipment taxonomy for aggregates/generators.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 193: Create equipment taxonomy for aggregates/generators."
@@ -3079,7 +3079,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-194",
           "title": "Create equipment taxonomy for lighting.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 194: Create equipment taxonomy for lighting."
@@ -3087,7 +3087,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-195",
           "title": "Create equipment taxonomy for samband.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 195: Create equipment taxonomy for samband."
@@ -3095,7 +3095,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-196",
           "title": "Add equipment status states: ready, missing, damaged, consumed, needs wash, needs service and quarantined.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 196: Add equipment status states: ready, missing, damaged, consumed, needs wash, needs service and quarantined."
@@ -3103,7 +3103,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-197",
           "title": "Add grouped MBK checklist for vehicles.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 197: Add grouped MBK checklist for vehicles."
@@ -3111,7 +3111,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-198",
           "title": "Add grouped MBK checklist for fire/slange equipment.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 198: Add grouped MBK checklist for fire/slange equipment."
@@ -3119,7 +3119,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-199",
           "title": "Add grouped MBK checklist for tents.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 199: Add grouped MBK checklist for tents."
@@ -3127,7 +3127,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-200",
           "title": "Add grouped MBK checklist for heaters.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 200: Add grouped MBK checklist for heaters."
@@ -3135,7 +3135,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-201",
           "title": "Add grouped MBK checklist for pumps.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 201: Add grouped MBK checklist for pumps."
@@ -3143,7 +3143,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-202",
           "title": "Add grouped MBK checklist for aggregates/generators.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 202: Add grouped MBK checklist for aggregates/generators."
@@ -3151,7 +3151,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-203",
           "title": "Add grouped MBK checklist for lighting.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 203: Add grouped MBK checklist for lighting."
@@ -3159,7 +3159,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-204",
           "title": "Add grouped MBK checklist for samband.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 204: Add grouped MBK checklist for samband."
@@ -3167,7 +3167,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-205",
           "title": "Add grouped MBK checklist for personal equipment.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 205: Add grouped MBK checklist for personal equipment."
@@ -3175,7 +3175,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-206",
           "title": "Add equipment readiness summary for new deployment.",
-          "status": "active",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
           "sourceHeading": "Task 206: Add equipment readiness summary for new deployment."
@@ -3183,7 +3183,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-207",
           "title": "Add equipment status export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 207: Add equipment status export."
