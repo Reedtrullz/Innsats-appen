@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T23:20:52.770Z",
+  "generatedAt": "2026-06-03T23:54:32.707Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-03T23:20:52.770Z",
+      "updatedAt": "2026-06-03T23:54:32.707Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -3191,7 +3191,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-208",
           "title": "Implement structured local field log.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 208: Implement structured local field log."
@@ -3199,7 +3199,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-209",
           "title": "Add log fields for timestamp, optional location, category, text and linked mission.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 209: Add log fields for timestamp, optional location, category, text and linked mission."
@@ -3207,7 +3207,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-210",
           "title": "Add log quick categories for funn, skadet person, ressursbehov, HMS-avvik, observasjon, samband, materiell, vær/fare and beslutning.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 210: Add log quick categories for funn, skadet person, ressursbehov, HMS-avvik, observasjon, samband, materiell, vær/fare and beslutning."
@@ -3215,7 +3215,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-211",
           "title": "Add critical observation flag to log entries.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 211: Add critical observation flag to log entries."
@@ -3223,7 +3223,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-212",
           "title": "Add 'must be forwarded' flag to log entries.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 212: Add 'must be forwarded' flag to log entries."
@@ -3231,7 +3231,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-213",
           "title": "Add log timeline view.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 213: Add log timeline view."
@@ -3239,7 +3239,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-214",
           "title": "Add log search/filter.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 214: Add log search/filter."
@@ -3247,7 +3247,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-215",
           "title": "Add log Markdown export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 215: Add log Markdown export."
@@ -3255,7 +3255,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-216",
           "title": "Add log JSON export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 216: Add log JSON export."
@@ -3263,7 +3263,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-217",
           "title": "Add log PDF export after text exports are stable.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 217: Add log PDF export after text exports are stable."
@@ -3271,7 +3271,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-218",
           "title": "Add patient-data warning to log UI.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 218: Add patient-data warning to log UI."
@@ -3279,7 +3279,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-219",
           "title": "Add tests that log schemas do not encourage patient records.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 219: Add tests that log schemas do not encourage patient records."
@@ -3287,7 +3287,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-220",
           "title": "Add simplified RUH form.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 220: Add simplified RUH form."
@@ -3295,7 +3295,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-221",
           "title": "Add RUH fields for time, category, what happened, immediate measure, risk and follow-up need.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 221: Add RUH fields for time, category, what happened, immediate measure, risk and follow-up need."
@@ -3303,7 +3303,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-222",
           "title": "Add RUH export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 222: Add RUH export."
@@ -3311,7 +3311,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-223",
           "title": "Add fatigue/belastning self-check for long operations.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 223: Add fatigue/belastning self-check for long operations."
@@ -3319,7 +3319,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-224",
           "title": "Add non-medical physical/mental load check.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 224: Add non-medical physical/mental load check."
@@ -3327,7 +3327,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-225",
           "title": "Add needs-rest/needs-relief quick flag.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 225: Add needs-rest/needs-relief quick flag."
@@ -3335,7 +3335,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-226",
           "title": "Add welfare reminders for water, food, warmth, rest and dry clothing.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 226: Add welfare reminders for water, food, warmth, rest and dry clothing."
@@ -3343,7 +3343,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-227",
           "title": "Evaluate photo attachment support for logs.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 227: Evaluate photo attachment support for logs."
@@ -3351,7 +3351,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-228",
           "title": "Evaluate video attachment support for logs.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 228: Evaluate video attachment support for logs."
@@ -3359,7 +3359,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-229",
           "title": "Add EXIF/GPS metadata stripping before media export if media support is implemented.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 229: Add EXIF/GPS metadata stripping before media export if media support is implemented."
@@ -3367,7 +3367,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-230",
           "title": "Add storage-size warning for media attachments.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 230: Add storage-size warning for media attachments."
@@ -3375,7 +3375,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-231",
           "title": "Add privacy warning before exporting media attachments.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 231: Add privacy warning before exporting media attachments."
@@ -3383,7 +3383,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-232",
           "title": "Research local man-down/inactivity alert as a separate safety-critical post-MVP feature.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 232: Research local man-down/inactivity alert as a separate safety-critical post-MVP feature."
