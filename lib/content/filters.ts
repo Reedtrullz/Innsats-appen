@@ -15,7 +15,7 @@ export function filterActionCards(cards: ActionCard[], filter: CardFilter): Acti
     if (filter.role && !card.roles.includes(filter.role)) return false;
     if (filter.scenario && !card.scenarios.includes(filter.scenario)) return false;
     if (query) {
-      const haystack = [card.title, ...card.steps, ...card.safety, ...card.reporting, card.warning ?? '', ...card.competenceRequired].join(' ').toLowerCase();
+      const haystack = [card.title, ...(card.steps ?? []), ...(card.safety ?? []), ...(card.reporting ?? []), card.warning ?? '', ...(card.competenceRequired ?? []), ...(card.equipmentRequired ?? [])].join(' ').toLowerCase();
       if (!haystack.includes(query)) return false;
     }
     return true;

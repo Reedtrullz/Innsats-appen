@@ -1,0 +1,6 @@
+- id: lokalt-distriktsoverlegg-fremtidig
+  districtName: Fremtidig distriktsoverlegg
+  status: planned
+  scopeNote: Kun deklarasjon for fremtidig godkjent lokalt/distriktsinnhold. Ingen private lokasjoner, persondata eller operative ordre synkes sentralt.
+  appliesToScenarios: [generelt, tilfluktsrom]
+  sourceIds: [src-operativt-konsept-for-sivilforsvaret]

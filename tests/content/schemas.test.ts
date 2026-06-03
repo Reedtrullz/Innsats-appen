@@ -1,6 +1,13 @@
 import {
   ActionCardSchema,
+  ContentChangelogEntrySchema,
+  EquipmentTaxonomyRecordSchema,
+  ExportTemplateMetadataSchema,
+  FAQEntrySchema,
   GlossaryTermSchema,
+  ImageMetadataSchema,
+  LocalOverlayDeclarationSchema,
+  MustReadNoticeSchema,
   OperationalChecklistSchema,
   ProtectionMeasureSchema,
   SourceDocumentSchema,
@@ -140,8 +147,33 @@ it('supports glossary synonyms', () => {
   const result = GlossaryTermSchema.safeParse({
     term: 'RADIAC',
     definition: 'Radiologisk måletjeneste',
+    aliases: ['rad'],
     synonyms: ['radiacmåling', 'dose'],
     sourceIds: ['src-bestemmelse-radiacmaletjeneste-del-i'],
   });
   expect(result.success).toBe(true);
+});
+
+it('accepts curated FAQ, equipment, export template, image, overlay, changelog and must-read metadata', () => {
+  expect(FAQEntrySchema.parse({
+    id: 'faq-kildebruk',
+    question: 'Hvordan brukes kilder?',
+    answer: 'Kontroller mot originalkilde.',
+    category: 'Kilder',
+    aliases: ['kilde'],
+    roles: ['leder'],
+    scenarios: ['generelt'],
+    competenceCodes: ['FIG10'],
+    equipmentTerms: ['samband'],
+    sourceIds: ['src-5-punktsordre'],
+    updatedAt: new Date('2026-06-03T00:00:00.000Z'),
+    mustRead: true,
+  }).updatedAt).toBe('2026-06-03');
+
+  expect(EquipmentTaxonomyRecordSchema.parse({ id: 'samband', label: 'Samband', category: 'samband', approvedForPublicUse: true })).toBeTruthy();
+  expect(ExportTemplateMetadataSchema.parse({ id: 'kort-md', title: 'Kort MD', description: 'Markdown', format: 'markdown', audienceRoles: ['leder'], updatedAt: '2026-06-03' })).toBeTruthy();
+  expect(ImageMetadataSchema.parse({ id: 'kart', publicPath: '/content-assets/kart.png', alt: 'Kart', sourceIds: ['src-5-punktsordre'], approvedForPublication: true, updatedAt: '2026-06-03' })).toBeTruthy();
+  expect(LocalOverlayDeclarationSchema.parse({ id: 'trondelag', districtName: 'Trøndelag', scopeNote: 'Fremtidig godkjent overlay', appliesToScenarios: ['flom'] })).toBeTruthy();
+  expect(ContentChangelogEntrySchema.parse({ id: 'nytt-kort', date: '2026-06-03', title: 'Nytt kort', summary: 'Lagt til', changeType: 'added', contentRefs: [{ kind: 'action-card', id: 'kort' }], mustRead: true })).toBeTruthy();
+  expect(MustReadNoticeSchema.parse({ id: 'les-kort', title: 'Les kort', body: 'Oppdatert prosedyre', severity: 'warning', changedAt: '2026-06-03', linkedCardSlugs: ['kort'], changelogEntryId: 'nytt-kort' })).toBeTruthy();
 });

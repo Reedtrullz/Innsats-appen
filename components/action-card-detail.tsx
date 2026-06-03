@@ -13,6 +13,7 @@ export function ActionCardDetail({ card, sources }: { card: ActionCard; sources:
         <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
           {card.roles.map((role) => <span key={role} className="rounded-full bg-slate-100 px-2.5 py-1">{roleLabels[role]}</span>)}
           {card.scenarios.map((scenario) => <span key={scenario} className="rounded-full bg-emerald-100 px-2.5 py-1 text-emerald-950">{scenarioLabels[scenario]}</span>)}
+          {(card.equipmentRequired ?? []).map((term) => <span key={term} className="rounded-full bg-indigo-100 px-2.5 py-1 text-indigo-950">Utstyr: {term}</span>)}
         </div>
       </div>
       {card.warning ? <WarningBanner>{card.warning}</WarningBanner> : null}
@@ -31,8 +32,9 @@ export function ActionCardDetail({ card, sources }: { card: ActionCard; sources:
       </section>
       <section className="rounded-3xl bg-white p-5 shadow-sm">
         <h2 className="text-xl font-black">Kilder</h2>
+        <p className="mt-2 text-sm font-semibold text-slate-600">Lenkene går direkte til kildeutdrag med tydelig utdragsvarsel.</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {linkedSources.map((source) => <SourceBadge key={source.id} source={source} />)}
+          {linkedSources.map((source) => <SourceBadge key={source.id} source={source} withAnchor />)}
         </div>
       </section>
     </article>

@@ -1,0 +1,17 @@
+- id: les-for-bruk-beslutningsstotte
+  title: Les før operativ bruk
+  body: Beredskapsboka er beslutningsstøtte. Gjeldende ordre, lokal plan og fagmyndighet går alltid foran, og appen skal ikke brukes til persondata, pasientdata eller skjermede lokasjoner.
+  severity: critical
+  changedAt: 2026-06-03
+  sourceIds: [src-5-punktsordre, src-operativt-konsept-for-sivilforsvaret]
+  linkedCardSlugs: [fem-punktsordre, tilfluktsrom-klargjoring]
+  changelogEntryId: group-1c-content-governance
+
+- id: tilfluktsrom-offentlig-informasjon
+  title: Bruk bare godkjent tilfluktsrominformasjon
+  body: Ikke legg private/skjermede tilfluktsromdata i appen. Bruk bare offentlig eller eksplisitt godkjent informasjon.
+  severity: warning
+  changedAt: 2026-06-03
+  sourceIds: [src-deep-research-tilfluktsrom]
+  linkedCardSlugs: [tilfluktsrom-klargjoring]
+  changelogEntryId: group-1c-content-governance

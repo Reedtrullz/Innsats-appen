@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildSearchIndex, type SearchDocument } from '@/lib/content/search';
-import type { ActionCard, GlossaryTerm, ProtectionMeasure, SourceDocument, TrainingPath } from '@/lib/content/schemas';
+import type { ActionCard, FAQEntry, GlossaryTerm, ProtectionMeasure, SourceDocument, TrainingPath } from '@/lib/content/schemas';
 
 async function readJson<T>(filePath: string): Promise<T> {
   return JSON.parse(await fs.readFile(filePath, 'utf8')) as T;
@@ -14,18 +14,19 @@ async function writeJson(filePath: string, value: unknown) {
 }
 
 export async function buildGeneratedSearchIndex(generatedDir = 'content/generated', publicGeneratedDir = 'public/generated-content') {
-  const [actionCards, sources, glossary, trainingPaths, protectionMeasures] = await Promise.all([
+  const [actionCards, sources, glossary, trainingPaths, protectionMeasures, faq] = await Promise.all([
     readJson<ActionCard[]>(path.join(generatedDir, 'action-cards.json')),
     readJson<SourceDocument[]>(path.join(generatedDir, 'source-documents.json')),
     readJson<GlossaryTerm[]>(path.join(generatedDir, 'glossary.json')),
     readJson<TrainingPath[]>(path.join(generatedDir, 'training-paths.json')),
     readJson<ProtectionMeasure[]>(path.join(generatedDir, 'protection-measures.json')),
+    readJson<FAQEntry[]>(path.join(generatedDir, 'faq.json')),
   ]);
   const docs: SearchDocument[] = [
     ...actionCards.map((card) => ({
       id: `kort:${card.slug}`,
       title: card.title,
-      body: [...card.steps, ...card.safety, ...card.reporting, card.warning ?? '', ...card.competenceRequired].join(' '),
+      body: [...(card.steps ?? []), ...(card.safety ?? []), ...(card.reporting ?? []), card.warning ?? '', ...(card.competenceRequired ?? []), ...(card.equipmentRequired ?? [])].join(' '),
       scenario: card.scenarios.join(' '),
       role: card.roles.join(' '),
       type: 'kort',
@@ -42,7 +43,7 @@ export async function buildGeneratedSearchIndex(generatedDir = 'content/generate
       id: `ord:${term.term.toLowerCase()}`,
       title: term.term,
       body: term.definition,
-      synonyms: term.synonyms.join(' '),
+      synonyms: [...(term.aliases ?? []), ...term.synonyms].join(' '),
       type: 'ord',
       href: `/hurtigkort?q=${encodeURIComponent(term.term)}`,
     })),
@@ -60,6 +61,15 @@ export async function buildGeneratedSearchIndex(generatedDir = 'content/generate
       body: `${measure.readinessChecks.join(' ')} ${measure.operationalSteps.join(' ')} ${measure.dataWarnings.join(' ')}`,
       type: 'tilfluktsrom',
       href: '/moduler/tilfluktsrom',
+    })),
+    ...faq.filter((entry) => entry.status === 'approved').map((entry) => ({
+      id: `faq:${entry.id}`,
+      title: entry.question,
+      body: `${entry.answer} ${entry.category} ${entry.aliases.join(' ')} ${entry.competenceCodes.join(' ')} ${entry.equipmentTerms.join(' ')}`,
+      scenario: entry.scenarios.join(' '),
+      role: entry.roles.join(' '),
+      type: 'FAQ',
+      href: `/faq#${entry.id}`,
     })),
   ];
   const index = buildSearchIndex(docs);

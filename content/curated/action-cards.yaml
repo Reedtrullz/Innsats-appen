@@ -53,6 +53,7 @@
     - Rapporter åpning, kapasitet, teknisk status, avvik og behov.
   sourceIds: [src-deep-research-tilfluktsrom]
   competenceRequired: []
+  equipmentRequired: [ventilasjon, nodstrom, vann, sanitaer, belysning, samband]
   warning: Researchbasert støtte, ikke offisiell ordre eller fullstendig oversikt. Bruk bare godkjent informasjon.
 
 - slug: cbrne-startkort
@@ -89,6 +90,7 @@
     - Rapporter måleverdier med tid, sted, metode og usikkerhet.
   sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i, src-veileder-radiacmaletjeneste-del-ii]
   competenceRequired: [RAD10]
+  equipmentRequired: [dosimeter, maleinstrument]
   warning: Kontroller alltid mot gjeldende radiacbestemmelse og ordre.
 
 - slug: mfe-anmodning
@@ -233,4 +235,5 @@
     - Rapporter effekt, behov og risiko.
   sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
   competenceRequired: [FIG10]
+  equipmentRequired: [pumpe, slangeutlegg]
   warning: Kontroller alltid lokal risikovurdering.

@@ -1,0 +1,25 @@
+- id: group-1c-content-governance
+  date: 2026-06-03
+  title: FAQ, taksonomier og kildevisning lagt til
+  summary: Curated FAQ, utstyrstaksonomi, bilde-/malmetadata, must-read-varsler og kildeutdrag er lagt inn som offentlig beslutningsstøtte.
+  changeType: added
+  contentRefs:
+    - kind: faq
+      id: beslutningsstotte-og-ordre
+    - kind: action-card
+      id: tilfluktsrom-klargjoring
+  sourceIds: [src-5-punktsordre, src-deep-research-tilfluktsrom]
+  mustRead: true
+
+- id: radiac-jod-faq-presisering
+  date: 2026-06-03
+  title: Presisering om jodtabletter
+  summary: FAQ presiserer at jodtabletter bare omtales som kildebelagt beslutningsstøtte og at offisielle myndighetsråd gjelder.
+  changeType: updated
+  contentRefs:
+    - kind: faq
+      id: radiac-jodtabletter
+    - kind: action-card
+      id: jod-atomberedskap
+  sourceIds: [src-jodtabletter-i-sivilforsvaret]
+  mustRead: false

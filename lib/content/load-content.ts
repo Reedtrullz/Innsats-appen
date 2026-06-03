@@ -2,15 +2,29 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   ActionCardSchema,
+  ContentChangelogEntrySchema,
   ContentManifestSchema,
+  EquipmentTaxonomyRecordSchema,
+  ExportTemplateMetadataSchema,
+  FAQEntrySchema,
   GlossaryTermSchema,
+  ImageMetadataSchema,
+  LocalOverlayDeclarationSchema,
+  MustReadNoticeSchema,
   OperationalChecklistSchema,
   ProtectionMeasureSchema,
   SourceDocumentSchema,
   TrainingPathSchema,
   type ActionCard,
+  type ContentChangelogEntry,
   type ContentManifest,
+  type EquipmentTaxonomyRecord,
+  type ExportTemplateMetadata,
+  type FAQEntry,
   type GlossaryTerm,
+  type ImageMetadata,
+  type LocalOverlayDeclaration,
+  type MustReadNotice,
   type OperationalChecklist,
   type ProtectionMeasure,
   type SourceDocument,
@@ -62,6 +76,34 @@ export function getProtectionMeasures(): ProtectionMeasure[] {
 
 export function getGlossaryTerms(): GlossaryTerm[] {
   return loadArray('glossary.json', 'glossary', (value) => GlossaryTermSchema.parse(value));
+}
+
+export function getFAQEntries(): FAQEntry[] {
+  return loadArray('faq.json', 'FAQ', (value) => FAQEntrySchema.parse(value)).filter((entry) => entry.status === 'approved');
+}
+
+export function getEquipmentTaxonomy(): EquipmentTaxonomyRecord[] {
+  return loadArray('equipment-taxonomy.json', 'equipment taxonomy', (value) => EquipmentTaxonomyRecordSchema.parse(value));
+}
+
+export function getExportTemplates(): ExportTemplateMetadata[] {
+  return loadArray('export-templates.json', 'export templates', (value) => ExportTemplateMetadataSchema.parse(value));
+}
+
+export function getImageMetadata(): ImageMetadata[] {
+  return loadArray('image-metadata.json', 'image metadata', (value) => ImageMetadataSchema.parse(value));
+}
+
+export function getLocalOverlays(): LocalOverlayDeclaration[] {
+  return loadArray('local-overlays.json', 'local overlays', (value) => LocalOverlayDeclarationSchema.parse(value));
+}
+
+export function getContentChangelog(): ContentChangelogEntry[] {
+  return loadArray('changelog.json', 'content changelog', (value) => ContentChangelogEntrySchema.parse(value)).sort((a, b) => b.date.localeCompare(a.date));
+}
+
+export function getMustReadNotices(): MustReadNotice[] {
+  return loadArray('must-read.json', 'must-read notices', (value) => MustReadNoticeSchema.parse(value)).sort((a, b) => b.changedAt.localeCompare(a.changedAt));
 }
 
 export function getContentManifest(): ContentManifest {

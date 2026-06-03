@@ -110,6 +110,165 @@ it('does not treat a generic shelter policy warning plus unrelated address as a 
   expect(errors.join('\n')).not.toContain('restricted shelter location details');
 });
 
+it('validates taxonomy values and image publication metadata for expanded curated content', async () => {
+  const errors = await validateContentGraph({
+    sources: [knownSource],
+    actionCards: [{ slug: 'bad-taxonomy', title: 'Bad taxonomy', phase: 'under', roles: ['ukjent-rolle'], scenarios: ['ukjent-scenario'], priority: 'high', steps: ['![Kart](/content-assets/missing.png)'], sourceIds: ['src-known'], competenceRequired: ['NOPE'], equipmentRequired: ['ukjent-utstyr'], warning: 'Varsel' }],
+    checklists: [{ slug: 'bad-checklist', title: 'Bad checklist', phase: 'for', roles: ['mannskap'], scenarios: ['generelt'], items: [{ id: 'ok', label: 'Ok', sourceIds: ['src-known'] }], sourceIds: ['src-known'], equipmentRequired: ['ukjent-utstyr'] }],
+    trainingPaths: [{ slug: 'bad-training', courseCode: 'FIG10', title: 'Bad training', targetRoles: ['mannskap'], duration: '1 dag', prerequisites: ['NOPE'], skills: ['Trygg'], sourceIds: ['src-known'] }],
+    protectionMeasures: [],
+    glossary: [],
+    faq: [{ id: 'bad-faq', question: 'Bad?', answer: 'Bad', category: 'Test', roles: ['ukjent-rolle'], scenarios: ['generelt'], competenceCodes: ['NOPE'], equipmentTerms: ['ukjent-utstyr'], sourceIds: ['src-known'], updatedAt: '2026-06-03' }],
+    equipmentTaxonomy: [{ id: 'ukjent-utstyr', label: 'Ukjent', category: 'annet', approvedForPublicUse: true }],
+    exportTemplates: [],
+    imageMetadata: [{ id: 'not-approved', publicPath: '/content-assets/missing.png', alt: 'Missing', sourceIds: ['src-known'], approvedForPublication: false, updatedAt: '2026-06-03' }],
+    localOverlays: [],
+    changelog: [{ id: 'bad-change', date: '2026-06-03', title: 'Bad', summary: 'Bad', changeType: 'updated', contentRefs: [{ kind: 'action-card', id: 'missing-card' }] }],
+    mustRead: [{ id: 'bad-notice', title: 'Bad notice', body: 'Bad', severity: 'warning', changedAt: '2026-06-03', linkedCardSlugs: ['missing-card'], changelogEntryId: 'missing-change' }],
+  } as any);
+  const joined = errors.join('\n');
+
+  expect(joined).toContain('bad-taxonomy roles references unknown taxonomy value ukjent-rolle');
+  expect(joined).toContain('bad-taxonomy scenarios references unknown taxonomy value ukjent-scenario');
+  expect(joined).toContain('bad-taxonomy competenceRequired references unknown taxonomy value NOPE');
+  expect(joined).toContain('bad-taxonomy equipmentRequired references unknown taxonomy value ukjent-utstyr');
+  expect(joined).toContain('image reference missing.png is not approved for publication');
+  expect(joined).toContain('image reference missing.png points to missing public asset /content-assets/missing.png');
+  expect(joined).toContain('bad-change references missing action-card missing-card');
+  expect(joined).toContain('bad-notice links missing action card missing-card');
+  expect(joined).toContain('bad-notice links missing changelog entry missing-change');
+});
+
+it('reports approved image metadata that points at a missing asset and handles malformed image URIs', async () => {
+  const errors = await validateContentGraph({
+    sources: [knownSource],
+    actionCards: [{ slug: 'malformed-image-ref', title: 'Malformed image ref', phase: 'under', roles: ['mannskap'], scenarios: ['generelt'], priority: 'medium', steps: ['![Malformed](broken%zz.png)'], sourceIds: ['src-known'] }],
+    checklists: [],
+    trainingPaths: [],
+    protectionMeasures: [],
+    glossary: [],
+    faq: [],
+    equipmentTaxonomy: [],
+    exportTemplates: [],
+    imageMetadata: [{ id: 'approved-missing', publicPath: '/content-assets/approved-missing.png', alt: 'Approved missing', sourceIds: ['src-known'], approvedForPublication: true, updatedAt: '2026-06-03' }],
+    localOverlays: [],
+    changelog: [],
+    mustRead: [],
+  } as any);
+  const joined = errors.join('\n');
+
+  expect(joined).toContain('approved-missing points to missing public asset /content-assets/approved-missing.png');
+  expect(joined).toContain('image reference broken-zz.png is missing approved publication metadata');
+});
+
+it('requires used equipment terms to exist in the curated equipment taxonomy artifact', async () => {
+  const errors = await validateContentGraph({
+    sources: [knownSource],
+    actionCards: [{ slug: 'needs-equipment-taxonomy', title: 'Needs equipment taxonomy', phase: 'under', roles: ['mannskap'], scenarios: ['generelt'], priority: 'medium', steps: ['Bruk samband'], sourceIds: ['src-known'], equipmentRequired: ['samband'] }],
+    checklists: [],
+    trainingPaths: [],
+    protectionMeasures: [],
+    glossary: [],
+    faq: [],
+    equipmentTaxonomy: [],
+    exportTemplates: [],
+    imageMetadata: [],
+    localOverlays: [],
+    changelog: [],
+    mustRead: [],
+  } as any);
+
+  expect(errors.join('\n')).toContain('needs-equipment-taxonomy equipmentRequired references equipment value missing from equipment taxonomy samband');
+});
+
+it('rejects equipment taxonomy records that are not approved for public use when public content references them', async () => {
+  const errors = await validateContentGraph({
+    sources: [knownSource],
+    actionCards: [{ slug: 'private-equipment', title: 'Private equipment', phase: 'under', roles: ['mannskap'], scenarios: ['generelt'], priority: 'medium', steps: ['Bruk samband'], sourceIds: ['src-known'], equipmentRequired: ['samband'] }],
+    checklists: [],
+    trainingPaths: [],
+    protectionMeasures: [],
+    glossary: [],
+    faq: [],
+    equipmentTaxonomy: [{ id: 'samband', label: 'Samband', category: 'samband', approvedForPublicUse: false, sourceIds: ['src-known'] }],
+    exportTemplates: [],
+    imageMetadata: [],
+    localOverlays: [],
+    changelog: [],
+    mustRead: [],
+  } as any);
+
+  expect(errors.join('\n')).toContain('private-equipment equipmentRequired references equipment value not approved for public use samband');
+});
+
+it('allows draft and retired FAQ entries to stay out of the public mirror and search index counts', async () => {
+  const approvedFaq = { id: 'approved-faq', question: 'Approved?', answer: 'Public answer.', category: 'Test', sourceIds: ['src-known'], updatedAt: '2026-06-03', status: 'approved' };
+  const searchIndex = { documents: [{ id: 'kilde:src-known', href: '/kilder/src-known' }, { id: 'faq:approved-faq', href: '/faq#approved-faq' }] };
+  const errors = await validateContentGraph({
+    sources: [knownSource],
+    actionCards: [],
+    checklists: [],
+    trainingPaths: [],
+    protectionMeasures: [],
+    glossary: [],
+    faq: [
+      approvedFaq,
+      { id: 'draft-faq', question: 'Draft?', answer: 'Not public.', category: 'Test', sourceIds: ['src-known'], updatedAt: '2026-06-03', status: 'draft' },
+      { id: 'retired-faq', question: 'Retired?', answer: 'Not public.', category: 'Test', sourceIds: ['src-known'], updatedAt: '2026-06-03', status: 'retired' },
+    ],
+    equipmentTaxonomy: [],
+    exportTemplates: [],
+    imageMetadata: [],
+    localOverlays: [],
+    changelog: [],
+    mustRead: [],
+    searchIndex,
+    publicGraph: {
+      sources: [knownSource],
+      actionCards: [],
+      checklists: [],
+      trainingPaths: [],
+      protectionMeasures: [],
+      glossary: [],
+      faq: [approvedFaq],
+      equipmentTaxonomy: [],
+      exportTemplates: [],
+      imageMetadata: [],
+      localOverlays: [],
+      changelog: [],
+      mustRead: [],
+      searchIndex,
+    },
+  } as any);
+
+  expect(errors).toEqual([]);
+});
+
+it('rejects draft or retired FAQ IDs in the generated search index', async () => {
+  const approvedFaq = { id: 'approved-faq', question: 'Approved?', answer: 'Public answer.', category: 'Test', sourceIds: ['src-known'], updatedAt: '2026-06-03', status: 'approved' };
+  const draftFaq = { id: 'draft-faq', question: 'Draft?', answer: 'Not public.', category: 'Test', sourceIds: ['src-known'], updatedAt: '2026-06-03', status: 'draft' };
+  const errors = await validateContentGraph({
+    sources: [knownSource],
+    actionCards: [],
+    checklists: [],
+    trainingPaths: [],
+    protectionMeasures: [],
+    glossary: [],
+    faq: [approvedFaq, draftFaq],
+    equipmentTaxonomy: [],
+    exportTemplates: [],
+    imageMetadata: [],
+    localOverlays: [],
+    changelog: [],
+    mustRead: [],
+    searchIndex: { documents: [{ id: 'kilde:src-known', href: '/kilder/src-known' }, { id: 'faq:draft-faq', href: '/faq#draft-faq' }] },
+  } as any);
+  const joined = errors.join('\n');
+
+  expect(joined).toContain('search index FAQ document ids missing faq:approved-faq');
+  expect(joined).toContain('search index FAQ document ids has unexpected faq:draft-faq');
+});
+
 it('reports generated artifact manifest, public mirror, and search-index mismatches', async () => {
   const errors = await validateContentGraph({
     sources: [knownSource],

@@ -1,0 +1,15 @@
+- id: oppdragslogg-markdown
+  title: Oppdragslogg Markdown
+  description: Lokal eksportmal for ikke-sensitive notater og statuslinjer fra oppdragstavlen.
+  format: markdown
+  audienceRoles: [lagforer, leder, beredskapsvakt]
+  sourceIds: [src-5-punktsordre]
+  updatedAt: 2026-06-03
+
+- id: sjekkliste-json
+  title: Sjekkliste JSON
+  description: Maskinlesbar lokal eksport av valgte sjekklister uten persondata eller pasientdata.
+  format: json
+  audienceRoles: [lagforer, materiellansvarlig]
+  sourceIds: [src-sjekkliste-fig-og-figp]
+  updatedAt: 2026-06-03

@@ -1,0 +1,80 @@
+- id: pumpeutlegg-image-1
+  publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image1.png
+  alt: Illustrasjon fra offentlig kildeutdrag om pumpeutlegg, bilde 1
+  caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+  approvedForPublication: true
+  usedByCardSlugs: [flom-pumpe-start]
+  updatedAt: 2026-06-03
+- id: pumpeutlegg-image-2
+  publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image2.png
+  alt: Illustrasjon fra offentlig kildeutdrag om pumpeutlegg, bilde 2
+  caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+  approvedForPublication: true
+  usedByCardSlugs: [flom-pumpe-start]
+  updatedAt: 2026-06-03
+- id: pumpeutlegg-image-3
+  publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image3.png
+  alt: Illustrasjon fra offentlig kildeutdrag om pumpeutlegg, bilde 3
+  caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+  approvedForPublication: true
+  usedByCardSlugs: [flom-pumpe-start]
+  updatedAt: 2026-06-03
+- id: pumpeutlegg-image-4
+  publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image4.png
+  alt: Illustrasjon fra offentlig kildeutdrag om pumpeutlegg, bilde 4
+  caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+  approvedForPublication: true
+  usedByCardSlugs: [flom-pumpe-start]
+  updatedAt: 2026-06-03
+- id: pumpeutlegg-image-5
+  publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image5.png
+  alt: Illustrasjon fra offentlig kildeutdrag om pumpeutlegg, bilde 5
+  caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+  approvedForPublication: true
+  usedByCardSlugs: [flom-pumpe-start]
+  updatedAt: 2026-06-03
+- id: pumpeutlegg-image-6
+  publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image6.png
+  alt: Illustrasjon fra offentlig kildeutdrag om pumpeutlegg, bilde 6
+  caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+  approvedForPublication: true
+  usedByCardSlugs: [flom-pumpe-start]
+  updatedAt: 2026-06-03
+- id: pumpeutlegg-image-7
+  publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image7.png
+  alt: Illustrasjon fra offentlig kildeutdrag om pumpeutlegg, bilde 7
+  caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+  approvedForPublication: true
+  usedByCardSlugs: [flom-pumpe-start]
+  updatedAt: 2026-06-03
+- id: sambandsdiagram-image-1
+  publicPath: /content-assets/docx_2.6-Kommunikasjons-og-sambandsdiagram__image1.png
+  alt: Illustrasjon fra offentlig kildeutdrag om kommunikasjons- og sambandsdiagram
+  caption: Sambandsdiagram, illustrasjon fra kildeutdrag.
+  sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+  approvedForPublication: true
+  usedByCardSlugs: [sambandsplan-start]
+  updatedAt: 2026-06-03
+- id: beredskapsvakt-image-2
+  publicPath: /content-assets/docx_7.7-Opplringsplan-for-beredskapsvakt-ved-sivilforsvarsdistriktene__image2.png
+  alt: Illustrasjon fra offentlig kildeutdrag om opplæringsplan for beredskapsvakt, bilde 2
+  caption: Beredskapsvakt opplæring, illustrasjon fra kildeutdrag.
+  sourceIds: [src-opplaeringsplan-for-beredskapsvakt]
+  approvedForPublication: true
+  usedByCardSlugs: []
+  updatedAt: 2026-06-03
+- id: beredskapsvakt-image-3
+  publicPath: /content-assets/docx_7.7-Opplringsplan-for-beredskapsvakt-ved-sivilforsvarsdistriktene__image3.png
+  alt: Illustrasjon fra offentlig kildeutdrag om opplæringsplan for beredskapsvakt, bilde 3
+  caption: Beredskapsvakt opplæring, illustrasjon fra kildeutdrag.
+  sourceIds: [src-opplaeringsplan-for-beredskapsvakt]
+  approvedForPublication: true
+  usedByCardSlugs: []
+  updatedAt: 2026-06-03

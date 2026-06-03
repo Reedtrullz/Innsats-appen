@@ -21,9 +21,9 @@ function LinkedCardList({ path, cardsBySlug }: { path: TrainingPath; cardsBySlug
           {linkedCards.map((card) => (
             <li key={card.slug} className="rounded-2xl border border-slate-200 p-3">
               <Link className="font-black text-sky-800" href={`/kort/${card.slug}`}>{card.title}</Link>
-              {card.competenceRequired.length > 0 ? (
+              {(card.competenceRequired ?? []).length > 0 ? (
                 <div className="mt-2 flex flex-wrap gap-2 text-xs font-bold text-slate-700">
-                  {card.competenceRequired.map((competence) => <span key={competence} className="rounded-full bg-slate-100 px-2.5 py-1">{competence}</span>)}
+                  {(card.competenceRequired ?? []).map((competence) => <span key={competence} className="rounded-full bg-slate-100 px-2.5 py-1">{competence}</span>)}
                 </div>
               ) : null}
             </li>

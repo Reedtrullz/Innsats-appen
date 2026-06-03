@@ -20,3 +20,12 @@ it('keeps a visible decision-support and local-only disclaimer in the persistent
   expect(screen.getByRole('link', { name: /kjente begrensninger/i })).toHaveAttribute('href', '/kjente-begrensninger');
   expect(screen.getByRole('link', { name: /data på enheten/i })).toHaveAttribute('href', '/data-pa-enheten');
 });
+
+it('shows generated content version and expanded content navigation', () => {
+  render(<AppShell currentPath="/hurtigkort"><p>Innhold</p></AppShell>);
+
+  expect(screen.getByTestId('shell-content-version')).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /FAQ/i })).toHaveAttribute('href', '/faq');
+  expect(screen.getByRole('link', { name: /Endringer/i })).toHaveAttribute('href', '/endringer');
+  expect(screen.getByRole('link', { name: /Må leses/i })).toHaveAttribute('href', '/ma-leses');
+});

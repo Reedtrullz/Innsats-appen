@@ -4,14 +4,28 @@ import yaml from 'js-yaml';
 import { fileURLToPath } from 'node:url';
 import {
   ActionCardSchema,
+  ContentChangelogEntrySchema,
   ContentManifestSchema,
+  EquipmentTaxonomyRecordSchema,
+  ExportTemplateMetadataSchema,
+  FAQEntrySchema,
   GlossaryTermSchema,
+  ImageMetadataSchema,
+  LocalOverlayDeclarationSchema,
+  MustReadNoticeSchema,
   OperationalChecklistSchema,
   ProtectionMeasureSchema,
   TrainingPathSchema,
   type ActionCard,
+  type ContentChangelogEntry,
   type ContentManifest,
+  type EquipmentTaxonomyRecord,
+  type ExportTemplateMetadata,
+  type FAQEntry,
   type GlossaryTerm,
+  type ImageMetadata,
+  type LocalOverlayDeclaration,
+  type MustReadNotice,
   type OperationalChecklist,
   type ProtectionMeasure,
   type TrainingPath,
@@ -29,6 +43,13 @@ export interface CompileResult {
   trainingPaths: TrainingPath[];
   protectionMeasures: ProtectionMeasure[];
   glossary: GlossaryTerm[];
+  faq: FAQEntry[];
+  equipmentTaxonomy: EquipmentTaxonomyRecord[];
+  exportTemplates: ExportTemplateMetadata[];
+  imageMetadata: ImageMetadata[];
+  localOverlays: LocalOverlayDeclaration[];
+  changelog: ContentChangelogEntry[];
+  mustRead: MustReadNotice[];
   manifest: ContentManifest;
 }
 
@@ -63,10 +84,22 @@ async function readManifest(generatedDir: string): Promise<ContentManifest> {
       trainingPathCount: 0,
       protectionMeasureCount: 0,
       glossaryCount: 0,
+      faqCount: 0,
+      equipmentTaxonomyCount: 0,
+      exportTemplateCount: 0,
+      imageMetadataCount: 0,
+      localOverlayCount: 0,
+      changelogCount: 0,
+      mustReadCount: 0,
       workplanCount: 0,
       copiedAssetCount: 0,
     };
   }
+}
+
+async function writeMirroredJson(generatedDir: string, publicGeneratedDir: string, fileName: string, value: unknown) {
+  await writeJson(path.join(generatedDir, fileName), value);
+  await writeJson(path.join(publicGeneratedDir, fileName), value);
 }
 
 export async function compileCuratedContent(options: CompileOptions = {}): Promise<CompileResult> {
@@ -79,17 +112,28 @@ export async function compileCuratedContent(options: CompileOptions = {}): Promi
   const trainingPaths = await readYamlArray(path.join(curatedDir, 'training-paths.yaml'), 'training paths', (v) => TrainingPathSchema.parse(v));
   const protectionMeasures = await readYamlArray(path.join(curatedDir, 'protection-measures.yaml'), 'protection measures', (v) => ProtectionMeasureSchema.parse(v));
   const glossary = await readYamlArray(path.join(curatedDir, 'glossary.yaml'), 'glossary', (v) => GlossaryTermSchema.parse(v));
+  const faq = await readYamlArray(path.join(curatedDir, 'faq.yaml'), 'FAQ', (v) => FAQEntrySchema.parse(v));
+  const publicFaq = faq.filter((entry) => entry.status === 'approved');
+  const equipmentTaxonomy = await readYamlArray(path.join(curatedDir, 'equipment-taxonomy.yaml'), 'equipment taxonomy', (v) => EquipmentTaxonomyRecordSchema.parse(v));
+  const exportTemplates = await readYamlArray(path.join(curatedDir, 'export-templates.yaml'), 'export templates', (v) => ExportTemplateMetadataSchema.parse(v));
+  const imageMetadata = await readYamlArray(path.join(curatedDir, 'image-metadata.yaml'), 'image metadata', (v) => ImageMetadataSchema.parse(v));
+  const localOverlays = await readYamlArray(path.join(curatedDir, 'local-overlays.yaml'), 'local overlays', (v) => LocalOverlayDeclarationSchema.parse(v));
+  const changelog = await readYamlArray(path.join(curatedDir, 'changelog.yaml'), 'content changelog', (v) => ContentChangelogEntrySchema.parse(v));
+  const mustRead = await readYamlArray(path.join(curatedDir, 'must-read.yaml'), 'must-read notices', (v) => MustReadNoticeSchema.parse(v));
 
-  await writeJson(path.join(generatedDir, 'action-cards.json'), actionCards);
-  await writeJson(path.join(generatedDir, 'checklists.json'), checklists);
-  await writeJson(path.join(generatedDir, 'training-paths.json'), trainingPaths);
-  await writeJson(path.join(generatedDir, 'protection-measures.json'), protectionMeasures);
-  await writeJson(path.join(generatedDir, 'glossary.json'), glossary);
-  await writeJson(path.join(publicGeneratedDir, 'action-cards.json'), actionCards);
-  await writeJson(path.join(publicGeneratedDir, 'checklists.json'), checklists);
-  await writeJson(path.join(publicGeneratedDir, 'training-paths.json'), trainingPaths);
-  await writeJson(path.join(publicGeneratedDir, 'protection-measures.json'), protectionMeasures);
-  await writeJson(path.join(publicGeneratedDir, 'glossary.json'), glossary);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'action-cards.json', actionCards);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'checklists.json', checklists);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'training-paths.json', trainingPaths);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'protection-measures.json', protectionMeasures);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'glossary.json', glossary);
+  await writeJson(path.join(generatedDir, 'faq.json'), faq);
+  await writeJson(path.join(publicGeneratedDir, 'faq.json'), publicFaq);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'equipment-taxonomy.json', equipmentTaxonomy);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'export-templates.json', exportTemplates);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'image-metadata.json', imageMetadata);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'local-overlays.json', localOverlays);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'changelog.json', changelog);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'must-read.json', mustRead);
 
   const previous = await readManifest(generatedDir);
   const now = new Date().toISOString();
@@ -102,10 +146,17 @@ export async function compileCuratedContent(options: CompileOptions = {}): Promi
     trainingPathCount: trainingPaths.length,
     protectionMeasureCount: protectionMeasures.length,
     glossaryCount: glossary.length,
+    faqCount: publicFaq.length,
+    equipmentTaxonomyCount: equipmentTaxonomy.length,
+    exportTemplateCount: exportTemplates.length,
+    imageMetadataCount: imageMetadata.length,
+    localOverlayCount: localOverlays.length,
+    changelogCount: changelog.length,
+    mustReadCount: mustRead.length,
   };
   await writeJson(path.join(generatedDir, 'manifest.json'), manifest);
   await writeJson(path.join(publicGeneratedDir, 'manifest.json'), manifest);
-  return { actionCards, checklists, trainingPaths, protectionMeasures, glossary, manifest };
+  return { actionCards, checklists, trainingPaths, protectionMeasures, glossary, faq, equipmentTaxonomy, exportTemplates, imageMetadata, localOverlays, changelog, mustRead, manifest };
 }
 
 async function main() {

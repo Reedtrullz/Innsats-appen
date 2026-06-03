@@ -7,6 +7,9 @@ const STATIC_APP_SHELL = [
   '/etter',
   '/kilder',
   '/kildegjennomgang',
+  '/faq',
+  '/endringer',
+  '/ma-leses',
   '/oppdrag',
   '/oppdrag/ny',
   '/laering',
@@ -21,6 +24,13 @@ const STATIC_APP_SHELL = [
   '/generated-content/training-paths.json',
   '/generated-content/protection-measures.json',
   '/generated-content/glossary.json',
+  '/generated-content/faq.json',
+  '/generated-content/equipment-taxonomy.json',
+  '/generated-content/export-templates.json',
+  '/generated-content/image-metadata.json',
+  '/generated-content/local-overlays.json',
+  '/generated-content/changelog.json',
+  '/generated-content/must-read.json',
   '/generated-content/source-documents.json',
   '/generated-content/search-index.json',
   '/generated-content/workplans.json',
@@ -49,13 +59,15 @@ async function fetchGeneratedJson(cache, url) {
 }
 
 async function discoverGeneratedRoutes(cache) {
-  const [cards, sources] = await Promise.all([
+  const [cards, sources, images] = await Promise.all([
     fetchGeneratedJson(cache, '/generated-content/action-cards.json'),
     fetchGeneratedJson(cache, '/generated-content/source-documents.json'),
+    fetchGeneratedJson(cache, '/generated-content/image-metadata.json'),
   ]);
   return [
     ...cards.map((card) => card && card.slug ? `/kort/${encodeURIComponent(card.slug)}` : null),
     ...sources.map((source) => source && source.id ? `/kilder/${encodeURIComponent(source.id)}` : null),
+    ...images.map((image) => image && image.publicPath && image.approvedForPublication === true ? image.publicPath : null),
   ].filter(Boolean);
 }
 

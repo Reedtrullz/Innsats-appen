@@ -1,0 +1,41 @@
+- id: beslutningsstotte-og-ordre
+  question: Er Beredskapsboka en offisiell ordre eller et kommando-/kontrollsystem?
+  answer: Nei. Innholdet er beslutningsstøtte for offentlig, ikke-sensitiv bruk. Gjeldende ordre, lokal plan og fagmyndighet går alltid foran.
+  category: Bruk og ansvar
+  aliases: [ordre, kommando, beslutningsstøtte]
+  roles: [mannskap, lagforer, leder, beredskapsvakt]
+  scenarios: [generelt]
+  competenceCodes: [FIG10]
+  equipmentTerms: [samband]
+  sourceIds: [src-5-punktsordre, src-operativt-konsept-for-sivilforsvaret]
+  updatedAt: 2026-06-03
+  status: approved
+  mustRead: true
+
+- id: private-tilfluktsromdata
+  question: Kan jeg legge inn eller publisere private/skjermede tilfluktsromdata?
+  answer: Nei. MVP-en skal bare vise offentlig eller eksplisitt godkjent informasjon. Private, skjermede eller graderte lokasjonslister skal ikke inn i appen.
+  category: Data og personvern
+  aliases: [tilfluktsromliste, skjermet lokasjon, private data]
+  roles: [leder, beredskapsvakt, stab-logistikk]
+  scenarios: [tilfluktsrom]
+  competenceCodes: []
+  equipmentTerms: [ventilasjon, nodstrom, vann, sanitaer, belysning]
+  sourceIds: [src-deep-research-tilfluktsrom]
+  updatedAt: 2026-06-03
+  status: approved
+  mustRead: true
+
+- id: radiac-jodtabletter
+  question: Når skal jodtabletter brukes?
+  answer: Følg bare offisielle råd fra myndighetene. Beredskapsboka kan peke til kildebelagt beslutningsstøtte, men gir ikke medisinske råd.
+  category: RADIAC
+  aliases: [jod, atomberedskap, medisinske råd]
+  roles: [leder, rad, beredskapsvakt]
+  scenarios: [radiac-nedfall]
+  competenceCodes: [RAD10]
+  equipmentTerms: [dosimeter, maleinstrument]
+  sourceIds: [src-jodtabletter-i-sivilforsvaret]
+  updatedAt: 2026-06-03
+  status: approved
+  mustRead: false

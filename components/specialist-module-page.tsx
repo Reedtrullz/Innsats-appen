@@ -43,7 +43,7 @@ export function SpecialistModuleContent({ cards, config }: { cards: ActionCard[]
   const moduleCards = filterActionCards(cards, { scenario: config.scenario });
   const warnings = unique(moduleCards.flatMap((card) => card.warning ? [card.warning] : []));
   const sourceIds = unique(moduleCards.flatMap((card) => card.sourceIds));
-  const competence = unique(moduleCards.flatMap((card) => card.competenceRequired));
+  const competence = unique(moduleCards.flatMap((card) => card.competenceRequired ?? []));
 
   return (
     <div className="space-y-5">

@@ -17,10 +17,10 @@ export function exportMissionMarkdown({ mission, checklists, runs }: { mission: 
     const run = runs.find((item) => item.templateSlug === checklist.slug);
     lines.push('');
     lines.push(`## ${checklist.title}`);
-    lines.push(`Kilder: ${checklist.sourceIds.join(', ')}`);
+    lines.push(`Kilder: ${(checklist.sourceIds ?? []).join(', ')}`);
     for (const item of checklist.items) {
       const checked = run?.checkedItemIds.includes(item.id) ? 'x' : ' ';
-      lines.push(`- [${checked}] ${item.label} (${item.sourceIds.join(', ')})`);
+      lines.push(`- [${checked}] ${item.label} (${(item.sourceIds ?? []).join(', ')})`);
     }
   }
   return `${lines.join('\n')}\n`;

@@ -1,5 +1,6 @@
 - term: jod
   definition: Jodtabletter brukes bare etter råd fra myndighetene ved atomberedskap.
+  aliases: [kaliumjodid]
   synonyms: [jodtabletter, atomberedskap]
   sourceIds: [src-jodtabletter-i-sivilforsvaret]
 - term: dose

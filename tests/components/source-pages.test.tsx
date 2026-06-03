@@ -20,7 +20,7 @@ const source = {
 } as SourceDocument;
 
 it('shows source document metadata before body', () => {
-  render(<SourceDocumentView source={source} />);
+  render(<SourceDocumentView source={source} linkedCards={[{ slug: 'fem-punktsordre', title: '5-punktsordre', phase: 'under', priority: 'high' }]} />);
   expect(screen.getByRole('heading', { name: /SRC - 5-punktsordre/i })).toBeInTheDocument();
   expect(screen.getByText(/unverified/i)).toBeInTheDocument();
   expect(screen.getByText(/Verifisert:\s*2026-06-03/i)).toBeInTheDocument();
@@ -31,11 +31,13 @@ it('shows source document metadata before body', () => {
   expect(screen.getByText(/Kontrolleres hvert kvartal/i)).toBeInTheDocument();
   expect(screen.getByText(/Kontroller mot planverk/i)).toBeInTheDocument();
   expect(screen.getByText(/Kildereferanse:\s*source-extracts\/SRC - 5-punktsordre\.md/)).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /5-punktsordre/i })).toHaveAttribute('href', '/kort/fem-punktsordre');
+  expect(screen.getByText(/ikke fullstendig offisielt dokument/i)).toBeInTheDocument();
 });
 
 it('shows source freshness badges on linked source chips', () => {
-  render(<SourceBadge source={source} now={new Date('2026-10-01T00:00:00.000Z')} />);
+  render(<SourceBadge source={source} now={new Date('2026-10-01T00:00:00.000Z')} withAnchor />);
 
-  expect(screen.getByRole('link', { name: /SRC - 5-punktsordre/i })).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /SRC - 5-punktsordre/i })).toHaveAttribute('href', '/kilder/src-5-punktsordre#excerpt');
   expect(screen.getByText(/Gjennomgang forfalt/i)).toBeInTheDocument();
 });

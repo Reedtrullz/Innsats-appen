@@ -8,7 +8,7 @@ export function ChecklistRunner({ checklist, missionId }: { checklist: Operation
   const runId = `${missionId}:${checklist.slug}`;
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [notesByItemId] = useState<Record<string, string>>({});
-  const sourceIds = useMemo(() => [...new Set([...checklist.sourceIds, ...checklist.items.flatMap((item) => item.sourceIds)])], [checklist]);
+  const sourceIds = useMemo(() => [...new Set([...(checklist.sourceIds ?? []), ...checklist.items.flatMap((item) => item.sourceIds ?? [])])], [checklist]);
   const requiredItems = useMemo(() => checklist.items.filter((item) => item.required), [checklist]);
   const requiredDone = requiredItems.filter((item) => checked.has(item.id)).length;
   const progress = checklist.items.length > 0 ? Math.round((checked.size / checklist.items.length) * 100) : 0;
@@ -59,7 +59,7 @@ export function ChecklistRunner({ checklist, missionId }: { checklist: Operation
                 {item.required ? <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-950">Påkrevd</span> : null}
               </span>
             </label>
-            <p className="mt-1 text-xs text-slate-500">Kilder: {item.sourceIds.join(', ')}</p>
+            <p className="mt-1 text-xs text-slate-500">Kilder: {(item.sourceIds ?? []).join(', ')}</p>
           </li>
         ))}
       </ul>

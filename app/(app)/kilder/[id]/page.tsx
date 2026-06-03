@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { SourceDocumentView } from '@/components/source-badge';
-import { getSourceDocuments } from '@/lib/content/load-content';
+import { getActionCards, getSourceDocuments } from '@/lib/content/load-content';
+import { linkedCardsForSource } from '@/lib/content/source-navigation';
 
 export const revalidate = 3600;
 
@@ -12,5 +13,5 @@ export default async function SourcePage({ params }: { params: Promise<{ id: str
   const { id } = await params;
   const source = getSourceDocuments().find((item) => item.id === id);
   if (!source) notFound();
-  return <SourceDocumentView source={source} />;
+  return <SourceDocumentView source={source} linkedCards={linkedCardsForSource(source, getActionCards())} />;
 }
