@@ -22,9 +22,9 @@ function cardText(card: ActionCard) {
     card.title,
     card.slug,
     ...card.steps,
-    ...card.safety,
-    ...card.reporting,
-    ...card.competenceRequired,
+    ...(card.safety ?? []),
+    ...(card.reporting ?? []),
+    ...(card.competenceRequired ?? []),
     ...(card.warning ? [card.warning] : []),
   ]);
 }

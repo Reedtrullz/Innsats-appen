@@ -72,30 +72,90 @@ it('clears stale 5-punktsordre export preview when order text changes', async ()
   expect(screen.queryByText(/Situasjon første/i)).not.toBeInTheDocument();
 });
 
-it('requires samband fields and renders exported markdown', async () => {
-  render(<CommsPlanForm />);
+it('requires expanded sambandsplan fields and renders Markdown/JSON/PDF-ready previews', async () => {
+  render(<CommsPlanForm contentVersion="test-content-ui-comms" />);
   expect(screen.getByText(/lagres bare lokalt/i)).toBeInTheDocument();
-  expect(screen.getByText(/ikke legg inn persondata/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/ikke legg inn persondata/i).length).toBeGreaterThan(0);
   expect(screen.getByText(/eksporterte filer kan inneholde operasjonelt sensitiv informasjon/i)).toBeInTheDocument();
-  const channel = screen.getByLabelText(/Kanal\/talegruppe/i);
+  expect(screen.getAllByText(/PDF-klar HTML/i).length).toBeGreaterThan(0);
+
+  const templateSelect = screen.getByLabelText(/rolle\/mal for sambandsplan/i);
+  expect(templateSelect).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: /lagleder\/lagfører/i })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: /fig-leder/i })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: /mfe/i })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: /lia\/liaison/i })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: /beredskapsvakt/i })).toBeInTheDocument();
+  await userEvent.selectOptions(templateSelect, 'beredskapsvakt');
+  expect(screen.getByRole('heading', { name: /malveiledning: beredskapsvakt/i })).toBeInTheDocument();
+
+  const channel = screen.getByLabelText(/Primær kanal\/talegruppe/i);
+  const fallback = screen.getByLabelText(/Fallback kanal\/kontaktmetode/i);
   const callsign = screen.getByLabelText(/Kallesignal/i);
-  const phone = screen.getByLabelText(/Telefon\/ISSI/i);
+  const ilKoContact = screen.getByLabelText(/IL-KO kontakt/i);
+  const districtContact = screen.getByLabelText(/Distrikt\/beredskapsvakt kontakt/i);
+  const checkInInterval = screen.getByLabelText(/Innsjekkingsintervall/i);
+  const lostCommsProcedure = screen.getByLabelText(/Prosedyre ved bortfall av samband/i);
+  const batteryStatus = screen.getByLabelText(/Batteri-\/ladestatus/i);
   expect(channel).toBeRequired();
+  expect(fallback).toBeRequired();
   expect(callsign).toBeRequired();
-  await userEvent.type(channel, 'Talegruppe Innsats-1');
+  expect(ilKoContact).toBeRequired();
+  expect(districtContact).toBeRequired();
+  expect(checkInInterval).toBeRequired();
+  expect(lostCommsProcedure).toBeRequired();
+  expect(batteryStatus).toBeRequired();
+  await userEvent.type(channel, 'Talegruppe etter lokal plan');
+  await userEvent.type(fallback, 'Fallback kontaktmetode etter lokal plan');
   await userEvent.type(callsign, 'FIG Trondheim 01');
-  await userEvent.type(phone, 'ISSI etter lokal plan');
+  await userEvent.type(ilKoContact, 'IL-KO kontaktpunkt');
+  await userEvent.type(districtContact, 'Beredskapsvakt kontaktpunkt');
+  await userEvent.type(checkInInterval, 'Hver 30. minutt');
+  await userEvent.type(lostCommsProcedure, 'Bruk fallback, returner til møtepunkt');
+  await userEvent.type(batteryStatus, 'Fulladet og reservebatteri klart');
   await userEvent.type(screen.getByLabelText(/Notes/i), 'Fallback avtales lokalt');
-  await userEvent.click(screen.getByRole('button', { name: /Eksporter sambandsplan/i }));
+
+  const markdownButton = screen.getByRole('button', { name: /Eksporter Markdown/i });
+  const jsonButton = screen.getByRole('button', { name: /Eksporter JSON/i });
+  const pdfButton = screen.getByRole('button', { name: /Lag PDF-klar HTML/i });
+  await userEvent.click(markdownButton);
   expect(screen.getByText(/# Sambandsplan/i)).toBeInTheDocument();
-  expect(screen.getByText(/Talegruppe Innsats-1/i)).toBeInTheDocument();
+  expect(screen.getByText(/Talegruppe etter lokal plan/i)).toBeInTheDocument();
+  expect(screen.getByText(/Innholdsversjon: test-content-ui-comms/i)).toBeInTheDocument();
   expect(screen.getByText(/src-kommunikasjons-og-sambandsdiagram/i)).toBeInTheDocument();
   expect(screen.getAllByText(/operasjonelt sensitiv informasjon/i).length).toBeGreaterThan(0);
+  await userEvent.click(jsonButton);
+  expect(screen.getByText(/"schemaVersion": "sambandsplan.v1"/i)).toBeInTheDocument();
+  await userEvent.click(pdfButton);
+  expect(screen.getAllByText(/PDF-klar HTML/i).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/Skriv ut.*Lagre som PDF/i).length).toBeGreaterThan(0);
+});
+
+it('clears stale sambandsplan export preview when fields change', async () => {
+  render(<CommsPlanForm contentVersion="test-content-ui-comms" />);
+  await userEvent.type(screen.getByLabelText(/Primær kanal\/talegruppe/i), 'Primær første');
+  await userEvent.type(screen.getByLabelText(/Fallback kanal\/kontaktmetode/i), 'Fallback første');
+  await userEvent.type(screen.getByLabelText(/Kallesignal/i), 'Kallesignal første');
+  await userEvent.type(screen.getByLabelText(/IL-KO kontakt/i), 'IL første');
+  await userEvent.type(screen.getByLabelText(/Distrikt\/beredskapsvakt kontakt/i), 'Distrikt første');
+  await userEvent.type(screen.getByLabelText(/Innsjekkingsintervall/i), '30 min');
+  await userEvent.type(screen.getByLabelText(/Prosedyre ved bortfall av samband/i), 'Fallback først');
+  await userEvent.type(screen.getByLabelText(/Batteri-\/ladestatus/i), 'Fulladet');
+  await userEvent.click(screen.getByRole('button', { name: /Eksporter Markdown/i }));
+
+  expect(screen.getByText(/# Sambandsplan/i)).toBeInTheDocument();
+  expect(screen.getByText(/Primær første/i)).toBeInTheDocument();
+
+  await userEvent.type(screen.getByLabelText(/Primær kanal\/talegruppe/i), ' oppdatert');
+
+  expect(screen.queryByText(/# Sambandsplan/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/Primær første/i)).not.toBeInTheDocument();
 });
 
 it('mounts order and comms forms in the mission route', () => {
   render(<MissionsPage />);
   expect(screen.getByRole('heading', { name: /Ordre og samband/i })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /Eksporter Markdown/i })).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: /Eksporter sambandsplan/i })).toBeInTheDocument();
+  expect(screen.getAllByRole('button', { name: /Eksporter Markdown/i }).length).toBeGreaterThanOrEqual(2);
+  expect(screen.getByLabelText(/rolle\/mal for sambandsplan/i)).toBeInTheDocument();
+  expect(screen.getAllByRole('button', { name: /Eksporter JSON/i }).length).toBeGreaterThanOrEqual(2);
 });

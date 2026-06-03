@@ -290,6 +290,48 @@
   sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats, src-psykososial-oppfolging-og-kollegastotte]
   warning: Etter innsats-støtte er ikke personjournal. Ikke legg inn navn, ID, persondata, pasientdata eller helsedata.
 
+- slug: sambandsjekk
+  title: Sambandsjekk
+  phase: for
+  roles: [mannskap, lagforer, leder, mfe, beredskapsvakt]
+  scenarios: [generelt]
+  equipmentRequired: [samband]
+  items:
+    - id: primaer-kanal-talegruppe-kontrollert
+      label: Primær kanal/talegruppe er kontrollert mot lokal sambandsplan og gjeldende ordre
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+    - id: fallback-kanal-kontaktmetode-kontrollert
+      label: Fallback kanal eller kontaktmetode er avklart uten å skrive inn sensitive sambandstabeller
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+    - id: kallesignal-avklart
+      label: Kallesignal/rollebetegnelse er avklart for relevant funksjon eller lag
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+    - id: il-ko-kontakt-avklart
+      label: Kontaktpunkt mot IL-KO/innsatsledelse er avklart etter lokal ordre
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+    - id: distrikt-beredskapsvakt-kontakt-avklart
+      label: Kontaktvei til distrikt/beredskapsvakt er avklart etter lokal vaktordning
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+    - id: innsjekkingsintervall-avklart
+      label: Innsjekkingsintervall og hendelsesstyrt rapportering er avklart
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+    - id: lost-comms-prosedyre-avklart
+      label: Prosedyre ved bortfall av samband er avklart, inkludert fallback og møtested/eskalering
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+    - id: batteri-lading-kontrollert
+      label: Batteri-/ladestatus, reservebatterier og lademulighet er kontrollert
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+  sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+  warning: Lokal sambandsjekk for nettleser/offline bruk. Ingen sensitive sambandstabeller, abonnentlister, ISSI-lister eller persondata skal lagres i appen.
+
 - slug: radiac-utstyrskontroll
   title: RADIAC utstyrskontroll
   phase: for

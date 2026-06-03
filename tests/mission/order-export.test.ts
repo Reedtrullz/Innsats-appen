@@ -1,6 +1,9 @@
 import {
+  COMMS_PLAN_ROLE_TEMPLATES,
   FIVE_POINT_ORDER_ROLE_TEMPLATES,
+  exportCommsPlanJson,
   exportCommsPlanMarkdown,
+  exportCommsPlanPdfReadyHtml,
   exportFivePointOrderJson,
   exportFivePointOrderMarkdown,
   exportFivePointOrderPdfReadyHtml,
@@ -119,19 +122,119 @@ it('refuses 5-punktsordre exports when readback is missing or false', () => {
   }
 });
 
-it('exports a samband plan with local-only fields and source references', () => {
+it('defines generic role templates for sambandsplan without sensitive Nødnett details', () => {
+  expect(COMMS_PLAN_ROLE_TEMPLATES.map((template) => template.id)).toEqual([
+    'lagleder-lagforer',
+    'fig-leder',
+    'mfe',
+    'lia-liaison',
+    'beredskapsvakt',
+  ]);
+  expect(COMMS_PLAN_ROLE_TEMPLATES.map((template) => template.label)).toEqual([
+    'Lagleder/lagfører',
+    'FIG-leder',
+    'MFE',
+    'LIA/liaison',
+    'Beredskapsvakt',
+  ]);
+  for (const template of COMMS_PLAN_ROLE_TEMPLATES) {
+    expect(template.sourceIds).toEqual(['src-kommunikasjons-og-sambandsdiagram']);
+    expect(template.guidance.primaryChannel).toMatch(/lokal|plan|avklar/i);
+    expect(JSON.stringify(template)).not.toMatch(/hemmelig|gradert|subscriber|abonnentliste|issi/i);
+  }
+});
+
+it('exports a samband plan with expanded local-only fields, warnings and metadata', () => {
   const markdown = exportCommsPlanMarkdown({
-    kanalTalegruppe: 'Talegruppe Innsats-1',
+    templateId: 'lagleder-lagforer',
+    primaryChannel: 'Talegruppe etter lokal plan',
+    fallbackChannel: 'Avtalt telefonvakt/radio reserve etter lokal plan',
     kallesignal: 'FIG Trondheim 01',
-    telefonIssi: 'ISSI etter lokal plan',
-    notes: 'Fallback avtales lokalt',
+    ilKoContact: 'IL-KO kontaktpunkt fra ordre',
+    districtContact: 'Distrikt/beredskapsvakt via lokal vaktordning',
+    checkInInterval: 'Hver 30. minutt eller ved endring',
+    lostCommsProcedure: 'Stans, forsøk fallback, returner til avtalt møtepunkt',
+    batteryStatus: 'Fulladet radio, reservebatteri og lader kontrollert',
+    notes: 'Ingen abonnentlister i eksporten',
+    generatedAt: '2026-06-03T16:00:00.000Z',
+    contentVersion: 'test-content-comms',
   });
-  expect(markdown).toContain('Kanal/talegruppe');
+  expect(markdown).toContain('Primær kanal/talegruppe');
+  expect(markdown).toContain('Fallback kanal/kontaktmetode');
   expect(markdown).toContain('Kallesignal');
-  expect(markdown).toContain('Telefon/ISSI');
-  expect(markdown).toContain('Talegruppe Innsats-1');
+  expect(markdown).toContain('IL-KO kontakt');
+  expect(markdown).toContain('Distrikt/beredskapsvakt kontakt');
+  expect(markdown).toContain('Innsjekkingsintervall');
+  expect(markdown).toContain('Prosedyre ved bortfall av samband');
+  expect(markdown).toContain('Batteri-/ladestatus');
+  expect(markdown).toContain('Talegruppe etter lokal plan');
+  expect(markdown).toContain('Stans, forsøk fallback');
+  expect(markdown).toContain('Mal: Lagleder/lagfører');
+  expect(markdown).toContain('Skjemaversjon: sambandsplan.v1');
+  expect(markdown).toContain('Innholdsversjon: test-content-comms');
+  expect(markdown).toContain('Generert: 2026-06-03T16:00:00.000Z');
   expect(markdown).toContain('src-kommunikasjons-og-sambandsdiagram');
   expect(markdown).toContain('Kontroller mot lokal sambandsplan');
   expect(markdown).toContain('Eksporterte filer kan inneholde operasjonelt sensitiv informasjon');
   expect(markdown).toContain('Lagres bare lokalt');
+  expect(markdown).toMatch(/ikke legg inn sensitive sambandstabeller, abonnentlister, ISSI-lister eller persondata/i);
+  expect(markdown).not.toMatch(/hemmelig|gradert|subscriber list/i);
+});
+
+it('exports stable sambandsplan JSON with metadata and fields', () => {
+  const json = exportCommsPlanJson({
+    templateId: 'fig-leder',
+    primaryChannel: 'Primær etter lokal plan',
+    fallbackChannel: 'Fallback kontaktmetode etter lokal plan',
+    kallesignal: 'FIG Leder',
+    ilKoContact: 'IL-KO kontaktpunkt',
+    districtContact: 'Beredskapsvakt kontaktpunkt',
+    checkInInterval: '15 min',
+    lostCommsProcedure: 'Bruk fallback og meld når reetablert',
+    batteryStatus: 'Reservebatterier medfølger',
+    generatedAt: '2026-06-03T17:00:00.000Z',
+    contentVersion: 'test-content-comms-json',
+  });
+  const parsed = JSON.parse(json);
+  expect(parsed.template).toMatchObject({ id: 'fig-leder', label: 'FIG-leder' });
+  expect(parsed.metadata).toEqual({
+    schemaVersion: 'sambandsplan.v1',
+    contentVersion: 'test-content-comms-json',
+    generatedAt: '2026-06-03T17:00:00.000Z',
+    sourceIds: ['src-kommunikasjons-og-sambandsdiagram'],
+  });
+  expect(parsed.fields).toMatchObject({
+    primaryChannel: 'Primær etter lokal plan',
+    fallbackChannel: 'Fallback kontaktmetode etter lokal plan',
+    kallesignal: 'FIG Leder',
+    ilKoContact: 'IL-KO kontaktpunkt',
+    districtContact: 'Beredskapsvakt kontaktpunkt',
+    checkInInterval: '15 min',
+    lostCommsProcedure: 'Bruk fallback og meld når reetablert',
+    batteryStatus: 'Reservebatterier medfølger',
+  });
+  expect(parsed.localOnly).toBe(true);
+  expect(JSON.stringify(parsed)).not.toMatch(/subscriber|hemmelig|gradert/i);
+});
+
+it('exports PDF-ready sambandsplan HTML that escapes text and labels browser print-to-PDF', () => {
+  const html = exportCommsPlanPdfReadyHtml({
+    templateId: 'lia-liaison',
+    primaryChannel: '<script>alert("x")</script> & lokal kanal',
+    fallbackChannel: 'Fallback <b>kontakt</b>',
+    kallesignal: 'LIA 01',
+    ilKoContact: 'IL-KO',
+    districtContact: 'Distrikt',
+    checkInInterval: '30 min',
+    lostCommsProcedure: 'Meld via fallback',
+    batteryStatus: 'Fulladet',
+    generatedAt: '2026-06-03T18:00:00.000Z',
+  });
+  expect(html).toContain('PDF-klar HTML');
+  expect(html).toContain('Skriv ut &gt; Lagre som PDF');
+  expect(html).toContain('&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt; &amp; lokal kanal');
+  expect(html).toContain('Fallback &lt;b&gt;kontakt&lt;/b&gt;');
+  expect(html).not.toContain('<script>alert');
+  expect(html).not.toContain('<b>kontakt</b>');
+  expect(html).toContain('LIA/liaison');
 });

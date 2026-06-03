@@ -16,11 +16,48 @@ it('curated YAML includes required starter slugs', () => {
   expect(cardSlugs).toContain('radiac-dosekontroll');
   expect(cardSlugs).toContain('mfe-anmodning');
   expect(training.map((path) => path.slug)).toContain('fig10-grunnkurs');
-  expect(exportTemplateIds).toEqual(expect.arrayContaining(['fem-punktsordre-markdown', 'fem-punktsordre-json', 'fem-punktsordre-pdf']));
+  expect(exportTemplateIds).toEqual(expect.arrayContaining([
+    'fem-punktsordre-markdown',
+    'fem-punktsordre-json',
+    'fem-punktsordre-pdf',
+    'sambandsplan-markdown',
+    'sambandsplan-json',
+    'sambandsplan-pdf',
+  ]));
   for (const id of ['fem-punktsordre-markdown', 'fem-punktsordre-json', 'fem-punktsordre-pdf']) {
     const template = exportTemplates.find((item) => item.id === id);
     expect(template?.sourceIds).toEqual(['src-5-punktsordre']);
     expect(template?.audienceRoles).toEqual(expect.arrayContaining(['lagforer', 'leder', 'mfe', 'beredskapsvakt']));
+  }
+  for (const id of ['sambandsplan-markdown', 'sambandsplan-json', 'sambandsplan-pdf']) {
+    const template = exportTemplates.find((item) => item.id === id);
+    expect(template?.sourceIds).toEqual(['src-kommunikasjons-og-sambandsdiagram']);
+    expect(template?.audienceRoles).toEqual(expect.arrayContaining(['lagforer', 'leder', 'mfe', 'liaison', 'beredskapsvakt']));
+    expect(template?.description).toMatch(/lokal|PDF-klar|JSON|Markdown/i);
+  }
+});
+
+it('curated sambandsjekk checklist covers required local-only samband controls', () => {
+  const checklists = readYaml('content/curated/checklists.yaml');
+  const bySlug = new Map(checklists.map((checklist) => [checklist.slug, checklist]));
+  const sambandsjekk = bySlug.get('sambandsjekk');
+
+  expect(sambandsjekk?.sourceIds).toEqual(['src-kommunikasjons-og-sambandsdiagram']);
+  expect(sambandsjekk?.warning).toMatch(/ingen sensitive sambandstabeller/i);
+  expect(sambandsjekk?.warning).toMatch(/ISSI-lister/i);
+  expect(sambandsjekk?.warning).toMatch(/persondata/i);
+  expect(sambandsjekk?.items.map((item: any) => item.id)).toEqual([
+    'primaer-kanal-talegruppe-kontrollert',
+    'fallback-kanal-kontaktmetode-kontrollert',
+    'kallesignal-avklart',
+    'il-ko-kontakt-avklart',
+    'distrikt-beredskapsvakt-kontakt-avklart',
+    'innsjekkingsintervall-avklart',
+    'lost-comms-prosedyre-avklart',
+    'batteri-lading-kontrollert',
+  ]);
+  for (const item of sambandsjekk?.items ?? []) {
+    expect(item.sourceIds).toContain('src-kommunikasjons-og-sambandsdiagram');
   }
 });
 

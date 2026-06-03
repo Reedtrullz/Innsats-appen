@@ -17,7 +17,7 @@ export default function MissionsPage() {
         </div>
         <div className="grid gap-4 lg:grid-cols-2">
           <FivePointOrderForm contentVersion={contentVersion} />
-          <CommsPlanForm />
+          <CommsPlanForm contentVersion={contentVersion} />
         </div>
       </section>
     </div>

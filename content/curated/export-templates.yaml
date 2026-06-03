@@ -45,3 +45,27 @@
   audienceRoles: [lagforer, leder, mfe, beredskapsvakt]
   sourceIds: [src-5-punktsordre]
   updatedAt: 2026-06-03
+
+- id: sambandsplan-markdown
+  title: Sambandsplan Markdown
+  description: Lokal Markdown-eksport av generisk sambandsplan med rolle-/malvalg, utvidede felt og kilde-/versjonsmetadata.
+  format: markdown
+  audienceRoles: [lagforer, leder, mfe, liaison, beredskapsvakt]
+  sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+  updatedAt: 2026-06-03
+
+- id: sambandsplan-json
+  title: Sambandsplan JSON
+  description: Stabil strukturert lokal JSON-eksport av sambandsplan med metadata, felter og local-only advarsler uten persondata.
+  format: json
+  audienceRoles: [lagforer, leder, mfe, liaison, beredskapsvakt]
+  sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+  updatedAt: 2026-06-03
+
+- id: sambandsplan-pdf
+  title: Sambandsplan PDF-klar HTML
+  description: PDF-klar HTML for lokal nettleserutskrift av sambandsplan via Skriv ut og Lagre som PDF, ikke en offisiell innsending.
+  format: pdf
+  audienceRoles: [lagforer, leder, mfe, liaison, beredskapsvakt]
+  sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+  updatedAt: 2026-06-03
