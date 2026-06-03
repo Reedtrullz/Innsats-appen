@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T18:16:07.200Z",
+  "generatedAt": "2026-06-03T19:08:10.252Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-03T18:16:07.200Z",
+      "updatedAt": "2026-06-03T19:08:10.252Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -1535,169 +1535,253 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-57",
           "title": "Expand Før innsats checklist with contact beredskapsvakt step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 57: Expand Før innsats checklist with contact beredskapsvakt step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-58",
           "title": "Expand Før innsats checklist with fremmøteliste step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 58: Expand Før innsats checklist with fremmøteliste step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-59",
           "title": "Expand Før innsats checklist with personnel fitness/safety/health suitability assessment step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 59: Expand Før innsats checklist with personnel fitness/safety/health suitability assessment step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-60",
           "title": "Expand Før innsats checklist with personal equipment control step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 60: Expand Før innsats checklist with personal equipment control step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-61",
           "title": "Expand Før innsats checklist with common equipment control step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 61: Expand Før innsats checklist with common equipment control step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-62",
           "title": "Expand Før innsats checklist with vehicle readiness step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 62: Expand Før innsats checklist with vehicle readiness step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-63",
           "title": "Expand Før innsats checklist with fuel/readiness step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 63: Expand Før innsats checklist with fuel/readiness step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-64",
           "title": "Expand Før innsats checklist with preliminary plan step.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 64: Expand Før innsats checklist with preliminary plan step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-65",
           "title": "Expand Før innsats checklist with order-giving/readback step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 65: Expand Før innsats checklist with order-giving/readback step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-66",
           "title": "Expand Før innsats checklist with log-started step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 66: Expand Før innsats checklist with log-started step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-67",
           "title": "Expand Før innsats checklist with report-ready-to-district step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 67: Expand Før innsats checklist with report-ready-to-district step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-68",
           "title": "Create a Før utrykning combined checklist view.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 68: Create a Før utrykning combined checklist view."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-69",
           "title": "Create a missing-equipment-before-departure export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 69: Create a missing-equipment-before-departure export."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-70",
           "title": "Create a personal-equipment checklist that avoids central personal inventory in MVP.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 70: Create a personal-equipment checklist that avoids central personal inventory in MVP."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-71",
           "title": "Create a team-equipment checklist that supports local mission export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 71: Create a team-equipment checklist that supports local mission export."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-72",
           "title": "Add weather/hazard context prompt to Før utrykning workflow.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 72: Add weather/hazard context prompt to Før utrykning workflow."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-73",
           "title": "Add 'latest updated procedure' notice to Før innsats page.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 73: Add 'latest updated procedure' notice to Før innsats page."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-74",
           "title": "Add 'must read before deployment' section to Før innsats page.",
-          "status": "active",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 74: Add 'must read before deployment' section to Før innsats page."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-75",
           "title": "Expand Under innsats workflow with arrival and own-safety assessment.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 75: Expand Under innsats workflow with arrival and own-safety assessment."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-76",
           "title": "Expand Under innsats workflow with oppmarsjområde placement assessment.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 76: Expand Under innsats workflow with oppmarsjområde placement assessment."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-77",
           "title": "Expand Under innsats workflow with contact innsatsleder step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:07:59.000Z",
+          "evidence": [
+            "Implemented in commit 36359af (pre-departure/Før utrykning checklists, missing-equipment export, Før/Under workflow UI notices, checklist note persistence hardening). Gates: targeted vitest 4 files/8 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 77: Expand Under innsats workflow with contact innsatsleder step."
         },
         {
