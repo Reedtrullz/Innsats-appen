@@ -19,8 +19,8 @@ The MVP may explain public protection concepts and operational readiness steps, 
 
 ## Privacy/security guardrails
 
-- Mission context, checklist runs, order exports, and sambandsplan exports are local browser state/output only.
-- Privacy reset deletes local IndexedDB mission/checklist state in the current browser.
+- Mission context, checklist runs, order exports, sambandsplan exports, and release-readiness board state are local browser state/output only.
+- Privacy reset on the mission dashboard deletes local IndexedDB mission/checklist state in the current browser; the `/release` board has its own reset because it is stored under a separate `localStorage` key.
 - Sensitive structured fields are blocked by `lib/content/source-policy.ts` and regression-tested in `tests/security/privacy-boundaries.test.ts`.
 - Context API routes use allowlisted parameters and reject generic proxy keys such as `url`, `upstream`, `proxy`, `target`, and `href` before adapter fetches.
 - MET/Kartverket/NVE context signals are separate public decision-support signals. They are not promoted to operational truth or checklist procedure steps.

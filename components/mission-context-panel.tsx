@@ -132,7 +132,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const now = new Date().toISOString();
-    const mission: MissionContext = {
+    const missionDraft: MissionContext = {
       id: crypto.randomUUID(),
       title: String(form.get('title') ?? ''),
       role: String(form.get('role') ?? 'mannskap') as Role,
@@ -142,11 +142,13 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
       createdAt: now,
       updatedAt: now,
       externalSignals: [],
-      activeChecklistIds: ['tilfluktsrom-teknisk-status'],
+      activeChecklistIds: [],
       notes: '',
       contentVersion,
       schemaVersion: 1,
     };
+    const activeChecklist = matchingChecklist(checklists, missionDraft);
+    const mission = { ...missionDraft, activeChecklistIds: activeChecklist ? [activeChecklist.slug] : [] };
     await saveMission(mission);
     router.push('/oppdrag');
   }

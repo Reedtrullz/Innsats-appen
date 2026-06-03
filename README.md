@@ -6,7 +6,7 @@ Mobile-first, offline-capable PWA for source-backed Sivilforsvaret decision supp
 - Production domain prepared for deploy: https://innsats.reidar.tech
 - GHCR image namespace: `ghcr.io/reedtrullz/innsats-appen`
 
-The app is a local MVP: generated content, mission notes, checklist runs, 5-punktsordre exports, and sambandsplan exports stay in the browser unless the user manually copies them out.
+The app is a local MVP: generated content, mission dashboards, checklist runs, 5-punktsordre exports, sambandsplan exports, and release-readiness board state stay in the browser unless the user manually copies them out.
 
 ## Requirements
 
@@ -39,7 +39,7 @@ npm run typecheck        # TypeScript gate
 npm run test             # Vitest unit/component/integration/security/content tests
 npm run build            # content build + production Next build
 npm run e2e              # production-mode Playwright E2E (service worker/offline checks)
-npm run e2e:prod         # same production-mode E2E alias
+npm run e2e:prod         # same production-mode E2E alias; set PLAYWRIGHT_PORT=3007 if local port 3000 is busy
 npm run check            # build content + typecheck + lint + Vitest + production build
 npm run check:ci         # explicit CI alias for the same ordered gate
 ```
@@ -52,6 +52,12 @@ npm run test -- tests/security/privacy-boundaries.test.ts
 npm run e2e:prod -- tests/e2e/core-mobile-journey.spec.ts
 npm run e2e:prod -- tests/e2e/offline.spec.ts
 ```
+
+## Current app surfaces
+
+- `/hurtigkort`, `/for`, `/under`, `/etter`, `/kilder`, and `/moduler/*` expose source-backed cards, phase pages, source views, and specialist modules.
+- `/oppdrag/ny` creates a local mission context; `/oppdrag` shows the active mission dashboard with recommended cards, scenario module link, matching checklist progress, order/comms export tools, and cached/stale public context signals.
+- `/release` is a standalone browser-local release-readiness board for launch planning, stage gates, active work, risk attention, local JSON export, and launch-material links. It intentionally avoids the operational app shell.
 
 ## Runbook
 
