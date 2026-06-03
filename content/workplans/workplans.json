@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-03T15:29:09.568Z",
-  "sourceCount": 4,
+  "generatedAt": "2026-06-03T15:57:14.210Z",
+  "sourceCount": 5,
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -841,6 +841,3360 @@
             "Final sync marker checks, npm run check PASS, and PLAYWRIGHT_PORT=3007 npm run e2e:prod PASS — 9/9 tests."
           ],
           "sourceHeading": "Task 9: Run final workplan sync and Obsidian/release verification"
+        }
+      ]
+    },
+    {
+      "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan",
+      "title": "Innsats-appen Remaining Expansion Backlog Workplan",
+      "sourcePath": ".hermes/plans/2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan.md",
+      "sourceType": "hermes-plan",
+      "summary": "Execute the remaining expansion backlog after the completed MVP, comprehensive implementation, remediation, and workplan sync plans.",
+      "stage": "build",
+      "risk": "high",
+      "status": "active",
+      "owner": "AR",
+      "evidence": [
+        "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
+      ],
+      "taskCount": 417,
+      "updatedAt": "2026-06-03T15:57:14.210Z",
+      "tasks": [
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
+          "title": "Maintain a visible decision-support disclaimer across all operational surfaces.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 1: Maintain a visible decision-support disclaimer across all operational surfaces."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-2",
+          "title": "Add a short in-app boundary page explaining that the app is not an official command system.",
+          "status": "active",
+          "stage": "scope",
+          "risk": "high",
+          "sourceHeading": "Task 2: Add a short in-app boundary page explaining that the app is not an official command system."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-3",
+          "title": "Add local-only data warnings to every mission, checklist, log, order, samband and export screen.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 3: Add local-only data warnings to every mission, checklist, log, order, samband and export screen."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-4",
+          "title": "Add explicit warnings that exported files may contain operationally sensitive information.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 4: Add explicit warnings that exported files may contain operationally sensitive information."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-5",
+          "title": "Add a release gate that blocks publication of private/skjermede tilfluktsrom data.",
+          "status": "active",
+          "stage": "release",
+          "risk": "high",
+          "sourceHeading": "Task 5: Add a release gate that blocks publication of private/skjermede tilfluktsrom data."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-6",
+          "title": "Add regression tests for forbidden private tilfluktsrom fields and location patterns.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 6: Add regression tests for forbidden private tilfluktsrom fields and location patterns."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-7",
+          "title": "Add regression tests that patient-identifying fields are not introduced into mission/log schemas.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 7: Add regression tests that patient-identifying fields are not introduced into mission/log schemas."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-8",
+          "title": "Add a documented privacy-retention policy for all local browser data.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 8: Add a documented privacy-retention policy for all local browser data."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-9",
+          "title": "Add a documented threat model for browser-offline operational support.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 9: Add a documented threat model for browser-offline operational support."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-10",
+          "title": "Add a governance note for every future feature that would require auth, sync, push, live tracking or backend storage.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 10: Add a governance note for every future feature that would require auth, sync, push, live tracking or backend storage."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-11",
+          "title": "Create a post-MVP security architecture document before any shared backend is introduced.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 11: Create a post-MVP security architecture document before any shared backend is introduced."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-12",
+          "title": "Create a post-MVP DPIA/personvernkonsekvensvurdering checklist for personal data features.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 12: Create a post-MVP DPIA/personvernkonsekvensvurdering checklist for personal data features."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-13",
+          "title": "Add a source-publication policy covering what may be compiled into static/generated content.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 13: Add a source-publication policy covering what may be compiled into static/generated content."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-14",
+          "title": "Add an in-app 'known limitations' page.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 14: Add an in-app 'known limitations' page."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-15",
+          "title": "Add an in-app 'data stored on this device' page.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 15: Add an in-app 'data stored on this device' page."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-16",
+          "title": "Add source status values to every source document where missing.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 16: Add source status values to every source document where missing."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-17",
+          "title": "Add verifiedAt metadata to every source document where missing.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 17: Add verifiedAt metadata to every source document where missing."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-18",
+          "title": "Add reviewAfter or expiresAt metadata to every high-risk source.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 18: Add reviewAfter or expiresAt metadata to every high-risk source."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-19",
+          "title": "Add reviewer/owner metadata to curated source records.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 19: Add reviewer/owner metadata to curated source records."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-20",
+          "title": "Add source freshness badges on card detail pages.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 20: Add source freshness badges on card detail pages."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-21",
+          "title": "Add source freshness badges on source detail pages.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 21: Add source freshness badges on source detail pages."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-22",
+          "title": "Add a source review dashboard for stale, expired or unreviewed sources.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 22: Add a source review dashboard for stale, expired or unreviewed sources."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-23",
+          "title": "Add CI reporting for sources with no linked cards.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 23: Add CI reporting for sources with no linked cards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-24",
+          "title": "Add CI reporting for cards with no linked source.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 24: Add CI reporting for cards with no linked source."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-25",
+          "title": "Add CI reporting for high-risk cards without warnings.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 25: Add CI reporting for high-risk cards without warnings."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-26",
+          "title": "Add CI reporting for high-risk cards without competence requirements or explicit rationale.",
+          "status": "active",
+          "stage": "scope",
+          "risk": "high",
+          "sourceHeading": "Task 26: Add CI reporting for high-risk cards without competence requirements or explicit rationale."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-27",
+          "title": "Add CI reporting for glossary terms referenced but not defined.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 27: Add CI reporting for glossary terms referenced but not defined."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-28",
+          "title": "Add content coverage report by role, phase and scenario.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 28: Add content coverage report by role, phase and scenario."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-29",
+          "title": "Add content coverage report by competence requirement.",
+          "status": "active",
+          "stage": "scope",
+          "risk": "high",
+          "sourceHeading": "Task 29: Add content coverage report by competence requirement."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-30",
+          "title": "Add content coverage report by source status.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 30: Add content coverage report by source status."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-31",
+          "title": "Add release-board visibility for content coverage gaps.",
+          "status": "active",
+          "stage": "release",
+          "risk": "high",
+          "sourceHeading": "Task 31: Add release-board visibility for content coverage gaps."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-32",
+          "title": "Add a content-review issue template.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 32: Add a content-review issue template."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-33",
+          "title": "Add a field-feedback issue template.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 33: Add a field-feedback issue template."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-34",
+          "title": "Add a source-update issue template.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 34: Add a source-update issue template."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-35",
+          "title": "Document the content review cycle.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 35: Document the content review cycle."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-36",
+          "title": "Document how to retire deprecated cards or sources.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 36: Document how to retire deprecated cards or sources."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-37",
+          "title": "Extend curated content to support FAQ entries.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 37: Extend curated content to support FAQ entries."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-38",
+          "title": "Extend curated content to support glossary aliases and synonyms.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 38: Extend curated content to support glossary aliases and synonyms."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-39",
+          "title": "Extend curated content to support equipment taxonomy.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 39: Extend curated content to support equipment taxonomy."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-40",
+          "title": "Extend curated content to support export-template metadata.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 40: Extend curated content to support export-template metadata."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-41",
+          "title": "Extend curated content to support image/illustration metadata.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 41: Extend curated content to support image/illustration metadata."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-42",
+          "title": "Extend curated content to support local/district-specific approved content overlays in the future.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 42: Extend curated content to support local/district-specific approved content overlays in the future."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-43",
+          "title": "Validate that all roles in content exist in the role taxonomy.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 43: Validate that all roles in content exist in the role taxonomy."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-44",
+          "title": "Validate that all equipment terms in content exist in the equipment taxonomy.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 44: Validate that all equipment terms in content exist in the equipment taxonomy."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-45",
+          "title": "Validate that all competence codes in content exist in the competence taxonomy.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 45: Validate that all competence codes in content exist in the competence taxonomy."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-46",
+          "title": "Validate that all scenarios in content exist in the scenario taxonomy.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 46: Validate that all scenarios in content exist in the scenario taxonomy."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-47",
+          "title": "Validate that all images referenced by content exist and are approved for publication.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 47: Validate that all images referenced by content exist and are approved for publication."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-48",
+          "title": "Add generated content version display inside the app.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 48: Add generated content version display inside the app."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-49",
+          "title": "Add content changelog generation.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 49: Add content changelog generation."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-50",
+          "title": "Add 'new and updated procedures' view.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 50: Add 'new and updated procedures' view."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-51",
+          "title": "Add 'must read' notices for critical content changes.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 51: Add 'must read' notices for critical content changes."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-52",
+          "title": "Add source-to-card reverse navigation.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 52: Add source-to-card reverse navigation."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-53",
+          "title": "Add card-to-source deep links with section anchors where possible.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 53: Add card-to-source deep links with section anchors where possible."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-54",
+          "title": "Add source excerpt display with clear 'excerpt not full official document' warning.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 54: Add source excerpt display with clear 'excerpt not full official document' warning."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-55",
+          "title": "Add a simple FAQ page populated from curated content.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 55: Add a simple FAQ page populated from curated content."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-56",
+          "title": "Create a feedback-driven FAQ update process.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 56: Create a feedback-driven FAQ update process."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-57",
+          "title": "Expand Før innsats checklist with contact beredskapsvakt step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 57: Expand Før innsats checklist with contact beredskapsvakt step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-58",
+          "title": "Expand Før innsats checklist with fremmøteliste step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 58: Expand Før innsats checklist with fremmøteliste step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-59",
+          "title": "Expand Før innsats checklist with personnel fitness/safety/health suitability assessment step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 59: Expand Før innsats checklist with personnel fitness/safety/health suitability assessment step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-60",
+          "title": "Expand Før innsats checklist with personal equipment control step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 60: Expand Før innsats checklist with personal equipment control step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-61",
+          "title": "Expand Før innsats checklist with common equipment control step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 61: Expand Før innsats checklist with common equipment control step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-62",
+          "title": "Expand Før innsats checklist with vehicle readiness step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 62: Expand Før innsats checklist with vehicle readiness step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-63",
+          "title": "Expand Før innsats checklist with fuel/readiness step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 63: Expand Før innsats checklist with fuel/readiness step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-64",
+          "title": "Expand Før innsats checklist with preliminary plan step.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 64: Expand Før innsats checklist with preliminary plan step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-65",
+          "title": "Expand Før innsats checklist with order-giving/readback step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 65: Expand Før innsats checklist with order-giving/readback step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-66",
+          "title": "Expand Før innsats checklist with log-started step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 66: Expand Før innsats checklist with log-started step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-67",
+          "title": "Expand Før innsats checklist with report-ready-to-district step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 67: Expand Før innsats checklist with report-ready-to-district step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-68",
+          "title": "Create a Før utrykning combined checklist view.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 68: Create a Før utrykning combined checklist view."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-69",
+          "title": "Create a missing-equipment-before-departure export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 69: Create a missing-equipment-before-departure export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-70",
+          "title": "Create a personal-equipment checklist that avoids central personal inventory in MVP.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 70: Create a personal-equipment checklist that avoids central personal inventory in MVP."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-71",
+          "title": "Create a team-equipment checklist that supports local mission export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 71: Create a team-equipment checklist that supports local mission export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-72",
+          "title": "Add weather/hazard context prompt to Før utrykning workflow.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 72: Add weather/hazard context prompt to Før utrykning workflow."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-73",
+          "title": "Add 'latest updated procedure' notice to Før innsats page.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 73: Add 'latest updated procedure' notice to Før innsats page."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-74",
+          "title": "Add 'must read before deployment' section to Før innsats page.",
+          "status": "active",
+          "stage": "release",
+          "risk": "high",
+          "sourceHeading": "Task 74: Add 'must read before deployment' section to Før innsats page."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-75",
+          "title": "Expand Under innsats workflow with arrival and own-safety assessment.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 75: Expand Under innsats workflow with arrival and own-safety assessment."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-76",
+          "title": "Expand Under innsats workflow with oppmarsjområde placement assessment.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 76: Expand Under innsats workflow with oppmarsjområde placement assessment."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-77",
+          "title": "Expand Under innsats workflow with contact innsatsleder step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 77: Expand Under innsats workflow with contact innsatsleder step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-78",
+          "title": "Expand Under innsats workflow with takeover-from-other-unit procedure.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 78: Expand Under innsats workflow with takeover-from-other-unit procedure."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-79",
+          "title": "Expand Under innsats workflow with reassess equipment/resources step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 79: Expand Under innsats workflow with reassess equipment/resources step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-80",
+          "title": "Expand Under innsats workflow with request additional resources step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 80: Expand Under innsats workflow with request additional resources step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-81",
+          "title": "Expand Under innsats workflow with continuous personnel control step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 81: Expand Under innsats workflow with continuous personnel control step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-82",
+          "title": "Expand Under innsats workflow with continuous risk/safety assessment step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 82: Expand Under innsats workflow with continuous risk/safety assessment step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-83",
+          "title": "Expand Under innsats workflow with ongoing dialogue with innsatsleder step.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 83: Expand Under innsats workflow with ongoing dialogue with innsatsleder step."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-84",
+          "title": "Expand Under innsats workflow with reanalysis after mission changes.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 84: Expand Under innsats workflow with reanalysis after mission changes."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-85",
+          "title": "Expand Under innsats workflow with food/water/rest check.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 85: Expand Under innsats workflow with food/water/rest check."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-86",
+          "title": "Expand Under innsats workflow with relief/avløsning planning.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 86: Expand Under innsats workflow with relief/avløsning planning."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-87",
+          "title": "Expand Under innsats workflow with psychosocial/EFOK trigger check.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 87: Expand Under innsats workflow with psychosocial/EFOK trigger check."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-88",
+          "title": "Expand Under innsats workflow with handover/departure from incident area.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 88: Expand Under innsats workflow with handover/departure from incident area."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-89",
+          "title": "Add current-situation overview combining mission, weather, hazards, notes, open tasks and active checklists.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 89: Add current-situation overview combining mission, weather, hazards, notes, open tasks and active checklists."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-90",
+          "title": "Add local task list inside mission.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 90: Add local task list inside mission."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-91",
+          "title": "Add task status values: not started, in progress, done, blocked and needs assistance.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 91: Add task status values: not started, in progress, done, blocked and needs assistance."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-92",
+          "title": "Add quick status messages such as på posisjon, oppgave fullført and trenger assistanse.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 92: Add quick status messages such as på posisjon, oppgave fullført and trenger assistanse."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-93",
+          "title": "Add resource request form for water, food, PPE, medical support, transport, fuel and equipment.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 93: Add resource request form for water, food, PPE, medical support, transport, fuel and equipment."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-94",
+          "title": "Add local export of task/status summary.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 94: Add local export of task/status summary."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-95",
+          "title": "Expand Etter innsats workflow with personnel control.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 95: Expand Etter innsats workflow with personnel control."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-96",
+          "title": "Expand Etter innsats workflow with injury/personnel-damage escalation.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 96: Expand Etter innsats workflow with injury/personnel-damage escalation."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-97",
+          "title": "Expand Etter innsats workflow with technical review.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 97: Expand Etter innsats workflow with technical review."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-98",
+          "title": "Expand Etter innsats workflow with defuse/emotional review consideration.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 98: Expand Etter innsats workflow with defuse/emotional review consideration."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-99",
+          "title": "Expand Etter innsats workflow with EFOK follow-up assessment.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 99: Expand Etter innsats workflow with EFOK follow-up assessment."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-100",
+          "title": "Expand Etter innsats workflow with MBK/equipment readiness review.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 100: Expand Etter innsats workflow with MBK/equipment readiness review."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-101",
+          "title": "Expand Etter innsats workflow with written report reminder.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 101: Expand Etter innsats workflow with written report reminder."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-102",
+          "title": "Expand Etter innsats workflow with complete attendance/travel information reminder.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 102: Expand Etter innsats workflow with complete attendance/travel information reminder."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-103",
+          "title": "Expand Etter innsats workflow with loss/damage report reminder.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 103: Expand Etter innsats workflow with loss/damage report reminder."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-104",
+          "title": "Expand Etter innsats workflow with dimittering only in consultation with district/beredskapsvakt.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 104: Expand Etter innsats workflow with dimittering only in consultation with district/beredskapsvakt."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-105",
+          "title": "Create after-action report template.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 105: Create after-action report template."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-106",
+          "title": "Auto-fill after-action report from mission, checklist, order, samband and log data.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 106: Auto-fill after-action report from mission, checklist, order, samband and log data."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-107",
+          "title": "Add resource consumption section to after-action report.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 107: Add resource consumption section to after-action report."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-108",
+          "title": "Add equipment damage/loss section to after-action report.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 108: Add equipment damage/loss section to after-action report."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-109",
+          "title": "Add MBK status summary export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 109: Add MBK status summary export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-110",
+          "title": "Add after-action Markdown export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 110: Add after-action Markdown export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-111",
+          "title": "Add after-action JSON export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 111: Add after-action JSON export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-112",
+          "title": "Add after-action PDF export after text exports are stable.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 112: Add after-action PDF export after text exports are stable."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-113",
+          "title": "Add local archive of completed missions.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 113: Add local archive of completed missions."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-114",
+          "title": "Add local archive search.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 114: Add local archive search."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-115",
+          "title": "Add local archive delete/reset.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 115: Add local archive delete/reset."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-116",
+          "title": "Add structured lessons-learned section.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 116: Add structured lessons-learned section."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-117",
+          "title": "Add structured feedback on leadership, equipment, procedures, training, safety and communications.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 117: Add structured feedback on leadership, equipment, procedures, training, safety and communications."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-118",
+          "title": "Expand 5-punktsordre form with role-specific templates for lagleder.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 118: Expand 5-punktsordre form with role-specific templates for lagleder."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-119",
+          "title": "Expand 5-punktsordre form with role-specific templates for FIG-leder.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 119: Expand 5-punktsordre form with role-specific templates for FIG-leder."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-120",
+          "title": "Expand 5-punktsordre form with role-specific templates for MFE.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 120: Expand 5-punktsordre form with role-specific templates for MFE."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-121",
+          "title": "Expand 5-punktsordre form with role-specific templates for LIA/liaison.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 121: Expand 5-punktsordre form with role-specific templates for LIA/liaison."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-122",
+          "title": "Expand 5-punktsordre form with role-specific templates for beredskapsvakt.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 122: Expand 5-punktsordre form with role-specific templates for beredskapsvakt."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-123",
+          "title": "Add explicit readback/forstått confirmation to 5-punktsordre workflow.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 123: Add explicit readback/forstått confirmation to 5-punktsordre workflow."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-124",
+          "title": "Add printable 5-punktsordre view.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 124: Add printable 5-punktsordre view."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-125",
+          "title": "Add source/version metadata to 5-punktsordre exports.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 125: Add source/version metadata to 5-punktsordre exports."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-126",
+          "title": "Add PDF export for 5-punktsordre after Markdown/JSON output is stable.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 126: Add PDF export for 5-punktsordre after Markdown/JSON output is stable."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-127",
+          "title": "Expand sambandsplan form with primary talegruppe/channel field.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 127: Expand sambandsplan form with primary talegruppe/channel field."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-128",
+          "title": "Expand sambandsplan form with fallback channel/contact method field.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 128: Expand sambandsplan form with fallback channel/contact method field."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-129",
+          "title": "Expand sambandsplan form with callsign/kallesignal field.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 129: Expand sambandsplan form with callsign/kallesignal field."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-130",
+          "title": "Expand sambandsplan form with IL-KO contact field.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 130: Expand sambandsplan form with IL-KO contact field."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-131",
+          "title": "Expand sambandsplan form with district/beredskapsvakt contact field.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 131: Expand sambandsplan form with district/beredskapsvakt contact field."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-132",
+          "title": "Expand sambandsplan form with check-in interval field.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 132: Expand sambandsplan form with check-in interval field."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-133",
+          "title": "Expand sambandsplan form with lost-comms procedure field.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 133: Expand sambandsplan form with lost-comms procedure field."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-134",
+          "title": "Expand sambandsplan form with battery/charging status field.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 134: Expand sambandsplan form with battery/charging status field."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-135",
+          "title": "Add generic role-specific sambandsplan templates without sensitive Nødnett details.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 135: Add generic role-specific sambandsplan templates without sensitive Nødnett details."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-136",
+          "title": "Add sambandsjekk checklist.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 136: Add sambandsjekk checklist."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-137",
+          "title": "Add printable sambandsplan view.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 137: Add printable sambandsplan view."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-138",
+          "title": "Add source/version metadata to sambandsplan exports.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 138: Add source/version metadata to sambandsplan exports."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-139",
+          "title": "Add PDF export for sambandsplan after Markdown/JSON output is stable.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 139: Add PDF export for sambandsplan after Markdown/JSON output is stable."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-140",
+          "title": "Add dedicated oppdragsanalyse action card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 140: Add dedicated oppdragsanalyse action card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-141",
+          "title": "Add OBBO/beslutningssløyfe action card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 141: Add OBBO/beslutningssløyfe action card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-142",
+          "title": "Add leadership/command-and-control action card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 142: Add leadership/command-and-control action card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-143",
+          "title": "Add presse/media handling action card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 143: Add presse/media handling action card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-144",
+          "title": "Add ethics/role-boundary action card.",
+          "status": "active",
+          "stage": "scope",
+          "risk": "high",
+          "sourceHeading": "Task 144: Add ethics/role-boundary action card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-145",
+          "title": "Add alvorlig ulykke/død eget personell action card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 145: Add alvorlig ulykke/død eget personell action card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-146",
+          "title": "Add immediate 113/life-saving-first-aid escalation card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 146: Add immediate 113/life-saving-first-aid escalation card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-147",
+          "title": "Add psychological first aid action sequence cards.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 147: Add psychological first aid action sequence cards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-148",
+          "title": "Add forced-debrief warning to psychological support content.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 148: Add forced-debrief warning to psychological support content."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-149",
+          "title": "Add skogbrann action cards.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 149: Add skogbrann action cards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-150",
+          "title": "Add brann water-supply/slange support cards.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 150: Add brann water-supply/slange support cards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-151",
+          "title": "Add SAR/ettersøkning action cards.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 151: Add SAR/ettersøkning action cards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-152",
+          "title": "Add search sector/teig action card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 152: Add search sector/teig action card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-153",
+          "title": "Add flom/pumpe/vannforsyning expanded cards.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 153: Add flom/pumpe/vannforsyning expanded cards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-154",
+          "title": "Add skred safety/samvirke card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 154: Add skred safety/samvirke card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-155",
+          "title": "Add evacuation support cards.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 155: Add evacuation support cards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-156",
+          "title": "Add samleplass skadde expanded cards without patient journal fields.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 156: Add samleplass skadde expanded cards without patient journal fields."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-157",
+          "title": "Add tilfluktsrom/public protection readiness cards.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 157: Add tilfluktsrom/public protection readiness cards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-158",
+          "title": "Add CBRNE soneinndeling card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 158: Add CBRNE soneinndeling card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-159",
+          "title": "Add CBRNE verneutstyr/stoppkriterier card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 159: Add CBRNE verneutstyr/stoppkriterier card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-160",
+          "title": "Add MRE clean/dirty-side and grovrens cards.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 160: Add MRE clean/dirty-side and grovrens cards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-161",
+          "title": "Add RADIAC measure-point card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 161: Add RADIAC measure-point card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-162",
+          "title": "Add RADIAC oppholdstid/rullering card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 162: Add RADIAC oppholdstid/rullering card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-163",
+          "title": "Add MFE request/receive/follow-up cards.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 163: Add MFE request/receive/follow-up cards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-164",
+          "title": "Add map/compass/GPS position-reporting cards.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 164: Add map/compass/GPS position-reporting cards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-165",
+          "title": "Add route/evacuation-way card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 165: Add route/evacuation-way card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-166",
+          "title": "Add vehicle/transport readiness card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 166: Add vehicle/transport readiness card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-167",
+          "title": "Add pump electrical hazard card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 167: Add pump electrical hazard card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-168",
+          "title": "Add contaminated-equipment handling warning card.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 168: Add contaminated-equipment handling warning card."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-169",
+          "title": "Expand competence taxonomy with FIG10.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 169: Expand competence taxonomy with FIG10."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-170",
+          "title": "Expand competence taxonomy with FIG20.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 170: Expand competence taxonomy with FIG20."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-171",
+          "title": "Expand competence taxonomy with FIG30.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 171: Expand competence taxonomy with FIG30."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-172",
+          "title": "Expand competence taxonomy with FIG31.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 172: Expand competence taxonomy with FIG31."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-173",
+          "title": "Expand competence taxonomy with MFE10.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 173: Expand competence taxonomy with MFE10."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-174",
+          "title": "Expand competence taxonomy with MRE10.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 174: Expand competence taxonomy with MRE10."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-175",
+          "title": "Expand competence taxonomy with MRE30.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 175: Expand competence taxonomy with MRE30."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-176",
+          "title": "Expand competence taxonomy with RAD10.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 176: Expand competence taxonomy with RAD10."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-177",
+          "title": "Expand competence taxonomy with RAD30.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 177: Expand competence taxonomy with RAD30."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-178",
+          "title": "Expand competence taxonomy with ATV.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 178: Expand competence taxonomy with ATV."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-179",
+          "title": "Expand competence taxonomy with båt.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 179: Expand competence taxonomy with båt."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-180",
+          "title": "Expand competence taxonomy with lett lastebil.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 180: Expand competence taxonomy with lett lastebil."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-181",
+          "title": "Expand competence taxonomy with SPS40.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 181: Expand competence taxonomy with SPS40."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-182",
+          "title": "Expand competence taxonomy with SPS41.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 182: Expand competence taxonomy with SPS41."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-183",
+          "title": "Add training path detail pages for missing competence codes.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 183: Add training path detail pages for missing competence codes."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-184",
+          "title": "Add 'trained personnel only' UI treatment for competence-gated cards.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 184: Add 'trained personnel only' UI treatment for competence-gated cards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-185",
+          "title": "Add 'do not perform if not trained/equipped' fallback guidance.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 185: Add 'do not perform if not trained/equipped' fallback guidance."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-186",
+          "title": "Add tests that high-risk cards have competence requirements or explicit rationale.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 186: Add tests that high-risk cards have competence requirements or explicit rationale."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-187",
+          "title": "Create equipment taxonomy for personal equipment.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 187: Create equipment taxonomy for personal equipment."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-188",
+          "title": "Create equipment taxonomy for vehicle equipment.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 188: Create equipment taxonomy for vehicle equipment."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-189",
+          "title": "Create equipment taxonomy for fire/slange equipment.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 189: Create equipment taxonomy for fire/slange equipment."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-190",
+          "title": "Create equipment taxonomy for tents.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 190: Create equipment taxonomy for tents."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-191",
+          "title": "Create equipment taxonomy for heaters.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 191: Create equipment taxonomy for heaters."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-192",
+          "title": "Create equipment taxonomy for pumps.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 192: Create equipment taxonomy for pumps."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-193",
+          "title": "Create equipment taxonomy for aggregates/generators.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 193: Create equipment taxonomy for aggregates/generators."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-194",
+          "title": "Create equipment taxonomy for lighting.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 194: Create equipment taxonomy for lighting."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-195",
+          "title": "Create equipment taxonomy for samband.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 195: Create equipment taxonomy for samband."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-196",
+          "title": "Add equipment status states: ready, missing, damaged, consumed, needs wash, needs service and quarantined.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 196: Add equipment status states: ready, missing, damaged, consumed, needs wash, needs service and quarantined."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-197",
+          "title": "Add grouped MBK checklist for vehicles.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 197: Add grouped MBK checklist for vehicles."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-198",
+          "title": "Add grouped MBK checklist for fire/slange equipment.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 198: Add grouped MBK checklist for fire/slange equipment."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-199",
+          "title": "Add grouped MBK checklist for tents.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 199: Add grouped MBK checklist for tents."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-200",
+          "title": "Add grouped MBK checklist for heaters.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 200: Add grouped MBK checklist for heaters."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-201",
+          "title": "Add grouped MBK checklist for pumps.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 201: Add grouped MBK checklist for pumps."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-202",
+          "title": "Add grouped MBK checklist for aggregates/generators.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 202: Add grouped MBK checklist for aggregates/generators."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-203",
+          "title": "Add grouped MBK checklist for lighting.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 203: Add grouped MBK checklist for lighting."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-204",
+          "title": "Add grouped MBK checklist for samband.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 204: Add grouped MBK checklist for samband."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-205",
+          "title": "Add grouped MBK checklist for personal equipment.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 205: Add grouped MBK checklist for personal equipment."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-206",
+          "title": "Add equipment readiness summary for new deployment.",
+          "status": "active",
+          "stage": "release",
+          "risk": "high",
+          "sourceHeading": "Task 206: Add equipment readiness summary for new deployment."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-207",
+          "title": "Add equipment status export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 207: Add equipment status export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-208",
+          "title": "Implement structured local field log.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 208: Implement structured local field log."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-209",
+          "title": "Add log fields for timestamp, optional location, category, text and linked mission.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 209: Add log fields for timestamp, optional location, category, text and linked mission."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-210",
+          "title": "Add log quick categories for funn, skadet person, ressursbehov, HMS-avvik, observasjon, samband, materiell, vær/fare and beslutning.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 210: Add log quick categories for funn, skadet person, ressursbehov, HMS-avvik, observasjon, samband, materiell, vær/fare and beslutning."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-211",
+          "title": "Add critical observation flag to log entries.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 211: Add critical observation flag to log entries."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-212",
+          "title": "Add 'must be forwarded' flag to log entries.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 212: Add 'must be forwarded' flag to log entries."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-213",
+          "title": "Add log timeline view.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 213: Add log timeline view."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-214",
+          "title": "Add log search/filter.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 214: Add log search/filter."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-215",
+          "title": "Add log Markdown export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 215: Add log Markdown export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-216",
+          "title": "Add log JSON export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 216: Add log JSON export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-217",
+          "title": "Add log PDF export after text exports are stable.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 217: Add log PDF export after text exports are stable."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-218",
+          "title": "Add patient-data warning to log UI.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 218: Add patient-data warning to log UI."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-219",
+          "title": "Add tests that log schemas do not encourage patient records.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 219: Add tests that log schemas do not encourage patient records."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-220",
+          "title": "Add simplified RUH form.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 220: Add simplified RUH form."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-221",
+          "title": "Add RUH fields for time, category, what happened, immediate measure, risk and follow-up need.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 221: Add RUH fields for time, category, what happened, immediate measure, risk and follow-up need."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-222",
+          "title": "Add RUH export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 222: Add RUH export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-223",
+          "title": "Add fatigue/belastning self-check for long operations.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 223: Add fatigue/belastning self-check for long operations."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-224",
+          "title": "Add non-medical physical/mental load check.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 224: Add non-medical physical/mental load check."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-225",
+          "title": "Add needs-rest/needs-relief quick flag.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 225: Add needs-rest/needs-relief quick flag."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-226",
+          "title": "Add welfare reminders for water, food, warmth, rest and dry clothing.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 226: Add welfare reminders for water, food, warmth, rest and dry clothing."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-227",
+          "title": "Evaluate photo attachment support for logs.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 227: Evaluate photo attachment support for logs."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-228",
+          "title": "Evaluate video attachment support for logs.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 228: Evaluate video attachment support for logs."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-229",
+          "title": "Add EXIF/GPS metadata stripping before media export if media support is implemented.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 229: Add EXIF/GPS metadata stripping before media export if media support is implemented."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-230",
+          "title": "Add storage-size warning for media attachments.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 230: Add storage-size warning for media attachments."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-231",
+          "title": "Add privacy warning before exporting media attachments.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 231: Add privacy warning before exporting media attachments."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-232",
+          "title": "Research local man-down/inactivity alert as a separate safety-critical post-MVP feature.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 232: Research local man-down/inactivity alert as a separate safety-critical post-MVP feature."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-233",
+          "title": "Expand search synonyms for jod.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 233: Expand search synonyms for jod."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-234",
+          "title": "Expand search synonyms for rens.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 234: Expand search synonyms for rens."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-235",
+          "title": "Expand search synonyms for MFE.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 235: Expand search synonyms for MFE."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-236",
+          "title": "Expand search synonyms for samband.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 236: Expand search synonyms for samband."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-237",
+          "title": "Expand search synonyms for samleplass.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 237: Expand search synonyms for samleplass."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-238",
+          "title": "Expand search synonyms for dose.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 238: Expand search synonyms for dose."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-239",
+          "title": "Expand search synonyms for ordre.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 239: Expand search synonyms for ordre."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-240",
+          "title": "Expand search synonyms for KO and IL-KO.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 240: Expand search synonyms for KO and IL-KO."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-241",
+          "title": "Expand search synonyms for innsatsleder/IL.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 241: Expand search synonyms for innsatsleder/IL."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-242",
+          "title": "Expand search synonyms for beredskapsvakt/vakt.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 242: Expand search synonyms for beredskapsvakt/vakt."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-243",
+          "title": "Expand search synonyms for pumpe/flom/vannforsyning.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 243: Expand search synonyms for pumpe/flom/vannforsyning."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-244",
+          "title": "Expand search synonyms for skadde/samleplass/førstehjelp.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 244: Expand search synonyms for skadde/samleplass/førstehjelp."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-245",
+          "title": "Expand search synonyms for defuse/EFOK/psykososial.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 245: Expand search synonyms for defuse/EFOK/psykososial."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-246",
+          "title": "Expand search synonyms for MBK.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 246: Expand search synonyms for MBK."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-247",
+          "title": "Add typo tolerance for Norwegian operational terms.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 247: Add typo tolerance for Norwegian operational terms."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-248",
+          "title": "Add role-aware search ranking.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 248: Add role-aware search ranking."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-249",
+          "title": "Add phase-aware search ranking.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 249: Add phase-aware search ranking."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-250",
+          "title": "Add scenario-aware search ranking.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 250: Add scenario-aware search ranking."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-251",
+          "title": "Add no-result suggestions.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 251: Add no-result suggestions."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-252",
+          "title": "Add offline search-index stale indicator.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 252: Add offline search-index stale indicator."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-253",
+          "title": "Add E2E tests for all critical search terms.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 253: Add E2E tests for all critical search terms."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-254",
+          "title": "Verify and document official Kartverket endpoint usage.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 254: Verify and document official Kartverket endpoint usage."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-255",
+          "title": "Verify and document official MET endpoint usage.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 255: Verify and document official MET endpoint usage."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-256",
+          "title": "Verify and document official NVE endpoint usage.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 256: Verify and document official NVE endpoint usage."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-257",
+          "title": "Configure production MET_USER_AGENT with contact-bearing value.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 257: Configure production MET_USER_AGENT with contact-bearing value."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-258",
+          "title": "Add MET Alerts adapter if not already production-ready.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 258: Add MET Alerts adapter if not already production-ready."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-259",
+          "title": "Add MET Nowcast adapter if useful for target locations.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 259: Add MET Nowcast adapter if useful for target locations."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-260",
+          "title": "Add NVE flood warning normalization.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 260: Add NVE flood warning normalization."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-261",
+          "title": "Add NVE landslide warning normalization.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 261: Add NVE landslide warning normalization."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-262",
+          "title": "Add NVE avalanche warning normalization.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 262: Add NVE avalanche warning normalization."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-263",
+          "title": "Add external context signal history per mission.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 263: Add external context signal history per mission."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-264",
+          "title": "Add fetched-at/stale state to all context signals.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 264: Add fetched-at/stale state to all context signals."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-265",
+          "title": "Add last-known-good cache for public context.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 265: Add last-known-good cache for public context."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-266",
+          "title": "Add API failure UI that does not hide stale useful context.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 266: Add API failure UI that does not hide stale useful context."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-267",
+          "title": "Add rate-limit handling tests.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 267: Add rate-limit handling tests."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-268",
+          "title": "Add route-guard tests for unsupported query shapes.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 268: Add route-guard tests for unsupported query shapes."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-269",
+          "title": "Add external-data-sources settings page.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 269: Add external-data-sources settings page."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-270",
+          "title": "Allow users to disable Kartverket context.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 270: Allow users to disable Kartverket context."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-271",
+          "title": "Allow users to disable MET context.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 271: Allow users to disable MET context."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-272",
+          "title": "Allow users to disable NVE context.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 272: Allow users to disable NVE context."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-273",
+          "title": "Write ADR for offline map architecture.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 273: Write ADR for offline map architecture."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-274",
+          "title": "Choose offline map approach: MBTiles/MapLibre, Leaflet tile packages or static map packages.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 274: Choose offline map approach: MBTiles/MapLibre, Leaflet tile packages or static map packages."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-275",
+          "title": "Implement basic map page after ADR approval.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 275: Implement basic map page after ADR approval."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-276",
+          "title": "Add map source attribution.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 276: Add map source attribution."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-277",
+          "title": "Add optional map package download for selected area/district.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 277: Add optional map package download for selected area/district."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-278",
+          "title": "Add map cache size warning.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 278: Add map cache size warning."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-279",
+          "title": "Add map cache reset.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 279: Add map cache reset."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-280",
+          "title": "Optimize map performance on older phones.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 280: Optimize map performance on older phones."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-281",
+          "title": "Add offline map E2E test.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 281: Add offline map E2E test."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-282",
+          "title": "Add map markers for incident site.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 282: Add map markers for incident site."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-283",
+          "title": "Add map markers for hazards.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 283: Add map markers for hazards."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-284",
+          "title": "Add map markers for resources.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 284: Add map markers for resources."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-285",
+          "title": "Add map markers for meeting point.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 285: Add map markers for meeting point."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-286",
+          "title": "Add map markers for IL-KO.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 286: Add map markers for IL-KO."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-287",
+          "title": "Add map markers for pump location.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 287: Add map markers for pump location."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-288",
+          "title": "Add map markers for observations.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 288: Add map markers for observations."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-289",
+          "title": "Add map layer controls.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 289: Add map layer controls."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-290",
+          "title": "Add drawing tools for point, line and polygon.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 290: Add drawing tools for point, line and polygon."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-291",
+          "title": "Add sector/teig drawing tools.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 291: Add sector/teig drawing tools."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-292",
+          "title": "Add distance measuring tool.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 292: Add distance measuring tool."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-293",
+          "title": "Add area measuring tool.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 293: Add area measuring tool."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-294",
+          "title": "Add local save/load of sectors.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 294: Add local save/load of sectors."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-295",
+          "title": "Add map image export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 295: Add map image export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-296",
+          "title": "Add GeoJSON export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 296: Add GeoJSON export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-297",
+          "title": "Add GeoJSON import.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 297: Add GeoJSON import."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-298",
+          "title": "Add KML import evaluation.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 298: Add KML import evaluation."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-299",
+          "title": "Add privacy warning for location exports.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 299: Add privacy warning for location exports."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-300",
+          "title": "Design QR/file-based sector import from leadership without backend sync.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 300: Design QR/file-based sector import from leadership without backend sync."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-301",
+          "title": "Research shared live position/blue-force tracking as post-MVP only.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 301: Research shared live position/blue-force tracking as post-MVP only."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-302",
+          "title": "Design optional local profile model.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 302: Design optional local profile model."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-303",
+          "title": "Add optional local PIN lock.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 303: Add optional local PIN lock."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-304",
+          "title": "Evaluate browser/platform biometric unlock support.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 304: Evaluate browser/platform biometric unlock support."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-305",
+          "title": "Encrypt sensitive local profile data using Web Crypto if profile is implemented.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 305: Encrypt sensitive local profile data using Web Crypto if profile is implemented."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-306",
+          "title": "Add local role selection separate from account/auth.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 306: Add local role selection separate from account/auth."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-307",
+          "title": "Add local competence/certification records only after privacy review.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 307: Add local competence/certification records only after privacy review."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-308",
+          "title": "Add competence expiry reminders stored locally.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 308: Add competence expiry reminders stored locally."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-309",
+          "title": "Add personal equipment issued/status view only after privacy review.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 309: Add personal equipment issued/status view only after privacy review."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-310",
+          "title": "Add local availability status only after privacy review.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 310: Add local availability status only after privacy review."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-311",
+          "title": "Add local calendar integration for exercises/courses only after privacy review.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 311: Add local calendar integration for exercises/courses only after privacy review."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-312",
+          "title": "Add multiple local profiles only after privacy review.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 312: Add multiple local profiles only after privacy review."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-313",
+          "title": "Add local profile deletion.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 313: Add local profile deletion."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-314",
+          "title": "Add local audit log for order creation, status change, export and reset.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 314: Add local audit log for order creation, status change, export and reset."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-315",
+          "title": "Add audit export.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 315: Add audit export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-316",
+          "title": "Add retention settings for local mission/archive/profile data.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 316: Add retention settings for local mission/archive/profile data."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-317",
+          "title": "Add dedicated Feltmodus.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 317: Add dedicated Feltmodus."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-318",
+          "title": "Add glove mode with extra-large buttons.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 318: Add glove mode with extra-large buttons."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-319",
+          "title": "Add dark/night mode.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 319: Add dark/night mode."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-320",
+          "title": "Evaluate reduced-blue-light night variant.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 320: Evaluate reduced-blue-light night variant."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-321",
+          "title": "Ensure every touch target is at least 48x48 px.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 321: Ensure every touch target is at least 48x48 px."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-322",
+          "title": "Improve scrolling for rain/gloves.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 322: Improve scrolling for rain/gloves."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-323",
+          "title": "Add outdoor readability review.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 323: Add outdoor readability review."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-324",
+          "title": "Add always-visible offline indicator if not persistent everywhere.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 324: Add always-visible offline indicator if not persistent everywhere."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-325",
+          "title": "Add quick action menu for create note, run checklist, open 5-punktsordre, open sambandsplan, export status and search.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 325: Add quick action menu for create note, run checklist, open 5-punktsordre, open sambandsplan, export status and search."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-326",
+          "title": "Add active mission shortcut on all main operational pages.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 326: Add active mission shortcut on all main operational pages."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-327",
+          "title": "Add stress-friendly empty states.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 327: Add stress-friendly empty states."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-328",
+          "title": "Research Web Speech API support for note dictation.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 328: Research Web Speech API support for note dictation."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-329",
+          "title": "Add optional voice input only with fallback and accuracy warning.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 329: Add optional voice input only with fallback and accuracy warning."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-330",
+          "title": "Add real-user field testing with mannskaper.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 330: Add real-user field testing with mannskaper."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-331",
+          "title": "Add feedback capture process from field testing.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 331: Add feedback capture process from field testing."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-332",
+          "title": "Write ADR for local database choice.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 332: Write ADR for local database choice."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-333",
+          "title": "Evaluate Dexie.js versus raw idb versus SQLite WASM/OPFS.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 333: Evaluate Dexie.js versus raw idb versus SQLite WASM/OPFS."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-334",
+          "title": "Add local data schema versioning.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 334: Add local data schema versioning."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-335",
+          "title": "Add local data migrations.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 335: Add local data migrations."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-336",
+          "title": "Add backward-compatibility tests for local data migrations.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 336: Add backward-compatibility tests for local data migrations."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-337",
+          "title": "Add storage quota handling.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 337: Add storage quota handling."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-338",
+          "title": "Add local backup/export of all local app data.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 338: Add local backup/export of all local app data."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-339",
+          "title": "Add import from previous local export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 339: Add import from previous local export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-340",
+          "title": "Add service-worker update UI.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 340: Add service-worker update UI."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-341",
+          "title": "Add cache version display.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 341: Add cache version display."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-342",
+          "title": "Add content-cache stale warning.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 342: Add content-cache stale warning."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-343",
+          "title": "Add fallback if generated content fails to load.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 343: Add fallback if generated content fails to load."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-344",
+          "title": "Add service-worker cache-corruption/chaos test.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 344: Add service-worker cache-corruption/chaos test."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-345",
+          "title": "Optimize bundle size.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 345: Optimize bundle size."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-346",
+          "title": "Add Lighthouse mobile performance budget.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 346: Add Lighthouse mobile performance budget."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-347",
+          "title": "Add Playwright traces/screenshots artifacts on CI failure.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 347: Add Playwright traces/screenshots artifacts on CI failure."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-348",
+          "title": "Add dependency update policy.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 348: Add dependency update policy."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-349",
+          "title": "Write CIM integration concept note limited to possible manual/status exports.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 349: Write CIM integration concept note limited to possible manual/status exports."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-350",
+          "title": "Do not implement CIM write integration without formal approval.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 350: Do not implement CIM write integration without formal approval."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-351",
+          "title": "Research QR-code import for orders.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 351: Research QR-code import for orders."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-352",
+          "title": "Research file import for orders.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 352: Research file import for orders."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-353",
+          "title": "Research Nødnett integration possibilities and constraints.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 353: Research Nødnett integration possibilities and constraints."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-354",
+          "title": "Document why real Nødnett group lists must not ship in static public content.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 354: Document why real Nødnett group lists must not ship in static public content."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-355",
+          "title": "Research push notification architecture as post-MVP.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 355: Research push notification architecture as post-MVP."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-356",
+          "title": "Do not implement push until backend/auth/governance exists.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 356: Do not implement push until backend/auth/governance exists."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-357",
+          "title": "Write backend sync architecture before any sync work.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 357: Write backend sync architecture before any sync work."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-358",
+          "title": "Define conflict resolution for future sync.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 358: Define conflict resolution for future sync."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-359",
+          "title": "Define RBAC for future backend.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 359: Define RBAC for future backend."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-360",
+          "title": "Define audit logging for future backend.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 360: Define audit logging for future backend."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-361",
+          "title": "Define encryption-at-rest for future backend.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 361: Define encryption-at-rest for future backend."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-362",
+          "title": "Define incident access model for future backend.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 362: Define incident access model for future backend."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-363",
+          "title": "Extend Playwright E2E for full Før-Under-Etter journey with real data.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 363: Extend Playwright E2E for full Før-Under-Etter journey with real data."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-364",
+          "title": "Add E2E for expanded 5-punktsordre templates.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 364: Add E2E for expanded 5-punktsordre templates."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-365",
+          "title": "Add E2E for expanded sambandsplan templates.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 365: Add E2E for expanded sambandsplan templates."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-366",
+          "title": "Add E2E for after-action report export.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 366: Add E2E for after-action report export."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-367",
+          "title": "Add E2E for structured field log.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 367: Add E2E for structured field log."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-368",
+          "title": "Add E2E for RUH form.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 368: Add E2E for RUH form."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-369",
+          "title": "Add E2E for privacy reset after archive/log creation.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 369: Add E2E for privacy reset after archive/log creation."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-370",
+          "title": "Add accessibility tests with axe or equivalent.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 370: Add accessibility tests with axe or equivalent."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-371",
+          "title": "Target WCAG 2.2 AA where practical.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 371: Target WCAG 2.2 AA where practical."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-372",
+          "title": "Add keyboard navigation tests.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 372: Add keyboard navigation tests."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-373",
+          "title": "Add screen-reader label checks.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 373: Add screen-reader label checks."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-374",
+          "title": "Add performance tests for mobile/offline usage.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 374: Add performance tests for mobile/offline usage."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-375",
+          "title": "Add storage quota tests.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 375: Add storage quota tests."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-376",
+          "title": "Add import/export roundtrip tests.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 376: Add import/export roundtrip tests."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-377",
+          "title": "Create manual test script for flom/pumpe.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 377: Create manual test script for flom/pumpe."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-378",
+          "title": "Create manual test script for SAR/ettersøkning.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 378: Create manual test script for SAR/ettersøkning."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-379",
+          "title": "Create manual test script for CBRNE.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 379: Create manual test script for CBRNE."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-380",
+          "title": "Create manual test script for RADIAC/nedfall.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 380: Create manual test script for RADIAC/nedfall."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-381",
+          "title": "Create manual test script for alvorlig ulykke/psykologisk førstehjelp.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 381: Create manual test script for alvorlig ulykke/psykologisk førstehjelp."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-382",
+          "title": "Create manual test script for Etter innsats/MBK.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 382: Create manual test script for Etter innsats/MBK."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-383",
+          "title": "Create manual test script for offline use.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 383: Create manual test script for offline use."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-384",
+          "title": "Create manual test script for rain/gloves/darkness/stress.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 384: Create manual test script for rain/gloves/darkness/stress."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-385",
+          "title": "Run real-device testing on iPhone Safari.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 385: Run real-device testing on iPhone Safari."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-386",
+          "title": "Run real-device testing on Android Chrome.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 386: Run real-device testing on Android Chrome."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-387",
+          "title": "Run install-to-home-screen testing.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 387: Run install-to-home-screen testing."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-388",
+          "title": "Run low-connectivity testing.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 388: Run low-connectivity testing."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-389",
+          "title": "Run update-after-offline testing.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 389: Run update-after-offline testing."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-390",
+          "title": "Add staging deployment before broader pilot.",
+          "status": "active",
+          "stage": "release",
+          "risk": "high",
+          "sourceHeading": "Task 390: Add staging deployment before broader pilot."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-391",
+          "title": "Add uptime monitoring compatible with privacy boundary.",
+          "status": "active",
+          "stage": "scope",
+          "risk": "high",
+          "sourceHeading": "Task 391: Add uptime monitoring compatible with privacy boundary."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-392",
+          "title": "Add release notes generation.",
+          "status": "active",
+          "stage": "release",
+          "risk": "high",
+          "sourceHeading": "Task 392: Add release notes generation."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-393",
+          "title": "Add What's new page after updates.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 393: Add What's new page after updates."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-394",
+          "title": "Add content-version-to-release mapping.",
+          "status": "active",
+          "stage": "release",
+          "risk": "high",
+          "sourceHeading": "Task 394: Add content-version-to-release mapping."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-395",
+          "title": "Write quick start guide for mannskaper.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 395: Write quick start guide for mannskaper."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-396",
+          "title": "Write guide for lagfører/leder.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 396: Write guide for lagfører/leder."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-397",
+          "title": "Write offline-use guide.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 397: Write offline-use guide."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-398",
+          "title": "Write privacy-reset guide.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 398: Write privacy-reset guide."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-399",
+          "title": "Write expanded 5-punktsordre guide.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 399: Write expanded 5-punktsordre guide."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-400",
+          "title": "Write expanded sambandsplan guide.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 400: Write expanded sambandsplan guide."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-401",
+          "title": "Write checklist-runner guide.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 401: Write checklist-runner guide."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-402",
+          "title": "Write export guide.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 402: Write export guide."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-403",
+          "title": "Write source/warning interpretation guide.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 403: Write source/warning interpretation guide."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-404",
+          "title": "Write field testing guide.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 404: Write field testing guide."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-405",
+          "title": "Write guide for distriktsledere to contribute approved content.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 405: Write guide for distriktsledere to contribute approved content."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-406",
+          "title": "Add short video or interactive guide for key functions after UI stabilizes.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 406: Add short video or interactive guide for key functions after UI stabilizes."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-407",
+          "title": "Plan pilot rollout with one district first.",
+          "status": "active",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 407: Plan pilot rollout with one district first."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-408",
+          "title": "Define support/contact channel for pilot.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 408: Define support/contact channel for pilot."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-409",
+          "title": "Create GitHub Projects or Markdown roadmap.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 409: Create GitHub Projects or Markdown roadmap."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-410",
+          "title": "Create technical debt register.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 410: Create technical debt register."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-411",
+          "title": "Create regular content update process from Beredskapsboka.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 411: Create regular content update process from Beredskapsboka."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-412",
+          "title": "Add automated stale-content notifications.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 412: Add automated stale-content notifications."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-413",
+          "title": "Add quarterly dependency review.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 413: Add quarterly dependency review."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-414",
+          "title": "Add annual security review.",
+          "status": "active",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 414: Add annual security review."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-415",
+          "title": "Add annual privacy impact assessment.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 415: Add annual privacy impact assessment."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-416",
+          "title": "Evaluate Nynorsk support after Bokmål content stabilizes.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 416: Evaluate Nynorsk support after Bokmål content stabilizes."
+        },
+        {
+          "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-417",
+          "title": "Evaluate English support only if operationally useful.",
+          "status": "active",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 417: Evaluate English support only if operationally useful."
         }
       ]
     }
