@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T16:45:19.321Z",
+  "generatedAt": "2026-06-03T17:17:09.127Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-03T16:45:19.321Z",
+      "updatedAt": "2026-06-03T17:17:09.127Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -1043,169 +1043,253 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-16",
           "title": "Add source status values to every source document where missing.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 16: Add source status values to every source document where missing."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-17",
           "title": "Add verifiedAt metadata to every source document where missing.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 17: Add verifiedAt metadata to every source document where missing."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-18",
           "title": "Add reviewAfter or expiresAt metadata to every high-risk source.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 18: Add reviewAfter or expiresAt metadata to every high-risk source."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-19",
           "title": "Add reviewer/owner metadata to curated source records.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 19: Add reviewer/owner metadata to curated source records."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-20",
           "title": "Add source freshness badges on card detail pages.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 20: Add source freshness badges on card detail pages."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-21",
           "title": "Add source freshness badges on source detail pages.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 21: Add source freshness badges on source detail pages."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-22",
           "title": "Add a source review dashboard for stale, expired or unreviewed sources.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 22: Add a source review dashboard for stale, expired or unreviewed sources."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-23",
           "title": "Add CI reporting for sources with no linked cards.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 23: Add CI reporting for sources with no linked cards."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-24",
           "title": "Add CI reporting for cards with no linked source.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 24: Add CI reporting for cards with no linked source."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-25",
           "title": "Add CI reporting for high-risk cards without warnings.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 25: Add CI reporting for high-risk cards without warnings."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-26",
           "title": "Add CI reporting for high-risk cards without competence requirements or explicit rationale.",
-          "status": "active",
+          "status": "completed",
           "stage": "scope",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 26: Add CI reporting for high-risk cards without competence requirements or explicit rationale."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-27",
           "title": "Add CI reporting for glossary terms referenced but not defined.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 27: Add CI reporting for glossary terms referenced but not defined."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-28",
           "title": "Add content coverage report by role, phase and scenario.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 28: Add content coverage report by role, phase and scenario."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-29",
           "title": "Add content coverage report by competence requirement.",
-          "status": "active",
+          "status": "completed",
           "stage": "scope",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 29: Add content coverage report by competence requirement."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-30",
           "title": "Add content coverage report by source status.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 30: Add content coverage report by source status."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-31",
           "title": "Add release-board visibility for content coverage gaps.",
-          "status": "active",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 31: Add release-board visibility for content coverage gaps."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-32",
           "title": "Add a content-review issue template.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 32: Add a content-review issue template."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-33",
           "title": "Add a field-feedback issue template.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 33: Add a field-feedback issue template."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-34",
           "title": "Add a source-update issue template.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 34: Add a source-update issue template."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-35",
           "title": "Document the content review cycle.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 35: Document the content review cycle."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-36",
           "title": "Document how to retire deprecated cards or sources.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T17:16:44.000Z",
+          "evidence": [
+            "Implemented in commit 5b518f1; verified by 6 targeted test files / 35 tests passing, build:content, typecheck, lint, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 36: Document how to retire deprecated cards or sources."
         },
         {
