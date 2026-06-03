@@ -92,6 +92,146 @@ it('does not infer plan completion from task-level status lines', () => {
   expect(workplan.status).toBe('active');
 });
 
+it('parses task-level status and evidence metadata from task sections', () => {
+  const markdown = `# Task Metadata Plan
+
+Status: active
+Stage: verify
+Risk: high
+
+**Goal:** Show task truth.
+
+### Task 1: Restore lint
+
+Status: completed
+Owner: AR
+Completed-At: 2026-06-03T13:00:00.000Z
+Evidence: npm run lint PASS
+
+### Task 2: Verify offline flow
+
+Status: active
+Stage: release
+Risk: high
+Evidence: PLAYWRIGHT_PORT=3007 npm run e2e:prod pending
+`;
+
+  const workplan = parseWorkplanMarkdown({
+    fileName: '2026-06-03_140000-task-metadata-plan.md',
+    relativePath: '.hermes/plans/2026-06-03_140000-task-metadata-plan.md',
+    markdown,
+    updatedAt: '2026-06-03T14:00:00.000Z',
+  });
+
+  expect(workplan.tasks).toHaveLength(2);
+  expect(workplan.tasks[0]).toMatchObject({
+    title: 'Restore lint',
+    status: 'completed',
+    owner: 'AR',
+    completedAt: '2026-06-03T13:00:00.000Z',
+    evidence: ['npm run lint PASS'],
+  });
+  expect(workplan.tasks[1]).toMatchObject({
+    title: 'Verify offline flow',
+    status: 'active',
+    stage: 'release',
+    risk: 'high',
+    evidence: ['PLAYWRIGHT_PORT=3007 npm run e2e:prod pending'],
+  });
+});
+
+it('rejects explicit invalid task-level enum metadata', () => {
+  const markdown = `# Invalid Task Metadata Plan
+
+Status: active
+
+**Goal:** Bad task metadata should fail.
+
+### Task 1: Bad task
+
+Status: waiting
+Stage: qa
+Risk: severe
+`;
+
+  expect(() => parseWorkplanMarkdown({
+    fileName: '2026-06-03_140000-invalid-task-metadata-plan.md',
+    relativePath: '.hermes/plans/2026-06-03_140000-invalid-task-metadata-plan.md',
+    markdown,
+  })).toThrow(/Invalid workplan metadata/i);
+});
+
+it('does not parse natural prose task status lines after body content as task metadata', () => {
+  const markdown = `# Task Prose Status Plan
+
+Status: active
+Stage: build
+Risk: medium
+
+**Goal:** Keep prose out of task metadata.
+
+### Task 1: Parse prose body
+
+Status: active
+
+- Step 1: Document the current state.
+- Status: completed in this bullet is natural prose, not metadata.
+
+Stage: release
+Evidence: should not be parsed after the bullet
+`;
+
+  const workplan = parseWorkplanMarkdown({
+    fileName: '2026-06-03_140000-task-prose-status-plan.md',
+    relativePath: '.hermes/plans/2026-06-03_140000-task-prose-status-plan.md',
+    markdown,
+  });
+
+  expect(workplan.tasks[0]).toMatchObject({
+    title: 'Parse prose body',
+    status: 'active',
+    stage: 'build',
+    risk: 'medium',
+  });
+  expect(workplan.tasks[0].evidence).toBeUndefined();
+});
+
+it('ignores task headings and metadata inside fenced code blocks', () => {
+  const markdown = `# Fenced Task Heading Plan
+
+Status: active
+Stage: build
+Risk: medium
+
+**Goal:** Ignore examples.
+
+### Task 1: Real task
+
+Status: active
+
+\`\`\`markdown
+### Task 99: Example only
+
+Status: completed
+Stage: release
+Evidence: should not become a task
+\`\`\`
+`;
+
+  const workplan = parseWorkplanMarkdown({
+    fileName: '2026-06-03_140000-fenced-task-heading-plan.md',
+    relativePath: '.hermes/plans/2026-06-03_140000-fenced-task-heading-plan.md',
+    markdown,
+  });
+
+  expect(workplan.tasks).toHaveLength(1);
+  expect(workplan.tasks[0]).toMatchObject({
+    id: '2026-06-03_140000-fenced-task-heading-plan-task-1',
+    title: 'Real task',
+    status: 'active',
+  });
+});
+
 it('preserves optional workplan and task evidence metadata', () => {
   const snapshot = WorkplansSnapshotSchema.parse({
     generatedAt: '2026-06-03T13:59:34.000Z',

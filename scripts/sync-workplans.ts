@@ -73,6 +73,12 @@ function cleanInlineMarkdown(value: string) {
 type MetadataValue = string | string[];
 type MetadataMap = Record<string, MetadataValue>;
 
+interface TaskSection {
+  number: string;
+  title: string;
+  body: string;
+}
+
 function metadataKey(value: string) {
   return value.trim().toLowerCase().replace(/[_\s]+/g, '-');
 }
@@ -203,6 +209,72 @@ function markdownBeforeFirstTask(markdown: string) {
   return firstTask === -1 ? markdown : markdown.slice(0, firstTask);
 }
 
+function extractTaskSections(markdown: string): TaskSection[] {
+  const headings: Array<{ number: string; title: string; bodyStart: number; headingStart: number }> = [];
+  let inFence = false;
+
+  for (const lineMatch of markdown.matchAll(/^.*(?:\r?\n|$)/gm)) {
+    const rawLine = lineMatch[0];
+    if (!rawLine) continue;
+    const headingStart = lineMatch.index ?? 0;
+    const line = rawLine.trim();
+
+    if (line.startsWith('```')) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
+
+    const headingMatch = line.match(/^###\s+Task\s+(\d+)\s*:\s*(.+)$/i);
+    if (!headingMatch) continue;
+
+    headings.push({
+      number: headingMatch[1] ?? String(headings.length + 1),
+      title: cleanInlineMarkdown(headingMatch[2] ?? `Task ${headings.length + 1}`),
+      bodyStart: headingStart + rawLine.length,
+      headingStart,
+    });
+  }
+
+  return headings.map((heading, index) => ({
+    number: heading.number,
+    title: heading.title,
+    body: markdown.slice(heading.bodyStart, headings[index + 1]?.headingStart ?? markdown.length),
+  }));
+}
+
+function extractSectionMetadata(sectionBody: string): MetadataMap {
+  const metadata: MetadataMap = {};
+  const lines = sectionBody.split(/\r?\n/);
+  let foundMetadata = false;
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) {
+      if (foundMetadata) break;
+      continue;
+    }
+    if (line.startsWith('```') || line.startsWith('**') || /^[-*+]\s+/.test(line) || /^\d+\.\s+/.test(line)) break;
+
+    const match = line.match(/^([A-Za-z][A-Za-z _-]*):\s*(.*)$/);
+    if (!match) break;
+
+    const key = metadataKey(match[1] ?? '');
+    const value = cleanInlineMarkdown(match[2] ?? '');
+    const existing = metadata[key];
+    foundMetadata = true;
+    if (key === 'evidence') {
+      metadata[key] = existing === undefined ? [value] : Array.isArray(existing) ? [...existing, value] : [existing, value];
+    } else if (existing === undefined) {
+      metadata[key] = value;
+    } else {
+      throw new Error(`Invalid workplan metadata duplicate ${key}: ${value}`);
+    }
+  }
+
+  return metadata;
+}
+
 function inferTaskStage(title: string, fallback: WorkplanStage): WorkplanStage {
   const lower = title.toLowerCase();
   if (/release|deploy|launch|go-live|final/.test(lower)) return 'release';
@@ -222,16 +294,20 @@ export function parseWorkplanMarkdown({ fileName, relativePath, markdown, update
   const stage = parseStage(scalarMetadata(metadata, 'stage'), inferredStage);
   const risk = parseRisk(scalarMetadata(metadata, 'risk'), inferRisk(planPreamble));
   const status = parseStatus(scalarMetadata(metadata, 'status'), inferStatus(planPreamble));
-  const tasks = [...markdown.matchAll(/^###\s+Task\s+(\d+)\s*:\s*(.+)$/gim)].map((match, index) => {
-    const number = match[1] ?? String(index + 1);
-    const taskTitle = cleanInlineMarkdown(match[2] ?? `Task ${number}`);
+  const tasks = extractTaskSections(markdown).map((section) => {
+    const taskMetadata = extractSectionMetadata(section.body);
+    const taskStage = parseStage(scalarMetadata(taskMetadata, 'stage'), inferTaskStage(section.title, stage));
+    const taskRisk = parseRisk(scalarMetadata(taskMetadata, 'risk'), risk);
     return {
-      id: `${id}-task-${number}`,
-      title: taskTitle,
-      status: 'planned' as const,
-      stage: inferTaskStage(taskTitle, stage),
-      risk,
-      sourceHeading: `Task ${number}: ${taskTitle}`,
+      id: `${id}-task-${section.number}`,
+      title: section.title,
+      status: parseStatus(scalarMetadata(taskMetadata, 'status'), 'planned'),
+      stage: taskStage,
+      risk: taskRisk,
+      owner: scalarMetadata(taskMetadata, 'owner'),
+      completedAt: scalarMetadata(taskMetadata, 'completed-at'),
+      evidence: evidenceMetadata(taskMetadata),
+      sourceHeading: `Task ${section.number}: ${section.title}`,
     };
   });
 
