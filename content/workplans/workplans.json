@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T15:14:15.636Z",
+  "generatedAt": "2026-06-03T15:29:09.568Z",
   "sourceCount": 4,
   "workplans": [
     {
@@ -730,82 +730,116 @@
       "sourcePath": ".hermes/plans/2026-06-03_135934-workplan-truth-sync-plan.md",
       "sourceType": "hermes-plan",
       "summary": "Make Obsidian 20-Workplans and the /release board reflect real plan/task status, evidence, and remaining work instead of showing every historical workplan task as active/planned.",
-      "stage": "build",
+      "stage": "release",
       "risk": "high",
-      "status": "active",
+      "status": "completed",
+      "owner": "AR",
+      "completedAt": "2026-06-03T15:28:49.000Z",
+      "evidence": [
+        "npm run sync:workplans marker checks PASS — 4/4 workplans parsed with completed historical status and no absolute repo path leak.",
+        "npm run check PASS — content build, typecheck, lint, Vitest 39 files / 97 tests, Next build 95 pages.",
+        "PLAYWRIGHT_PORT=3007 npm run e2e:prod PASS — 9/9 production E2E tests after rebuilding .next."
+      ],
       "taskCount": 9,
-      "updatedAt": "2026-06-03T14:12:17.968Z",
+      "updatedAt": "2026-06-03T15:29:09.568Z",
       "tasks": [
         {
           "id": "2026-06-03_135934-workplan-truth-sync-plan-task-1",
           "title": "Extend workplan schemas for optional evidence metadata",
-          "status": "planned",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "evidence": [
+            "c068c59 added optional workplan/task metadata schema; tests/workplans/sync-workplans.test.ts PASS."
+          ],
           "sourceHeading": "Task 1: Extend workplan schemas for optional evidence metadata"
         },
         {
           "id": "2026-06-03_135934-workplan-truth-sync-plan-task-2",
           "title": "Parse plan-level metadata from markdown",
-          "status": "planned",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "evidence": [
+            "3e8ad81 added plan-level metadata parsing and invalid metadata rejection; sync-workplans focused tests PASS."
+          ],
           "sourceHeading": "Task 2: Parse plan-level metadata from markdown"
         },
         {
           "id": "2026-06-03_135934-workplan-truth-sync-plan-task-3",
           "title": "Parse task-level metadata from markdown sections",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "1d74688 added task-level metadata parsing and fence-aware task extraction; sync-workplans focused tests PASS."
+          ],
           "sourceHeading": "Task 3: Parse task-level metadata from markdown sections"
         },
         {
           "id": "2026-06-03_135934-workplan-truth-sync-plan-task-4",
           "title": "Render grouped Obsidian workplans with task status and evidence",
-          "status": "planned",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "evidence": [
+            "ea2e223 rendered grouped Obsidian workplans with task status/evidence; npm run sync:workplans marker checks PASS."
+          ],
           "sourceHeading": "Task 4: Render grouped Obsidian workplans with task status and evidence"
         },
         {
           "id": "2026-06-03_135934-workplan-truth-sync-plan-task-5",
           "title": "Add release-plan progress summaries from task statuses",
-          "status": "planned",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
+          "evidence": [
+            "844f667 added release-plan progress summaries; tests/release/plan-sync.test.ts PASS."
+          ],
           "sourceHeading": "Task 5: Add release-plan progress summaries from task statuses"
         },
         {
           "id": "2026-06-03_135934-workplan-truth-sync-plan-task-6",
           "title": "Surface synced task progress on the release page",
-          "status": "planned",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
+          "evidence": [
+            "0c8694f surfaced synced task progress on /release; tests/components/release-readiness-tool.test.tsx PASS."
+          ],
           "sourceHeading": "Task 6: Surface synced task progress on the release page"
         },
         {
           "id": "2026-06-03_135934-workplan-truth-sync-plan-task-7",
           "title": "Add production E2E coverage for synced workplans on /release",
-          "status": "planned",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
+          "evidence": [
+            "b691c9f added production E2E coverage for /release workplan artifacts; release-workplans spec PASS."
+          ],
           "sourceHeading": "Task 7: Add production E2E coverage for synced workplans on /release"
         },
         {
           "id": "2026-06-03_135934-workplan-truth-sync-plan-task-8",
           "title": "Mark existing local workplans with truthful status evidence",
-          "status": "planned",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "evidence": [
+            "d1367de marked historical plans completed; snapshot shows 10/10, 44/44, and 6/6 historical tasks completed."
+          ],
           "sourceHeading": "Task 8: Mark existing local workplans with truthful status evidence"
         },
         {
           "id": "2026-06-03_135934-workplan-truth-sync-plan-task-9",
           "title": "Run final workplan sync and Obsidian/release verification",
-          "status": "planned",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Final sync marker checks, npm run check PASS, and PLAYWRIGHT_PORT=3007 npm run e2e:prod PASS — 9/9 tests."
+          ],
           "sourceHeading": "Task 9: Run final workplan sync and Obsidian/release verification"
         }
       ]
