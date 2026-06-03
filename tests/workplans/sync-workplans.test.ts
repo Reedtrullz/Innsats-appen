@@ -40,6 +40,58 @@ it('parses a workplan markdown file into release-ready workplan metadata and tas
   expect(workplan.tasks.map((task) => task.title)).toEqual(['Build sync script', 'Verify release page']);
 });
 
+it('parses explicit plan-level metadata from markdown', () => {
+  const markdown = `# Verified Plan\n\nStatus: **completed**\nStage: release\nRisk: low\nOwner: **AR**\nCompleted-At: 2026-06-03T13:59:34.000Z\nEvidence: [npm run check PASS](https://example.invalid/log)\nEvidence: live health matched SHA\n\n**Goal:** Capture verified release truth.\n\n### Task 1: Close release loop\n`;
+
+  const workplan = parseWorkplanMarkdown({
+    fileName: '2026-06-03_135934-verified-plan.md',
+    relativePath: '.hermes/plans/2026-06-03_135934-verified-plan.md',
+    markdown,
+    updatedAt: '2026-06-03T13:59:34.000Z',
+  });
+
+  expect(workplan).toMatchObject({
+    status: 'completed',
+    stage: 'release',
+    risk: 'low',
+    owner: 'AR',
+    completedAt: '2026-06-03T13:59:34.000Z',
+    evidence: ['npm run check PASS', 'live health matched SHA'],
+  });
+});
+
+it('rejects explicit invalid plan-level enum metadata instead of falling back', () => {
+  const markdown = `# Bad Metadata Plan\n\nStatus: done\nStage: qa\nRisk: severe\n\n**Goal:** This should fail loudly.\n\n### Task 1: Never parsed\n`;
+
+  expect(() => parseWorkplanMarkdown({
+    fileName: '2026-06-03_135934-bad-metadata-plan.md',
+    relativePath: '.hermes/plans/2026-06-03_135934-bad-metadata-plan.md',
+    markdown,
+  })).toThrow(/Invalid workplan metadata/i);
+});
+
+it('rejects duplicate non-evidence plan metadata instead of falling back', () => {
+  const markdown = `# Duplicate Metadata Plan\n\nStatus: done\nStatus: active\n\n**Goal:** Duplicate metadata should not hide invalid values.\n\n### Task 1: Never parsed\n`;
+
+  expect(() => parseWorkplanMarkdown({
+    fileName: '2026-06-03_135934-duplicate-metadata-plan.md',
+    relativePath: '.hermes/plans/2026-06-03_135934-duplicate-metadata-plan.md',
+    markdown,
+  })).toThrow(/Invalid workplan metadata/i);
+});
+
+it('does not infer plan completion from task-level status lines', () => {
+  const markdown = `# Task Only Status Plan\n\n**Goal:** Keep plan-level status inferred from the preamble only.\n\n### Task 1: Completed child task\n\nStatus: completed\nCompleted-At: 2026-06-03T13:59:34.000Z\n`;
+
+  const workplan = parseWorkplanMarkdown({
+    fileName: '2026-06-03_135934-task-only-status-plan.md',
+    relativePath: '.hermes/plans/2026-06-03_135934-task-only-status-plan.md',
+    markdown,
+  });
+
+  expect(workplan.status).toBe('active');
+});
+
 it('preserves optional workplan and task evidence metadata', () => {
   const snapshot = WorkplansSnapshotSchema.parse({
     generatedAt: '2026-06-03T13:59:34.000Z',

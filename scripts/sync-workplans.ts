@@ -70,6 +70,55 @@ function cleanInlineMarkdown(value: string) {
     .trim();
 }
 
+type MetadataValue = string | string[];
+type MetadataMap = Record<string, MetadataValue>;
+
+function metadataKey(value: string) {
+  return value.trim().toLowerCase().replace(/[_\s]+/g, '-');
+}
+
+function extractLeadingMetadata(markdown: string): MetadataMap {
+  const metadata: MetadataMap = {};
+  const lines = markdown.split(/\r?\n/);
+  const h1Index = lines.findIndex((line) => /^#\s+/.test(line.trim()));
+  const startIndex = h1Index === -1 ? 0 : h1Index + 1;
+
+  for (let index = startIndex; index < lines.length; index += 1) {
+    const line = lines[index]?.trim() ?? '';
+    if (!line) continue;
+    if (line.startsWith('>') || /^(?:\*\*)?Goal(?:\*\*)?:/i.test(line) || /^###\s+Task\s+\d+\s*:/i.test(line)) break;
+
+    const match = line.match(/^([A-Za-z][A-Za-z _-]*):\s*(.*)$/);
+    if (!match) break;
+
+    const key = metadataKey(match[1] ?? '');
+    const value = cleanInlineMarkdown(match[2] ?? '');
+    const existing = metadata[key];
+    if (key === 'evidence') {
+      metadata[key] = existing === undefined ? [value] : Array.isArray(existing) ? [...existing, value] : [existing, value];
+    } else if (existing === undefined) {
+      metadata[key] = value;
+    } else {
+      throw new Error(`Invalid workplan metadata duplicate ${key}: ${value}`);
+    }
+  }
+
+  return metadata;
+}
+
+function scalarMetadata(metadata: MetadataMap, key: string) {
+  const value = metadata[metadataKey(key)];
+  return typeof value === 'string' ? value : undefined;
+}
+
+function evidenceMetadata(metadata: MetadataMap) {
+  const value = metadata.evidence;
+  if (value === undefined) return undefined;
+  const evidence = Array.isArray(value) ? value : [value];
+  const nonEmptyEvidence = evidence.filter((item) => item.length > 0);
+  return nonEmptyEvidence.length > 0 ? nonEmptyEvidence : undefined;
+}
+
 function slugifyWorkplanId(value: string) {
   return normalizeNorwegian(value)
     .toLowerCase()
@@ -126,8 +175,32 @@ function inferStatus(markdown: string): WorkplanStatus {
   if (explicit === 'planned') return 'planned';
   if (explicit === 'active') return 'active';
   if (/^blocked:\s*true\s*$/im.test(markdown)) return 'blocked';
-  if (/\b(task|implementation|execute|build|verify|review)\b/i.test(markdown)) return 'active';
+  if (/\b(task|implementation|execute|build|ship|verify|review)\b/i.test(markdown)) return 'active';
   return 'planned';
+}
+
+function enumMetadata<T extends string>(value: string | undefined, fallback: T, allowed: readonly T[], label: string): T {
+  if (value === undefined) return fallback;
+  const parsed = value.toLowerCase() as T;
+  if ((allowed as readonly string[]).includes(parsed)) return parsed;
+  throw new Error(`Invalid workplan metadata ${label}: ${value}`);
+}
+
+function parseStage(value: string | undefined, fallback: WorkplanStage): WorkplanStage {
+  return enumMetadata(value, fallback, ['idea', 'scope', 'build', 'verify', 'release'] as const, 'stage');
+}
+
+function parseRisk(value: string | undefined, fallback: WorkplanRisk): WorkplanRisk {
+  return enumMetadata(value, fallback, ['low', 'medium', 'high'] as const, 'risk');
+}
+
+function parseStatus(value: string | undefined, fallback: WorkplanStatus): WorkplanStatus {
+  return enumMetadata(value, fallback, ['planned', 'active', 'blocked', 'completed'] as const, 'status');
+}
+
+function markdownBeforeFirstTask(markdown: string) {
+  const firstTask = markdown.search(/^###\s+Task\s+\d+\s*:/im);
+  return firstTask === -1 ? markdown : markdown.slice(0, firstTask);
 }
 
 function inferTaskStage(title: string, fallback: WorkplanStage): WorkplanStage {
@@ -140,12 +213,15 @@ function inferTaskStage(title: string, fallback: WorkplanStage): WorkplanStage {
 }
 
 export function parseWorkplanMarkdown({ fileName, relativePath, markdown, updatedAt }: ParseWorkplanOptions): Workplan {
+  const metadata = extractLeadingMetadata(markdown);
   const id = slugifyWorkplanId(path.basename(fileName, path.extname(fileName)));
   const title = extractTitle(markdown, fileName);
   const summary = extractSummary(markdown);
-  const stage = inferStage(title, summary);
-  const risk = inferRisk(markdown);
-  const status = inferStatus(markdown);
+  const planPreamble = markdownBeforeFirstTask(markdown);
+  const inferredStage = inferStage(title, summary);
+  const stage = parseStage(scalarMetadata(metadata, 'stage'), inferredStage);
+  const risk = parseRisk(scalarMetadata(metadata, 'risk'), inferRisk(planPreamble));
+  const status = parseStatus(scalarMetadata(metadata, 'status'), inferStatus(planPreamble));
   const tasks = [...markdown.matchAll(/^###\s+Task\s+(\d+)\s*:\s*(.+)$/gim)].map((match, index) => {
     const number = match[1] ?? String(index + 1);
     const taskTitle = cleanInlineMarkdown(match[2] ?? `Task ${number}`);
@@ -168,6 +244,9 @@ export function parseWorkplanMarkdown({ fileName, relativePath, markdown, update
     stage,
     risk,
     status,
+    owner: scalarMetadata(metadata, 'owner'),
+    completedAt: scalarMetadata(metadata, 'completed-at'),
+    evidence: evidenceMetadata(metadata),
     taskCount: tasks.length,
     updatedAt: updatedAt ?? new Date().toISOString(),
     tasks,
