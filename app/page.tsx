@@ -16,6 +16,9 @@ export default function Home() {
           <Link className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-sky-200 px-4 text-sm font-black text-white" href="/oppdrag/ny">
             Start lokalt oppdrag
           </Link>
+          <Link className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-sky-200 px-4 text-sm font-black text-white sm:col-span-2" href="/release">
+            Release readiness
+          </Link>
         </div>
       </section>
 
