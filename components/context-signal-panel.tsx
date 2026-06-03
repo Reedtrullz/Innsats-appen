@@ -14,8 +14,8 @@ export function ContextSignalPanel({ signals, unavailableSources = [] }: { signa
       {hasStaleSignals ? <p className="mt-2 rounded-2xl bg-slate-100 p-3 text-sm font-semibold text-slate-800">Viser sist vellykkede lokale kontekstsignal som stale etter manglende eller feilet oppfrisking.</p> : null}
       {unavailableSources.map((source) => <p key={source} className="mt-2 text-sm font-semibold text-red-800">{source} utilgjengelig – viser eventuelt sist vellykkede signal som stale.</p>)}
       <div className="mt-3 space-y-3">
-        {signals.map((signal) => (
-          <article key={`${signal.source}-${signal.kind}-${signal.upstreamId ?? signal.title}`} className="rounded-2xl border border-slate-200 p-3">
+        {signals.map((signal, index) => (
+          <article key={`${signal.source}-${signal.kind}-${signal.upstreamId ?? signal.rawRef ?? signal.title}-${index}`} className="rounded-2xl border border-slate-200 p-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold">{signal.source}</span>
               <span className="rounded-full bg-sky-100 px-2 py-1 text-xs font-bold">{signal.kind}</span>

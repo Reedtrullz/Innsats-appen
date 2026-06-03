@@ -182,8 +182,52 @@
       label: Kontakt med innsatsleder etablert og videre oppdrag/rapportering avklart
       required: true
       sourceIds: [src-tiltakskort-for-innsats, src-kommunikasjons-og-sambandsdiagram]
-  sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
-  warning: Følg innsatsleders føringer og lokal ordre. Ikke registrer persondata eller pasientdata.
+    - id: overtakelse-fra-annen-enhet
+      label: Ved overtakelse fra annen enhet er situasjon, tiltak, risiko, samband og utestående behov gjennomgått med avtroppende leder
+      required: false
+      sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
+    - id: ressurs-og-utstyr-revurdert
+      label: Ressurser, verneutstyr, samband, kjøretøy og utholdenhet er revurdert mot oppdragets varighet og risikobilde
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats]
+    - id: anmod-ekstra-ressurser
+      label: Behov for ekstra ressurser er meldt via innsatsleder eller avtalt rapporteringslinje før mangler påvirker sikkerhet eller oppdragsløsning
+      required: false
+      sourceIds: [src-tiltakskort-for-innsats, src-kommunikasjons-og-sambandsdiagram]
+    - id: kontinuerlig-personellkontroll
+      label: Personellkontroll gjennomføres fortløpende uten å registrere navn, ID eller helsedata i appen
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats]
+    - id: kontinuerlig-risikovurdering
+      label: Risiko og egen sikkerhet vurderes kontinuerlig; stans, trekk tilbake eller meld endringer ved uakseptabel risiko
+      required: true
+      sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre]
+    - id: lopende-dialog-innsatsleder
+      label: Løpende dialog med innsatsleder holdes om status, avvik, ressursbehov og neste prioritet
+      required: true
+      sourceIds: [src-tiltakskort-for-innsats, src-kommunikasjons-og-sambandsdiagram]
+    - id: ny-analyse-ved-endring
+      label: Oppdrag, tiltak og risikobilde analyseres på nytt ved endret situasjon, vær, fare, ordre eller ressursstatus
+      required: true
+      sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre]
+    - id: mat-vann-hvile
+      label: Mat, vann, varme/kuldebeskyttelse og hvile er kontrollert for å opprettholde sikker drift over tid
+      required: false
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats]
+    - id: avlosning-planlagt
+      label: Plan for avløsning, rotasjon eller forsterkning er avklart før personell blir utslitt
+      required: false
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats]
+    - id: psykososial-efok-trigger
+      label: Tegn på sterke belastninger, utrygghet eller hendelser som kan utløse psykososial oppfølging/EFOK er meldt etter lokale rutiner
+      required: false
+      sourceIds: [src-psykososial-oppfolging-og-kollegastotte, src-tiltakskort-for-innsats]
+    - id: overlevering-avmarsj
+      label: Ved avmarsj er oppdrag, restanser, farer, sperringer, ressursbehov og kontaktpunkt overlevert til innsatsleder eller neste enhet
+      required: true
+      sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
+  sourceIds: [src-tiltakskort-for-innsats, src-sjekkliste-fig-og-figp, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram, src-psykososial-oppfolging-og-kollegastotte]
+  warning: Følg innsatsleders føringer og lokal ordre. Ikke legg inn navn, ID, persondata, pasientdata, helsejournal eller skjermet operativ informasjon.
 
 - slug: fig-etter-innsats
   title: FIG etter innsats
@@ -191,6 +235,18 @@
   roles: [mannskap, lagforer, materiellansvarlig]
   scenarios: [generelt]
   items:
+    - id: personellkontroll-etter
+      label: Personellkontroll etter innsats er gjennomført etter lokale rutiner uten å registrere navn, ID eller helsedata i appen
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
+    - id: skade-eller-personellskade-eskalering
+      label: Skade, nestenulykke eller mulig personellskade er eskalert til ansvarlig leder og ordinære systemer; ikke bruk appen som helsejournal
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
+    - id: teknisk-gjennomgang
+      label: Teknisk gjennomgang av kjøretøy, samband, verneutstyr og fellesutstyr er startet før materiell settes tilbake i beredskap
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
     - id: utstyr-retur
       label: Utstyr, kjøretøy og forbruk registrert
       required: true
@@ -203,8 +259,8 @@
       label: Behov for psykososial oppfølging vurdert
       required: false
       sourceIds: [src-psykososial-oppfolging-og-kollegastotte]
-  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
-  warning: Ikke personjournal.
+  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats, src-psykososial-oppfolging-og-kollegastotte]
+  warning: Etter innsats-støtte er ikke personjournal. Ikke legg inn navn, ID, persondata, pasientdata eller helsedata.
 
 - slug: radiac-utstyrskontroll
   title: RADIAC utstyrskontroll

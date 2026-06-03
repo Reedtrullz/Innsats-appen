@@ -2,6 +2,22 @@ import type { OperationalChecklist } from '@/lib/content/schemas';
 import { EXPORT_SENSITIVITY_WARNING } from './order-export';
 import type { ChecklistRun, MissionContext } from './schemas';
 
+const LOCAL_ONLY_STATUS_WARNING = 'Lagres bare lokalt i denne nettleseren. Ikke offisiell logg alene. Ikke legg inn eller del navn, ID, pasientdetaljer, helsejournal, skjermet operativ informasjon eller annet sensitivt innhold.';
+
+const resourceKindLabels: Record<string, string> = {
+  water: 'Vann',
+  food: 'Mat',
+  ppe: 'Verneutstyr',
+  'medical-support': 'Medisinsk støtte',
+  transport: 'Transport',
+  fuel: 'Drivstoff',
+  equipment: 'Utstyr',
+};
+
+function joinDefined(parts: Array<string | undefined>) {
+  return parts.filter((part) => part && part.trim().length > 0).join(' — ');
+}
+
 export function exportMissionMarkdown({ mission, checklists, runs }: { mission: MissionContext; checklists: OperationalChecklist[]; runs: ChecklistRun[] }) {
   const lines: string[] = [];
   lines.push(`# ${mission.title}`);
@@ -21,6 +37,61 @@ export function exportMissionMarkdown({ mission, checklists, runs }: { mission: 
     for (const item of checklist.items) {
       const checked = run?.checkedItemIds.includes(item.id) ? 'x' : ' ';
       lines.push(`- [${checked}] ${item.label} (${(item.sourceIds ?? []).join(', ')})`);
+    }
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+export function exportMissionStatusSummaryMarkdown({ mission }: { mission: MissionContext }) {
+  const lines: string[] = [];
+  const openTasks = mission.tasks.filter((task) => task.status !== 'done');
+  lines.push('# Lokal oppdragsstatus');
+  lines.push('');
+  lines.push(`> ${EXPORT_SENSITIVITY_WARNING}`);
+  lines.push(`> ${LOCAL_ONLY_STATUS_WARNING}`);
+  lines.push('');
+  lines.push('## Situasjonsoversikt nå');
+  lines.push(`- Oppdrag: ${mission.title}`);
+  lines.push(`- Fase/rolle/scenario: ${mission.phase} / ${mission.role} / ${mission.scenario}`);
+  lines.push(`- Sted: ${mission.locationText}`);
+  lines.push(`- Oppdatert: ${mission.updatedAt}`);
+  lines.push(`- Aktive sjekklister: ${mission.activeChecklistIds.length > 0 ? mission.activeChecklistIds.join(', ') : 'Ingen registrert'}`);
+  lines.push(`- Åpne oppgaver: ${openTasks.length}`);
+  if (mission.notes) lines.push(`- Notater: ${mission.notes}`);
+  lines.push('');
+  lines.push('### Vær/farer (lagrede sammendrag, ikke rådata)');
+  if (mission.externalSignals.length === 0) {
+    lines.push('- Ingen lokale sammendrag lagret');
+  } else {
+    for (const signal of mission.externalSignals) {
+      lines.push(`- ${signal.title}: ${signal.summary} (${signal.source}, ${signal.severity}, ${signal.staleness})`);
+    }
+  }
+  lines.push('');
+  lines.push('## Oppgaver');
+  if (mission.tasks.length === 0) {
+    lines.push('- Ingen lokale oppgaver registrert');
+  } else {
+    for (const task of mission.tasks) {
+      lines.push(`- [${task.status}] ${task.title}${task.notes ? ` — ${task.notes}` : ''}`);
+    }
+  }
+  lines.push('');
+  lines.push('## Hurtigstatus');
+  if (mission.statusLog.length === 0) {
+    lines.push('- Ingen hurtigstatus registrert');
+  } else {
+    for (const status of mission.statusLog) {
+      lines.push(`- ${status.message} (${status.createdAt})${status.note ? ` — ${status.note}` : ''}`);
+    }
+  }
+  lines.push('');
+  lines.push('## Ressursbehov');
+  if (mission.resourceRequests.length === 0) {
+    lines.push('- Ingen ressursbehov registrert');
+  } else {
+    for (const request of mission.resourceRequests) {
+      lines.push(`- ${resourceKindLabels[request.kind] ?? request.kind}: ${joinDefined([request.status, request.quantity, request.note])}`);
     }
   }
   return `${lines.join('\n')}\n`;

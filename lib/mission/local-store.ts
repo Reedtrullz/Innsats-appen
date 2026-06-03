@@ -38,12 +38,13 @@ export async function saveMission(input: MissionContext): Promise<MissionContext
 }
 
 export async function getMission(id: string): Promise<MissionContext | undefined> {
-  return (await db()).get('missions', id);
+  const mission = await (await db()).get('missions', id);
+  return mission ? MissionContextSchema.parse({ ...mission, schemaVersion: mission.schemaVersion ?? 1 }) : undefined;
 }
 
 export async function listMissions(): Promise<MissionContext[]> {
   const missions = await (await db()).getAll('missions');
-  return missions.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  return missions.map((mission) => MissionContextSchema.parse({ ...mission, schemaVersion: mission.schemaVersion ?? 1 })).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 export async function deleteMission(id: string): Promise<void> {

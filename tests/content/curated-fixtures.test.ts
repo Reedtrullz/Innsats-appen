@@ -16,7 +16,7 @@ it('curated YAML includes required starter slugs', () => {
   expect(training.map((path) => path.slug)).toContain('fig10-grunnkurs');
 });
 
-it('curated Group 2A checklists cover før utrykning and first under innsats workflow steps', () => {
+it('curated Group 2A/2B checklists cover før utrykning, expanded under innsats and first etter innsats workflow steps', () => {
   const checklists = readYaml('content/curated/checklists.yaml');
   const bySlug = new Map(checklists.map((checklist) => [checklist.slug, checklist]));
 
@@ -56,5 +56,30 @@ it('curated Group 2A checklists cover før utrykning and first under innsats wor
     'ankomst-og-egen-sikkerhet',
     'oppmarsjomrade-plassering',
     'kontakt-innsatsleder',
+    'overtakelse-fra-annen-enhet',
+    'ressurs-og-utstyr-revurdert',
+    'anmod-ekstra-ressurser',
+    'kontinuerlig-personellkontroll',
+    'kontinuerlig-risikovurdering',
+    'lopende-dialog-innsatsleder',
+    'ny-analyse-ved-endring',
+    'mat-vann-hvile',
+    'avlosning-planlagt',
+    'psykososial-efok-trigger',
+    'overlevering-avmarsj',
+  ]);
+
+  const underInnsats = bySlug.get('fig-under-innsats');
+  expect(underInnsats?.warning).toMatch(/ikke legg inn navn/i);
+  expect(underInnsats?.items.find((item: any) => item.id === 'psykososial-efok-trigger')?.sourceIds).toContain('src-psykososial-oppfolging-og-kollegastotte');
+  expect(underInnsats?.items.find((item: any) => item.id === 'lopende-dialog-innsatsleder')?.sourceIds).toContain('src-kommunikasjons-og-sambandsdiagram');
+
+  expect(bySlug.get('fig-etter-innsats')?.items.map((item: any) => item.id)).toEqual([
+    'personellkontroll-etter',
+    'skade-eller-personellskade-eskalering',
+    'teknisk-gjennomgang',
+    'utstyr-retur',
+    'vask',
+    'oppfolging',
   ]);
 });

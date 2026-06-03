@@ -26,6 +26,43 @@ export const ExternalContextSignalSchema = z
   })
   .strict();
 
+export const MissionTaskStatusSchema = z.enum(['not-started', 'in-progress', 'done', 'blocked', 'needs-assistance']);
+
+export const MissionTaskSchema = z
+  .object({
+    id: z.string().min(1),
+    title: z.string().min(1),
+    status: MissionTaskStatusSchema,
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+    notes: z.string().optional(),
+  })
+  .strict();
+
+export const QuickStatusMessageSchema = z.enum(['på posisjon', 'oppgave fullført', 'trenger assistanse']);
+
+export const MissionStatusLogItemSchema = z
+  .object({
+    id: z.string().min(1),
+    message: QuickStatusMessageSchema,
+    createdAt: z.string().datetime(),
+    note: z.string().optional(),
+  })
+  .strict();
+
+export const ResourceRequestKindSchema = z.enum(['water', 'food', 'ppe', 'medical-support', 'transport', 'fuel', 'equipment']);
+
+export const MissionResourceRequestSchema = z
+  .object({
+    id: z.string().min(1),
+    kind: ResourceRequestKindSchema,
+    status: MissionTaskStatusSchema,
+    createdAt: z.string().datetime(),
+    quantity: z.string().optional(),
+    note: z.string().optional(),
+  })
+  .strict();
+
 export const MissionContextSchema = z
   .object({
     id: z.string().min(1),
@@ -41,6 +78,9 @@ export const MissionContextSchema = z
     externalSignals: z.array(ExternalContextSignalSchema).default([]),
     activeChecklistIds: z.array(z.string()).default([]),
     notes: z.string().default(''),
+    tasks: z.array(MissionTaskSchema).default([]),
+    statusLog: z.array(MissionStatusLogItemSchema).default([]),
+    resourceRequests: z.array(MissionResourceRequestSchema).default([]),
     contentVersion: z.string().min(1),
     schemaVersion: z.number().int().positive().default(1),
   })
@@ -61,3 +101,9 @@ export const ChecklistRunSchema = z
 export type MissionContext = z.infer<typeof MissionContextSchema>;
 export type ChecklistRun = z.infer<typeof ChecklistRunSchema>;
 export type ExternalContextSignal = z.infer<typeof ExternalContextSignalSchema>;
+export type MissionTaskStatus = z.infer<typeof MissionTaskStatusSchema>;
+export type MissionTask = z.infer<typeof MissionTaskSchema>;
+export type QuickStatusMessage = z.infer<typeof QuickStatusMessageSchema>;
+export type MissionStatusLogItem = z.infer<typeof MissionStatusLogItemSchema>;
+export type ResourceRequestKind = z.infer<typeof ResourceRequestKindSchema>;
+export type MissionResourceRequest = z.infer<typeof MissionResourceRequestSchema>;
