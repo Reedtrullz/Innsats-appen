@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T15:57:14.210Z",
+  "generatedAt": "2026-06-03T16:45:19.321Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,126 +858,186 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-03T15:57:14.210Z",
+      "updatedAt": "2026-06-03T16:45:19.321Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
           "title": "Maintain a visible decision-support disclaimer across all operational surfaces.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 1: Maintain a visible decision-support disclaimer across all operational surfaces."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-2",
           "title": "Add a short in-app boundary page explaining that the app is not an official command system.",
-          "status": "active",
+          "status": "completed",
           "stage": "scope",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 2: Add a short in-app boundary page explaining that the app is not an official command system."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-3",
           "title": "Add local-only data warnings to every mission, checklist, log, order, samband and export screen.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 3: Add local-only data warnings to every mission, checklist, log, order, samband and export screen."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-4",
           "title": "Add explicit warnings that exported files may contain operationally sensitive information.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 4: Add explicit warnings that exported files may contain operationally sensitive information."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-5",
           "title": "Add a release gate that blocks publication of private/skjermede tilfluktsrom data.",
-          "status": "active",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 5: Add a release gate that blocks publication of private/skjermede tilfluktsrom data."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-6",
           "title": "Add regression tests for forbidden private tilfluktsrom fields and location patterns.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 6: Add regression tests for forbidden private tilfluktsrom fields and location patterns."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-7",
           "title": "Add regression tests that patient-identifying fields are not introduced into mission/log schemas.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 7: Add regression tests that patient-identifying fields are not introduced into mission/log schemas."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-8",
           "title": "Add a documented privacy-retention policy for all local browser data.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 8: Add a documented privacy-retention policy for all local browser data."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-9",
           "title": "Add a documented threat model for browser-offline operational support.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 9: Add a documented threat model for browser-offline operational support."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-10",
           "title": "Add a governance note for every future feature that would require auth, sync, push, live tracking or backend storage.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 10: Add a governance note for every future feature that would require auth, sync, push, live tracking or backend storage."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-11",
           "title": "Create a post-MVP security architecture document before any shared backend is introduced.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 11: Create a post-MVP security architecture document before any shared backend is introduced."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-12",
           "title": "Create a post-MVP DPIA/personvernkonsekvensvurdering checklist for personal data features.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 12: Create a post-MVP DPIA/personvernkonsekvensvurdering checklist for personal data features."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-13",
           "title": "Add a source-publication policy covering what may be compiled into static/generated content.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 13: Add a source-publication policy covering what may be compiled into static/generated content."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-14",
           "title": "Add an in-app 'known limitations' page.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 14: Add an in-app 'known limitations' page."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-15",
           "title": "Add an in-app 'data stored on this device' page.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T16:45:13.000Z",
+          "evidence": [
+            "Implemented in commit ca66007; verified by 8 targeted test files / 25 tests passing, typecheck, lint, validate:content, git diff --check, spec PASS, code quality APPROVED."
+          ],
           "sourceHeading": "Task 15: Add an in-app 'data stored on this device' page."
         },
         {
