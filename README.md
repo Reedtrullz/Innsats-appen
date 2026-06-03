@@ -28,13 +28,16 @@ OBSIDIAN_BEREDSKAPSBOKA_PATH=/path/to/your/Obsidian/Beredskapsboka
 
 Curated MVP content lives in `content/curated/*.yaml`. Build scripts compile it to `content/generated/*` and mirror browser-readable JSON to `public/generated-content/*`. The sanitized `content/generated/source-documents.json` snapshot is committed so clean GitHub Actions runners can build and test without access to the private Obsidian vault; refresh it with `npm run build:content` and rely on the privacy tests before committing changes.
 
+Workplans live in `.hermes/plans/*.md` when developing locally. `npm run sync:workplans` extracts safe metadata/task headings into `content/workplans/workplans.json`, mirrors `content/generated/workplans.json` + `public/generated-content/workplans.json`, and writes `20-Workplans.md` in the Obsidian project folder when the vault is available. `/release` fetches that generated snapshot and merges it into the browser-local release board while preserving local status overrides.
+
 ## App commands
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use 22
 npm install
 npm run dev              # local Next dev server
-npm run build:content    # import Obsidian, compile curated YAML, build search index, validate graph/artifacts
+npm run build:content    # import Obsidian, compile curated YAML, build search index, sync workplans, validate graph/artifacts
+npm run sync:workplans    # mirror .hermes/plans into Obsidian + generated workplans for /release
 npm run typecheck        # TypeScript gate
 npm run test             # Vitest unit/component/integration/security/content tests
 npm run build            # content build + production Next build
@@ -57,7 +60,7 @@ npm run e2e:prod -- tests/e2e/offline.spec.ts
 
 - `/hurtigkort`, `/for`, `/under`, `/etter`, `/kilder`, and `/moduler/*` expose source-backed cards, phase pages, source views, and specialist modules.
 - `/oppdrag/ny` creates a local mission context; `/oppdrag` shows the active mission dashboard with recommended cards, scenario module link, matching checklist progress, order/comms export tools, and cached/stale public context signals.
-- `/release` is a standalone browser-local release-readiness board for launch planning, stage gates, active work, risk attention, local JSON export, and launch-material links. It intentionally avoids the operational app shell.
+- `/release` is a standalone release-readiness board for launch planning, stage gates, active work, synced workplans, risk attention, local JSON export, and launch-material links. It intentionally avoids the operational app shell.
 
 ## Runbook
 

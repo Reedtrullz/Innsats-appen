@@ -22,6 +22,7 @@ const STATIC_APP_SHELL = [
   '/generated-content/glossary.json',
   '/generated-content/source-documents.json',
   '/generated-content/search-index.json',
+  '/generated-content/workplans.json',
 ];
 
 async function precacheUrl(cache, url) {

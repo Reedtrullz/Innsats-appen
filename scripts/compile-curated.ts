@@ -63,6 +63,7 @@ async function readManifest(generatedDir: string): Promise<ContentManifest> {
       trainingPathCount: 0,
       protectionMeasureCount: 0,
       glossaryCount: 0,
+      workplanCount: 0,
       copiedAssetCount: 0,
     };
   }

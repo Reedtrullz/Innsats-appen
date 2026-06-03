@@ -21,10 +21,11 @@
     "e2e": "npm run build && PLAYWRIGHT_PROD=1 playwright test",
     "e2e:prod": "npm run build && PLAYWRIGHT_PROD=1 playwright test",
     "import:obsidian": "tsx scripts/import-obsidian.ts",
+    "sync:workplans": "tsx scripts/sync-workplans.ts",
     "compile:curated": "tsx scripts/compile-curated.ts",
     "validate:content": "tsx scripts/validate-content.ts",
     "build:search": "tsx scripts/build-search-index.ts",
-    "build:content": "npm run import:obsidian && npm run compile:curated && npm run build:search && npm run validate:content",
+    "build:content": "npm run import:obsidian && npm run compile:curated && npm run build:search && npm run sync:workplans && npm run validate:content",
     "check": "npm run check:ci",
     "check:ci": "npm run build:content && npm run typecheck && npm run lint && npm run test && npm run build:app"
   },

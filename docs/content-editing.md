@@ -8,6 +8,7 @@ Beredskapsboka content is source-backed and generated. Do not edit `content/gene
 - Curated YAML: `content/curated/*.yaml`
 - Generated Node/server JSON: `content/generated/*`
 - Generated browser/offline JSON: `public/generated-content/*`
+- Workplan snapshot: `content/workplans/workplans.json` (regenerated from `.hermes/plans/*.md` when available)
 - Copied approved assets: `public/content-assets/*`
 
 ## Build pipeline
@@ -17,12 +18,24 @@ source ~/.nvm/nvm.sh && nvm use 22
 npm run import:obsidian
 npm run compile:curated
 npm run build:search
+npm run sync:workplans
 npm run validate:content
 # or all at once:
 npm run build:content
 ```
 
-`validate:content` enforces schema validity, source references, warning/status constraints, and sensitive structured key policy.
+`validate:content` enforces schema validity, source references, warning/status constraints, workplan snapshot shape, public mirror parity, and sensitive structured key policy.
+
+## Workplan sync
+
+- Local planning files live under `.hermes/plans/*.md`.
+- `npm run sync:workplans` parses the H1, `**Goal:**` summary, and `### Task N:` headings into a safe workplan snapshot.
+- The script writes:
+  - `content/workplans/workplans.json` as the committed fallback snapshot for CI/deploy;
+  - `content/generated/workplans.json` for server/build-time validation;
+  - `public/generated-content/workplans.json` for `/release` and offline cache;
+  - `20-Workplans.md` in the Obsidian project folder when `OBSIDIAN_BEREDSKAPSBOKA_PATH` or the default local vault path exists.
+- `/release` fetches `/generated-content/workplans.json`, displays the synced workplans, and merges them into the local release board. Manual browser status changes are preserved in `localStorage`; the static app does not write browser edits back to Obsidian.
 
 ## Add a card
 

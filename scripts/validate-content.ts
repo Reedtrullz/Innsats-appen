@@ -9,6 +9,7 @@ import {
   SourceDocumentSchema,
   TrainingPathSchema,
 } from '@/lib/content/schemas';
+import { WorkplansSnapshotSchema } from '@/lib/workplans/schemas';
 import { containsSensitiveStructuredKey } from '@/lib/content/source-policy';
 
 interface GraphInput {
@@ -18,6 +19,7 @@ interface GraphInput {
   trainingPaths?: any[];
   protectionMeasures?: any[];
   glossary?: any[];
+  workplans?: any;
   manifest?: any;
   searchIndex?: any;
   publicGraph?: GraphInput;
@@ -35,6 +37,7 @@ async function readGeneratedGraph(generatedDir = 'content/generated', publicGene
     trainingPaths: await readJson(path.join(generatedDir, 'training-paths.json')),
     protectionMeasures: await readJson(path.join(generatedDir, 'protection-measures.json')),
     glossary: await readJson(path.join(generatedDir, 'glossary.json')),
+    workplans: await readJson(path.join(generatedDir, 'workplans.json')),
     manifest: await readJson(path.join(generatedDir, 'manifest.json')),
     searchIndex: await readJson(path.join(generatedDir, 'search-index.json')),
     publicGraph: {
@@ -44,6 +47,7 @@ async function readGeneratedGraph(generatedDir = 'content/generated', publicGene
       trainingPaths: await readJson(path.join(publicGeneratedDir, 'training-paths.json')),
       protectionMeasures: await readJson(path.join(publicGeneratedDir, 'protection-measures.json')),
       glossary: await readJson(path.join(publicGeneratedDir, 'glossary.json')),
+      workplans: await readJson(path.join(publicGeneratedDir, 'workplans.json')),
       manifest: await readJson(path.join(publicGeneratedDir, 'manifest.json')),
       searchIndex: await readJson(path.join(publicGeneratedDir, 'search-index.json')),
     },
@@ -94,6 +98,7 @@ function validateGeneratedArtifacts(errors: string[], graph: GraphInput) {
     trainingPathCount: graph.trainingPaths?.length ?? 0,
     protectionMeasureCount: graph.protectionMeasures?.length ?? 0,
     glossaryCount: graph.glossary?.length ?? 0,
+    workplanCount: Array.isArray(graph.workplans?.workplans) ? graph.workplans.workplans.length : 0,
   };
 
   if (graph.manifest) {
@@ -105,7 +110,7 @@ function validateGeneratedArtifacts(errors: string[], graph: GraphInput) {
   const publicGraph = graph.publicGraph;
   if (publicGraph) {
     if (graph.manifest && publicGraph.manifest && !sameJson(graph.manifest, publicGraph.manifest)) errors.push('public generated manifest does not mirror content generated manifest');
-    for (const key of ['actionCards', 'checklists', 'trainingPaths', 'protectionMeasures', 'glossary'] as const) {
+    for (const key of ['actionCards', 'checklists', 'trainingPaths', 'protectionMeasures', 'glossary', 'workplans'] as const) {
       if (!sameJson(graph[key] ?? [], publicGraph[key] ?? [])) errors.push(`public generated ${key} does not mirror content generated ${key}`);
     }
     compareIdSets(errors, 'public source documents', (graph.sources ?? []).map((source) => String(source.id)), (publicGraph.sources ?? []).map((source) => String(source.id)));
@@ -140,6 +145,7 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
   const trainingPaths = graph.trainingPaths ?? [];
   const protectionMeasures = graph.protectionMeasures ?? [];
   const glossary = graph.glossary ?? [];
+  const workplans = graph.workplans;
   const sourceIds = new Set(sources.map((source: any) => source.id));
   const actionCardSlugs = new Set(actionCards.map((card: any) => card.slug));
   const sourceStatus = new Map(sources.map((source: any) => [source.id, source.status]));
@@ -188,6 +194,14 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
     if (!result.success) errors.push(`glossary[${index}] ${result.error.message}`);
     for (const sourceId of collectRefs(term)) if (!sourceIds.has(sourceId)) errors.push(`${term.term ?? 'term'} references missing source ${sourceId}`);
   });
+  if (workplans !== undefined) {
+    const workplansResult = WorkplansSnapshotSchema.safeParse(workplans);
+    if (!workplansResult.success) {
+      errors.push(`workplans ${workplansResult.error.message}`);
+    } else {
+      addDuplicateErrors(errors, 'workplan id', workplansResult.data.workplans, (workplan: any) => workplan.id);
+    }
+  }
 
   const sensitiveKeys = containsSensitiveStructuredKey(graph);
   sensitiveKeys.forEach((key) => errors.push(`generated content exposes sensitive structured key ${key}`));

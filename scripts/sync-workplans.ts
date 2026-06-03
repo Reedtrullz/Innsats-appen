@@ -1,0 +1,336 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { ContentManifestSchema, type ContentManifest } from '@/lib/content/schemas';
+import {
+  WorkplanSchema,
+  WorkplansSnapshotSchema,
+  type Workplan,
+  type WorkplanRisk,
+  type WorkplanStage,
+  type WorkplanStatus,
+  type WorkplansSnapshot,
+} from '@/lib/workplans/schemas';
+
+export interface ParseWorkplanOptions {
+  fileName: string;
+  relativePath: string;
+  markdown: string;
+  updatedAt?: string;
+}
+
+export interface SyncWorkplansOptions {
+  rootDir?: string;
+  plansDir?: string;
+  generatedDir?: string;
+  publicGeneratedDir?: string;
+  snapshotSourcePath?: string;
+  obsidianProjectDir?: string;
+  now?: string;
+}
+
+export interface SyncWorkplansResult {
+  snapshot: WorkplansSnapshot;
+  workplans: Workplan[];
+  obsidianNotePath?: string;
+}
+
+function repoPath(rootDir: string, ...parts: string[]) {
+  return path.join(rootDir, ...parts);
+}
+
+async function pathExists(filePath: string) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function writeJson(filePath: string, value: unknown) {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
+function normalizeNorwegian(value: string) {
+  return value
+    .replace(/æ/g, 'ae').replace(/Æ/g, 'ae')
+    .replace(/ø/g, 'o').replace(/Ø/g, 'o')
+    .replace(/å/g, 'a').replace(/Å/g, 'a')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function cleanInlineMarkdown(value: string) {
+  return value
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+    .trim();
+}
+
+function slugifyWorkplanId(value: string) {
+  return normalizeNorwegian(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-');
+}
+
+function extractTitle(markdown: string, fileName: string) {
+  const h1 = markdown.match(/^#\s+(.+)$/m)?.[1];
+  if (h1) return cleanInlineMarkdown(h1);
+  return cleanInlineMarkdown(path.basename(fileName, path.extname(fileName)).replace(/[-_]+/g, ' '));
+}
+
+function extractSummary(markdown: string) {
+  const goal = markdown.match(/\*\*Goal:\*\*\s*([^\n]+)/i)?.[1] ?? markdown.match(/^Goal:\s*([^\n]+)/im)?.[1];
+  if (goal) return cleanInlineMarkdown(goal);
+
+  const lines = markdown.split(/\r?\n/);
+  let inFence = false;
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (line.startsWith('```')) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence || !line || line === '---') continue;
+    if (line.startsWith('#') || line.startsWith('>') || line.startsWith('- ') || /^\d+\./.test(line)) continue;
+    return cleanInlineMarkdown(line).slice(0, 220);
+  }
+  return 'Workplan imported from the local Hermes planning folder.';
+}
+
+function inferStage(title: string, markdown: string): WorkplanStage {
+  const text = `${title}\n${markdown.slice(0, 500)}`.toLowerCase();
+  if (/\b(deploy|go-live|launch|shipping|ship it|production)\b/.test(text)) return 'release';
+  if (/\b(verify|review|audit|remediation|qa|test|gate|quality)\b/.test(text)) return 'verify';
+  if (/\b(scope|boundary|non-goal|requirements?)\b/.test(text)) return 'scope';
+  if (/\b(idea|intake|proposal|vision)\b/.test(text)) return 'idea';
+  return 'build';
+}
+
+function inferRisk(markdown: string): WorkplanRisk {
+  const text = markdown.toLowerCase();
+  if (/\b(high risk|security|privacy|persondata|sensitive|deploy|live|production|vps|ci\/cd)\b/.test(text)) return 'high';
+  if (/\b(medium risk|offline|pwa|validation|api|integration)\b/.test(text)) return 'medium';
+  return 'medium';
+}
+
+function inferStatus(markdown: string): WorkplanStatus {
+  const explicit = markdown.match(/^status:\s*(blocked|completed|complete|active|planned)\s*$/im)?.[1]?.toLowerCase();
+  if (explicit === 'blocked') return 'blocked';
+  if (explicit === 'completed' || explicit === 'complete') return 'completed';
+  if (explicit === 'planned') return 'planned';
+  if (explicit === 'active') return 'active';
+  if (/^blocked:\s*true\s*$/im.test(markdown)) return 'blocked';
+  if (/\b(task|implementation|execute|build|verify|review)\b/i.test(markdown)) return 'active';
+  return 'planned';
+}
+
+function inferTaskStage(title: string, fallback: WorkplanStage): WorkplanStage {
+  const lower = title.toLowerCase();
+  if (/release|deploy|launch|go-live|final/.test(lower)) return 'release';
+  if (/verify|test|review|audit|lint|gate|quality/.test(lower)) return 'verify';
+  if (/scope|requirement|boundary/.test(lower)) return 'scope';
+  if (/idea|plan|proposal/.test(lower)) return 'idea';
+  return fallback;
+}
+
+export function parseWorkplanMarkdown({ fileName, relativePath, markdown, updatedAt }: ParseWorkplanOptions): Workplan {
+  const id = slugifyWorkplanId(path.basename(fileName, path.extname(fileName)));
+  const title = extractTitle(markdown, fileName);
+  const summary = extractSummary(markdown);
+  const stage = inferStage(title, summary);
+  const risk = inferRisk(markdown);
+  const status = inferStatus(markdown);
+  const tasks = [...markdown.matchAll(/^###\s+Task\s+(\d+)\s*:\s*(.+)$/gim)].map((match, index) => {
+    const number = match[1] ?? String(index + 1);
+    const taskTitle = cleanInlineMarkdown(match[2] ?? `Task ${number}`);
+    return {
+      id: `${id}-task-${number}`,
+      title: taskTitle,
+      status: 'planned' as const,
+      stage: inferTaskStage(taskTitle, stage),
+      risk,
+      sourceHeading: `Task ${number}: ${taskTitle}`,
+    };
+  });
+
+  return WorkplanSchema.parse({
+    id,
+    title,
+    sourcePath: relativePath.replace(/\\/g, '/'),
+    sourceType: 'hermes-plan',
+    summary,
+    stage,
+    risk,
+    status,
+    taskCount: tasks.length,
+    updatedAt: updatedAt ?? new Date().toISOString(),
+    tasks,
+  });
+}
+
+async function readLocalPlanFiles(rootDir: string, plansDir: string): Promise<Workplan[]> {
+  if (!(await pathExists(plansDir))) return [];
+  const entries = (await fs.readdir(plansDir)).filter((file) => file.endsWith('.md')).sort((a, b) => a.localeCompare(b, 'nb'));
+  const workplans: Workplan[] = [];
+  for (const fileName of entries) {
+    const filePath = path.join(plansDir, fileName);
+    const markdown = await fs.readFile(filePath, 'utf8');
+    const stat = await fs.stat(filePath);
+    workplans.push(parseWorkplanMarkdown({
+      fileName,
+      relativePath: path.relative(rootDir, filePath),
+      markdown,
+      updatedAt: stat.mtime.toISOString(),
+    }));
+  }
+  return workplans;
+}
+
+async function readSnapshotSource(snapshotSourcePath: string): Promise<Workplan[]> {
+  if (!(await pathExists(snapshotSourcePath))) return [];
+  const snapshot = WorkplansSnapshotSchema.parse(JSON.parse(await fs.readFile(snapshotSourcePath, 'utf8')));
+  return snapshot.workplans.map((workplan) => WorkplanSchema.parse({ ...workplan, sourceType: workplan.sourceType ?? 'manual-snapshot' }));
+}
+
+async function readManifest(generatedDir: string): Promise<ContentManifest> {
+  const manifestPath = path.join(generatedDir, 'manifest.json');
+  if (!(await pathExists(manifestPath))) {
+    return {
+      contentVersion: new Date().toISOString(),
+      generatedAt: new Date().toISOString(),
+      sourceCount: 0,
+      actionCardCount: 0,
+      checklistCount: 0,
+      trainingPathCount: 0,
+      protectionMeasureCount: 0,
+      glossaryCount: 0,
+      workplanCount: 0,
+      copiedAssetCount: 0,
+    };
+  }
+  return ContentManifestSchema.parse(JSON.parse(await fs.readFile(manifestPath, 'utf8')));
+}
+
+function defaultObsidianProjectDir() {
+  return process.env.OBSIDIAN_BEREDSKAPSBOKA_PATH ?? path.join(process.env.HOME ?? '', 'Obsidian/Hvelvet/01_Projects/Beredskapsboka');
+}
+
+function renderObsidianWorkplansNote(snapshot: WorkplansSnapshot) {
+  const lines = [
+    '---',
+    `updated: ${snapshot.generatedAt.slice(0, 10)}`,
+    'type: workplan-index',
+    'project: beredskapsboka',
+    'status: active',
+    'tags:',
+    '  - beredskapsboka',
+    '  - workplans',
+    '  - release-readiness',
+    '---',
+    '',
+    '# Workplans',
+    '',
+    'Oppdatert automatisk fra repoets Hermes-planer og speilet til `https://innsats.reidar.tech/release` ved bygg/deploy.',
+    '',
+    `- Prosjektindeks: [[00-Index]]`,
+    `- Live release board: https://innsats.reidar.tech/release`,
+    `- Sist planendring: ${snapshot.generatedAt}`,
+    `- Antall workplans: ${snapshot.sourceCount}`,
+    '',
+    '## Aktive planer',
+    '',
+  ];
+
+  if (snapshot.workplans.length === 0) {
+    lines.push('Ingen workplans funnet i `.hermes/plans/` eller `content/workplans/workplans.json`.', '');
+    return `${lines.join('\n')}\n`;
+  }
+
+  for (const workplan of snapshot.workplans) {
+    lines.push(`### ${workplan.title}`);
+    lines.push('');
+    lines.push(`- Status: ${workplan.status}`);
+    lines.push(`- Fase: ${workplan.stage}`);
+    lines.push(`- Risiko: ${workplan.risk}`);
+    lines.push(`- Kilde: \`${workplan.sourcePath}\``);
+    lines.push(`- Oppgaver: ${workplan.taskCount}`);
+    lines.push(`- Sammendrag: ${workplan.summary}`);
+    if (workplan.tasks.length > 0) {
+      lines.push('', '#### Oppgaver');
+      for (const task of workplan.tasks) {
+        lines.push(`- ${task.sourceHeading ?? task.title}`);
+      }
+    }
+    lines.push('');
+  }
+
+  return `${lines.join('\n')}\n`;
+}
+
+async function writeObsidianNote(snapshot: WorkplansSnapshot, obsidianProjectDir: string, explicitPath: boolean) {
+  if (!explicitPath && !(await pathExists(obsidianProjectDir))) return undefined;
+  await fs.mkdir(obsidianProjectDir, { recursive: true });
+  const notePath = path.join(obsidianProjectDir, '20-Workplans.md');
+  await fs.writeFile(notePath, renderObsidianWorkplansNote(snapshot), 'utf8');
+  return notePath;
+}
+
+function latestWorkplanTimestamp(workplans: Workplan[], fallback: string) {
+  return workplans.map((workplan) => workplan.updatedAt).sort().at(-1) ?? fallback;
+}
+
+export async function syncWorkplans(options: SyncWorkplansOptions = {}): Promise<SyncWorkplansResult> {
+  const rootDir = path.resolve(options.rootDir ?? process.cwd());
+  const plansDir = path.resolve(options.plansDir ?? repoPath(rootDir, '.hermes/plans'));
+  const generatedDir = path.resolve(options.generatedDir ?? repoPath(rootDir, 'content/generated'));
+  const publicGeneratedDir = path.resolve(options.publicGeneratedDir ?? repoPath(rootDir, 'public/generated-content'));
+  const snapshotSourcePath = path.resolve(options.snapshotSourcePath ?? repoPath(rootDir, 'content/workplans/workplans.json'));
+  const runGeneratedAt = options.now ?? new Date().toISOString();
+
+  const localWorkplans = await readLocalPlanFiles(rootDir, plansDir);
+  const workplans = localWorkplans.length > 0 ? localWorkplans : await readSnapshotSource(snapshotSourcePath);
+  const snapshotGeneratedAt = options.now ?? latestWorkplanTimestamp(workplans, runGeneratedAt);
+  const snapshot = WorkplansSnapshotSchema.parse({
+    generatedAt: snapshotGeneratedAt,
+    sourceCount: workplans.length,
+    workplans,
+  });
+
+  if (localWorkplans.length > 0) await writeJson(snapshotSourcePath, snapshot);
+  await writeJson(path.join(generatedDir, 'workplans.json'), snapshot);
+  await writeJson(path.join(publicGeneratedDir, 'workplans.json'), snapshot);
+
+  const previous = await readManifest(generatedDir);
+  const manifest: ContentManifest = {
+    ...previous,
+    contentVersion: runGeneratedAt,
+    generatedAt: runGeneratedAt,
+    workplanCount: snapshot.workplans.length,
+  };
+  await writeJson(path.join(generatedDir, 'manifest.json'), manifest);
+  await writeJson(path.join(publicGeneratedDir, 'manifest.json'), manifest);
+
+  const explicitObsidianPath = options.obsidianProjectDir !== undefined;
+  const obsidianProjectDir = path.resolve(options.obsidianProjectDir ?? defaultObsidianProjectDir());
+  const obsidianNotePath = await writeObsidianNote(snapshot, obsidianProjectDir, explicitObsidianPath);
+  return { snapshot, workplans: snapshot.workplans, obsidianNotePath };
+}
+
+async function main() {
+  const result = await syncWorkplans();
+  console.log(`Synced ${result.workplans.length} workplans${result.obsidianNotePath ? ` and updated ${result.obsidianNotePath}` : ''}`);
+}
+
+const thisFile = fileURLToPath(import.meta.url);
+if (process.argv[1] && path.resolve(process.argv[1]) === thisFile) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

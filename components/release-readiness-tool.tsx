@@ -2,27 +2,17 @@
 
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
-
-type StageId = 'idea' | 'scope' | 'build' | 'verify' | 'release';
-type StageStatus = 'not-started' | 'in-progress' | 'ready';
-type WorkStatus = 'needs-work' | 'in-progress' | 'blocked' | 'completed';
-type RiskLevel = 'low' | 'medium' | 'high';
-
-interface ReleaseItem {
-  id: string;
-  title: string;
-  owner: string;
-  stage: StageId;
-  status: WorkStatus;
-  risk: RiskLevel;
-  notes: string;
-  completedAt?: string;
-}
-
-interface ReleasePlan {
-  stages: Record<StageId, StageStatus>;
-  items: ReleaseItem[];
-}
+import {
+  defaultReleasePlan,
+  mergeSyncedWorkplansIntoPlan,
+  type ReleaseItem,
+  type ReleasePlan,
+  type RiskLevel,
+  type StageId,
+  type StageStatus,
+  type WorkStatus,
+} from '@/lib/release/plan';
+import { WorkplansSnapshotSchema, type WorkplansSnapshot } from '@/lib/workplans/schemas';
 
 const storageKey = 'beredskapsboka-release-readiness-v1';
 
@@ -55,46 +45,6 @@ const stageStatusLabels: Record<StageStatus, string> = {
   ready: 'Ready',
 };
 
-const defaultPlan: ReleasePlan = {
-  stages: {
-    idea: 'ready',
-    scope: 'ready',
-    build: 'ready',
-    verify: 'in-progress',
-    release: 'not-started',
-  },
-  items: [
-    {
-      id: 'seed-mission-dashboard',
-      title: 'Mission command dashboard prototype',
-      owner: 'AR',
-      stage: 'build',
-      status: 'completed',
-      risk: 'medium',
-      notes: 'Active mission context, recommended actions, and checklist progress are in place.',
-      completedAt: '2026-06-03T11:50:00.000Z',
-    },
-    {
-      id: 'seed-release-tool',
-      title: 'Release readiness tracker',
-      owner: 'JM',
-      stage: 'verify',
-      status: 'in-progress',
-      risk: 'medium',
-      notes: 'Track ideas, blockers, stage gates, completed work, and readiness.',
-    },
-    {
-      id: 'seed-offline-qa',
-      title: 'Offline and privacy release check',
-      owner: 'TS',
-      stage: 'verify',
-      status: 'needs-work',
-      risk: 'high',
-      notes: 'Run production mobile flow, offline reload, and privacy reset before release.',
-    },
-  ],
-};
-
 const milestones: Array<{ title: string; date: string; owner: string; stage: StageId }> = [
   { title: 'MVP boundary approved', date: 'Jun 3', owner: 'AR', stage: 'idea' },
   { title: 'Release scope locked', date: 'Jun 4', owner: 'JM', stage: 'scope' },
@@ -112,15 +62,15 @@ function newId() {
 }
 
 function loadPlan(): ReleasePlan {
-  if (typeof window === 'undefined') return defaultPlan;
+  if (typeof window === 'undefined') return defaultReleasePlan;
   const raw = window.localStorage.getItem(storageKey);
-  if (!raw) return defaultPlan;
+  if (!raw) return defaultReleasePlan;
   try {
     const parsed = JSON.parse(raw) as ReleasePlan;
-    if (!parsed?.stages || !Array.isArray(parsed.items)) return defaultPlan;
+    if (!parsed?.stages || !Array.isArray(parsed.items)) return defaultReleasePlan;
     return parsed;
   } catch {
-    return defaultPlan;
+    return defaultReleasePlan;
   }
 }
 
@@ -170,8 +120,10 @@ function materialHref(title: string) {
 }
 
 export function ReleaseReadinessTool() {
-  const [plan, setPlan] = useState<ReleasePlan>(defaultPlan);
+  const [plan, setPlan] = useState<ReleasePlan>(defaultReleasePlan);
   const [hydrated, setHydrated] = useState(false);
+  const [workplansSnapshot, setWorkplansSnapshot] = useState<WorkplansSnapshot | null>(null);
+  const [workplansError, setWorkplansError] = useState<string | null>(null);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -184,6 +136,29 @@ export function ReleaseReadinessTool() {
   useEffect(() => {
     if (hydrated) window.localStorage.setItem(storageKey, JSON.stringify(plan));
   }, [hydrated, plan]);
+
+  useEffect(() => {
+    if (!hydrated) return undefined;
+    let cancelled = false;
+
+    async function loadSyncedWorkplans() {
+      const response = await fetch('/generated-content/workplans.json', { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Failed to load workplans: ${response.status}`);
+      const snapshot = WorkplansSnapshotSchema.parse(await response.json());
+      if (cancelled) return;
+      setWorkplansSnapshot(snapshot);
+      setWorkplansError(null);
+      setPlan((current) => mergeSyncedWorkplansIntoPlan(current, snapshot));
+    }
+
+    loadSyncedWorkplans().catch(() => {
+      if (!cancelled) setWorkplansError('Workplan sync is unavailable in this browser session.');
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated]);
 
   const summary = useMemo(() => {
     const completed = plan.items.filter((item) => item.status === 'completed').length;
@@ -203,6 +178,7 @@ export function ReleaseReadinessTool() {
 
   const activeItems = plan.items.filter((item) => item.status !== 'completed');
   const completedItems = plan.items.filter((item) => item.status === 'completed');
+  const syncedWorkplans = workplansSnapshot?.workplans ?? [];
   const attentionItems = activeItems
     .filter((item) => item.status === 'blocked' || item.risk !== 'low')
     .slice(0, 4);
@@ -244,7 +220,7 @@ export function ReleaseReadinessTool() {
   }
 
   function resetPlan() {
-    setPlan(defaultPlan);
+    setPlan(workplansSnapshot ? mergeSyncedWorkplansIntoPlan(defaultReleasePlan, workplansSnapshot) : defaultReleasePlan);
   }
 
   function removeItem(id: string) {
@@ -369,6 +345,36 @@ export function ReleaseReadinessTool() {
                   );
                 })}
               </div>
+            </section>
+
+            <section className="mt-8 rounded-2xl border border-blue-100 bg-blue-50 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-wide text-blue-700">Automatic sync</p>
+                  <h2 className="text-2xl font-black">Synced workplans</h2>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">{syncedWorkplans.length} synced from Obsidian</p>
+                </div>
+                <p className="rounded-xl bg-white px-3 py-2 text-xs font-black text-blue-700">{workplansSnapshot ? `Last sync: ${workplansSnapshot.generatedAt}` : workplansError ?? 'Waiting for generated workplan sync.'}</p>
+              </div>
+              {syncedWorkplans.length === 0 ? (
+                <p className="mt-4 rounded-xl bg-white p-3 text-sm font-semibold text-slate-600">No generated workplans are available yet. Run <code>npm run sync:workplans</code> locally to sync `.hermes/plans` into Obsidian and the release board.</p>
+              ) : (
+                <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                  {syncedWorkplans.map((workplan) => (
+                    <article key={workplan.id} className="rounded-xl bg-white p-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 className="font-black">{workplan.title}</h3>
+                          <p className="mt-1 text-sm font-semibold text-slate-500">{workplan.taskCount} tasks · {stageLabels[workplan.stage]} · {riskLabels[workplan.risk]} risk</p>
+                        </div>
+                        <span className={`rounded-full px-2 py-1 text-xs font-black ${workplan.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : workplan.status === 'blocked' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>{workplan.status}</span>
+                      </div>
+                      <p className="mt-3 text-sm font-semibold text-slate-600">{workplan.summary}</p>
+                      <p className="mt-3 text-xs font-black text-slate-500">{workplan.sourcePath}</p>
+                    </article>
+                  ))}
+                </div>
+              )}
             </section>
 
             <section className="mt-8 grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">

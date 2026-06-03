@@ -98,6 +98,7 @@ export const ContentManifestSchema = z.object({
   trainingPathCount: z.number().int().nonnegative().default(0),
   protectionMeasureCount: z.number().int().nonnegative().default(0),
   glossaryCount: z.number().int().nonnegative().default(0),
+  workplanCount: z.number().int().nonnegative().default(0),
   copiedAssetCount: z.number().int().nonnegative().default(0),
 });
 
