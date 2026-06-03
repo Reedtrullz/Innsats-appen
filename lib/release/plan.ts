@@ -79,10 +79,23 @@ function summarizeOpenTasks(workplan: Workplan) {
   return openTasks.map((task) => `• ${task.title}`).join('\n');
 }
 
+function taskProgressSummary(workplan: Workplan) {
+  if (workplan.tasks.length === 0) return 'Task progress: no task headings found';
+  const completed = workplan.tasks.filter((task) => task.status === 'completed').length;
+  const blocked = workplan.tasks.filter((task) => task.status === 'blocked').length;
+  const suffix = blocked > 0 ? `, ${blocked} blocked` : '';
+  return `Task progress: ${completed}/${workplan.tasks.length} completed${suffix}`;
+}
+
+function planCompletedAt(workplan: Workplan, existing?: ReleaseItem, status?: WorkStatus) {
+  if (status !== 'completed') return undefined;
+  return existing?.completedAt ?? workplan.completedAt;
+}
+
 export function releaseItemFromWorkplan(workplan: Workplan, existing?: ReleaseItem): ReleaseItem {
   const generatedStatus = statusFromWorkplan(workplan);
   const status = existing?.status ?? generatedStatus;
-  const completedAt = status === 'completed' ? existing?.completedAt : undefined;
+  const completedAt = planCompletedAt(workplan, existing, status);
   return {
     id: releaseItemId(workplan.id),
     title: workplan.title,
@@ -95,6 +108,7 @@ export function releaseItemFromWorkplan(workplan: Workplan, existing?: ReleaseIt
       workplan.summary,
       `Kilde: ${workplan.sourcePath}`,
       `Oppgaver: ${workplan.taskCount}`,
+      taskProgressSummary(workplan),
       summarizeOpenTasks(workplan),
     ].filter(Boolean).join('\n'),
   };
