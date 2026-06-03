@@ -20,6 +20,45 @@ it('imports source extracts with stable IDs and relative source references', asy
   expect(JSON.stringify(result.sources)).not.toContain(path.resolve('tests/fixtures/obsidian-mini'));
 });
 
+it('uses pregenerated source documents when explicitly allowed and source extracts are unavailable', async () => {
+  const outputRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'beredskapsboka-pregenerated-'));
+  const generatedDir = path.join(outputRoot, 'generated');
+  const publicGeneratedDir = path.join(outputRoot, 'public-generated');
+  const publicAssetsDir = path.join(outputRoot, 'assets');
+  await fs.mkdir(generatedDir, { recursive: true });
+  await fs.mkdir(publicAssetsDir, { recursive: true });
+  await fs.writeFile(path.join(publicAssetsDir, 'diagram.png'), 'fake image');
+  await fs.writeFile(path.join(generatedDir, 'source-documents.json'), JSON.stringify([
+    {
+      id: 'src-known',
+      title: 'SRC - Known',
+      sourcePath: 'source-extracts/SRC - Known.md',
+      sourceType: 'source-extract',
+      status: 'verified',
+      body: 'Known source body',
+      warnings: [],
+    },
+  ]));
+
+  const previous = process.env.ALLOW_PREGENERATED_CONTENT;
+  process.env.ALLOW_PREGENERATED_CONTENT = '1';
+  try {
+    const result = await importObsidianSources(path.join(outputRoot, 'missing-vault'), {
+      generatedDir,
+      publicAssetsDir,
+      publicGeneratedDir,
+      minRealSourceCount: 0,
+    });
+    expect(result.sources).toHaveLength(1);
+    expect(result.sources[0].id).toBe('src-known');
+    expect(result.copiedAssets).toEqual(['diagram.png']);
+    await expect(fs.readFile(path.join(publicGeneratedDir, 'source-documents.json'), 'utf8')).resolves.toContain('Known source body');
+  } finally {
+    if (previous === undefined) delete process.env.ALLOW_PREGENERATED_CONTENT;
+    else process.env.ALLOW_PREGENERATED_CONTENT = previous;
+  }
+});
+
 it('redacts common local path forms without touching URLs', () => {
   const redacted = redactLocalPathReferences([
     String.raw`Windows C:\Users\Reidar\secret.docx`,

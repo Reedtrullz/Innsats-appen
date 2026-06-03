@@ -1,0 +1,178 @@
+---
+# Playbook: deploy-beredskapsboka.yml
+# Description: Deploy Beredskapsboka to the Racknerd VPS as a GHCR-backed Docker container and expose it at innsats.reidar.tech through host Caddy.
+# Requirements:
+#   - Target host has Docker, Docker Compose v2/v5, and Caddy installed.
+#   - Target host is logged into GHCR if the image is private.
+#   - community.docker collection installed on the control node.
+# Variables:
+#   - docker_image: image tag to deploy (default ghcr.io/reedtrullz/beredskapsboka:latest)
+#   - app_version: version exposed by /api/health (default APP_VERSION env or latest)
+#   - app_domain: public domain (inventory default innsats.reidar.tech)
+# Usage:
+#   APP_VERSION=$(git rev-parse HEAD) ansible-playbook -i deploy/inventory/hosts.yml deploy/playbook.yml -e "docker_image=ghcr.io/reedtrullz/beredskapsboka:$(git rev-parse --short=12 HEAD)"
+
+- name: Deploy Beredskapsboka to VPS
+  hosts: beredskapsboka
+  become: true
+  gather_facts: false
+
+  vars:
+    app_name: beredskapsboka
+    container_name: beredskapsboka
+    app_dir: /opt/apps/beredskapsboka
+    docker_image: ghcr.io/reedtrullz/beredskapsboka:latest
+    app_version: "{{ lookup('ansible.builtin.env', 'APP_VERSION') | default('latest', true) }}"
+    met_user_agent: "{{ lookup('ansible.builtin.env', 'MET_USER_AGENT') | default('Beredskapsboka/0.1 (+https://innsats.reidar.tech)', true) }}"
+    health_url: "http://{{ app_bind_address }}:{{ app_host_port }}/api/health"
+    public_health_url: "https://{{ app_domain }}/api/health"
+
+  pre_tasks:
+    - name: Validate deployment variables
+      ansible.builtin.assert:
+        that:
+          - app_domain is match('^[a-z0-9.-]+$')
+          - app_host_port | int > 1024
+          - app_host_port | int < 65536
+          - app_bind_address in ['127.0.0.1', 'localhost']
+          - docker_image is match('^ghcr.io/[a-z0-9._-]+/[a-z0-9._-]+:[A-Za-z0-9._-]+$')
+        fail_msg: Invalid Beredskapsboka deployment variables.
+        success_msg: Beredskapsboka deployment variables validated.
+      tags: [always]
+
+    - name: Verify Docker is available on target host
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+      check_mode: false
+      tags: [always]
+
+    - name: Verify Docker Compose is available on target host
+      ansible.builtin.command: docker compose version
+      register: compose_version
+      changed_when: false
+      check_mode: false
+      tags: [always]
+
+    - name: Verify Caddy is available on target host
+      ansible.builtin.command: caddy version
+      register: caddy_version
+      changed_when: false
+      check_mode: false
+      tags: [always]
+
+  tasks:
+    - name: Ensure app directory exists
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: deploy
+        group: deploy
+        mode: '0755'
+      tags: [deploy]
+
+    - name: Pull requested GHCR image
+      community.docker.docker_image:
+        name: "{{ docker_image }}"
+        source: pull
+        force_source: true
+      tags: [deploy]
+
+    - name: Render production Compose file
+      ansible.builtin.template:
+        src: templates/compose.production.yml.j2
+        dest: "{{ app_dir }}/compose.production.yml"
+        owner: deploy
+        group: deploy
+        mode: '0644'
+      tags: [deploy]
+
+    - name: Start Beredskapsboka with Docker Compose
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        files:
+          - compose.production.yml
+        state: present
+        recreate: always
+        remove_orphans: true
+        wait: true
+        wait_timeout: 120
+      tags: [deploy]
+
+    - name: Wait for local Beredskapsboka health endpoint
+      ansible.builtin.uri:
+        url: "{{ health_url }}"
+        return_content: true
+        status_code: 200
+        timeout: 5
+      register: local_health
+      until: local_health.status == 200 and (local_health.json.status | default('')) == 'healthy'
+      retries: 12
+      delay: 5
+      failed_when: false
+      tags: [verify]
+
+    - name: Fail if local health endpoint is not healthy
+      ansible.builtin.fail:
+        msg: "Local health check failed for {{ health_url }}: {{ local_health }}"
+      when: local_health.status | default(0) != 200 or (local_health.json.status | default('')) != 'healthy'
+      tags: [verify]
+
+    - name: Manage Caddy reverse proxy block
+      ansible.builtin.blockinfile:
+        path: /etc/caddy/Caddyfile
+        marker: "# {mark} ANSIBLE MANAGED - Beredskapsboka"
+        block: |
+          {{ app_domain }} {
+            reverse_proxy {{ app_bind_address }}:{{ app_host_port }}
+          }
+        backup: true
+        mode: '0644'
+        validate: caddy validate --config %s
+      notify: Reload Caddy
+      tags: [caddy]
+
+    - name: Validate Caddy configuration
+      ansible.builtin.command: caddy validate --config /etc/caddy/Caddyfile
+      changed_when: false
+      tags: [caddy, verify]
+
+    - name: Apply Caddy configuration before public verification
+      ansible.builtin.meta: flush_handlers
+      tags: [caddy]
+
+    - name: Wait for public HTTPS health endpoint
+      ansible.builtin.uri:
+        url: "{{ public_health_url }}"
+        return_content: true
+        status_code: 200
+        timeout: 10
+      register: public_health
+      until: public_health.status == 200 and (public_health.json.status | default('')) == 'healthy'
+      retries: 12
+      delay: 5
+      failed_when: false
+      delegate_to: localhost
+      become: false
+      tags: [verify]
+
+    - name: Fail if public health endpoint is not healthy
+      ansible.builtin.fail:
+        msg: "Public health check failed for {{ public_health_url }}: {{ public_health }}"
+      when: public_health.status | default(0) != 200 or (public_health.json.status | default('')) != 'healthy'
+      tags: [verify]
+
+    - name: Report successful deployment
+      ansible.builtin.debug:
+        msg:
+          - "Beredskapsboka deployed at {{ public_health_url }}"
+          - "Container: {{ container_name }}"
+          - "Image: {{ docker_image }}"
+          - "Version: {{ app_version }}"
+      tags: [verify]
+
+  handlers:
+    - name: Reload Caddy
+      ansible.builtin.systemd:
+        name: caddy
+        state: reloaded

@@ -55,6 +55,16 @@ npm run e2e:prod -- tests/e2e/offline.spec.ts
 5. Run `npm run e2e:prod` to prove the production shell, service worker, offline flow, local mission storage, privacy reset, and mobile journey.
 6. Do not claim demo-ready until Task 44's full integrated gate passes and any changed files are committed deliberately.
 
+## Deployment
+
+An Ansible/GHCR deploy setup for `https://innsats.reidar.tech` lives in `deploy/`.
+
+```bash
+./deploy/publish-and-deploy.sh
+```
+
+See `deploy/README.md` for prerequisites, GHCR login notes, and VPS verification commands.
+
 ## MVP boundaries
 
 See `docs/mvp-boundaries.md` for the full boundary policy. In short: no login, no live tracking, no push, no patient/persondata, no central incident database, no official command-system integration, and no private/skjermede tilfluktsrom data in the MVP.

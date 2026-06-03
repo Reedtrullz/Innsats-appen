@@ -70,6 +70,29 @@ async function readManifest(generatedDir: string): Promise<ContentManifest> {
   return JSON.parse(await fs.readFile(manifestPath, 'utf8'));
 }
 
+async function readPregeneratedImportResult(generatedDir: string, publicGeneratedDir: string, publicAssetsDir: string): Promise<ImportResult> {
+  const sourcePath = path.join(generatedDir, 'source-documents.json');
+  if (!(await pathExists(sourcePath))) {
+    throw new Error(`Source extract directory is unavailable and ${sourcePath} does not exist`);
+  }
+  const sources = JSON.parse(await fs.readFile(sourcePath, 'utf8')).map((source: unknown) => SourceDocumentSchema.parse(source));
+  if (sources.length === 0) throw new Error(`Pregenerated ${sourcePath} must contain at least one source document`);
+  await writeJson(path.join(publicGeneratedDir, 'source-documents.json'), sources.map((source: SourceDocument) => ({ ...source, body: source.body.slice(0, 12000) })));
+  const copiedAssets = (await pathExists(publicAssetsDir)) ? (await fs.readdir(publicAssetsDir)).sort() : [];
+  const previous = await readManifest(generatedDir);
+  const now = new Date().toISOString();
+  const manifest: ContentManifest = {
+    ...previous,
+    contentVersion: now,
+    generatedAt: now,
+    sourceCount: sources.length,
+    copiedAssetCount: copiedAssets.length,
+  };
+  await writeJson(path.join(generatedDir, 'manifest.json'), manifest);
+  await writeJson(path.join(publicGeneratedDir, 'manifest.json'), manifest);
+  return { sources, copiedAssets, manifest };
+}
+
 async function writeJson(filePath: string, value: unknown) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
@@ -138,6 +161,13 @@ export async function importObsidianSources(basePath = DEFAULT_SOURCE_PATH, opti
   const publicGeneratedDir = path.resolve(options.publicGeneratedDir ?? repoPath('public/generated-content'));
   const sourceExtractDir = path.join(sourceRoot, 'source-extracts');
   const minRealSourceCount = options.minRealSourceCount ?? (isDefaultSourceRoot ? 61 : 0);
+
+  if (!(await pathExists(sourceExtractDir))) {
+    if (process.env.ALLOW_PREGENERATED_CONTENT === '1') {
+      return readPregeneratedImportResult(generatedDir, publicGeneratedDir, publicAssetsDir);
+    }
+    throw new Error(`Source extract directory not found: ${sourceExtractDir}`);
+  }
 
   const entries = (await fs.readdir(sourceExtractDir)).filter((file) => file.endsWith('.md')).sort((a, b) => a.localeCompare(b, 'nb'));
   if (entries.length < minRealSourceCount) {

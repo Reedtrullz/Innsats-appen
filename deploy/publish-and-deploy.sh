@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+IMAGE="${IMAGE:-ghcr.io/reedtrullz/beredskapsboka}"
+INVENTORY="${INVENTORY:-deploy/inventory/hosts.yml}"
+PLAYBOOK="${PLAYBOOK:-deploy/playbook.yml}"
+PLATFORM="${PLATFORM:-linux/amd64}"
+
+if [[ -s "$HOME/.nvm/nvm.sh" ]]; then
+  # shellcheck source=/dev/null
+  source "$HOME/.nvm/nvm.sh"
+  nvm use 22 >/dev/null
+fi
+
+for cmd in git npm ansible-playbook ansible-galaxy gh docker; do
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "Missing required command: $cmd" >&2
+    exit 1
+  fi
+done
+
+SHA="$(git rev-parse HEAD)"
+SHORT_SHA="$(git rev-parse --short=12 HEAD)"
+TAGGED_IMAGE="${IMAGE}:${SHORT_SHA}"
+
+if [[ -n "$(git status --porcelain)" ]]; then
+  echo "Working tree is dirty. Commit or stash changes before publishing a production image." >&2
+  git status --short >&2
+  exit 1
+fi
+
+echo "Building generated content locally from Obsidian/curated sources..."
+npm run build:content
+
+echo "Installing Ansible collection requirements..."
+ansible-galaxy collection install -r deploy/requirements.yml
+
+echo "Logging Docker into GHCR with gh auth token..."
+gh auth token | docker login ghcr.io -u Reedtrullz --password-stdin >/dev/null
+
+echo "Building and pushing ${TAGGED_IMAGE} and ${IMAGE}:latest for ${PLATFORM}..."
+docker buildx build \
+  --platform "$PLATFORM" \
+  --build-arg "VERSION=$SHA" \
+  --tag "$TAGGED_IMAGE" \
+  --tag "${IMAGE}:latest" \
+  --push \
+  .
+
+echo "Deploying ${TAGGED_IMAGE} to innsats.reidar.tech..."
+APP_VERSION="$SHA" ansible-playbook -i "$INVENTORY" "$PLAYBOOK" -e "docker_image=$TAGGED_IMAGE"
