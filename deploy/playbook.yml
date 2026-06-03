@@ -134,12 +134,12 @@
           }
         backup: true
         mode: '0644'
-        validate: caddy validate --config %s
+        validate: caddy validate --config %s --adapter caddyfile
       notify: Reload Caddy
       tags: [caddy]
 
     - name: Validate Caddy configuration
-      ansible.builtin.command: caddy validate --config /etc/caddy/Caddyfile
+      ansible.builtin.command: caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
       changed_when: false
       tags: [caddy, verify]
 
