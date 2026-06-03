@@ -301,6 +301,37 @@ it('rejects inconsistent workplan and task counts', () => {
   expect(result.success).toBe(false);
 });
 
+it('groups active and completed plans in the rendered Obsidian note', async () => {
+  const root = await tempRoot();
+  const plansDir = path.join(root, '.hermes/plans');
+  const generatedDir = path.join(root, 'content/generated');
+  const publicGeneratedDir = path.join(root, 'public/generated-content');
+  const obsidianProjectDir = path.join(root, 'Obsidian/Hvelvet/01_Projects/Beredskapsboka');
+  await fs.mkdir(plansDir, { recursive: true });
+  await fs.writeFile(
+    path.join(plansDir, '2026-06-03_140000-active-plan.md'),
+    '# Active Plan\n\nStatus: active\nStage: verify\nRisk: high\n\n**Goal:** Finish the open item.\n\n### Task 1: Open item\n\nStatus: active\nEvidence: waiting for e2e\n',
+  );
+  await fs.writeFile(
+    path.join(plansDir, '2026-06-03_130000-completed-plan.md'),
+    '# Completed Plan\n\nStatus: completed\nStage: release\nRisk: medium\nCompleted-At: 2026-06-03T13:00:00.000Z\nEvidence: npm run check PASS\n\n**Goal:** Record done work.\n\n### Task 1: Done item\n\nStatus: completed\nCompleted-At: 2026-06-03T13:00:00.000Z\nEvidence: sync PASS\n',
+  );
+
+  await syncWorkplans({ rootDir: root, generatedDir, publicGeneratedDir, obsidianProjectDir });
+  const obsidianNote = await fs.readFile(path.join(obsidianProjectDir, '20-Workplans.md'), 'utf8');
+
+  expect(obsidianNote).toContain('## Aktive planer');
+  expect(obsidianNote).toContain('## Fullførte planer');
+  expect(obsidianNote).toContain('### Active Plan');
+  expect(obsidianNote).toContain('### Completed Plan');
+  expect(obsidianNote).toContain('- Task 1: Open item — `active`');
+  expect(obsidianNote).toContain('- Task 1: Done item — `completed`');
+  expect(obsidianNote).toContain('- Fullført: 2026-06-03T13:00:00.000Z');
+  expect(obsidianNote).toContain('- Evidence: npm run check PASS');
+  expect(obsidianNote).toContain('  - Evidence: waiting for e2e');
+  expect(obsidianNote).toContain('  - Evidence: sync PASS');
+});
+
 it('writes generated/public workplans JSON and an Obsidian index note from local plan files', async () => {
   const root = await tempRoot();
   const plansDir = path.join(root, '.hermes/plans');

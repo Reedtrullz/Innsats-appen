@@ -376,6 +376,29 @@ function defaultObsidianProjectDir() {
   return process.env.OBSIDIAN_BEREDSKAPSBOKA_PATH ?? path.join(process.env.HOME ?? '', 'Obsidian/Hvelvet/01_Projects/Beredskapsboka');
 }
 
+function workplanSectionTitle(status: WorkplanStatus) {
+  if (status === 'completed') return 'Fullførte planer';
+  if (status === 'blocked') return 'Blokkerte planer';
+  return 'Aktive planer';
+}
+
+function groupedWorkplans(workplans: Workplan[]) {
+  const order = ['Aktive planer', 'Blokkerte planer', 'Fullførte planer'] as const;
+  const groups = new Map<(typeof order)[number], Workplan[]>();
+  for (const title of order) groups.set(title, []);
+  for (const workplan of workplans) {
+    const title = workplanSectionTitle(workplan.status);
+    groups.get(title)?.push(workplan);
+  }
+  return order
+    .map((title) => ({ title, workplans: groups.get(title) ?? [] }))
+    .filter((group) => group.workplans.length > 0);
+}
+
+function renderEvidenceLines(evidence: string[] | undefined) {
+  return (evidence ?? []).map((line) => `  - Evidence: ${line}`);
+}
+
 function renderObsidianWorkplansNote(snapshot: WorkplansSnapshot) {
   const lines = [
     '---',
@@ -398,31 +421,37 @@ function renderObsidianWorkplansNote(snapshot: WorkplansSnapshot) {
     `- Sist planendring: ${snapshot.generatedAt}`,
     `- Antall workplans: ${snapshot.sourceCount}`,
     '',
-    '## Aktive planer',
-    '',
   ];
 
   if (snapshot.workplans.length === 0) {
+    lines.push('## Aktive planer', '');
     lines.push('Ingen workplans funnet i `.hermes/plans/` eller `content/workplans/workplans.json`.', '');
     return `${lines.join('\n')}\n`;
   }
 
-  for (const workplan of snapshot.workplans) {
-    lines.push(`### ${workplan.title}`);
-    lines.push('');
-    lines.push(`- Status: ${workplan.status}`);
-    lines.push(`- Fase: ${workplan.stage}`);
-    lines.push(`- Risiko: ${workplan.risk}`);
-    lines.push(`- Kilde: \`${workplan.sourcePath}\``);
-    lines.push(`- Oppgaver: ${workplan.taskCount}`);
-    lines.push(`- Sammendrag: ${workplan.summary}`);
-    if (workplan.tasks.length > 0) {
-      lines.push('', '#### Oppgaver');
-      for (const task of workplan.tasks) {
-        lines.push(`- ${task.sourceHeading ?? task.title}`);
+  for (const group of groupedWorkplans(snapshot.workplans)) {
+    lines.push(`## ${group.title}`, '');
+    for (const workplan of group.workplans) {
+      lines.push(`### ${workplan.title}`);
+      lines.push('');
+      lines.push(`- Status: ${workplan.status}`);
+      lines.push(`- Fase: ${workplan.stage}`);
+      lines.push(`- Risiko: ${workplan.risk}`);
+      lines.push(`- Kilde: \`${workplan.sourcePath}\``);
+      lines.push(`- Oppgaver: ${workplan.taskCount}`);
+      lines.push(`- Sammendrag: ${workplan.summary}`);
+      if (workplan.completedAt) lines.push(`- Fullført: ${workplan.completedAt}`);
+      for (const evidence of workplan.evidence ?? []) lines.push(`- Evidence: ${evidence}`);
+      if (workplan.tasks.length > 0) {
+        lines.push('', '#### Oppgaver');
+        for (const task of workplan.tasks) {
+          lines.push(`- ${task.sourceHeading ?? task.title} — \`${task.status}\``);
+          if (task.completedAt) lines.push(`  - Fullført: ${task.completedAt}`);
+          lines.push(...renderEvidenceLines(task.evidence));
+        }
       }
+      lines.push('');
     }
-    lines.push('');
   }
 
   return `${lines.join('\n')}\n`;
