@@ -11,6 +11,9 @@ import {
 } from '@/lib/content/schemas';
 import { WorkplansSnapshotSchema } from '@/lib/workplans/schemas';
 import { containsSensitiveStructuredKey } from '@/lib/content/source-policy';
+import { buildContentCoverageReport as buildCoverageReport } from '@/lib/content/coverage-report';
+
+export { buildContentCoverageReport } from '@/lib/content/coverage-report';
 
 interface GraphInput {
   sources?: any[];
@@ -27,6 +30,11 @@ interface GraphInput {
 
 async function readJson<T>(filePath: string): Promise<T> {
   return JSON.parse(await fs.readFile(filePath, 'utf8')) as T;
+}
+
+async function writeJson(filePath: string, value: unknown) {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
 async function readGeneratedGraph(generatedDir = 'content/generated', publicGeneratedDir = 'public/generated-content'): Promise<GraphInput> {
@@ -153,7 +161,7 @@ function validateGeneratedArtifacts(errors: string[], graph: GraphInput) {
     for (const source of graph.sources ?? []) {
       const publicSource = (publicGraph.sources ?? []).find((candidate) => candidate.id === source.id);
       if (!publicSource) continue;
-      for (const key of ['id', 'title', 'sourcePath', 'sourceType', 'status'] as const) {
+      for (const key of ['id', 'title', 'sourcePath', 'sourceType', 'status', 'verifiedAt', 'reviewAfter', 'expiresAt', 'owner', 'reviewer', 'reviewRisk', 'reviewNotes'] as const) {
         if (source[key] !== publicSource[key]) errors.push(`public source ${source.id} field ${key} does not mirror content generated source`);
       }
       if (!String(source.body ?? '').startsWith(String(publicSource.body ?? ''))) errors.push(`public source ${source.id} body is not a prefix of content generated body`);
@@ -248,12 +256,16 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
 }
 
 async function main() {
-  const errors = await validateContentGraph();
+  const graph = await readGeneratedGraph();
+  const report = buildCoverageReport(graph);
+  await writeJson(path.join('content/generated', 'content-coverage-report.json'), report);
+  await writeJson(path.join('public/generated-content', 'content-coverage-report.json'), report);
+  const errors = await validateContentGraph(graph);
   if (errors.length > 0) {
     errors.forEach((error) => console.error(error));
     process.exit(1);
   }
-  console.log('Content graph valid');
+  console.log(`Content graph valid. Coverage report generated with ${report.releaseBoard.gaps.length} release-board gaps.`);
 }
 
 const thisFile = fileURLToPath(import.meta.url);

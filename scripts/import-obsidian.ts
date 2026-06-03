@@ -6,6 +6,9 @@ import { SourceDocumentSchema, type ContentManifest, type SourceDocument } from 
 
 const DEFAULT_SOURCE_PATH = process.env.OBSIDIAN_BEREDSKAPSBOKA_PATH ?? '/Users/reidar/Obsidian/Hvelvet/01_Projects/Beredskapsboka';
 const GENERIC_ASSET_NAMES = new Set(['i-icon-32.png', 'fullscreen_on.png', 'Attachment.png']);
+const DEFAULT_SOURCE_OWNER = 'content-team';
+const DEFAULT_SOURCE_REVIEWER = 'fagansvarlig';
+const DEFAULT_SOURCE_VERIFIED_AT = '2026-06-03';
 
 export interface ImportOptions {
   generatedDir?: string;
@@ -43,6 +46,64 @@ function mapStatus(value: unknown): SourceDocument['status'] {
   return 'unverified';
 }
 
+function formatDateOnly(value: Date) {
+  return value.toISOString().slice(0, 10);
+}
+
+function addDays(date: Date, days: number) {
+  const copy = new Date(date);
+  copy.setUTCDate(copy.getUTCDate() + days);
+  return copy;
+}
+
+function metadataString(value: unknown): string | undefined {
+  if (value instanceof Date) return formatDateOnly(value);
+  const raw = String(value ?? '').trim();
+  return raw.length > 0 ? raw : undefined;
+}
+
+function metadataDate(value: unknown): string | undefined {
+  const raw = metadataString(value);
+  if (!raw) return undefined;
+  const dateOnly = raw.slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(dateOnly) ? dateOnly : undefined;
+}
+
+function mapReviewRisk(value: unknown, status: SourceDocument['status']): SourceDocument['reviewRisk'] {
+  const raw = String(value ?? '').toLowerCase().trim();
+  if (raw === 'low' || raw === 'medium' || raw === 'high') return raw;
+  return status === 'verified' ? 'medium' : 'high';
+}
+
+function sourceReviewMetadata(data: Record<string, unknown>, status: SourceDocument['status']) {
+  const verifiedAt = metadataDate(data.verifiedAt ?? data.verified_at ?? data.reviewedAt ?? data.reviewed_at) ?? DEFAULT_SOURCE_VERIFIED_AT;
+  const verifiedDate = new Date(`${verifiedAt}T00:00:00.000Z`);
+  const reviewRisk = mapReviewRisk(data.reviewRisk ?? data.review_risk, status);
+  const requiresSchedule = reviewRisk === 'high' || ['unverified', 'historical', 'draft', 'expired'].includes(status);
+  const reviewAfter = metadataDate(data.reviewAfter ?? data.review_after) ?? (requiresSchedule ? formatDateOnly(addDays(verifiedDate, 90)) : formatDateOnly(addDays(verifiedDate, 180)));
+  const expiresAt = metadataDate(data.expiresAt ?? data.expires_at);
+  const reviewNotes = metadataString(data.reviewNotes ?? data.review_notes);
+  return {
+    verifiedAt,
+    reviewAfter,
+    ...(expiresAt ? { expiresAt } : {}),
+    owner: metadataString(data.owner) ?? DEFAULT_SOURCE_OWNER,
+    reviewer: metadataString(data.reviewer) ?? DEFAULT_SOURCE_REVIEWER,
+    reviewRisk,
+    ...(reviewNotes ? { reviewNotes } : {}),
+  };
+}
+
+function normalizeSourceDocument(source: unknown): SourceDocument {
+  const draft = source as Record<string, unknown>;
+  const status = mapStatus(draft.status ?? draft.source_status);
+  return SourceDocumentSchema.parse({
+    ...draft,
+    status,
+    ...sourceReviewMetadata(draft, status),
+  });
+}
+
 async function pathExists(filePath: string) {
   try {
     await fs.access(filePath);
@@ -76,7 +137,7 @@ async function readPregeneratedImportResult(generatedDir: string, publicGenerate
   if (!(await pathExists(sourcePath))) {
     throw new Error(`Source extract directory is unavailable and ${sourcePath} does not exist`);
   }
-  const sources = JSON.parse(await fs.readFile(sourcePath, 'utf8')).map((source: unknown) => SourceDocumentSchema.parse(source));
+  const sources = JSON.parse(await fs.readFile(sourcePath, 'utf8')).map((source: unknown) => normalizeSourceDocument(source));
   if (sources.length === 0) throw new Error(`Pregenerated ${sourcePath} must contain at least one source document`);
   await writeJson(path.join(publicGeneratedDir, 'source-documents.json'), sources.map((source: SourceDocument) => ({ ...source, body: source.body.slice(0, 12000) })));
   const copiedAssets = (await pathExists(publicAssetsDir)) ? (await fs.readdir(publicAssetsDir)).sort() : [];
@@ -182,12 +243,14 @@ export async function importObsidianSources(basePath = DEFAULT_SOURCE_PATH, opti
     const raw = await fs.readFile(sourcePath, 'utf8');
     const parsed = matter(raw);
     const stem = path.basename(file, '.md');
+    const status = mapStatus(parsed.data.source_status ?? parsed.data.status);
     const source = SourceDocumentSchema.parse({
       id: slugifySourceId(stem),
       title: stem,
       sourcePath: canonicalSourceRef(file),
       sourceType: 'source-extract',
-      status: mapStatus(parsed.data.source_status ?? parsed.data.status),
+      status,
+      ...sourceReviewMetadata(parsed.data, status),
       body: redactLocalPathReferences(parsed.content.trim()),
       warnings: ['Kontroller alltid mot gjeldende offisielt planverk før operativ bruk.'],
     });

@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 import { ActionCardDetail } from '@/components/action-card-detail';
 import { getActionCards, getSourceDocuments } from '@/lib/content/load-content';
 
+export const revalidate = 3600;
+
 export function generateStaticParams() {
   return getActionCards().map((card) => ({ slug: card.slug }));
 }

@@ -5,19 +5,42 @@ export const PhaseSchema = z.enum(phases);
 export const RoleSchema = z.enum(roles);
 export const ScenarioSchema = z.enum(scenarios);
 export const SourceStatusSchema = z.enum(['verified', 'unverified', 'historical', 'draft', 'expired']);
+export const SourceReviewRiskSchema = z.enum(['low', 'medium', 'high']);
 
 const sourcePathPattern = /^(?:source-extracts|curated-notes)\/[A-Za-z0-9ÆØÅæøå._() -]+\.md$/;
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+const DateOnlySchema = z
+  .string()
+  .regex(datePattern, 'date must use YYYY-MM-DD')
+  .refine((value) => {
+    const parsed = new Date(`${value}T00:00:00.000Z`);
+    return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
+  }, 'date must be a real calendar date');
 
-export const SourceDocumentSchema = z.object({
-  id: z.string().min(1).regex(slugPattern, 'source id must be lowercase kebab-case'),
-  title: z.string().min(1),
-  sourcePath: z.string().min(1).regex(sourcePathPattern, 'sourcePath must be a canonical public reference such as source-extracts/<file>.md'),
-  sourceType: z.enum(['source-extract', 'curated-note']),
-  status: SourceStatusSchema,
-  body: z.string().min(1),
-  warnings: z.array(z.string()).default([]),
-});
+export const SourceDocumentSchema = z
+  .object({
+    id: z.string().min(1).regex(slugPattern, 'source id must be lowercase kebab-case'),
+    title: z.string().min(1),
+    sourcePath: z.string().min(1).regex(sourcePathPattern, 'sourcePath must be a canonical public reference such as source-extracts/<file>.md'),
+    sourceType: z.enum(['source-extract', 'curated-note']),
+    status: SourceStatusSchema,
+    verifiedAt: DateOnlySchema,
+    reviewAfter: DateOnlySchema.optional(),
+    expiresAt: DateOnlySchema.optional(),
+    owner: z.string().min(1),
+    reviewer: z.string().min(1),
+    reviewRisk: SourceReviewRiskSchema.default('medium'),
+    reviewNotes: z.string().optional(),
+    body: z.string().min(1),
+    warnings: z.array(z.string()).default([]),
+  })
+  .superRefine((value, ctx) => {
+    const requiresSchedule = value.reviewRisk === 'high' || ['unverified', 'historical', 'draft', 'expired'].includes(value.status);
+    if (requiresSchedule && !value.reviewAfter && !value.expiresAt) {
+      ctx.addIssue({ code: 'custom', message: 'High-risk or non-current sources require reviewAfter or expiresAt', path: ['reviewAfter'] });
+    }
+  });
 
 export const ActionCardSchema = z.object({
   slug: z.string().min(1).regex(slugPattern, 'action card slug must be lowercase kebab-case'),
@@ -31,6 +54,7 @@ export const ActionCardSchema = z.object({
   reporting: z.array(z.string()).default([]),
   sourceIds: z.array(z.string().min(1)).min(1),
   competenceRequired: z.array(z.string()).default([]),
+  competenceRationale: z.string().optional(),
   warning: z.string().optional(),
 });
 

@@ -56,6 +56,42 @@ const milestones: Array<{ title: string; date: string; owner: string; stage: Sta
   { title: 'Go-live', date: 'Jun 10', owner: 'AR', stage: 'release' },
 ];
 
+interface CoverageGap {
+  id: string;
+  title: string;
+  count: number;
+  severity: 'low' | 'medium' | 'high';
+  detail: string;
+}
+
+interface CoverageReportSnapshot {
+  generatedAt?: string;
+  releaseBoard: { gaps: CoverageGap[] };
+}
+
+function isCoverageGap(value: unknown): value is CoverageGap {
+  if (!value || typeof value !== 'object') return false;
+  const gap = value as Record<string, unknown>;
+  return (
+    typeof gap.id === 'string'
+    && typeof gap.title === 'string'
+    && typeof gap.count === 'number'
+    && Number.isFinite(gap.count)
+    && (gap.severity === 'low' || gap.severity === 'medium' || gap.severity === 'high')
+    && typeof gap.detail === 'string'
+  );
+}
+
+function normalizeCoverageReportSnapshot(value: unknown): CoverageReportSnapshot {
+  const record = value && typeof value === 'object' ? value as Record<string, unknown> : {};
+  const releaseBoard = record.releaseBoard && typeof record.releaseBoard === 'object' ? record.releaseBoard as Record<string, unknown> : {};
+  const gaps = Array.isArray(releaseBoard.gaps) ? releaseBoard.gaps.filter(isCoverageGap) : [];
+  return {
+    generatedAt: typeof record.generatedAt === 'string' ? record.generatedAt : undefined,
+    releaseBoard: { gaps },
+  };
+}
+
 function newId() {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
   return `release-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -132,6 +168,8 @@ export function ReleaseReadinessTool() {
   const [hydrated, setHydrated] = useState(false);
   const [workplansSnapshot, setWorkplansSnapshot] = useState<WorkplansSnapshot | null>(null);
   const [workplansError, setWorkplansError] = useState<string | null>(null);
+  const [coverageReport, setCoverageReport] = useState<CoverageReportSnapshot | null>(null);
+  const [coverageError, setCoverageError] = useState<string | null>(null);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -168,6 +206,28 @@ export function ReleaseReadinessTool() {
     };
   }, [hydrated]);
 
+  useEffect(() => {
+    if (!hydrated) return undefined;
+    let cancelled = false;
+
+    async function loadCoverageReport() {
+      const response = await fetch('/generated-content/content-coverage-report.json', { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Failed to load content coverage report: ${response.status}`);
+      const snapshot = normalizeCoverageReportSnapshot(await response.json());
+      if (cancelled) return;
+      setCoverageReport(snapshot);
+      setCoverageError(null);
+    }
+
+    loadCoverageReport().catch(() => {
+      if (!cancelled) setCoverageError('Content coverage report is unavailable. Run npm run validate:content locally.');
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated]);
+
   const summary = useMemo(() => {
     const completed = plan.items.filter((item) => item.status === 'completed').length;
     const blocked = plan.items.filter((item) => item.status === 'blocked').length;
@@ -187,6 +247,7 @@ export function ReleaseReadinessTool() {
   const activeItems = plan.items.filter((item) => item.status !== 'completed');
   const completedItems = plan.items.filter((item) => item.status === 'completed');
   const syncedWorkplans = workplansSnapshot?.workplans ?? [];
+  const coverageGaps = coverageReport?.releaseBoard?.gaps ?? [];
   const attentionItems = activeItems
     .filter((item) => item.status === 'blocked' || item.risk !== 'low')
     .slice(0, 4);
@@ -475,6 +536,23 @@ export function ReleaseReadinessTool() {
                     <span>{title}</span>
                     <span aria-hidden="true" className="text-2xl text-slate-400">›</span>
                   </a>
+                ))}
+              </div>
+            </section>
+
+            <section className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+              <h2 className="text-2xl font-black">Content coverage gaps</h2>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{coverageReport?.generatedAt ? `Report: ${coverageReport.generatedAt}` : coverageError ?? 'Waiting for generated coverage report.'}</p>
+              <div className="mt-3 space-y-3">
+                {coverageGaps.length === 0 ? <p className="rounded-xl bg-white p-3 text-sm font-semibold text-slate-600">No release-board content coverage gaps reported.</p> : null}
+                {coverageGaps.map((gap) => (
+                  <article key={gap.id} className="rounded-xl bg-white p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="font-black">{gap.title}</h3>
+                      <span className={`rounded-full px-2 py-1 text-xs font-black ${gap.severity === 'high' ? 'bg-red-100 text-red-700' : gap.severity === 'medium' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-700'}`}>{gap.count}</span>
+                    </div>
+                    <p className="mt-2 text-sm font-semibold text-slate-600">{gap.detail}</p>
+                  </article>
                 ))}
               </div>
             </section>

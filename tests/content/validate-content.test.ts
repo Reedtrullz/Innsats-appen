@@ -1,6 +1,6 @@
-import { validateContentGraph } from '@/scripts/validate-content';
+import { buildContentCoverageReport, validateContentGraph } from '@/scripts/validate-content';
 
-const knownSource = { id: 'src-known', title: 'Known', sourcePath: 'source-extracts/SRC - Known.md', sourceType: 'source-extract', status: 'verified', body: 'Known', warnings: [] };
+const knownSource = { id: 'src-known', title: 'Known', sourcePath: 'source-extracts/SRC - Known.md', sourceType: 'source-extract', status: 'verified', verifiedAt: '2026-06-03', reviewAfter: '2026-12-03', owner: 'content-team', reviewer: 'fagansvarlig', reviewRisk: 'low', body: 'Known', warnings: [] };
 
 it('reports missing source references', async () => {
   const errors = await validateContentGraph({
@@ -13,8 +13,8 @@ it('reports missing source references', async () => {
 it('reports duplicate ids and slugs across generated content', async () => {
   const errors = await validateContentGraph({
     sources: [
-      { id: 'src-known', title: 'Known 1', sourcePath: 'source-extracts/SRC - Known 1.md', sourceType: 'source-extract', status: 'verified', body: 'Known', warnings: [] },
-      { id: 'src-known', title: 'Known 2', sourcePath: 'source-extracts/SRC - Known 2.md', sourceType: 'source-extract', status: 'verified', body: 'Known', warnings: [] },
+      { ...knownSource, title: 'Known 1', sourcePath: 'source-extracts/SRC - Known 1.md' },
+      { ...knownSource, title: 'Known 2', sourcePath: 'source-extracts/SRC - Known 2.md' },
     ],
     actionCards: [
       { slug: 'same-card', title: 'A', phase: 'under', roles: ['lagforer'], scenarios: ['generelt'], priority: 'high', steps: ['A'], sourceIds: ['src-known'], warning: 'A' },
@@ -137,4 +137,34 @@ it('reports generated artifact manifest, public mirror, and search-index mismatc
   expect(joined).toContain('public source src-known field title does not mirror content generated source');
   expect(joined).toContain('search index source document ids missing kilde:src-known');
   expect(joined).toContain('search index source document ids has unexpected kilde:src-stale');
+});
+
+it('builds CI content coverage reports for source links, high-risk cards, glossary gaps, and coverage dimensions', () => {
+  const report = buildContentCoverageReport({
+    sources: [
+      knownSource,
+      { ...knownSource, id: 'src-orphan', title: 'Orphan', sourcePath: 'source-extracts/SRC - Orphan.md', status: 'unverified', reviewRisk: 'high' },
+      { ...knownSource, id: 'src-risk', title: 'Risk', sourcePath: 'source-extracts/SRC - Risk.md', status: 'expired', reviewRisk: 'high', expiresAt: '2026-01-01' },
+    ],
+    actionCards: [
+      { slug: 'risk-card', title: 'Risk [[MissingTerm]]', phase: 'under', roles: ['lagforer'], scenarios: ['generelt'], priority: 'high', steps: ['Use MissingAlias'], sourceIds: ['src-risk'], competenceRequired: [] },
+      { slug: 'no-source-card', title: 'No source', phase: 'for', roles: ['mannskap'], scenarios: ['flom'], priority: 'medium', steps: ['Step'], sourceIds: [] },
+    ],
+    checklists: [],
+    trainingPaths: [],
+    protectionMeasures: [],
+    glossary: [{ term: 'KnownTerm', definition: 'Defined', synonyms: ['MissingAlias'], sourceIds: ['src-known'] }],
+  } as any);
+
+  expect(report.linkage.sourcesWithoutReferences).toEqual(['src-orphan']);
+  expect(report.linkage.cardsWithoutSources).toEqual(['no-source-card']);
+  expect(report.risk.highRiskCardsWithoutWarnings).toEqual(['risk-card']);
+  expect(report.risk.highRiskCardsWithoutCompetenceOrRationale).toEqual(['risk-card']);
+  expect(report.glossary.referencedButUndefined).toEqual(['MissingTerm']);
+  expect(report.coverage.byRole.lagforer.cardCount).toBe(1);
+  expect(report.coverage.byPhase.under.cardCount).toBe(1);
+  expect(report.coverage.byScenario.generelt.cardCount).toBe(1);
+  expect(report.coverage.byCompetence.unassigned.cardCount).toBe(2);
+  expect(report.coverage.bySourceStatus.expired.sourceCount).toBe(1);
+  expect(report.releaseBoard.gaps.some((gap) => gap.id === 'content-high-risk-card-warnings')).toBe(true);
 });

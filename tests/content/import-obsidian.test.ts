@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { vi } from 'vitest';
 import { importObsidianSources, redactLocalPathReferences } from '@/scripts/import-obsidian';
 
 it('imports source extracts with stable IDs and relative source references', async () => {
@@ -16,8 +17,70 @@ it('imports source extracts with stable IDs and relative source references', asy
   expect(result.sources.map((s) => s.id)).toContain('src-deep-research-tilfluktsrom');
   expect(result.sources.map((s) => s.id)).toContain('src-kursplan-grunnkurs-fig10');
   expect(result.sources.every((source) => source.sourcePath.startsWith('source-extracts/'))).toBe(true);
+  expect(result.sources.every((source) => source.status && source.verifiedAt && source.reviewAfter && source.owner && source.reviewer)).toBe(true);
+  expect(result.sources.every((source) => source.reviewRisk === 'high')).toBe(true);
   expect(JSON.stringify(result.sources)).not.toContain('/Users/');
   expect(JSON.stringify(result.sources)).not.toContain(path.resolve('tests/fixtures/obsidian-mini'));
+});
+
+it('uses stable default review metadata independent of the build clock', async () => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date('2030-01-01T00:00:00.000Z'));
+  try {
+    const fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'beredskapsboka-import-stable-review-'));
+    await fs.mkdir(path.join(fixtureRoot, 'source-extracts'), { recursive: true });
+    await fs.writeFile(path.join(fixtureRoot, 'source-extracts', 'SRC - Stable.md'), '# Stable\nKilde uten frontmatter.');
+
+    const result = await importObsidianSources(fixtureRoot, {
+      generatedDir: path.join(fixtureRoot, 'generated'),
+      publicAssetsDir: path.join(fixtureRoot, 'assets'),
+      publicGeneratedDir: path.join(fixtureRoot, 'public-generated'),
+    });
+
+    expect(result.sources[0].verifiedAt).toBe('2026-06-03');
+    expect(result.sources[0].reviewAfter).toBe('2026-09-01');
+  } finally {
+    vi.useRealTimers();
+  }
+});
+
+it('uses source review frontmatter when present and safe defaults when missing', async () => {
+  const fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'beredskapsboka-import-metadata-'));
+  await fs.mkdir(path.join(fixtureRoot, 'source-extracts'), { recursive: true });
+  await fs.writeFile(
+    path.join(fixtureRoot, 'source-extracts', 'SRC - Metadata.md'),
+    [
+      '---',
+      'status: verified',
+      'verifiedAt: 2026-01-10',
+      'reviewAfter: 2026-07-10',
+      'expiresAt: 2027-01-10',
+      'owner: radiac-team',
+      'reviewer: kari',
+      'reviewRisk: high',
+      'reviewNotes: Kontrollert mot offentlig prosedyre.',
+      '---',
+      '# Metadata',
+      'Kilde uten lokale stier.',
+    ].join('\n'),
+  );
+
+  const result = await importObsidianSources(fixtureRoot, {
+    generatedDir: path.join(fixtureRoot, 'generated'),
+    publicAssetsDir: path.join(fixtureRoot, 'assets'),
+    publicGeneratedDir: path.join(fixtureRoot, 'public-generated'),
+  });
+
+  expect(result.sources[0]).toMatchObject({
+    status: 'verified',
+    verifiedAt: '2026-01-10',
+    reviewAfter: '2026-07-10',
+    expiresAt: '2027-01-10',
+    owner: 'radiac-team',
+    reviewer: 'kari',
+    reviewRisk: 'high',
+    reviewNotes: 'Kontrollert mot offentlig prosedyre.',
+  });
 });
 
 it('uses pregenerated source documents when explicitly allowed and source extracts are unavailable', async () => {

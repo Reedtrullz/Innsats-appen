@@ -14,10 +14,52 @@ it('accepts a valid source document', () => {
     sourcePath: 'source-extracts/SRC - 5-punktsordre.md',
     sourceType: 'source-extract',
     status: 'unverified',
+    verifiedAt: '2026-06-03',
+    reviewAfter: '2026-09-01',
+    owner: 'content-team',
+    reviewer: 'fagansvarlig',
+    reviewRisk: 'high',
     body: 'Kildeinnhold',
     warnings: ['Kontroller mot gjeldende planverk'],
   });
   expect(result.success).toBe(true);
+});
+
+it('rejects impossible source review dates', () => {
+  const result = SourceDocumentSchema.safeParse({
+    id: 'src-bad-date',
+    title: 'SRC - Bad date',
+    sourcePath: 'source-extracts/SRC - Bad date.md',
+    sourceType: 'source-extract',
+    status: 'verified',
+    verifiedAt: '2026-99-99',
+    reviewAfter: '2026-02-31',
+    owner: 'content-team',
+    reviewer: 'fagansvarlig',
+    reviewRisk: 'low',
+    body: 'Kildeinnhold',
+    warnings: [],
+  });
+
+  expect(result.success).toBe(false);
+});
+
+it('requires review scheduling metadata for high-risk source documents', () => {
+  const result = SourceDocumentSchema.safeParse({
+    id: 'src-high-risk',
+    title: 'SRC - High risk',
+    sourcePath: 'source-extracts/SRC - High risk.md',
+    sourceType: 'source-extract',
+    status: 'unverified',
+    verifiedAt: '2026-06-03',
+    owner: 'content-team',
+    reviewer: 'fagansvarlig',
+    reviewRisk: 'high',
+    body: 'Kildeinnhold',
+    warnings: ['Kontroller mot gjeldende planverk'],
+  });
+
+  expect(result.success).toBe(false);
 });
 
 it('rejects local filesystem source paths', () => {
