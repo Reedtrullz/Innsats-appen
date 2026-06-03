@@ -1,3 +1,31 @@
+- id: group-2a-for-utrykning
+  date: 2026-06-03
+  title: Før utrykning-prosedyre oppdatert
+  summary: Før innsats har fått samlet før utrykning-kontroll, personell-/utstyr-/kjøretøysteg, vær-/fareprompt og lokale eksportgrenser for manglende utstyr.
+  changeType: updated
+  contentRefs:
+    - kind: checklist
+      id: fig-for-innsats
+    - kind: checklist
+      id: for-utrykning-samlet
+    - kind: checklist
+      id: personlig-utstyr-for-utrykning
+    - kind: checklist
+      id: lagsutstyr-for-utrykning
+  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
+  mustRead: true
+
+- id: group-2a-under-innsats-start
+  date: 2026-06-03
+  title: Første Under innsats-steg lagt til
+  summary: Under innsats har fått startsteg for ankomst/egen sikkerhet, oppmarsjområde og kontakt med innsatsleder.
+  changeType: added
+  contentRefs:
+    - kind: checklist
+      id: fig-under-innsats
+  sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
+  mustRead: false
+
 - id: group-1c-content-governance
   date: 2026-06-03
   title: FAQ, taksonomier og kildevisning lagt til

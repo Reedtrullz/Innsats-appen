@@ -13,3 +13,11 @@
   audienceRoles: [lagforer, materiellansvarlig]
   sourceIds: [src-sjekkliste-fig-og-figp]
   updatedAt: 2026-06-03
+
+- id: manglende-utstyr-for-avreise
+  title: Manglende utstyr før avreise Markdown
+  description: Lokal eksport av ukrysset personlig utstyr og lagsutstyr før utrykning, basert på lokal sjekklistestatus og notater uten sentral personlig inventarliste.
+  format: markdown
+  audienceRoles: [lagforer, materiellansvarlig, beredskapsvakt]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-kommunikasjons-og-sambandsdiagram]
+  updatedAt: 2026-06-03

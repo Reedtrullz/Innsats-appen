@@ -28,21 +28,162 @@
   phase: for
   roles: [mannskap, lagforer]
   scenarios: [generelt]
+  equipmentRequired: [personlig-utrustning, verneutstyr, samband, kjoretoy]
   items:
-    - id: utstyr
-      label: Personlig utrustning kontrollert
+    - id: kontakt-beredskapsvakt
+      label: Kontakt beredskapsvakt og bekreft mottatt oppdrag, oppmøte og rapporteringslinje
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats]
+    - id: fremmoteliste
+      label: Fremmøteliste er startet lokalt uten personopplysninger utover lokale rutiner
       required: true
       sourceIds: [src-sjekkliste-fig-og-figp]
-    - id: ordre
-      label: Oppdrag og sikkerhet forstått
+    - id: personell-skikkethet-sikkerhet-helse
+      label: Personell vurdert skikket for oppdraget med hensyn til sikkerhet, helse og utholdenhet
       required: true
-      sourceIds: [src-5-punktsordre]
-    - id: samband
-      label: Samband testet
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats]
+    - id: personlig-utstyr
+      label: Personlig utstyr og verneutstyr kontrollert før avreise
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: fellesutstyr
+      label: Fellesutstyr og samband kontrollert mot oppdragets behov
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-kommunikasjons-og-sambandsdiagram]
+    - id: kjoretoy-klar
+      label: Kjøretøy er klart, pakket forsvarlig og egnet for oppdraget
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: drivstoff-beredskap
+      label: Drivstoff, rekkevidde og beredskap for retur/omdisponering er kontrollert
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: vaer-og-farevurdering
+      label: Vær, føre og relevante farer er vurdert manuelt før utrykning; ikke lagre rå eksterne datasett
+      required: true
+      sourceIds: [src-tiltakskort-for-innsats]
+    - id: forelopig-plan
+      label: Foreløpig plan for fremføring, oppmarsj og første tiltak er formulert
+      required: true
+      sourceIds: [src-5-punktsordre, src-tiltakskort-for-innsats]
+    - id: ordre-tilbakelesing
+      label: Ordre gitt med tilbakelesing av oppdrag, sikkerhet, samband og rapportering
+      required: true
+      sourceIds: [src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
+    - id: logg-startet
+      label: Lokal oppdragslogg er startet før avreise
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-5-punktsordre]
+    - id: klar-til-distrikt
+      label: Klar til avreise meldt til distrikt/beredskapsvakt etter lokale rutiner
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-kommunikasjons-og-sambandsdiagram]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
+  warning: Lokal ordre gjelder. Bruk sjekklisten som offentlig beslutningsstøtte; ikke legg inn persondata, pasientdata eller skjermet operativ informasjon.
+
+- slug: for-utrykning-samlet
+  title: Før utrykning samlet kontroll
+  phase: for
+  roles: [mannskap, lagforer, beredskapsvakt, materiellansvarlig]
+  scenarios: [generelt]
+  equipmentRequired: [personlig-utrustning, verneutstyr, samband, kjoretoy]
+  items:
+    - id: kontakt-og-mottak
+      label: Oppdrag mottatt, kontakt med beredskapsvakt etablert og oppmøte/rapporteringslinje avklart
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats]
+    - id: personell-og-sikkerhet
+      label: Fremmøteliste, personellskikkethet, sikkerhet og helse vurdert lokalt
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats]
+    - id: utstyr-kjoretoy-drivstoff
+      label: Personlig utstyr, lagsutstyr, kjøretøy og drivstoff er kontrollert før avreise
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: vaer-farer-og-plan
+      label: Vær-/farekontekst og foreløpig plan er vurdert manuelt mot gjeldende ordre
+      required: true
+      sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre]
+    - id: ordre-logg-og-klar
+      label: Ordre gitt med tilbakelesing, lokal logg startet og klar meldt til distrikt/beredskapsvakt
+      required: true
+      sourceIds: [src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
+  warning: Samlet før utrykning-visning for lokal nettleser. Ingen persondata, pasientdata, sentral inventarliste eller rå eksterne vær-/faredata i MVP.
+
+- slug: personlig-utstyr-for-utrykning
+  title: Personlig utstyr før utrykning
+  phase: for
+  roles: [mannskap, lagforer]
+  scenarios: [generelt]
+  equipmentRequired: [personlig-utrustning, verneutstyr]
+  items:
+    - id: bekledning
+      label: Bekledning valgt etter vær, føre, varighet og oppdragstype
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: hjelm-og-verneutstyr
+      label: Hjelm og relevant verneutstyr kontrollert av den enkelte
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: personlig-samband-og-lys
+      label: Personlig samband/lys/enkle hjelpemidler kontrollert der lokale rutiner krever det
+      required: false
+      sourceIds: [src-sjekkliste-fig-og-figp, src-kommunikasjons-og-sambandsdiagram]
+    - id: mangler-notert-lokalt
+      label: Eventuelle mangler er notert lokalt uten navn eller sentral personlig inventarliste
+      required: false
+      sourceIds: [src-sjekkliste-fig-og-figp]
+  sourceIds: [src-sjekkliste-fig-og-figp]
+  warning: Ingen sentral personlig inventarliste i MVP. Bruk bare lokal sjekklistestatus/notat, ikke persondata eller helsedata.
+
+- slug: lagsutstyr-for-utrykning
+  title: Lagsutstyr før utrykning
+  phase: for
+  roles: [lagforer, materiellansvarlig, stab-logistikk]
+  scenarios: [generelt]
+  equipmentRequired: [samband, kjoretoy, verneutstyr]
+  items:
+    - id: fellesutstyr-komplett
+      label: Fellesutstyr kontrollert mot oppdragstype og lokal pakkliste
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: samband-testet
+      label: Samband, kallesignal og reservebatterier testet etter lokal sambandsplan
       required: true
       sourceIds: [src-kommunikasjons-og-sambandsdiagram]
-  sourceIds: [src-sjekkliste-fig-og-figp]
-  warning: Lokal ordre gjelder.
+    - id: kjoretoy-og-lasting
+      label: Kjøretøy, sikring av last og tilgjengelighet for rask avreise kontrollert
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: mangler-notert-lokalt
+      label: Manglende lagsutstyr er notert lokalt for oppdragseksport før avreise
+      required: false
+      sourceIds: [src-sjekkliste-fig-og-figp]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-kommunikasjons-og-sambandsdiagram]
+  warning: Støtter lokal oppdragseksport av mangler. Ingen remote sync, sentral inventarliste, persondata eller pasientdata.
+
+- slug: fig-under-innsats
+  title: FIG under innsats
+  phase: under
+  roles: [mannskap, lagforer]
+  scenarios: [generelt]
+  equipmentRequired: [verneutstyr, samband]
+  items:
+    - id: ankomst-og-egen-sikkerhet
+      label: Ankomst meldt og egen sikkerhet/risikobilde vurdert før første tiltak
+      required: true
+      sourceIds: [src-tiltakskort-for-innsats, src-kommunikasjons-og-sambandsdiagram]
+    - id: oppmarsjomrade-plassering
+      label: Oppmarsjområde/plassering vurdert for sikkerhet, fremkommelighet og ledelseslinje
+      required: true
+      sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre]
+    - id: kontakt-innsatsleder
+      label: Kontakt med innsatsleder etablert og videre oppdrag/rapportering avklart
+      required: true
+      sourceIds: [src-tiltakskort-for-innsats, src-kommunikasjons-og-sambandsdiagram]
+  sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
+  warning: Følg innsatsleders føringer og lokal ordre. Ikke registrer persondata eller pasientdata.
 
 - slug: fig-etter-innsats
   title: FIG etter innsats

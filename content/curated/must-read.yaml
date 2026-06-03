@@ -1,3 +1,12 @@
+- id: for-utrykning-les-forst
+  title: Må leses før utrykning
+  body: Kontroller gjeldende ordre, beredskapsvaktens føringer, vær/farer, samband og lokale sikkerhetsgrenser før avreise. Bruk bare lokale sjekklistenotater; ikke registrer persondata, pasientdata eller sentral personlig inventarliste.
+  severity: warning
+  changedAt: 2026-06-03
+  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
+  linkedCardSlugs: [fem-punktsordre, sambandsplan-start]
+  changelogEntryId: group-2a-for-utrykning
+
 - id: les-for-bruk-beslutningsstotte
   title: Les før operativ bruk
   body: Beredskapsboka er beslutningsstøtte. Gjeldende ordre, lokal plan og fagmyndighet går alltid foran, og appen skal ikke brukes til persondata, pasientdata eller skjermede lokasjoner.
