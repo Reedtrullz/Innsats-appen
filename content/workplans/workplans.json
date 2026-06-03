@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T19:08:10.252Z",
+  "generatedAt": "2026-06-03T19:40:11.479Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-03T19:08:10.252Z",
+      "updatedAt": "2026-06-03T19:40:11.479Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -1787,161 +1787,241 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-78",
           "title": "Expand Under innsats workflow with takeover-from-other-unit procedure.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 78: Expand Under innsats workflow with takeover-from-other-unit procedure."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-79",
           "title": "Expand Under innsats workflow with reassess equipment/resources step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 79: Expand Under innsats workflow with reassess equipment/resources step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-80",
           "title": "Expand Under innsats workflow with request additional resources step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 80: Expand Under innsats workflow with request additional resources step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-81",
           "title": "Expand Under innsats workflow with continuous personnel control step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 81: Expand Under innsats workflow with continuous personnel control step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-82",
           "title": "Expand Under innsats workflow with continuous risk/safety assessment step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 82: Expand Under innsats workflow with continuous risk/safety assessment step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-83",
           "title": "Expand Under innsats workflow with ongoing dialogue with innsatsleder step.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 83: Expand Under innsats workflow with ongoing dialogue with innsatsleder step."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-84",
           "title": "Expand Under innsats workflow with reanalysis after mission changes.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 84: Expand Under innsats workflow with reanalysis after mission changes."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-85",
           "title": "Expand Under innsats workflow with food/water/rest check.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 85: Expand Under innsats workflow with food/water/rest check."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-86",
           "title": "Expand Under innsats workflow with relief/avløsning planning.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 86: Expand Under innsats workflow with relief/avløsning planning."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-87",
           "title": "Expand Under innsats workflow with psychosocial/EFOK trigger check.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 87: Expand Under innsats workflow with psychosocial/EFOK trigger check."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-88",
           "title": "Expand Under innsats workflow with handover/departure from incident area.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 88: Expand Under innsats workflow with handover/departure from incident area."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-89",
           "title": "Add current-situation overview combining mission, weather, hazards, notes, open tasks and active checklists.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 89: Add current-situation overview combining mission, weather, hazards, notes, open tasks and active checklists."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-90",
           "title": "Add local task list inside mission.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 90: Add local task list inside mission."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-91",
           "title": "Add task status values: not started, in progress, done, blocked and needs assistance.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 91: Add task status values: not started, in progress, done, blocked and needs assistance."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-92",
           "title": "Add quick status messages such as på posisjon, oppgave fullført and trenger assistanse.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 92: Add quick status messages such as på posisjon, oppgave fullført and trenger assistanse."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-93",
           "title": "Add resource request form for water, food, PPE, medical support, transport, fuel and equipment.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 93: Add resource request form for water, food, PPE, medical support, transport, fuel and equipment."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-94",
           "title": "Add local export of task/status summary.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 94: Add local export of task/status summary."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-95",
           "title": "Expand Etter innsats workflow with personnel control.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 95: Expand Etter innsats workflow with personnel control."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-96",
           "title": "Expand Etter innsats workflow with injury/personnel-damage escalation.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 96: Expand Etter innsats workflow with injury/personnel-damage escalation."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-97",
           "title": "Expand Etter innsats workflow with technical review.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-03T19:40:01.000Z",
+          "evidence": [
+            "Implemented in commit f530de4 (expanded Under/Etter workflows, local mission task/status/resource model, situation overview, local status export with stale-signal parity and write-race protection). Gates: targeted vitest 4 files/14 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 97: Expand Etter innsats workflow with technical review."
         },
         {
