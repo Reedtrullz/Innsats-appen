@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T19:40:11.479Z",
+  "generatedAt": "2026-06-03T20:51:00.951Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-03T19:40:11.479Z",
+      "updatedAt": "2026-06-03T20:51:00.951Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -2027,161 +2027,241 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-98",
           "title": "Expand Etter innsats workflow with defuse/emotional review consideration.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 98: Expand Etter innsats workflow with defuse/emotional review consideration."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-99",
           "title": "Expand Etter innsats workflow with EFOK follow-up assessment.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 99: Expand Etter innsats workflow with EFOK follow-up assessment."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-100",
           "title": "Expand Etter innsats workflow with MBK/equipment readiness review.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 100: Expand Etter innsats workflow with MBK/equipment readiness review."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-101",
           "title": "Expand Etter innsats workflow with written report reminder.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 101: Expand Etter innsats workflow with written report reminder."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-102",
           "title": "Expand Etter innsats workflow with complete attendance/travel information reminder.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 102: Expand Etter innsats workflow with complete attendance/travel information reminder."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-103",
           "title": "Expand Etter innsats workflow with loss/damage report reminder.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 103: Expand Etter innsats workflow with loss/damage report reminder."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-104",
           "title": "Expand Etter innsats workflow with dimittering only in consultation with district/beredskapsvakt.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 104: Expand Etter innsats workflow with dimittering only in consultation with district/beredskapsvakt."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-105",
           "title": "Create after-action report template.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 105: Create after-action report template."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-106",
           "title": "Auto-fill after-action report from mission, checklist, order, samband and log data.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 106: Auto-fill after-action report from mission, checklist, order, samband and log data."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-107",
           "title": "Add resource consumption section to after-action report.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 107: Add resource consumption section to after-action report."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-108",
           "title": "Add equipment damage/loss section to after-action report.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 108: Add equipment damage/loss section to after-action report."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-109",
           "title": "Add MBK status summary export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 109: Add MBK status summary export."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-110",
           "title": "Add after-action Markdown export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 110: Add after-action Markdown export."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-111",
           "title": "Add after-action JSON export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 111: Add after-action JSON export."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-112",
           "title": "Add after-action PDF export after text exports are stable.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 112: Add after-action PDF export after text exports are stable."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-113",
           "title": "Add local archive of completed missions.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 113: Add local archive of completed missions."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-114",
           "title": "Add local archive search.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 114: Add local archive search."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-115",
           "title": "Add local archive delete/reset.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 115: Add local archive delete/reset."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-116",
           "title": "Add structured lessons-learned section.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 116: Add structured lessons-learned section."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-117",
           "title": "Add structured feedback on leadership, equipment, procedures, training, safety and communications.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T20:50:32.000Z",
+          "evidence": [
+            "Implemented in commit a861095 (Etter workflow expansion, after-action report exports, local archive/search/delete/reset, structured lessons/feedback, MBK classification hardening). Gates: targeted vitest 5 files/30 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality review APPROVED after MBK false-positive fixes."
+          ],
           "sourceHeading": "Task 117: Add structured feedback on leadership, equipment, procedures, training, safety and communications."
         },
         {
