@@ -21,3 +21,27 @@
   audienceRoles: [lagforer, materiellansvarlig, beredskapsvakt]
   sourceIds: [src-sjekkliste-fig-og-figp, src-kommunikasjons-og-sambandsdiagram]
   updatedAt: 2026-06-03
+
+- id: fem-punktsordre-markdown
+  title: 5-punktsordre Markdown
+  description: Lokal Markdown-eksport av 5-punktsordre med generiske rolle-/malvalg, tilbakelesing/forstått-bekreftelse og kilde-/versjonsmetadata.
+  format: markdown
+  audienceRoles: [lagforer, leder, mfe, beredskapsvakt]
+  sourceIds: [src-5-punktsordre]
+  updatedAt: 2026-06-03
+
+- id: fem-punktsordre-json
+  title: 5-punktsordre JSON
+  description: Stabil strukturert lokal JSON-eksport av 5-punktsordre med mal, ordrepunkt, tilbakelesing/forstått og metadata uten persondata.
+  format: json
+  audienceRoles: [lagforer, leder, mfe, beredskapsvakt]
+  sourceIds: [src-5-punktsordre]
+  updatedAt: 2026-06-03
+
+- id: fem-punktsordre-pdf
+  title: 5-punktsordre PDF-klar HTML
+  description: PDF-klar HTML for lokal nettleserutskrift av 5-punktsordre via Skriv ut og Lagre som PDF, ikke en offisiell innsending.
+  format: pdf
+  audienceRoles: [lagforer, leder, mfe, beredskapsvakt]
+  sourceIds: [src-5-punktsordre]
+  updatedAt: 2026-06-03

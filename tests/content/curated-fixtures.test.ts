@@ -6,7 +6,9 @@ const readYaml = (path: string) => yaml.load(fs.readFileSync(path, 'utf8')) as a
 it('curated YAML includes required starter slugs', () => {
   const cards = readYaml('content/curated/action-cards.yaml');
   const training = readYaml('content/curated/training-paths.yaml');
+  const exportTemplates = readYaml('content/curated/export-templates.yaml');
   const cardSlugs = cards.map((card) => card.slug);
+  const exportTemplateIds = exportTemplates.map((template) => template.id);
   expect(cardSlugs).toContain('fem-punktsordre');
   expect(cardSlugs).toContain('sambandsplan-start');
   expect(cardSlugs).toContain('tilfluktsrom-klargjoring');
@@ -14,6 +16,12 @@ it('curated YAML includes required starter slugs', () => {
   expect(cardSlugs).toContain('radiac-dosekontroll');
   expect(cardSlugs).toContain('mfe-anmodning');
   expect(training.map((path) => path.slug)).toContain('fig10-grunnkurs');
+  expect(exportTemplateIds).toEqual(expect.arrayContaining(['fem-punktsordre-markdown', 'fem-punktsordre-json', 'fem-punktsordre-pdf']));
+  for (const id of ['fem-punktsordre-markdown', 'fem-punktsordre-json', 'fem-punktsordre-pdf']) {
+    const template = exportTemplates.find((item) => item.id === id);
+    expect(template?.sourceIds).toEqual(['src-5-punktsordre']);
+    expect(template?.audienceRoles).toEqual(expect.arrayContaining(['lagforer', 'leder', 'mfe', 'beredskapsvakt']));
+  }
 });
 
 it('curated Group 2A/2B checklists cover før utrykning, expanded under innsats and first etter innsats workflow steps', () => {
