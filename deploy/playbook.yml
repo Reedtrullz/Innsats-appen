@@ -6,11 +6,11 @@
 #   - Target host is logged into GHCR if the image is private.
 #   - community.docker collection installed on the control node.
 # Variables:
-#   - docker_image: image tag to deploy (default ghcr.io/reedtrullz/beredskapsboka:latest)
+#   - docker_image: image tag to deploy (default ghcr.io/reedtrullz/innsats-appen:latest)
 #   - app_version: version exposed by /api/health (default APP_VERSION env or latest)
 #   - app_domain: public domain (inventory default innsats.reidar.tech)
 # Usage:
-#   APP_VERSION=$(git rev-parse HEAD) ansible-playbook -i deploy/inventory/hosts.yml deploy/playbook.yml -e "docker_image=ghcr.io/reedtrullz/beredskapsboka:$(git rev-parse --short=12 HEAD)"
+#   APP_VERSION=$(git rev-parse HEAD) ansible-playbook -i deploy/inventory/hosts.yml deploy/playbook.yml -e "docker_image=ghcr.io/reedtrullz/innsats-appen:$(git rev-parse --short=12 HEAD)"
 
 - name: Deploy Beredskapsboka to VPS
   hosts: beredskapsboka
@@ -21,7 +21,7 @@
     app_name: beredskapsboka
     container_name: beredskapsboka
     app_dir: /opt/apps/beredskapsboka
-    docker_image: ghcr.io/reedtrullz/beredskapsboka:latest
+    docker_image: ghcr.io/reedtrullz/innsats-appen:latest
     app_version: "{{ lookup('ansible.builtin.env', 'APP_VERSION') | default('latest', true) }}"
     met_user_agent: "{{ lookup('ansible.builtin.env', 'MET_USER_AGENT') | default('Beredskapsboka/0.1 (+https://innsats.reidar.tech)', true) }}"
     health_url: "http://{{ app_bind_address }}:{{ app_host_port }}/api/health"

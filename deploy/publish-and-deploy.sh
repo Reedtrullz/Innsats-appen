@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-IMAGE="${IMAGE:-ghcr.io/reedtrullz/beredskapsboka}"
+IMAGE="${IMAGE:-ghcr.io/reedtrullz/innsats-appen}"
 INVENTORY="${INVENTORY:-deploy/inventory/hosts.yml}"
 PLAYBOOK="${PLAYBOOK:-deploy/playbook.yml}"
 PLATFORM="${PLATFORM:-linux/amd64}"

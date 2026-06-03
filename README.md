@@ -1,6 +1,12 @@
-# Beredskapsboka
+# Beredskapsboka / Innsats-appen
 
-Mobile-first, offline-capable PWA for source-backed Sivilforsvaret decision support. The app is a local MVP: generated content, mission notes, checklist runs, 5-punktsordre exports, and sambandsplan exports stay in the browser unless the user manually copies them out.
+Mobile-first, offline-capable PWA for source-backed Sivilforsvaret decision support.
+
+- Repository: https://github.com/Reedtrullz/Innsats-appen
+- Production domain prepared for deploy: https://innsats.reidar.tech
+- GHCR image namespace: `ghcr.io/reedtrullz/innsats-appen`
+
+The app is a local MVP: generated content, mission notes, checklist runs, 5-punktsordre exports, and sambandsplan exports stay in the browser unless the user manually copies them out.
 
 ## Requirements
 

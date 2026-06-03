@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Reedtrullz/Innsats-appen.git"
+  },
+  "homepage": "https://innsats.reidar.tech",
   "scripts": {
     "dev": "next dev",
     "build": "npm run build:content && next build",

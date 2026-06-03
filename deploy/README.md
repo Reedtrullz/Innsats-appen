@@ -3,8 +3,9 @@
 This deploys Beredskapsboka to the Racknerd VPS at:
 
 - Public URL: https://innsats.reidar.tech
+- GitHub repository: https://github.com/Reedtrullz/Innsats-appen
 - VPS: 198.23.137.16 (`Racknerd-Deploy`, user `deploy`)
-- Container image: `ghcr.io/reedtrullz/beredskapsboka:<git-sha>`
+- Container image: `ghcr.io/reedtrullz/innsats-appen:<git-sha>`
 - Container: `beredskapsboka`
 - Host port: `127.0.0.1:3006 -> container:3000`
 - Remote app dir: `/opt/apps/beredskapsboka`
@@ -56,7 +57,7 @@ If `gh auth token` lacks package write permissions, refresh it or use a token wi
 ```bash
 APP_VERSION=$(git rev-parse HEAD) \
 ansible-playbook -i deploy/inventory/hosts.yml deploy/playbook.yml \
-  -e "docker_image=ghcr.io/reedtrullz/beredskapsboka:$(git rev-parse --short=12 HEAD)"
+  -e "docker_image=ghcr.io/reedtrullz/innsats-appen:$(git rev-parse --short=12 HEAD)"
 ```
 
 For a manual latest-tag deploy:
