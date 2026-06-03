@@ -77,9 +77,16 @@ it('curated Group 2A/2B checklists cover før utrykning, expanded under innsats 
   expect(bySlug.get('fig-etter-innsats')?.items.map((item: any) => item.id)).toEqual([
     'personellkontroll-etter',
     'skade-eller-personellskade-eskalering',
+    'defuse-emosjonell-gjennomgang',
+    'efok-oppfolging-vurdert',
     'teknisk-gjennomgang',
     'utstyr-retur',
     'vask',
+    'mbk-materiellberedskap-vurdert',
+    'skriftlig-rapport-paminnelse',
+    'oppmote-reisegrunnlag-komplett',
+    'tap-skade-melding-paminnelse',
+    'dimittering-avklart-distrikt',
     'oppfolging',
   ]);
 });

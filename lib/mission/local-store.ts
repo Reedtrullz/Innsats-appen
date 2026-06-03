@@ -44,7 +44,60 @@ export async function getMission(id: string): Promise<MissionContext | undefined
 
 export async function listMissions(): Promise<MissionContext[]> {
   const missions = await (await db()).getAll('missions');
-  return missions.map((mission) => MissionContextSchema.parse({ ...mission, schemaVersion: mission.schemaVersion ?? 1 })).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  return missions
+    .map((mission) => MissionContextSchema.parse({ ...mission, schemaVersion: mission.schemaVersion ?? 1 }))
+    .filter((mission) => !mission.archivedAt)
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+type ArchiveMissionFields = {
+  completedAt?: string;
+  archivedAt?: string;
+};
+
+function archiveSearchText(mission: MissionContext) {
+  return [
+    mission.title,
+    mission.locationText,
+    mission.municipality,
+    mission.notes,
+    mission.lessonsLearned?.summary,
+    mission.lessonsLearned?.whatWorked,
+    mission.lessonsLearned?.improvements,
+    mission.lessonsLearned?.followUp,
+    mission.feedback?.leadership,
+    mission.feedback?.equipment,
+    mission.feedback?.procedures,
+    mission.feedback?.training,
+    mission.feedback?.safety,
+    mission.feedback?.communications,
+  ].filter(Boolean).join(' ').toLowerCase();
+}
+
+export async function archiveMission(id: string, fields: ArchiveMissionFields = {}): Promise<MissionContext | undefined> {
+  const database = await db();
+  const mission = await database.get('missions', id);
+  if (!mission) return undefined;
+  const now = new Date().toISOString();
+  const archived = MissionContextSchema.parse({
+    ...mission,
+    completedAt: fields.completedAt ?? mission.completedAt ?? now,
+    archivedAt: fields.archivedAt ?? now,
+    updatedAt: now,
+    schemaVersion: mission.schemaVersion ?? 1,
+  });
+  await database.put('missions', archived);
+  return archived;
+}
+
+export async function listArchivedMissions(query = ''): Promise<MissionContext[]> {
+  const normalizedQuery = query.trim().toLowerCase();
+  const missions = await (await db()).getAll('missions');
+  return missions
+    .map((mission) => MissionContextSchema.parse({ ...mission, schemaVersion: mission.schemaVersion ?? 1 }))
+    .filter((mission) => Boolean(mission.archivedAt))
+    .filter((mission) => !normalizedQuery || archiveSearchText(mission).includes(normalizedQuery))
+    .sort((a, b) => (b.archivedAt ?? b.updatedAt).localeCompare(a.archivedAt ?? a.updatedAt));
 }
 
 export async function deleteMission(id: string): Promise<void> {
@@ -54,6 +107,17 @@ export async function deleteMission(id: string): Promise<void> {
   const runs = await tx.objectStore('checklistRuns').index('by-mission').getAll(id);
   await Promise.all(runs.map((run) => tx.objectStore('checklistRuns').delete(run.id)));
   await tx.done;
+}
+
+export async function deleteArchivedMission(id: string): Promise<void> {
+  const mission = await getMission(id);
+  if (!mission?.archivedAt) return;
+  await deleteMission(id);
+}
+
+export async function clearArchivedMissions(): Promise<void> {
+  const archived = await listArchivedMissions();
+  await Promise.all(archived.map((mission) => deleteMission(mission.id)));
 }
 
 export async function saveChecklistRun(input: ChecklistRun): Promise<ChecklistRun> {

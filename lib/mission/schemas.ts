@@ -63,6 +63,26 @@ export const MissionResourceRequestSchema = z
   })
   .strict();
 
+export const MissionLessonsLearnedSchema = z
+  .object({
+    summary: z.string().default(''),
+    whatWorked: z.string().default(''),
+    improvements: z.string().default(''),
+    followUp: z.string().default(''),
+  })
+  .strict();
+
+export const MissionFeedbackSchema = z
+  .object({
+    leadership: z.string().default(''),
+    equipment: z.string().default(''),
+    procedures: z.string().default(''),
+    training: z.string().default(''),
+    safety: z.string().default(''),
+    communications: z.string().default(''),
+  })
+  .strict();
+
 export const MissionContextSchema = z
   .object({
     id: z.string().min(1),
@@ -81,6 +101,10 @@ export const MissionContextSchema = z
     tasks: z.array(MissionTaskSchema).default([]),
     statusLog: z.array(MissionStatusLogItemSchema).default([]),
     resourceRequests: z.array(MissionResourceRequestSchema).default([]),
+    lessonsLearned: MissionLessonsLearnedSchema.optional(),
+    feedback: MissionFeedbackSchema.optional(),
+    completedAt: z.string().datetime().optional(),
+    archivedAt: z.string().datetime().optional(),
     contentVersion: z.string().min(1),
     schemaVersion: z.number().int().positive().default(1),
   })
@@ -107,3 +131,5 @@ export type QuickStatusMessage = z.infer<typeof QuickStatusMessageSchema>;
 export type MissionStatusLogItem = z.infer<typeof MissionStatusLogItemSchema>;
 export type ResourceRequestKind = z.infer<typeof ResourceRequestKindSchema>;
 export type MissionResourceRequest = z.infer<typeof MissionResourceRequestSchema>;
+export type MissionLessonsLearned = z.infer<typeof MissionLessonsLearnedSchema>;
+export type MissionFeedback = z.infer<typeof MissionFeedbackSchema>;

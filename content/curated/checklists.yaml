@@ -243,6 +243,14 @@
       label: Skade, nestenulykke eller mulig personellskade er eskalert til ansvarlig leder og ordinære systemer; ikke bruk appen som helsejournal
       required: true
       sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
+    - id: defuse-emosjonell-gjennomgang
+      label: Teknisk og ved behov følelsesmessig (defuse) gjennomgang av hendelsen er vurdert; ikke registrer personlige reaksjoner eller helsedata i appen
+      required: false
+      sourceIds: [src-tiltakskort-etter-innsats, src-psykososial-oppfolging-og-kollegastotte]
+    - id: efok-oppfolging-vurdert
+      label: Behov for emosjonell førstehjelp og krisehåndtering (EFOK) eller annen psykososial oppfølging er vurdert i samråd med beredskapsvakt/distrikt; ikke før helseopplysninger i appen
+      required: false
+      sourceIds: [src-tiltakskort-etter-innsats, src-psykososial-oppfolging-og-kollegastotte]
     - id: teknisk-gjennomgang
       label: Teknisk gjennomgang av kjøretøy, samband, verneutstyr og fellesutstyr er startet før materiell settes tilbake i beredskap
       required: true
@@ -255,8 +263,28 @@
       label: Vask/vedlikehold eller karantene avklart
       required: true
       sourceIds: [src-tiltakskort-etter-innsats]
+    - id: mbk-materiellberedskap-vurdert
+      label: Materiellberedskapskontroll (MBK), kjørebøker, materielljournaler og MBK-skjemaer er vurdert etter lokal rutine for å gjøre avdelingen klar til ny innsats
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
+    - id: skriftlig-rapport-paminnelse
+      label: Skriftlig rapport til beredskapsvakt/distrikt er påminnet etter lokal frist; ikke legg persondata, pasientdata eller sensitive detaljer i appen
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
+    - id: oppmote-reisegrunnlag-komplett
+      label: Fullstendig oppmøte-/frammøteliste og reiseinformasjon er sendt i ordinær kanal; ikke legg navn, ID eller persondata i appen
+      required: true
+      sourceIds: [src-tiltakskort-etter-innsats]
+    - id: tap-skade-melding-paminnelse
+      label: Taps- og skademelding er fylt ut og sendt i ordinær kanal ved behov; ikke lagre skadebeskrivelser, kontaktopplysninger eller persondata i appen
+      required: false
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
+    - id: dimittering-avklart-distrikt
+      label: Dimittering av mannskaper er avklart i samråd med sivilforsvarsdistrikt/beredskapsvakt
+      required: true
+      sourceIds: [src-tiltakskort-etter-innsats]
     - id: oppfolging
-      label: Behov for psykososial oppfølging vurdert
+      label: Behov for psykososial oppfølging er vurdert uten å registrere personlige reaksjoner eller helsedata i appen
       required: false
       sourceIds: [src-psykososial-oppfolging-og-kollegastotte]
   sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats, src-psykososial-oppfolging-og-kollegastotte]

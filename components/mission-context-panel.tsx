@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation';
 import type { ActionCard, OperationalChecklist } from '@/lib/content/schemas';
 import { filterActionCards, sortActionCards } from '@/lib/content/filters';
 import { phaseLabels, priorityLabels, roleLabels, roles, scenarioLabels, scenarios, phases, type Phase, type Role, type Scenario } from '@/lib/content/taxonomy';
+import { buildAfterActionReport, exportAfterActionJson, exportAfterActionMarkdown, exportAfterActionPdfReadyHtml } from '@/lib/mission/after-action-report';
 import { exportMissionStatusSummaryMarkdown } from '@/lib/mission/export-markdown';
-import { clearLocalMissionData, listMissions, saveMission } from '@/lib/mission/local-store';
+import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArchivedMission, listArchivedMissions, listChecklistRuns, listMissions, saveMission } from '@/lib/mission/local-store';
 import type { MissionContext, MissionTaskStatus, QuickStatusMessage, ResourceRequestKind } from '@/lib/mission/schemas';
 import { ChecklistRunner } from './checklist-runner';
 import { ContextSignalPanel, markStoredContextSignalsStale } from './context-signal-panel';
@@ -192,7 +193,170 @@ function LocalMissionControls({ mission, displaySignals, onMissionChange }: { mi
   );
 }
 
-function MissionCommandDashboard({ mission, cards, checklist, onMissionChange }: { mission: MissionContext; cards: ActionCard[]; checklist?: OperationalChecklist; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void> }) {
+function StructuredLessonsFeedbackControls({ mission, onMissionChange, onArchive }: { mission: MissionContext; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
+  const [lessons, setLessons] = useState(() => ({
+    summary: mission.lessonsLearned?.summary ?? '',
+    whatWorked: mission.lessonsLearned?.whatWorked ?? '',
+    improvements: mission.lessonsLearned?.improvements ?? '',
+    followUp: mission.lessonsLearned?.followUp ?? '',
+  }));
+  const [feedback, setFeedback] = useState(() => ({
+    leadership: mission.feedback?.leadership ?? '',
+    equipment: mission.feedback?.equipment ?? '',
+    procedures: mission.feedback?.procedures ?? '',
+    training: mission.feedback?.training ?? '',
+    safety: mission.feedback?.safety ?? '',
+    communications: mission.feedback?.communications ?? '',
+  }));
+  const [message, setMessage] = useState('');
+
+  async function saveStructuredFeedback() {
+    const now = new Date().toISOString();
+    await onMissionChange(mission.id, (current) => ({
+      ...current,
+      updatedAt: now,
+      lessonsLearned: {
+        summary: lessons.summary.trim(),
+        whatWorked: lessons.whatWorked.trim(),
+        improvements: lessons.improvements.trim(),
+        followUp: lessons.followUp.trim(),
+      },
+      feedback: {
+        leadership: feedback.leadership.trim(),
+        equipment: feedback.equipment.trim(),
+        procedures: feedback.procedures.trim(),
+        training: feedback.training.trim(),
+        safety: feedback.safety.trim(),
+        communications: feedback.communications.trim(),
+      },
+    }));
+    setMessage('Erfaringer og tilbakemelding er lagret lokalt.');
+  }
+
+  async function saveStructuredFeedbackAndArchive() {
+    await saveStructuredFeedback();
+    await onArchive(mission.id);
+  }
+
+  return (
+    <section className="space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+      <div>
+        <p className="text-xs font-black uppercase tracking-wide text-sky-700">Lokal læring</p>
+        <h3 className="text-xl font-black">Erfaringer og strukturert tilbakemelding</h3>
+        <p className="mt-1 text-sm font-semibold text-amber-900">Kun lokal erfaringslogg. Ikke offisielt arkiv eller innsending. Ikke legg inn navn, ID, pasient-/helseopplysninger, sensitive private lokasjoner eller skjermet operativ informasjon.</p>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        <label className="block text-sm font-bold">Erfaringsoppsummering<textarea value={lessons.summary} onChange={(event) => setLessons((current) => ({ ...current, summary: event.target.value }))} className="mt-1 min-h-24 w-full rounded-xl border border-slate-300 p-3" placeholder="Kort, sanitert lokal oppsummering" /></label>
+        <label className="block text-sm font-bold">Hva fungerte<textarea value={lessons.whatWorked} onChange={(event) => setLessons((current) => ({ ...current, whatWorked: event.target.value }))} className="mt-1 min-h-24 w-full rounded-xl border border-slate-300 p-3" /></label>
+        <label className="block text-sm font-bold">Forbedringer<textarea value={lessons.improvements} onChange={(event) => setLessons((current) => ({ ...current, improvements: event.target.value }))} className="mt-1 min-h-24 w-full rounded-xl border border-slate-300 p-3" /></label>
+        <label className="block text-sm font-bold">Oppfølging<textarea value={lessons.followUp} onChange={(event) => setLessons((current) => ({ ...current, followUp: event.target.value }))} className="mt-1 min-h-24 w-full rounded-xl border border-slate-300 p-3" /></label>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <label className="block text-sm font-bold">Tilbakemelding ledelse<textarea value={feedback.leadership} onChange={(event) => setFeedback((current) => ({ ...current, leadership: event.target.value }))} className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 p-3" /></label>
+        <label className="block text-sm font-bold">Tilbakemelding utstyr<textarea value={feedback.equipment} onChange={(event) => setFeedback((current) => ({ ...current, equipment: event.target.value }))} className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 p-3" /></label>
+        <label className="block text-sm font-bold">Tilbakemelding prosedyrer<textarea value={feedback.procedures} onChange={(event) => setFeedback((current) => ({ ...current, procedures: event.target.value }))} className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 p-3" /></label>
+        <label className="block text-sm font-bold">Tilbakemelding trening<textarea value={feedback.training} onChange={(event) => setFeedback((current) => ({ ...current, training: event.target.value }))} className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 p-3" /></label>
+        <label className="block text-sm font-bold">Tilbakemelding sikkerhet<textarea value={feedback.safety} onChange={(event) => setFeedback((current) => ({ ...current, safety: event.target.value }))} className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 p-3" /></label>
+        <label className="block text-sm font-bold">Tilbakemelding kommunikasjon<textarea value={feedback.communications} onChange={(event) => setFeedback((current) => ({ ...current, communications: event.target.value }))} className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 p-3" /></label>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => void saveStructuredFeedback()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lagre erfaringer og tilbakemelding</button>
+        <button type="button" onClick={() => void saveStructuredFeedbackAndArchive()} className="min-h-11 rounded-xl border border-emerald-700 bg-emerald-50 px-4 font-bold text-emerald-950">Fullfør og arkiver lokalt</button>
+      </div>
+      {message ? <p className="text-sm font-semibold text-emerald-800">{message}</p> : null}
+    </section>
+  );
+}
+
+function activeAfterActionChecklists(checklists: OperationalChecklist[], mission: MissionContext, fallbackChecklist?: OperationalChecklist) {
+  const activeIds = new Set(mission.activeChecklistIds);
+  const active = activeIds.size > 0 ? checklists.filter((checklist) => activeIds.has(checklist.slug)) : [];
+  if (active.length > 0) return active;
+  return fallbackChecklist ? [fallbackChecklist] : [];
+}
+
+function AfterActionReportControls({ mission, displaySignals, checklists, fallbackChecklist }: { mission: MissionContext; displaySignals: MissionContext['externalSignals']; checklists: OperationalChecklist[]; fallbackChecklist?: OperationalChecklist }) {
+  const [localOrderText, setLocalOrderText] = useState('');
+  const [localSambandText, setLocalSambandText] = useState('');
+  const [localLogText, setLocalLogText] = useState('');
+  const [markdown, setMarkdown] = useState('');
+  const [json, setJson] = useState('');
+  const [pdfReadyHtml, setPdfReadyHtml] = useState('');
+
+  async function buildReport() {
+    const runs = await listChecklistRuns(mission.id);
+    const selectedChecklists = activeAfterActionChecklists(checklists, mission, fallbackChecklist);
+    return buildAfterActionReport({
+      mission: statusSummaryMission(mission, displaySignals),
+      checklists: selectedChecklists,
+      checklistRuns: runs,
+      localOrderText,
+      localSambandText,
+      localLogText,
+    });
+  }
+
+  async function generateMarkdown() {
+    setMarkdown(exportAfterActionMarkdown(await buildReport()));
+  }
+
+  async function generateJson() {
+    setJson(exportAfterActionJson(await buildReport()));
+  }
+
+  async function generatePdfReadyHtml() {
+    setPdfReadyHtml(exportAfterActionPdfReadyHtml(await buildReport()));
+  }
+
+  return (
+    <section className="space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+      <div>
+        <p className="text-xs font-black uppercase tracking-wide text-sky-700">Lokal etterrapport</p>
+        <h3 className="text-xl font-black">Etteraksjonsrapport</h3>
+        <p className="mt-1 text-sm font-semibold text-amber-900">PDF-klar utskrift er HTML for nettleserens Skriv ut &gt; Lagre som PDF. Ikke offisiell innsending. Lagres bare lokalt; ikke legg inn persondata, pasientdata, sensitive private lokasjoner eller skjermet operativ informasjon.</p>
+      </div>
+      <div className="grid gap-3 lg:grid-cols-3">
+        <label className="block text-sm font-bold">
+          Lokal ordretekst
+          <textarea value={localOrderText} onChange={(event) => setLocalOrderText(event.target.value)} className="mt-1 min-h-28 w-full rounded-xl border border-slate-300 p-3 font-mono text-xs" placeholder="Valgfritt. Hvis tomt markeres Ikke registrert i lokal oppdragstavle." />
+        </label>
+        <label className="block text-sm font-bold">
+          Lokalt samband
+          <textarea value={localSambandText} onChange={(event) => setLocalSambandText(event.target.value)} className="mt-1 min-h-28 w-full rounded-xl border border-slate-300 p-3 font-mono text-xs" placeholder="Valgfritt lokalt sambandssammendrag uten sensitiv informasjon." />
+        </label>
+        <label className="block text-sm font-bold">
+          Lokal logg
+          <textarea value={localLogText} onChange={(event) => setLocalLogText(event.target.value)} className="mt-1 min-h-28 w-full rounded-xl border border-slate-300 p-3 font-mono text-xs" placeholder="Valgfritt. Én hendelse per linje, uten persondata." />
+        </label>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => void generateMarkdown()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag etteraksjonsrapport Markdown</button>
+        <button type="button" onClick={() => void generateJson()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag etteraksjonsrapport JSON</button>
+        <button type="button" onClick={() => void generatePdfReadyHtml()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag PDF-klar etteraksjonsrapport</button>
+      </div>
+      {markdown ? (
+        <label htmlFor="after-action-markdown" className="block text-sm font-bold">
+          Etteraksjonsrapport Markdown
+          <textarea id="after-action-markdown" readOnly value={markdown} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
+        </label>
+      ) : null}
+      {json ? (
+        <label htmlFor="after-action-json" className="block text-sm font-bold">
+          Etteraksjonsrapport JSON
+          <textarea id="after-action-json" readOnly value={json} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
+        </label>
+      ) : null}
+      {pdfReadyHtml ? (
+        <label htmlFor="after-action-pdf-ready-html" className="block text-sm font-bold">
+          PDF-klar etteraksjonsrapport HTML
+          <textarea id="after-action-pdf-ready-html" readOnly value={pdfReadyHtml} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
+        </label>
+      ) : null}
+    </section>
+  );
+}
+
+function MissionCommandDashboard({ mission, cards, checklist, checklists, onMissionChange, onArchive }: { mission: MissionContext; cards: ActionCard[]; checklist?: OperationalChecklist; checklists: OperationalChecklist[]; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
   const firstActions = missionCards(cards, mission);
   const staleSignals = useMemo(() => (mission.externalSignals.length > 0 ? markStoredContextSignalsStale(mission.externalSignals) : []), [mission.externalSignals]);
 
@@ -245,6 +409,8 @@ function MissionCommandDashboard({ mission, cards, checklist, onMissionChange }:
       </section>
 
       <LocalMissionControls mission={mission} displaySignals={staleSignals} onMissionChange={onMissionChange} />
+      <StructuredLessonsFeedbackControls key={mission.id} mission={mission} onMissionChange={onMissionChange} onArchive={onArchive} />
+      <AfterActionReportControls mission={mission} displaySignals={staleSignals} checklists={checklists} fallbackChecklist={checklist} />
 
       <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
         <div className="flex items-start justify-between gap-3">
@@ -280,9 +446,12 @@ function MissionCommandDashboard({ mission, cards, checklist, onMissionChange }:
 export function MissionContextPanel({ mode = 'list', contentVersion, checklists, actionCards = [] }: { mode?: 'list' | 'create'; contentVersion: string; checklists: OperationalChecklist[]; actionCards?: ActionCard[] }) {
   const router = useRouter();
   const [missions, setMissions] = useState<MissionContext[]>([]);
+  const [archivedMissions, setArchivedMissions] = useState<MissionContext[]>([]);
+  const [archiveSearch, setArchiveSearch] = useState('');
   const [privacyMessage, setPrivacyMessage] = useState('Lagres bare lokalt i denne nettleseren');
   const latestMissionsRef = useRef<MissionContext[]>([]);
   const missionWriteQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const archiveSearchRequestRef = useRef(0);
 
   useEffect(() => {
     listMissions().then((storedMissions) => {
@@ -290,6 +459,18 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
       setMissions(storedMissions);
     });
   }, []);
+
+  useEffect(() => {
+    const requestId = archiveSearchRequestRef.current + 1;
+    archiveSearchRequestRef.current = requestId;
+    let active = true;
+    listArchivedMissions(archiveSearch).then((storedArchivedMissions) => {
+      if (active && archiveSearchRequestRef.current === requestId) setArchivedMissions(storedArchivedMissions);
+    });
+    return () => {
+      active = false;
+    };
+  }, [archiveSearch]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -323,6 +504,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
     await clearLocalMissionData();
     latestMissionsRef.current = [];
     setMissions([]);
+    setArchivedMissions([]);
     setPrivacyMessage('Dette sletter bare data i denne nettleseren. Beredskapsboka sender ikke oppdrag, sjekklister eller notater til en server i MVP.');
   }
 
@@ -331,12 +513,37 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
       const currentMission = latestMissionsRef.current.find((item) => item.id === missionId);
       if (!currentMission) return;
       const saved = await saveMission(update(currentMission));
-      const nextMissions = latestMissionsRef.current.map((item) => (item.id === saved.id ? saved : item)).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+      const nextMissions = latestMissionsRef.current.map((item) => (item.id === saved.id ? saved : item)).filter((item) => !item.archivedAt).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
       latestMissionsRef.current = nextMissions;
       setMissions(nextMissions);
     });
     missionWriteQueueRef.current = operation.then(() => undefined, () => undefined);
     await operation;
+  }
+
+  async function refreshMissionLists() {
+    const [active, archived] = await Promise.all([listMissions(), listArchivedMissions(archiveSearch)]);
+    latestMissionsRef.current = active;
+    setMissions(active);
+    setArchivedMissions(archived);
+  }
+
+  async function archiveActiveMission(missionId: string) {
+    await missionWriteQueueRef.current.catch(() => undefined);
+    await archiveMission(missionId);
+    await refreshMissionLists();
+    setPrivacyMessage('Oppdraget er fullført og arkivert bare lokalt i denne nettleseren. Dette er ikke offisielt arkiv eller innsending.');
+  }
+
+  async function removeArchivedMission(missionId: string) {
+    await deleteArchivedMission(missionId);
+    await refreshMissionLists();
+  }
+
+  async function resetArchiveOnly() {
+    await clearArchivedMissions();
+    await refreshMissionLists();
+    setPrivacyMessage('Lokalt arkiv er tømt i denne nettleseren. Aktive lokale oppdrag er beholdt.');
   }
 
   if (mode === 'create') {
@@ -361,6 +568,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
 
   const activeMission = missions[0];
   const activeChecklist = activeMission ? matchingChecklist(checklists, activeMission) : undefined;
+  const archiveSearchActive = archiveSearch.trim().length > 0;
   return (
     <div className="space-y-4">
       <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
@@ -379,7 +587,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
           <p className="mt-2 text-sm font-semibold text-slate-700">Opprett et oppdrag for å samle fase, rolle, scenario, anbefalte tiltak og sjekklister i én arbeidsflate.</p>
           <a href="/oppdrag/ny" className="mt-4 inline-flex min-h-12 items-center rounded-xl bg-slate-950 px-5 font-bold text-white">Start oppdragstavle</a>
         </section>
-      ) : <MissionCommandDashboard mission={activeMission} cards={actionCards} checklist={activeChecklist} onMissionChange={updateMission} />}
+      ) : <MissionCommandDashboard mission={activeMission} cards={actionCards} checklist={activeChecklist} checklists={checklists} onMissionChange={updateMission} onArchive={archiveActiveMission} />}
       {missions.length > 1 ? (
         <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
           <h2 className="text-lg font-black">Andre lokale oppdrag</h2>
@@ -393,6 +601,36 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
           </div>
         </section>
       ) : null}
+      <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-black uppercase tracking-wide text-sky-700">Lokalt arkiv</p>
+            <h2 className="text-lg font-black">Lokalt fullførte oppdrag</h2>
+            <p className="mt-1 text-sm font-semibold text-amber-900">Bare lokalt i denne nettleseren; ikke offisielt arkiv, innsending, backend-synk eller kommandosystem. Ikke lagre navn, ID, pasient-/helsedetaljer, sensitive private lokasjoner eller skjermet operativ informasjon.</p>
+          </div>
+          <button type="button" onClick={() => void resetArchiveOnly()} disabled={archiveSearchActive || archivedMissions.length === 0} title={archiveSearchActive ? 'Tøm søket før du kan tømme hele det lokale arkivet.' : undefined} className="min-h-11 rounded-xl border border-red-300 bg-red-50 px-4 font-bold text-red-900 disabled:opacity-50">Tøm lokalt arkiv</button>
+        </div>
+        <label className="mt-3 block text-sm font-bold">Søk i lokalt arkiv<input value={archiveSearch} onChange={(event) => setArchiveSearch(event.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3" placeholder="Søk i tittel, sted, erfaringer eller tilbakemelding" /></label>
+        {archivedMissions.length > 0 ? (
+          <div className="mt-3 space-y-2">
+            {archivedMissions.map((mission) => (
+              <article key={mission.id} className="rounded-xl border border-slate-200 p-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 className="font-black">{mission.title}</h3>
+                    <p className="text-sm font-semibold text-slate-600">{phaseLabels[mission.phase]} / {roleLabels[mission.role]} / {scenarioLabels[mission.scenario]} / {mission.locationText}</p>
+                    <p className="text-xs font-semibold text-slate-500">Fullført: {mission.completedAt ? formatUpdatedAt(mission.completedAt) : 'Ikke registrert'} / Arkivert: {mission.archivedAt ? formatUpdatedAt(mission.archivedAt) : 'Ikke registrert'}</p>
+                    {mission.lessonsLearned?.summary ? <p className="mt-1 text-sm font-semibold text-slate-700">Erfaring: {mission.lessonsLearned.summary}</p> : null}
+                  </div>
+                  <button type="button" onClick={() => void removeArchivedMission(mission.id)} className="min-h-11 rounded-xl border border-red-300 bg-red-50 px-3 text-sm font-bold text-red-900" aria-label={`Slett arkivert oppdrag ${mission.title}`}>Slett</button>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-3 rounded-xl bg-slate-100 p-3 text-sm font-semibold text-slate-700">Ingen lokale arkivtreff.</p>
+        )}
+      </section>
       <button type="button" onClick={() => void reset()} className="min-h-12 w-full rounded-xl border border-red-300 bg-red-50 px-5 font-bold text-red-900">Slett lokale data</button>
       <p className="text-sm text-slate-600">Dette sletter bare data i denne nettleseren. Beredskapsboka sender ikke oppdrag, sjekklister eller notater til en server i MVP.</p>
     </div>

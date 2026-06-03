@@ -1,5 +1,5 @@
 import { afterEach, expect, it } from 'vitest';
-import { clearLocalMissionData, deleteMission, getChecklistRun, getMission, listMissions, saveChecklistRun, saveMission } from '@/lib/mission/local-store';
+import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArchivedMission, deleteMission, getChecklistRun, getMission, listArchivedMissions, listMissions, saveChecklistRun, saveMission } from '@/lib/mission/local-store';
 import { MissionContextSchema } from '@/lib/mission/schemas';
 
 const baseMission = {
@@ -96,4 +96,78 @@ it('rejects unsupported local task statuses and quick status messages', () => {
     ...baseMission,
     statusLog: [{ id: 'bad-status', message: 'sendt til server', createdAt: '2026-06-03T10:01:00.000Z' }],
   }).success).toBe(false);
+});
+
+it('archives completed missions locally and excludes them from active mission lists', async () => {
+  const mission = MissionContextSchema.parse({
+    ...baseMission,
+    id: 'mission-archive-1',
+    title: 'Fullført flomvakt',
+    locationText: 'Lokal sone vest',
+    notes: 'Kort lokal læring uten persondata',
+    lessonsLearned: {
+      summary: 'Kort erfaringsoppsummering',
+      whatWorked: 'Tydelig rollefordeling',
+      improvements: 'Bedre lys ved depot',
+      followUp: 'Teste samband neste øvelse',
+    },
+    feedback: {
+      leadership: 'Rolig ledelse',
+      equipment: 'Mangler ekstra lykter',
+      procedures: 'Tiltakskort fungerte',
+      training: 'Mer øving på skiftbytte',
+      safety: 'God sperring',
+      communications: 'Samband må testes tidligere',
+    },
+  });
+
+  await saveMission(mission);
+  await archiveMission(mission.id, { completedAt: '2026-06-03T12:00:00.000Z', archivedAt: '2026-06-03T12:05:00.000Z' });
+
+  expect(await listMissions()).toEqual([]);
+  const archived = await listArchivedMissions();
+  expect(archived).toHaveLength(1);
+  expect(archived[0]).toMatchObject({ id: mission.id, completedAt: '2026-06-03T12:00:00.000Z', archivedAt: '2026-06-03T12:05:00.000Z' });
+  expect(archived[0]?.lessonsLearned?.whatWorked).toContain('rollefordeling');
+  expect(archived[0]?.feedback?.communications).toContain('testes tidligere');
+});
+
+it('searches archived missions across title, location, lessons and feedback', async () => {
+  await saveMission(MissionContextSchema.parse({
+    ...baseMission,
+    id: 'archive-search-hit',
+    title: 'Etterkontroll MFE',
+    locationText: 'Depot nord',
+    lessonsLearned: { summary: 'Samband og utstyr må klargjøres tidligere', whatWorked: '', improvements: '', followUp: '' },
+    feedback: { leadership: '', equipment: 'Ekstra radio', procedures: '', training: '', safety: '', communications: 'Kallesett uklart' },
+  }));
+  await saveMission(MissionContextSchema.parse({
+    ...baseMission,
+    id: 'archive-search-miss',
+    title: 'Rutinekontroll',
+    locationText: 'Depot sør',
+  }));
+  await archiveMission('archive-search-hit', { archivedAt: '2026-06-03T12:00:00.000Z' });
+  await archiveMission('archive-search-miss', { archivedAt: '2026-06-03T11:00:00.000Z' });
+
+  expect((await listArchivedMissions('radio')).map((item) => item.id)).toEqual(['archive-search-hit']);
+  expect((await listArchivedMissions('depot')).map((item) => item.id)).toEqual(['archive-search-hit', 'archive-search-miss']);
+});
+
+it('deletes one archived mission and can reset only the local archive', async () => {
+  await saveMission(MissionContextSchema.parse({ ...baseMission, id: 'active-kept', title: 'Aktivt oppdrag' }));
+  await saveMission(MissionContextSchema.parse({ ...baseMission, id: 'archived-delete', title: 'Arkiv slettes' }));
+  await saveMission(MissionContextSchema.parse({ ...baseMission, id: 'archived-clear', title: 'Arkiv tømmes' }));
+  await saveChecklistRun({ id: 'run-archive-delete', missionId: 'archived-delete', templateSlug: 'fig-under-innsats', checkedItemIds: [], notesByItemId: {}, updatedAt: '2026-06-03T12:00:00.000Z', schemaVersion: 1 });
+  await archiveMission('archived-delete', { archivedAt: '2026-06-03T12:00:00.000Z' });
+  await archiveMission('archived-clear', { archivedAt: '2026-06-03T12:05:00.000Z' });
+
+  await deleteArchivedMission('archived-delete');
+  expect(await getMission('archived-delete')).toBeUndefined();
+  expect(await getChecklistRun('run-archive-delete')).toBeUndefined();
+  expect((await listArchivedMissions()).map((item) => item.id)).toEqual(['archived-clear']);
+
+  await clearArchivedMissions();
+  expect(await listArchivedMissions()).toEqual([]);
+  expect((await listMissions()).map((item) => item.id)).toContain('active-kept');
 });
