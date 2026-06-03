@@ -41,6 +41,8 @@ export function normalizeNveDateRange(start: string, end: string) {
   const endDate = parseIsoDate(end);
   if (!startDate || !endDate) throw new Error('start/end must use valid YYYY-MM-DD dates');
   if (startDate.getTime() > endDate.getTime()) throw new Error('start must be before or equal to end');
+  const days = (endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000);
+  if (days > 7) throw new Error('NVE date range must be 7 days or less');
   return { start, end };
 }
 
@@ -65,10 +67,19 @@ function endpointUrl(endpoint: NveEndpoint, municipality: string, start: string,
   return `${endpoint.base}/api/Warning/Municipality/${encodeURIComponent(municipality)}/1/${encodeURIComponent(start)}/${encodeURIComponent(end)}`;
 }
 
-function warningArray(data: unknown): any[] {
-  if (Array.isArray(data)) return data;
-  if (data && typeof data === 'object' && Array.isArray((data as any).Warnings)) return (data as any).Warnings;
+type NveWarning = Record<string, unknown>;
+
+function warningArray(data: unknown): NveWarning[] {
+  if (Array.isArray(data)) return data.filter((item): item is NveWarning => item !== null && typeof item === 'object' && !Array.isArray(item));
+  if (data && typeof data === 'object' && Array.isArray((data as { Warnings?: unknown }).Warnings)) {
+    return (data as { Warnings: unknown[] }).Warnings.filter((item): item is NveWarning => item !== null && typeof item === 'object' && !Array.isArray(item));
+  }
   return [];
+}
+
+function stringField(warning: NveWarning, key: string): string | undefined {
+  const value = warning[key];
+  return value === null || value === undefined ? undefined : String(value);
 }
 
 function usableWarningId(value: unknown) {
@@ -76,7 +87,7 @@ function usableWarningId(value: unknown) {
   return raw && raw.toLowerCase() !== 'xxx' ? raw : null;
 }
 
-function stableWarningId(endpoint: NveEndpoint, municipality: string, warning: any, upstreamHash: string) {
+function stableWarningId(endpoint: NveEndpoint, municipality: string, warning: NveWarning, upstreamHash: string) {
   const directId = usableWarningId(warning.EventId) ?? usableWarningId(warning.Id) ?? usableWarningId(warning.WarningId);
   if (directId) return `${endpoint.kind}:${municipality}:${directId}`;
   return [
@@ -108,8 +119,8 @@ export async function fetchNveHazardSignals({
         source: 'nve',
         kind: endpoint.kind,
         severity: severity(warning.ActivityLevel),
-        title: warning.DangerTypeName ?? (endpoint.kind === 'flood-warning' ? 'Flomvarsel' : 'Jordskredvarsel'),
-        summary: warning.MainText ?? warning.LevelMeaningText ?? 'NVE varsel',
+        title: stringField(warning, 'DangerTypeName') ?? (endpoint.kind === 'flood-warning' ? 'Flomvarsel' : 'Jordskredvarsel'),
+        summary: stringField(warning, 'MainText') ?? stringField(warning, 'LevelMeaningText') ?? 'NVE varsel',
         validFrom: parseNveDate(warning.ValidFrom),
         validTo: parseNveDate(warning.ValidTo),
         fetchedAt,
@@ -117,7 +128,7 @@ export async function fetchNveHazardSignals({
         upstreamId: stableWarningId(endpoint, municipality, warning, upstreamHash),
         upstreamHash,
         geometry: { municipality, area: warning.Area ?? null },
-        rawRef: url,
+        rawRef: `nve:${endpoint.kind}`,
       } satisfies ExternalContextSignal;
     });
   }));

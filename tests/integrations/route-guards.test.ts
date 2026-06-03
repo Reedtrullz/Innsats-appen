@@ -17,7 +17,7 @@ const validSignal = {
   fetchedAt: '2026-06-02T20:00:00.000Z',
   staleness: 'fresh',
   upstreamHash: 'abc123',
-  rawRef: 'https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=63.4&lon=10.4',
+  rawRef: 'met:locationforecast',
 };
 
 it('rejects invalid or missing lat/lon with a 400 guard result', async () => {
@@ -43,6 +43,15 @@ it('rejects unsupported upstream paths and generic proxy/query parameters', () =
     if (!result.ok) expect(result.status).toBe(400);
   }
   expect(guardAllowedQuery(new URLSearchParams('q=Trondheim&extra=1'), ['q']).ok).toBe(false);
+  expect(guardAllowedQuery(new URLSearchParams('q=Trondheim&q=Oslo'), ['q']).ok).toBe(false);
+  expect(guardAllowedQuery(new URLSearchParams('Q=Trondheim'), ['q']).ok).toBe(false);
+});
+
+it('rejects sensitive or oversized public geocode lookup text', () => {
+  for (const q of ['01010112345', 'privat tilfluktsrom ved skole', 'skjermet tilfluktsromliste', 'x'.repeat(121), 'Trondheim\nAdresse']) {
+    const result = guardAllowedQuery(new URLSearchParams([['q', q]]), ['q']);
+    expect(result.ok, q).toBe(false);
+  }
 });
 
 it('accepts only external context signals, not action-card-shaped payloads', () => {
@@ -52,4 +61,9 @@ it('accepts only external context signals, not action-card-shaped payloads', () 
   expect(guardExternalContextSignals([{ ...validSignal, source: 123 }]).ok).toBe(false);
   expect(guardExternalContextSignals([{ ...validSignal, validFrom: 123 }]).ok).toBe(false);
   expect(guardExternalContextSignals([{ ...validSignal, upstreamHash: { hash: 'bad' } }]).ok).toBe(false);
+  expect(guardExternalContextSignals([{ ...validSignal, fetchedAt: 'not-a-date' }]).ok).toBe(false);
+  expect(guardExternalContextSignals([{ ...validSignal, validFrom: 'not-a-date' }]).ok).toBe(false);
+  expect(guardExternalContextSignals([{ ...validSignal, patientName: 'Ola' }]).ok).toBe(false);
+  expect(guardExternalContextSignals([{ ...validSignal, rawRef: 'https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=63.4&lon=10.4' }]).ok).toBe(false);
+  expect(guardExternalContextSignals([{ ...validSignal, rawRef: 'met:locationforecast?lat=63.4' }]).ok).toBe(false);
 });

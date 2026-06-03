@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SearchBox } from '@/components/search-box';
 
@@ -14,4 +14,17 @@ it('finds operational stress terms locally', async () => {
     await userEvent.type(screen.getByRole('searchbox'), term);
     expect(screen.getByText(/kort/i)).toBeInTheDocument();
   }
+});
+
+it('reacts to query-string changes while mounted', async () => {
+  window.history.replaceState(null, '', '/hurtigkort');
+  render(<SearchBox documents={docs} />);
+  expect(screen.getByRole('searchbox')).toHaveValue('');
+
+  act(() => {
+    window.history.pushState(null, '', '/hurtigkort?q=FIG10');
+  });
+
+  await waitFor(() => expect(screen.getByRole('searchbox')).toHaveValue('FIG10'));
+  expect(screen.getByRole('link', { name: 'Rens CBRN' })).toBeInTheDocument();
 });

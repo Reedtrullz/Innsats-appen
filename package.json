@@ -11,14 +11,14 @@
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "PLAYWRIGHT_PROD=1 playwright test",
-    "e2e:prod": "PLAYWRIGHT_PROD=1 playwright test",
+    "e2e": "npm run build && PLAYWRIGHT_PROD=1 playwright test",
+    "e2e:prod": "npm run build && PLAYWRIGHT_PROD=1 playwright test",
     "import:obsidian": "tsx scripts/import-obsidian.ts",
     "compile:curated": "tsx scripts/compile-curated.ts",
     "validate:content": "tsx scripts/validate-content.ts",
     "build:search": "tsx scripts/build-search-index.ts",
-    "build:content": "npm run import:obsidian && npm run compile:curated && npm run validate:content && npm run build:search",
-    "check": "npm run typecheck && npm run test && npm run build"
+    "build:content": "npm run import:obsidian && npm run compile:curated && npm run build:search && npm run validate:content",
+    "check": "npm run typecheck && npm run lint && npm run test && npm run build"
   },
   "dependencies": {
     "@next/third-parties": "16.2.7",
@@ -41,7 +41,7 @@
     "@types/react": "19.2.16",
     "@types/react-dom": "19.2.3",
     "autoprefixer": "10.5.0",
-    "eslint": "10.4.1",
+    "eslint": "9.39.1",
     "eslint-config-next": "16.2.7",
     "fake-indexeddb": "6.2.5",
     "jsdom": "29.1.1",

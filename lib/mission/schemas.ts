@@ -22,7 +22,7 @@ export const ExternalContextSignalSchema = z
     etag: z.string().optional(),
     upstreamHash: z.string().optional(),
     geometry: z.unknown().optional(),
-    rawRef: z.string().min(1),
+    rawRef: z.string().regex(/^[a-z]+:[a-z0-9-]+$/, 'rawRef must be a sanitized source reference'),
   })
   .strict();
 

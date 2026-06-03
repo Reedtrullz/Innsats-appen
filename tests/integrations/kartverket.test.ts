@@ -28,6 +28,7 @@ it('maps Kartverket address, stedsnavn and municipality responses with upstream 
   expect(signals.filter((signal) => signal.kind === 'geocode')).toHaveLength(2);
   expect(signals.some((signal) => signal.kind === 'administrative-area')).toBe(true);
   expect(signals.every((signal) => signal.upstreamId || signal.upstreamHash)).toBe(true);
+  expect(signals.map((signal) => signal.rawRef)).toEqual(['kartverket:adresse-sok', 'kartverket:stedsnavn-sok', 'kartverket:kommune-sok']);
   expect(fetchImpl.mock.calls.map(([url]) => url).join('\n')).toContain('/sok?knavn=Trondheim');
 });
 
@@ -51,10 +52,15 @@ it('returns partial geocode context if one Kartverket upstream fails', async () 
   expect(signals.filter((signal) => signal.kind === 'geocode')).toHaveLength(2);
 });
 
+it('returns an empty geocode signal list when Kartverket succeeds with no matches', async () => {
+  const fetchImpl = vi.fn(async () => new Response(JSON.stringify({ adresser: [], navn: [], kommuner: [] })));
+  await expect(fetchKartverketSignals({ q: 'NoSuchPlace', fetchImpl })).resolves.toEqual([]);
+});
+
 it('rejects malformed geocode route queries before fetch', async () => {
   const fetchMock = vi.fn();
   vi.stubGlobal('fetch', fetchMock);
-  for (const query of ['url=https://evil.example', 'proxy=https://evil.example', '', 'lat=63.4', 'q=Trondheim&lat=63.4&lon=10.4']) {
+  for (const query of ['url=https://evil.example', 'proxy=https://evil.example', '', 'lat=63.4', 'q=Trondheim&lat=63.4&lon=10.4', 'q=Trondheim&q=Oslo', 'q=01010112345', 'q=privat tilfluktsrom ved skole']) {
     const response = await GET(new Request(`http://localhost/api/context/geocode?${query}`));
     expect(response.status).toBe(400);
   }

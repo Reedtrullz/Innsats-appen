@@ -1,5 +1,5 @@
 const CACHE_NAME = 'beredskapsboka-v1';
-const APP_SHELL = [
+const STATIC_APP_SHELL = [
   '/',
   '/hurtigkort',
   '/for',
@@ -8,6 +8,11 @@ const APP_SHELL = [
   '/kilder',
   '/oppdrag',
   '/oppdrag/ny',
+  '/laering',
+  '/moduler/cbrn',
+  '/moduler/mfe',
+  '/moduler/radiac',
+  '/moduler/tilfluktsrom',
   '/offline',
   '/generated-content/manifest.json',
   '/generated-content/action-cards.json',
@@ -19,19 +24,44 @@ const APP_SHELL = [
   '/generated-content/search-index.json',
 ];
 
+async function precacheUrl(cache, url) {
+  try {
+    const response = await fetch(url, { cache: 'reload' });
+    if (response.ok) await cache.put(url, response.clone());
+    return response;
+  } catch (_) {
+    return null;
+  }
+}
+
+async function fetchGeneratedJson(cache, url) {
+  const response = await precacheUrl(cache, url);
+  if (!response || !response.ok) return [];
+  try {
+    const parsed = await response.clone().json();
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+async function discoverGeneratedRoutes(cache) {
+  const [cards, sources] = await Promise.all([
+    fetchGeneratedJson(cache, '/generated-content/action-cards.json'),
+    fetchGeneratedJson(cache, '/generated-content/source-documents.json'),
+  ]);
+  return [
+    ...cards.map((card) => card && card.slug ? `/kort/${encodeURIComponent(card.slug)}` : null),
+    ...sources.map((source) => source && source.id ? `/kilder/${encodeURIComponent(source.id)}` : null),
+  ].filter(Boolean);
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      await Promise.all(
-        APP_SHELL.map(async (url) => {
-          try {
-            const response = await fetch(url, { cache: 'reload' });
-            if (response.ok) await cache.put(url, response);
-          } catch (_) {
-            // Individual cache misses must not hide the whole service worker install.
-          }
-        }),
-      );
+      await Promise.all(STATIC_APP_SHELL.map((url) => precacheUrl(cache, url)));
+      const generatedRoutes = await discoverGeneratedRoutes(cache);
+      await Promise.all(generatedRoutes.map((url) => precacheUrl(cache, url)));
     }).then(() => self.skipWaiting()),
   );
 });

@@ -98,6 +98,16 @@ function safeAssetName(rel: string): string {
   return path.basename(rel).replace(/[^a-zA-Z0-9._-]+/g, '-');
 }
 
+function canonicalSourceRef(fileName: string): string {
+  return path.posix.join('source-extracts', fileName);
+}
+
+export function redactLocalPathReferences(markdown: string): string {
+  return markdown
+    .replace(/([A-Za-z]:\\[^\s`)\]]+)/g, '[redigert lokal sti]')
+    .replace(/(^|[`"'({\s])\/(?:Users|home|tmp|var\/folders|private|Volumes)\/[^\s`)\]]+/g, '$1[redigert lokal sti]');
+}
+
 async function copyApprovedAssets(sourceRoot: string, markdown: string, publicAssetsDir: string) {
   const copied: string[] = [];
   const seenNames = new Set<string>();
@@ -119,11 +129,15 @@ async function copyApprovedAssets(sourceRoot: string, markdown: string, publicAs
 
 export async function importObsidianSources(basePath = DEFAULT_SOURCE_PATH, options: ImportOptions = {}): Promise<ImportResult> {
   const sourceRoot = path.resolve(basePath);
+  const isDefaultSourceRoot = sourceRoot === path.resolve(DEFAULT_SOURCE_PATH);
+  if (!isDefaultSourceRoot && (!options.generatedDir || !options.publicGeneratedDir || !options.publicAssetsDir)) {
+    throw new Error('Non-default source imports must pass generatedDir, publicGeneratedDir, and publicAssetsDir to avoid overwriting repository artifacts');
+  }
   const generatedDir = path.resolve(options.generatedDir ?? repoPath('content/generated'));
   const publicAssetsDir = path.resolve(options.publicAssetsDir ?? repoPath('public/content-assets'));
   const publicGeneratedDir = path.resolve(options.publicGeneratedDir ?? repoPath('public/generated-content'));
   const sourceExtractDir = path.join(sourceRoot, 'source-extracts');
-  const minRealSourceCount = options.minRealSourceCount ?? (sourceRoot === path.resolve(DEFAULT_SOURCE_PATH) ? 61 : 0);
+  const minRealSourceCount = options.minRealSourceCount ?? (isDefaultSourceRoot ? 61 : 0);
 
   const entries = (await fs.readdir(sourceExtractDir)).filter((file) => file.endsWith('.md')).sort((a, b) => a.localeCompare(b, 'nb'));
   if (entries.length < minRealSourceCount) {
@@ -140,10 +154,10 @@ export async function importObsidianSources(basePath = DEFAULT_SOURCE_PATH, opti
     const source = SourceDocumentSchema.parse({
       id: slugifySourceId(stem),
       title: stem,
-      sourcePath,
+      sourcePath: canonicalSourceRef(file),
       sourceType: 'source-extract',
       status: mapStatus(parsed.data.source_status ?? parsed.data.status),
-      body: parsed.content.trim(),
+      body: redactLocalPathReferences(parsed.content.trim()),
       warnings: ['Kontroller alltid mot gjeldende offisielt planverk før operativ bruk.'],
     });
     sources.push(source);

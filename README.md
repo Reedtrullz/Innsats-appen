@@ -14,10 +14,10 @@ Mobile-first, offline-capable PWA for source-backed Sivilforsvaret decision supp
 
 ## Source of truth
 
-The Obsidian knowledge bank is the source of source extracts and project notes:
+The Obsidian knowledge bank is the source of source extracts and project notes. Configure it with:
 
 ```text
-/Users/reidar/Obsidian/Hvelvet/01_Projects/Beredskapsboka
+OBSIDIAN_BEREDSKAPSBOKA_PATH=/path/to/your/Obsidian/Beredskapsboka
 ```
 
 Curated MVP content lives in `content/curated/*.yaml`. Build scripts compile it to `content/generated/*` and mirror browser-readable JSON to `public/generated-content/*`.
@@ -28,13 +28,13 @@ Curated MVP content lives in `content/curated/*.yaml`. Build scripts compile it 
 source ~/.nvm/nvm.sh && nvm use 22
 npm install
 npm run dev              # local Next dev server
-npm run build:content    # import Obsidian, compile curated YAML, validate graph, build search index
+npm run build:content    # import Obsidian, compile curated YAML, build search index, validate graph/artifacts
 npm run typecheck        # TypeScript gate
 npm run test             # Vitest unit/component/integration/security/content tests
 npm run build            # content build + production Next build
 npm run e2e              # production-mode Playwright E2E (service worker/offline checks)
 npm run e2e:prod         # same production-mode E2E alias
-npm run check            # typecheck + Vitest + production build
+npm run check            # typecheck + lint + Vitest + production build
 ```
 
 Useful targeted gates:

@@ -66,7 +66,7 @@ async function fetchMetSignalsDetailed({ lat, lon, userAgent = getMetUserAgent()
         upstreamId: first.time ?? forecast.properties?.meta?.updated_at,
         upstreamVersion: forecast.properties?.meta?.updated_at,
         upstreamHash: hash(forecast),
-        rawRef: forecastUrl,
+        rawRef: 'met:locationforecast',
       });
     }
   }
@@ -90,7 +90,7 @@ async function fetchMetSignalsDetailed({ lat, lon, userAgent = getMetUserAgent()
         upstreamId: String(feature.id ?? props.identifier ?? props.capId ?? hash(feature)),
         upstreamHash: hash(feature),
         geometry: feature.geometry,
-        rawRef: alertUrl,
+        rawRef: 'met:alerts-current',
       });
     }
   }

@@ -26,6 +26,8 @@ it('maps Locationforecast and MetAlerts with contact User-Agent and upstream ide
   expect(weather?.upstreamHash).toBeTruthy();
   expect(alert?.upstreamId).toBe('alert-1');
   expect(alert?.upstreamHash).toBeTruthy();
+  expect(weather?.rawRef).toBe('met:locationforecast');
+  expect(alert?.rawRef).toBe('met:alerts-current');
 });
 
 it('fails loudly in production when MET_USER_AGENT is missing or placeholder', () => {

@@ -15,6 +15,10 @@ function now() {
   return new Date().toISOString();
 }
 
+function nonEmptyString(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() ? value : undefined;
+}
+
 async function fetchJson(fetchImpl: FetchLike, url: string, timeoutMs = 6_000) {
   const controller = typeof AbortController !== 'undefined' ? new AbortController() : undefined;
   const timeout = controller ? setTimeout(() => controller.abort(), timeoutMs) : undefined;
@@ -61,7 +65,7 @@ export async function fetchKartverketSignals({ q, lat, lon, fetchImpl = fetch }:
         upstreamId: firstAddress.adressekode?.toString(),
         upstreamHash: hash(firstAddress),
         geometry: firstAddress.representasjonspunkt,
-        rawRef: addressUrl,
+        rawRef: 'kartverket:adresse-sok',
       });
     }
     const firstPlace = place?.navn?.[0] ?? place?.items?.[0];
@@ -79,12 +83,12 @@ export async function fetchKartverketSignals({ q, lat, lon, fetchImpl = fetch }:
         upstreamId: firstPlace.stedsnummer?.toString() ?? firstPlace.stednummer?.toString(),
         upstreamHash: hash(firstPlace),
         geometry: firstPlace.representasjonspunkt,
-        rawRef: placeUrl,
+        rawRef: 'kartverket:stedsnavn-sok',
       });
     }
     const firstMunicipality = municipality?.kommuner?.[0] ?? municipality;
-    const municipalityName = firstMunicipality?.kommunenavn ?? firstMunicipality?.navn;
-    const municipalityNumber = firstMunicipality?.kommunenummer ?? municipality?.kommunenummer;
+    const municipalityName = nonEmptyString(firstMunicipality?.kommunenavn) ?? nonEmptyString(firstMunicipality?.navn);
+    const municipalityNumber = nonEmptyString(firstMunicipality?.kommunenummer) ?? nonEmptyString(municipality?.kommunenummer);
     if (municipalityName) {
       signals.push({
         source: 'kartverket',
@@ -98,10 +102,10 @@ export async function fetchKartverketSignals({ q, lat, lon, fetchImpl = fetch }:
         staleness: 'fresh',
         upstreamId: municipalityNumber?.toString(),
         upstreamHash: hash(firstMunicipality),
-        rawRef: municipalityUrl,
+        rawRef: 'kartverket:kommune-sok',
       });
     }
-    if (signals.length === 0) {
+    if (signals.length === 0 && [addressResult, placeResult, municipalityResult].every((result) => result.status === 'rejected')) {
       const firstError = [addressResult, placeResult, municipalityResult].find((result) => result.status === 'rejected') as PromiseRejectedResult | undefined;
       throw new Error(firstError?.reason instanceof Error ? firstError.reason.message : 'Kartverket context unavailable');
     }
@@ -121,7 +125,7 @@ export async function fetchKartverketSignals({ q, lat, lon, fetchImpl = fetch }:
       upstreamId: data.kommunenummer?.toString(),
       upstreamHash: hash(data),
       geometry: data.representasjonspunkt,
-      rawRef: url,
+      rawRef: 'kartverket:kommune-punkt',
     });
   }
   return signals;

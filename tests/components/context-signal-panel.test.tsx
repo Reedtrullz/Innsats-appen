@@ -13,7 +13,7 @@ const freshSignal: ExternalContextSignal = {
   fetchedAt: '2026-06-02T20:00:00.000Z',
   staleness: 'fresh',
   upstreamHash: 'abc123',
-  rawRef: 'https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=63.4&lon=10.4',
+  rawRef: 'met:locationforecast',
 };
 
 it('shows stale, unavailable, last-success and separation warnings', () => {

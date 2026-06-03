@@ -2,24 +2,21 @@
 
 import { useEffect, useState } from 'react';
 
+import { registerServiceWorker } from './service-worker-registration';
+
 export function OfflineStatus() {
-  const [online, setOnline] = useState(true);
+  const [online, setOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine));
   const [ready, setReady] = useState(false);
   const [contentVersion, setContentVersion] = useState<string>('ukjent');
 
   useEffect(() => {
-    setOnline(navigator.onLine);
     const update = () => setOnline(navigator.onLine);
     window.addEventListener('online', update);
     window.addEventListener('offline', update);
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then(() => navigator.serviceWorker.ready)
-        .then(() => setReady(true))
-        .catch(() => setReady(false));
-    }
+    registerServiceWorker()
+      .then((registration) => setReady(Boolean(registration)))
+      .catch(() => setReady(false));
 
     fetch('/generated-content/manifest.json')
       .then((res) => (res.ok ? res.json() : null))

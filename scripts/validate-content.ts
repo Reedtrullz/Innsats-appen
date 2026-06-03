@@ -18,13 +18,16 @@ interface GraphInput {
   trainingPaths?: any[];
   protectionMeasures?: any[];
   glossary?: any[];
+  manifest?: any;
+  searchIndex?: any;
+  publicGraph?: GraphInput;
 }
 
 async function readJson<T>(filePath: string): Promise<T> {
   return JSON.parse(await fs.readFile(filePath, 'utf8')) as T;
 }
 
-async function readGeneratedGraph(generatedDir = 'content/generated'): Promise<GraphInput> {
+async function readGeneratedGraph(generatedDir = 'content/generated', publicGeneratedDir = 'public/generated-content'): Promise<GraphInput> {
   return {
     sources: await readJson(path.join(generatedDir, 'source-documents.json')),
     actionCards: await readJson(path.join(generatedDir, 'action-cards.json')),
@@ -32,6 +35,18 @@ async function readGeneratedGraph(generatedDir = 'content/generated'): Promise<G
     trainingPaths: await readJson(path.join(generatedDir, 'training-paths.json')),
     protectionMeasures: await readJson(path.join(generatedDir, 'protection-measures.json')),
     glossary: await readJson(path.join(generatedDir, 'glossary.json')),
+    manifest: await readJson(path.join(generatedDir, 'manifest.json')),
+    searchIndex: await readJson(path.join(generatedDir, 'search-index.json')),
+    publicGraph: {
+      sources: await readJson(path.join(publicGeneratedDir, 'source-documents.json')),
+      actionCards: await readJson(path.join(publicGeneratedDir, 'action-cards.json')),
+      checklists: await readJson(path.join(publicGeneratedDir, 'checklists.json')),
+      trainingPaths: await readJson(path.join(publicGeneratedDir, 'training-paths.json')),
+      protectionMeasures: await readJson(path.join(publicGeneratedDir, 'protection-measures.json')),
+      glossary: await readJson(path.join(publicGeneratedDir, 'glossary.json')),
+      manifest: await readJson(path.join(publicGeneratedDir, 'manifest.json')),
+      searchIndex: await readJson(path.join(publicGeneratedDir, 'search-index.json')),
+    },
   };
 }
 
@@ -44,18 +59,103 @@ function collectRefs(item: any): string[] {
   return [...refs];
 }
 
+function addDuplicateErrors<T>(errors: string[], label: string, items: T[], keyOf: (item: T) => unknown) {
+  const seen = new Set<string>();
+  for (const item of items) {
+    const key = String(keyOf(item) ?? '').trim();
+    if (!key) continue;
+    if (seen.has(key)) errors.push(`duplicate ${label} ${key}`);
+    seen.add(key);
+  }
+}
+
+const restrictedShelterPublicationPattern = /(?:privat\w*|skjermet\w*|hemmelig\w*|gradert\w*)[^.\n]{0,80}tilfluktsrom|tilfluktsrom[^.\n]{0,80}(?:liste|data|lokasjon|plassering)/i;
+
+function publicProtectionText(measure: any) {
+  return JSON.stringify({ title: measure?.title, readinessChecks: measure?.readinessChecks, operationalSteps: measure?.operationalSteps });
+}
+
+function sameJson(a: unknown, b: unknown) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function compareIdSets(errors: string[], label: string, expected: Iterable<string>, actual: Iterable<string>) {
+  const expectedSet = new Set(expected);
+  const actualSet = new Set(actual);
+  for (const id of expectedSet) if (!actualSet.has(id)) errors.push(`${label} missing ${id}`);
+  for (const id of actualSet) if (!expectedSet.has(id)) errors.push(`${label} has unexpected ${id}`);
+}
+
+function validateGeneratedArtifacts(errors: string[], graph: GraphInput) {
+  const counts = {
+    sourceCount: graph.sources?.length ?? 0,
+    actionCardCount: graph.actionCards?.length ?? 0,
+    checklistCount: graph.checklists?.length ?? 0,
+    trainingPathCount: graph.trainingPaths?.length ?? 0,
+    protectionMeasureCount: graph.protectionMeasures?.length ?? 0,
+    glossaryCount: graph.glossary?.length ?? 0,
+  };
+
+  if (graph.manifest) {
+    for (const [key, expected] of Object.entries(counts)) {
+      if (graph.manifest[key] !== expected) errors.push(`manifest ${key}=${graph.manifest[key]} does not match generated count ${expected}`);
+    }
+  }
+
+  const publicGraph = graph.publicGraph;
+  if (publicGraph) {
+    if (graph.manifest && publicGraph.manifest && !sameJson(graph.manifest, publicGraph.manifest)) errors.push('public generated manifest does not mirror content generated manifest');
+    for (const key of ['actionCards', 'checklists', 'trainingPaths', 'protectionMeasures', 'glossary'] as const) {
+      if (!sameJson(graph[key] ?? [], publicGraph[key] ?? [])) errors.push(`public generated ${key} does not mirror content generated ${key}`);
+    }
+    compareIdSets(errors, 'public source documents', (graph.sources ?? []).map((source) => String(source.id)), (publicGraph.sources ?? []).map((source) => String(source.id)));
+    for (const source of graph.sources ?? []) {
+      const publicSource = (publicGraph.sources ?? []).find((candidate) => candidate.id === source.id);
+      if (!publicSource) continue;
+      for (const key of ['id', 'title', 'sourcePath', 'sourceType', 'status'] as const) {
+        if (source[key] !== publicSource[key]) errors.push(`public source ${source.id} field ${key} does not mirror content generated source`);
+      }
+      if (!String(source.body ?? '').startsWith(String(publicSource.body ?? ''))) errors.push(`public source ${source.id} body is not a prefix of content generated body`);
+    }
+  }
+
+  const docs = Array.isArray(graph.searchIndex?.documents) ? graph.searchIndex.documents : undefined;
+  if (docs) {
+    compareIdSets(errors, 'search index source document ids', (graph.sources ?? []).map((source) => `kilde:${source.id}`), docs.filter((doc: any) => String(doc?.id ?? '').startsWith('kilde:')).map((doc: any) => String(doc.id)));
+    const expectedDocCount = counts.sourceCount + counts.actionCardCount + counts.glossaryCount + counts.trainingPathCount + counts.protectionMeasureCount;
+    if (docs.length !== expectedDocCount) errors.push(`search index document count ${docs.length} does not match generated count ${expectedDocCount}`);
+    for (const doc of docs) {
+      if (String(doc?.id ?? '').startsWith('kilde:') && !String(doc?.href ?? '').startsWith('/kilder/')) errors.push(`search index source document ${doc.id} has invalid href ${doc.href}`);
+    }
+  }
+  if (publicGraph?.searchIndex && graph.searchIndex && !sameJson(graph.searchIndex, publicGraph.searchIndex)) errors.push('public generated search-index does not mirror content generated search-index');
+}
+
 export async function validateContentGraph(input?: GraphInput): Promise<string[]> {
   const graph = input ?? (await readGeneratedGraph());
   const errors: string[] = [];
   const sources = graph.sources ?? [];
+  const actionCards = graph.actionCards ?? [];
+  const checklists = graph.checklists ?? [];
+  const trainingPaths = graph.trainingPaths ?? [];
+  const protectionMeasures = graph.protectionMeasures ?? [];
+  const glossary = graph.glossary ?? [];
   const sourceIds = new Set(sources.map((source: any) => source.id));
+  const actionCardSlugs = new Set(actionCards.map((card: any) => card.slug));
   const sourceStatus = new Map(sources.map((source: any) => [source.id, source.status]));
+
+  addDuplicateErrors(errors, 'source id', sources, (source: any) => source.id);
+  addDuplicateErrors(errors, 'action card slug', actionCards, (card: any) => card.slug);
+  addDuplicateErrors(errors, 'checklist slug', checklists, (checklist: any) => checklist.slug);
+  addDuplicateErrors(errors, 'training path slug', trainingPaths, (training: any) => training.slug);
+  addDuplicateErrors(errors, 'protection measure slug', protectionMeasures, (measure: any) => measure.slug);
+  addDuplicateErrors(errors, 'glossary term', glossary, (term: any) => term.term);
 
   sources.forEach((source, index) => {
     const result = SourceDocumentSchema.safeParse(source);
     if (!result.success) errors.push(`sources[${index}] ${result.error.message}`);
   });
-  (graph.actionCards ?? []).forEach((card, index) => {
+  actionCards.forEach((card, index) => {
     const result = ActionCardSchema.safeParse(card);
     if (!result.success) errors.push(`actionCards[${index}] ${result.error.message}`);
     for (const sourceId of collectRefs(card)) {
@@ -64,25 +164,26 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
     const needsWarning = collectRefs(card).some((sourceId) => ['historical', 'unverified', 'draft', 'expired'].includes(String(sourceStatus.get(sourceId))));
     if (needsWarning && !card.warning) errors.push(`${card.slug ?? 'card'} uses non-verified source without visible warning`);
   });
-  (graph.checklists ?? []).forEach((checklist, index) => {
+  checklists.forEach((checklist, index) => {
     const result = OperationalChecklistSchema.safeParse(checklist);
     if (!result.success) errors.push(`checklists[${index}] ${result.error.message}`);
     for (const sourceId of collectRefs(checklist)) if (!sourceIds.has(sourceId)) errors.push(`${checklist.slug ?? 'checklist'} references missing source ${sourceId}`);
   });
-  (graph.trainingPaths ?? []).forEach((training, index) => {
+  trainingPaths.forEach((training, index) => {
     const result = TrainingPathSchema.safeParse(training);
     if (!result.success) errors.push(`trainingPaths[${index}] ${result.error.message}`);
     for (const sourceId of collectRefs(training)) if (!sourceIds.has(sourceId)) errors.push(`${training.slug ?? 'training'} references missing source ${sourceId}`);
+    for (const cardSlug of training.linkedCardSlugs ?? []) if (!actionCardSlugs.has(cardSlug)) errors.push(`${training.slug ?? 'training'} links missing action card ${cardSlug}`);
   });
-  (graph.protectionMeasures ?? []).forEach((measure, index) => {
+  protectionMeasures.forEach((measure, index) => {
     const result = ProtectionMeasureSchema.safeParse(measure);
     if (!result.success) errors.push(`protectionMeasures[${index}] ${result.error.message}`);
-    if (measure.publicOrRestricted === 'public' && /privat(e)?\s+tilfluktsromliste/i.test(JSON.stringify(measure))) {
-      errors.push(`${measure.slug ?? 'measure'} appears to publish private shelter list as public content`);
+    if (measure.publicOrRestricted === 'public' && restrictedShelterPublicationPattern.test(publicProtectionText(measure))) {
+      errors.push(`${measure.slug ?? 'measure'} appears to publish restricted shelter data as public content`);
     }
     for (const sourceId of collectRefs(measure)) if (!sourceIds.has(sourceId)) errors.push(`${measure.slug ?? 'measure'} references missing source ${sourceId}`);
   });
-  (graph.glossary ?? []).forEach((term, index) => {
+  glossary.forEach((term, index) => {
     const result = GlossaryTermSchema.safeParse(term);
     if (!result.success) errors.push(`glossary[${index}] ${result.error.message}`);
     for (const sourceId of collectRefs(term)) if (!sourceIds.has(sourceId)) errors.push(`${term.term ?? 'term'} references missing source ${sourceId}`);
@@ -90,6 +191,7 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
 
   const sensitiveKeys = containsSensitiveStructuredKey(graph);
   sensitiveKeys.forEach((key) => errors.push(`generated content exposes sensitive structured key ${key}`));
+  validateGeneratedArtifacts(errors, graph);
   return errors;
 }
 

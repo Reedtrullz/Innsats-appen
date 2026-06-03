@@ -6,10 +6,13 @@ export const RoleSchema = z.enum(roles);
 export const ScenarioSchema = z.enum(scenarios);
 export const SourceStatusSchema = z.enum(['verified', 'unverified', 'historical', 'draft', 'expired']);
 
+const sourcePathPattern = /^(?:source-extracts|curated-notes)\/[A-Za-z0-9ÆØÅæøå._() -]+\.md$/;
+const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
 export const SourceDocumentSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1).regex(slugPattern, 'source id must be lowercase kebab-case'),
   title: z.string().min(1),
-  sourcePath: z.string().min(1),
+  sourcePath: z.string().min(1).regex(sourcePathPattern, 'sourcePath must be a canonical public reference such as source-extracts/<file>.md'),
   sourceType: z.enum(['source-extract', 'curated-note']),
   status: SourceStatusSchema,
   body: z.string().min(1),
@@ -17,7 +20,7 @@ export const SourceDocumentSchema = z.object({
 });
 
 export const ActionCardSchema = z.object({
-  slug: z.string().min(1),
+  slug: z.string().min(1).regex(slugPattern, 'action card slug must be lowercase kebab-case'),
   title: z.string().min(1),
   phase: PhaseSchema,
   roles: z.array(RoleSchema).min(1),
@@ -32,14 +35,14 @@ export const ActionCardSchema = z.object({
 });
 
 export const ChecklistItemSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1).regex(slugPattern, 'checklist item id must be lowercase kebab-case'),
   label: z.string().min(1),
   required: z.boolean().default(false),
   sourceIds: z.array(z.string().min(1)).default([]),
 });
 
 export const OperationalChecklistSchema = z.object({
-  slug: z.string().min(1),
+  slug: z.string().min(1).regex(slugPattern, 'checklist slug must be lowercase kebab-case'),
   title: z.string().min(1),
   phase: PhaseSchema,
   roles: z.array(RoleSchema).min(1),
@@ -50,7 +53,7 @@ export const OperationalChecklistSchema = z.object({
 });
 
 export const TrainingPathSchema = z.object({
-  slug: z.string().min(1),
+  slug: z.string().min(1).regex(slugPattern, 'training path slug must be lowercase kebab-case'),
   courseCode: z.string().min(1),
   title: z.string().min(1),
   targetRoles: z.array(RoleSchema).min(1),
@@ -63,7 +66,7 @@ export const TrainingPathSchema = z.object({
 
 export const ProtectionMeasureSchema = z
   .object({
-    slug: z.string().min(1),
+    slug: z.string().min(1).regex(slugPattern, 'protection measure slug must be lowercase kebab-case'),
     title: z.string().min(1),
     kind: z.enum(['tilfluktsrom', 'evakuering', 'egenberedskap', 'annen']),
     publicOrRestricted: z.enum(['public', 'restricted']),

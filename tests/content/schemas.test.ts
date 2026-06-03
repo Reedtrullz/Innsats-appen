@@ -11,13 +11,28 @@ it('accepts a valid source document', () => {
   const result = SourceDocumentSchema.safeParse({
     id: 'src-5-punktsordre',
     title: 'SRC - 5-punktsordre',
-    sourcePath: '/Users/reidar/Obsidian/Hvelvet/01_Projects/Beredskapsboka/source-extracts/SRC - 5-punktsordre.md',
+    sourcePath: 'source-extracts/SRC - 5-punktsordre.md',
     sourceType: 'source-extract',
     status: 'unverified',
     body: 'Kildeinnhold',
     warnings: ['Kontroller mot gjeldende planverk'],
   });
   expect(result.success).toBe(true);
+});
+
+it('rejects local filesystem source paths', () => {
+  const base = {
+    id: 'src-local',
+    title: 'SRC - Local',
+    sourceType: 'source-extract',
+    status: 'unverified',
+    body: 'Kildeinnhold',
+    warnings: [],
+  };
+
+  for (const sourcePath of ['/tmp/private.md', '/etc/passwd', '~/vault/private.md', 'file:///tmp/private.md', '../private.md', String.raw`C:\Users\Reidar\x.md`, 'source-extracts/../private.md', 'curated-notes/../private.md']) {
+    expect(SourceDocumentSchema.safeParse({ ...base, sourcePath }).success, sourcePath).toBe(false);
+  }
 });
 
 it('requires source IDs for action cards', () => {

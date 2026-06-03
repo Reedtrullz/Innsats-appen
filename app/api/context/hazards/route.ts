@@ -1,5 +1,5 @@
 import { fetchNveHazardSignals, normalizeNveDateRange } from '@/lib/integrations/nve';
-import { guardAllowedQuery, jsonGuardError } from '@/lib/integrations/route-guards';
+import { guardAllowedQuery, guardExternalContextSignals, jsonGuardError } from '@/lib/integrations/route-guards';
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
@@ -17,7 +17,10 @@ export async function GET(request: Request) {
     return Response.json({ error: error instanceof Error ? error.message : 'invalid date range' }, { status: 400 });
   }
   try {
-    return Response.json(await fetchNveHazardSignals({ municipality, start, end }), { headers: { 'Cache-Control': 's-maxage=1800, stale-while-revalidate=7200' } });
+    const signals = await fetchNveHazardSignals({ municipality, start, end });
+    const guarded = guardExternalContextSignals(signals);
+    if (!guarded.ok) return jsonGuardError(guarded);
+    return Response.json(guarded.value, { headers: { 'Cache-Control': 's-maxage=1800, stale-while-revalidate=7200' } });
   } catch (error) {
     return Response.json({ error: error instanceof Error ? error.message : 'hazards unavailable' }, { status: 502 });
   }

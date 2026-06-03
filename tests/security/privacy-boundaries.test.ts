@@ -88,6 +88,9 @@ it('does not publish sensitive structured fields in generated MVP content', () =
     .flatMap((text) => text.match(/\b\d{11}\b/g) ?? [])
     .filter(isRealisticNorwegianNationalIdentityNumber);
   expect(nationalIds, 'generated content must not contain raw Norwegian national identity numbers').toEqual([]);
+
+  const leakedLocalPaths = collectStrings(content).filter((text) => /\/Users\/|[A-Za-z]:\\\\Users\\\\|Hvelvet|Projectos\/Beredskapsboka/.test(text));
+  expect(leakedLocalPaths, 'generated content must not expose local filesystem paths or vault names').toEqual([]);
 });
 
 it('keeps MVP schemas free of sensitive scope-creep fields', () => {
@@ -100,6 +103,20 @@ it('keeps MVP schemas free of sensitive scope-creep fields', () => {
   for (const field of sensitiveSchemaFieldNames) {
     expect(schemaText, `schema code exposes banned field: ${field}`).not.toContain(field);
   }
+});
+
+it('normalizes sensitive structured field variants before matching', () => {
+  const hits = containsSensitiveStructuredKey({
+    PatientName: 'Ola',
+    patient_name: 'Ola',
+    fnr: '01010112345',
+    fødselsnr: '01010112345',
+    fodselsnummer: '01010112345',
+    tracking_device_id: 'tracker-1',
+    phoneNumber: '+4712345678',
+  });
+
+  expect(hits).toEqual(expect.arrayContaining(['PatientName', 'patient_name', 'fnr', 'fødselsnr', 'fodselsnummer', 'tracking_device_id', 'phoneNumber']));
 });
 
 it('rejects generic upstream URL proxy parameters before adapter fetches', async () => {

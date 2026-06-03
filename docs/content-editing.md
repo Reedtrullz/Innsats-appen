@@ -4,7 +4,7 @@ Beredskapsboka content is source-backed and generated. Do not edit `content/gene
 
 ## Source locations
 
-- Obsidian knowledge bank: `/Users/reidar/Obsidian/Hvelvet/01_Projects/Beredskapsboka`
+- Obsidian knowledge bank: set `OBSIDIAN_BEREDSKAPSBOKA_PATH=/path/to/your/Obsidian/Beredskapsboka`
 - Curated YAML: `content/curated/*.yaml`
 - Generated Node/server JSON: `content/generated/*`
 - Generated browser/offline JSON: `public/generated-content/*`
@@ -16,8 +16,8 @@ Beredskapsboka content is source-backed and generated. Do not edit `content/gene
 source ~/.nvm/nvm.sh && nvm use 22
 npm run import:obsidian
 npm run compile:curated
-npm run validate:content
 npm run build:search
+npm run validate:content
 # or all at once:
 npm run build:content
 ```
@@ -41,7 +41,7 @@ npm run build:content
    - `competenceRequired`
    - `warning` when the content is unverified, restricted, or easy to misuse.
 3. Use a stable slug; card routes are `/kort/<slug>`.
-4. Reference only existing `sourceIds` from `content/curated/source-documents.yaml` or imported source extracts.
+4. Reference only existing `sourceIds` from imported source extracts.
 5. Run:
    ```bash
    npm run build:content
@@ -50,9 +50,9 @@ npm run build:content
 
 ## Add a source
 
-1. Prefer importing source extracts from the Obsidian source path.
-2. If adding a curated source manually, edit `content/curated/source-documents.yaml`.
-3. Include:
+1. Prefer importing source extracts from the Obsidian source path (`source-extracts/*.md`).
+2. Manual curated source documents are not currently supported by the compiler; add or update a source extract instead, or extend `scripts/compile-curated.ts` first.
+3. Each source extract should produce:
    - `id`
    - `title`
    - `sourcePath`
