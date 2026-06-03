@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-02T23:40:55.423Z",
-  "sourceCount": 3,
+  "generatedAt": "2026-06-03T14:12:17.968Z",
+  "sourceCount": 4,
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -521,6 +521,92 @@
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 6: Harden context route query handling and provenance refs"
+        }
+      ]
+    },
+    {
+      "id": "2026-06-03_135934-workplan-truth-sync-plan",
+      "title": "Workplan Truth Sync Implementation Plan",
+      "sourcePath": ".hermes/plans/2026-06-03_135934-workplan-truth-sync-plan.md",
+      "sourceType": "hermes-plan",
+      "summary": "Make Obsidian 20-Workplans and the /release board reflect real plan/task status, evidence, and remaining work instead of showing every historical workplan task as active/planned.",
+      "stage": "build",
+      "risk": "high",
+      "status": "active",
+      "taskCount": 9,
+      "updatedAt": "2026-06-03T14:12:17.968Z",
+      "tasks": [
+        {
+          "id": "2026-06-03_135934-workplan-truth-sync-plan-task-1",
+          "title": "Extend workplan schemas for optional evidence metadata",
+          "status": "planned",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 1: Extend workplan schemas for optional evidence metadata"
+        },
+        {
+          "id": "2026-06-03_135934-workplan-truth-sync-plan-task-2",
+          "title": "Parse plan-level metadata from markdown",
+          "status": "planned",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 2: Parse plan-level metadata from markdown"
+        },
+        {
+          "id": "2026-06-03_135934-workplan-truth-sync-plan-task-3",
+          "title": "Parse task-level metadata from markdown sections",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "sourceHeading": "Task 3: Parse task-level metadata from markdown sections"
+        },
+        {
+          "id": "2026-06-03_135934-workplan-truth-sync-plan-task-4",
+          "title": "Render grouped Obsidian workplans with task status and evidence",
+          "status": "planned",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 4: Render grouped Obsidian workplans with task status and evidence"
+        },
+        {
+          "id": "2026-06-03_135934-workplan-truth-sync-plan-task-5",
+          "title": "Add release-plan progress summaries from task statuses",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "sourceHeading": "Task 5: Add release-plan progress summaries from task statuses"
+        },
+        {
+          "id": "2026-06-03_135934-workplan-truth-sync-plan-task-6",
+          "title": "Surface synced task progress on the release page",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "sourceHeading": "Task 6: Surface synced task progress on the release page"
+        },
+        {
+          "id": "2026-06-03_135934-workplan-truth-sync-plan-task-7",
+          "title": "Add production E2E coverage for synced workplans on /release",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "sourceHeading": "Task 7: Add production E2E coverage for synced workplans on /release"
+        },
+        {
+          "id": "2026-06-03_135934-workplan-truth-sync-plan-task-8",
+          "title": "Mark existing local workplans with truthful status evidence",
+          "status": "planned",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 8: Mark existing local workplans with truthful status evidence"
+        },
+        {
+          "id": "2026-06-03_135934-workplan-truth-sync-plan-task-9",
+          "title": "Run final workplan sync and Obsidian/release verification",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "sourceHeading": "Task 9: Run final workplan sync and Obsidian/release verification"
         }
       ]
     }
