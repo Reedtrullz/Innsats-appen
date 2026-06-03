@@ -56,8 +56,8 @@ it('loads synced workplans into the release board', async () => {
           taskCount: 2,
           updatedAt: '2026-06-04T12:00:00.000Z',
           tasks: [
-            { id: 'pilot-workplan-task-1', title: 'Sync Obsidian note', status: 'active', stage: 'verify', risk: 'medium' },
-            { id: 'pilot-workplan-task-2', title: 'Verify release page', status: 'planned', stage: 'release', risk: 'high' },
+            { id: 'pilot-workplan-task-1', title: 'Sync Obsidian note', status: 'completed', stage: 'verify', risk: 'medium' },
+            { id: 'pilot-workplan-task-2', title: 'Verify release page', status: 'active', stage: 'release', risk: 'high' },
           ],
         },
       ],
@@ -68,6 +68,8 @@ it('loads synced workplans into the release board', async () => {
 
   expect(await screen.findByRole('heading', { name: 'Synced workplans' })).toBeInTheDocument();
   expect((await screen.findAllByRole('heading', { name: 'Pilot Workplan' })).length).toBeGreaterThan(0);
+  expect(screen.getByText(/1\/2 tasks completed/i)).toBeInTheDocument();
+  expect(screen.getByText(/Open: Verify release page/i)).toBeInTheDocument();
   expect(screen.getByText(/1 synced from Obsidian/i)).toBeInTheDocument();
   expect(screen.getByText(/Last sync: 2026-06-04T12:00:00.000Z/i)).toBeInTheDocument();
 

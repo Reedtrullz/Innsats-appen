@@ -119,6 +119,14 @@ function materialHref(title: string) {
   return '#release-export';
 }
 
+function completedTaskCount(workplan: WorkplansSnapshot['workplans'][number]) {
+  return workplan.tasks.filter((task) => task.status === 'completed').length;
+}
+
+function firstOpenTask(workplan: WorkplansSnapshot['workplans'][number]) {
+  return workplan.tasks.find((task) => task.status !== 'completed');
+}
+
 export function ReleaseReadinessTool() {
   const [plan, setPlan] = useState<ReleasePlan>(defaultReleasePlan);
   const [hydrated, setHydrated] = useState(false);
@@ -366,6 +374,14 @@ export function ReleaseReadinessTool() {
                         <div>
                           <h3 className="font-black">{workplan.title}</h3>
                           <p className="mt-1 text-sm font-semibold text-slate-500">{workplan.taskCount} tasks · {stageLabels[workplan.stage]} · {riskLabels[workplan.risk]} risk</p>
+                          <p className="mt-2 text-sm font-black text-slate-700">
+                            {completedTaskCount(workplan)}/{workplan.taskCount} tasks completed
+                          </p>
+                          {firstOpenTask(workplan) ? (
+                            <p className="mt-1 text-sm font-semibold text-orange-700">Open: {firstOpenTask(workplan)?.title}</p>
+                          ) : (
+                            <p className="mt-1 text-sm font-semibold text-emerald-700">No open task headings.</p>
+                          )}
                         </div>
                         <span className={`rounded-full px-2 py-1 text-xs font-black ${workplan.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : workplan.status === 'blocked' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>{workplan.status}</span>
                       </div>
