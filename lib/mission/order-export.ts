@@ -16,6 +16,7 @@ export interface CommsPlanInput {
 
 const ORDER_SOURCE_IDS = ['src-5-punktsordre'];
 const COMMS_SOURCE_IDS = ['src-kommunikasjons-og-sambandsdiagram'];
+export const EXPORT_SENSITIVITY_WARNING = 'Eksporterte filer kan inneholde operasjonelt sensitiv informasjon. Lagres bare lokalt; del, lagre og slett etter lokale rutiner. Ikke legg inn persondata eller pasientdata.';
 
 function clean(value: string | undefined) {
   return value?.trim() ?? '';
@@ -31,6 +32,7 @@ export function exportFivePointOrderMarkdown(input: FivePointOrderInput) {
     '# 5-punktsordre',
     '',
     '> Beslutningsstøtte for lokal strukturering. Kontroller alltid mot gjeldende ordre, innsatsledelse og lokale systemer før bruk.',
+    `> ${EXPORT_SENSITIVITY_WARNING}`,
     '',
     `Kilder: ${ORDER_SOURCE_IDS.join(', ')}`,
     '',
@@ -60,6 +62,7 @@ export function exportCommsPlanMarkdown(input: CommsPlanInput) {
     '# Sambandsplan',
     '',
     '> Kontroller mot lokal sambandsplan. Ikke legg inn sensitive abonnentlister eller persondata i MVP-eksporten.',
+    `> ${EXPORT_SENSITIVITY_WARNING}`,
     '',
     `Kilder: ${COMMS_SOURCE_IDS.join(', ')}`,
     '',

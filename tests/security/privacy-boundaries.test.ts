@@ -7,6 +7,7 @@ import { GET as weatherGet } from '@/app/api/context/weather/route';
 import { getActionCards, getChecklists, getGlossaryTerms, getProtectionMeasures, getSourceDocuments, getTrainingPaths } from '@/lib/content/load-content';
 import { containsSensitiveStructuredKey, sensitiveFieldNames } from '@/lib/content/source-policy';
 import { guardAllowedQuery } from '@/lib/integrations/route-guards';
+import { ChecklistRunSchema, MissionContextSchema } from '@/lib/mission/schemas';
 
 const sensitiveSchemaFieldNames = sensitiveFieldNames.filter((field) => !['url', 'upstream'].includes(field));
 const forbiddenProxyParams = ['url', 'upstream', 'proxy', 'target', 'href'];
@@ -113,10 +114,67 @@ it('normalizes sensitive structured field variants before matching', () => {
     fødselsnr: '01010112345',
     fodselsnummer: '01010112345',
     tracking_device_id: 'tracker-1',
-    phoneNumber: '+4712345678',
+    phoneNumber: '+471****5678',
   });
 
   expect(hits).toEqual(expect.arrayContaining(['PatientName', 'patient_name', 'fnr', 'fødselsnr', 'fodselsnummer', 'tracking_device_id', 'phoneNumber']));
+});
+
+it('rejects patient-identifying fields in local mission and checklist/log schemas', () => {
+  const now = '2026-06-03T12:00:00.000Z';
+  const mission = {
+    id: 'mission-1',
+    title: 'Lokal støtte',
+    createdAt: now,
+    updatedAt: now,
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'generelt',
+    locationText: 'Kun område',
+    externalSignals: [],
+    activeChecklistIds: [],
+    notes: '',
+    contentVersion: 'test',
+    schemaVersion: 1,
+  };
+  for (const field of ['patientName', 'patientId', 'fødselsnummer', 'phoneNumber', 'medicalRecordNumber']) {
+    expect(MissionContextSchema.safeParse({ ...mission, [field]: 'forbudt' }).success, `mission accepted ${field}`).toBe(false);
+  }
+
+  const checklistRun = {
+    id: 'run-1',
+    missionId: 'mission-1',
+    templateSlug: 'checklist-1',
+    checkedItemIds: [],
+    notesByItemId: {},
+    updatedAt: now,
+    schemaVersion: 1,
+  };
+  for (const field of ['patientName', 'patientId', 'fødselsnummer', 'phoneNumber', 'medicalRecordNumber']) {
+    expect(ChecklistRunSchema.safeParse({ ...checklistRun, [field]: 'forbudt' }).success, `checklist/log accepted ${field}`).toBe(false);
+  }
+});
+
+it('documents local retention, browser-offline threat model, governance, post-MVP security, DPIA, and source-publication policies', () => {
+  const docs = [
+    'docs/privacy-retention.md',
+    'docs/threat-model-browser-offline.md',
+    'docs/governance-gates.md',
+    'docs/post-mvp-security-architecture.md',
+    'docs/dpia-checklist.md',
+    'docs/source-publication-policy.md',
+  ];
+  for (const doc of docs) {
+    const text = fs.readFileSync(path.join(process.cwd(), doc), 'utf8');
+    expect(text.length, `${doc} should be specific enough`).toBeGreaterThan(700);
+  }
+
+  expect(repoTextFor(['docs/privacy-retention.md'])).toMatch(/IndexedDB|localStorage|slett/i);
+  expect(repoTextFor(['docs/threat-model-browser-offline.md'])).toMatch(/offline|nettleser|trussel|tiltak/i);
+  expect(repoTextFor(['docs/governance-gates.md'])).toMatch(/auth|sync|push|live tracking|backend storage/i);
+  expect(repoTextFor(['docs/post-mvp-security-architecture.md'])).toMatch(/før delt backend|security architecture|autentisering|logging/i);
+  expect(repoTextFor(['docs/dpia-checklist.md'])).toMatch(/DPIA|personvernkonsekvensvurdering|persondata/i);
+  expect(repoTextFor(['docs/source-publication-policy.md'])).toMatch(/statisk|generert|private\/skjermede tilfluktsrom|persondata/i);
 });
 
 it('rejects generic upstream URL proxy parameters before adapter fetches', async () => {

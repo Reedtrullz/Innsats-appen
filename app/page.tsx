@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { DecisionSupportNotice } from '@/components/decision-support-notice';
 
 export default function Home() {
   return (
@@ -31,6 +32,8 @@ export default function Home() {
       <section className="rounded-3xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-950">
         Lokal MVP: ingen innlogging, ingen sentral hendelsesdatabase, ingen pasient/persondata og ingen private/skjermede tilfluktsromlister. Alt oppdragsinnhold lagres lokalt i nettleseren.
       </section>
+
+      <DecisionSupportNotice />
     </main>
   );
 }

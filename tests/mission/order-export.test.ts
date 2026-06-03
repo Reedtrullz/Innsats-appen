@@ -14,6 +14,8 @@ it('exports a 5-punktsordre with warning and source references', () => {
   }
   expect(markdown).toContain('Flom truer infrastruktur');
   expect(markdown).toContain('Beslutningsstøtte');
+  expect(markdown).toContain('Eksporterte filer kan inneholde operasjonelt sensitiv informasjon');
+  expect(markdown).toContain('Lagres bare lokalt');
   expect(markdown).toContain('src-5-punktsordre');
   expect(markdown).not.toContain('personnummer');
 });
@@ -31,4 +33,6 @@ it('exports a samband plan with local-only fields and source references', () => 
   expect(markdown).toContain('Talegruppe Innsats-1');
   expect(markdown).toContain('src-kommunikasjons-og-sambandsdiagram');
   expect(markdown).toContain('Kontroller mot lokal sambandsplan');
+  expect(markdown).toContain('Eksporterte filer kan inneholde operasjonelt sensitiv informasjon');
+  expect(markdown).toContain('Lagres bare lokalt');
 });

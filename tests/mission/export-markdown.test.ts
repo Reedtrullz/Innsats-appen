@@ -11,5 +11,7 @@ it('exports mission and checklist state without browser metadata', () => {
   expect(markdown).toContain('[x] Kontroller ventilasjon');
   expect(markdown).toContain('src-deep-research-tilfluktsrom');
   expect(markdown).toContain('manuelt overført');
+  expect(markdown).toContain('Eksporterte filer kan inneholde operasjonelt sensitiv informasjon');
+  expect(markdown).toContain('Lagres bare lokalt');
   expect(markdown).not.toContain('indexedDB');
 });

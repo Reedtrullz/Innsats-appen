@@ -1,5 +1,13 @@
 const baseSensitiveFieldNames = [
   'privateTilfluktsromLocations',
+  'privateTilfluktsromList',
+  'privateShelterLocations',
+  'privateShelterList',
+  'skjermedeTilfluktsrom',
+  'skjermetTilfluktsromListe',
+  'restrictedShelterLocations',
+  'shelterCoordinates',
+  'shelterAddress',
   'patient',
   'patientName',
   'patientId',

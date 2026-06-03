@@ -1,4 +1,5 @@
 import type { OperationalChecklist } from '@/lib/content/schemas';
+import { EXPORT_SENSITIVITY_WARNING } from './order-export';
 import type { ChecklistRun, MissionContext } from './schemas';
 
 export function exportMissionMarkdown({ mission, checklists, runs }: { mission: MissionContext; checklists: OperationalChecklist[]; runs: ChecklistRun[] }) {
@@ -6,6 +7,7 @@ export function exportMissionMarkdown({ mission, checklists, runs }: { mission: 
   lines.push(`# ${mission.title}`);
   lines.push('');
   lines.push('> Eksporten er manuelt overført beslutningsstøtte og er ikke offisiell logg alene. Kontroller mot gjeldende ordre og systemer.');
+  lines.push(`> ${EXPORT_SENSITIVITY_WARNING}`);
   lines.push('');
   lines.push(`- Fase/rolle/scenario: ${mission.phase} / ${mission.role} / ${mission.scenario}`);
   lines.push(`- Sted: ${mission.locationText}`);

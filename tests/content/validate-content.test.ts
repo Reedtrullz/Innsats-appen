@@ -45,6 +45,71 @@ it('reports broader private shelter publication phrases in public protection mea
   expect(errors.join('\n')).toContain('bad-shelter appears to publish restricted shelter data as public content');
 });
 
+it('blocks private shelter structured fields and location patterns from generated public content', async () => {
+  const restrictedLocation = 'Skjermet tilfluktsrom: Kongens gate 1, 7010 Trondheim';
+  const errors = await validateContentGraph({
+    sources: [
+      knownSource,
+      { ...knownSource, id: 'src-leak', title: 'Leak', sourcePath: 'source-extracts/SRC - Leak.md', body: restrictedLocation },
+    ],
+    actionCards: [{ slug: 'leaky-card', title: 'Leak card', phase: 'under', roles: ['lagforer'], scenarios: ['generelt'], priority: 'high', steps: [restrictedLocation], sourceIds: ['src-known'], warning: 'Kildevarsel' }],
+    checklists: [{ slug: 'leaky-checklist', title: 'Leak checklist', phase: 'under', roles: ['lagforer'], scenarios: ['generelt'], items: [{ id: 'leak', label: restrictedLocation, sourceIds: ['src-known'] }], sourceIds: ['src-known'] }],
+    protectionMeasures: [
+      {
+        slug: 'bad-private-field',
+        title: 'Bad private field',
+        kind: 'tilfluktsrom',
+        publicOrRestricted: 'public',
+        responsibleAuthority: 'DSB',
+        operationalSteps: ['Bruk bare offentlige råd'],
+        privateTilfluktsromLocations: ['Storgata 1, 7010 Trondheim'],
+        sourceIds: ['src-known'],
+      },
+      {
+        slug: 'bad-location-pattern',
+        title: 'Bad location pattern',
+        kind: 'tilfluktsrom',
+        publicOrRestricted: 'public',
+        responsibleAuthority: 'DSB',
+        operationalSteps: ['Bruk bare offentlige råd'],
+        dataWarnings: [restrictedLocation],
+        sourceIds: ['src-known'],
+      },
+    ],
+  } as any);
+  const joined = errors.join('\n');
+
+  expect(joined).toContain('generated content exposes sensitive structured key privateTilfluktsromLocations');
+  expect(joined).toContain('sources[1].body appears to publish restricted shelter location details');
+  expect(joined).toContain('actionCards[0].steps[0] appears to publish restricted shelter location details');
+  expect(joined).toContain('checklists[0].items[0].label appears to publish restricted shelter location details');
+  expect(joined).toContain('protectionMeasures[1].dataWarnings[0] appears to publish restricted shelter location details');
+});
+
+it('does not treat a generic shelter policy warning plus unrelated address as a restricted shelter location leak', async () => {
+  const errors = await validateContentGraph({
+    sources: [
+      {
+        ...knownSource,
+        body: 'Ikke publiser private tilfluktsromdata. Oppmøtested for åpent kurs: Kongens gate 1.',
+      },
+    ],
+    protectionMeasures: [
+      {
+        slug: 'segment-regression',
+        title: 'Ikke publiser private tilfluktsromdata',
+        kind: 'tilfluktsrom',
+        publicOrRestricted: 'public',
+        responsibleAuthority: 'DSB',
+        operationalSteps: ['Oppmøtested for åpent kurs: Kongens gate 1.'],
+        sourceIds: ['src-known'],
+      },
+    ],
+  } as any);
+
+  expect(errors.join('\n')).not.toContain('restricted shelter location details');
+});
+
 it('reports generated artifact manifest, public mirror, and search-index mismatches', async () => {
   const errors = await validateContentGraph({
     sources: [knownSource],

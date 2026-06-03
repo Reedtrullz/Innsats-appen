@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { exportCommsPlanMarkdown } from '@/lib/mission/order-export';
+import { EXPORT_SENSITIVITY_WARNING, exportCommsPlanMarkdown } from '@/lib/mission/order-export';
 
 function value(form: FormData, key: string) {
   return String(form.get(key) ?? '').trim();
@@ -26,7 +26,8 @@ export function CommsPlanForm() {
       <div>
         <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Lokal samband</p>
         <h2 className="text-2xl font-black">Sambandsplan</h2>
-        <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Kontroller mot lokal sambandsplan. Ikke legg inn sensitive abonnentlister.</p>
+        <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Kontroller mot lokal sambandsplan og bruk bare operativt nødvendige opplysninger; unngå sensitive abonnentlister.</p>
+        <p className="mt-2 rounded-2xl bg-red-50 p-3 text-sm font-semibold text-red-950">{EXPORT_SENSITIVITY_WARNING}</p>
       </div>
       <label className="block text-sm font-bold">Kanal/talegruppe<input name="kanalTalegruppe" required className="mt-1 min-h-12 w-full rounded-2xl border px-3" /></label>
       <label className="block text-sm font-bold">Kallesignal<input name="kallesignal" required className="mt-1 min-h-12 w-full rounded-2xl border px-3" /></label>

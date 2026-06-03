@@ -1,4 +1,5 @@
 import { BottomNav } from './bottom-nav';
+import { DecisionSupportNotice } from './decision-support-notice';
 import { OfflineStatus } from './offline-status';
 
 export function AppShell({ children, currentPath }: { children: React.ReactNode; currentPath?: string }) {
@@ -14,7 +15,12 @@ export function AppShell({ children, currentPath }: { children: React.ReactNode;
         </div>
       </header>
       <OfflineStatus />
-      <main className="mx-auto max-w-3xl px-4 pb-28 pt-4">{children}</main>
+      <main className="mx-auto max-w-3xl px-4 pb-28 pt-4">
+        <div className="mb-4">
+          <DecisionSupportNotice />
+        </div>
+        {children}
+      </main>
       <BottomNav currentPath={currentPath} />
     </div>
   );

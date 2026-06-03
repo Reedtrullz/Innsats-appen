@@ -74,9 +74,45 @@ function addDuplicateErrors<T>(errors: string[], label: string, items: T[], keyO
 }
 
 const restrictedShelterPublicationPattern = /(?:privat\w*|skjermet\w*|hemmelig\w*|gradert\w*)[^.\n]{0,80}tilfluktsrom|tilfluktsrom[^.\n]{0,80}(?:liste|data|lokasjon|plassering)/i;
+const restrictedShelterMarkerPattern = /(?:privat\w*|skjermet\w*|hemmelig\w*|gradert\w*)[^.\n]{0,80}tilfluktsrom|tilfluktsrom[^.\n]{0,80}(?:privat\w*|skjermet\w*|hemmelig\w*|gradert\w*)/i;
+const shelterLocationDetailPattern = /\b(?:(?:[A-ZÆØÅ][A-Za-zÆØÅæøå-]+\s+){0,4}(?:[A-ZÆØÅ][A-Za-zÆØÅæøå-]*(?:gata|gaten|veien|vegen|bakken|plassen|torget|alléen|alleen|stien|lia)|gate|gata|gaten|vei|veien|veg|vegen|bakke|bakken|plass|plassen|torg|torget|allé|alle|alléen|alleen|sti|stien|lia)\s+\d+[A-Za-z]?|(?:koordinat|coord|utm|lat|lon|lng)[^\n]{0,40}\d{2}[.,]\d{3,}|\b\d{2}[.,]\d{3,}\s*,\s*\d{1,2}[.,]\d{3,})/i;
 
 function publicProtectionText(measure: any) {
   return JSON.stringify({ title: measure?.title, readinessChecks: measure?.readinessChecks, operationalSteps: measure?.operationalSteps });
+}
+
+function validateRestrictedShelterLocationText(errors: string[], value: unknown, currentPath: string) {
+  if (typeof value === 'string') {
+    const segments = value.split(/(?:[.!?]\s+|\n+)/);
+    if (segments.some((segment) => restrictedShelterMarkerPattern.test(segment) && shelterLocationDetailPattern.test(segment))) {
+      errors.push(`${currentPath} appears to publish restricted shelter location details`);
+    }
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => validateRestrictedShelterLocationText(errors, item, `${currentPath}[${index}]`));
+    return;
+  }
+  if (value && typeof value === 'object') {
+    for (const [key, child] of Object.entries(value)) {
+      validateRestrictedShelterLocationText(errors, child, `${currentPath}.${key}`);
+    }
+  }
+}
+
+function validateRestrictedShelterLocationSurfaces(errors: string[], graph: GraphInput) {
+  for (const [key, items] of Object.entries({
+    sources: graph.sources,
+    actionCards: graph.actionCards,
+    checklists: graph.checklists,
+    trainingPaths: graph.trainingPaths,
+    protectionMeasures: graph.protectionMeasures,
+    glossary: graph.glossary,
+    searchIndex: graph.searchIndex,
+    publicGraph: graph.publicGraph,
+  })) {
+    if (items !== undefined) validateRestrictedShelterLocationText(errors, items, key);
+  }
 }
 
 function sameJson(a: unknown, b: unknown) {
@@ -184,7 +220,8 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
   protectionMeasures.forEach((measure, index) => {
     const result = ProtectionMeasureSchema.safeParse(measure);
     if (!result.success) errors.push(`protectionMeasures[${index}] ${result.error.message}`);
-    if (measure.publicOrRestricted === 'public' && restrictedShelterPublicationPattern.test(publicProtectionText(measure))) {
+    const protectionText = publicProtectionText(measure);
+    if (measure.publicOrRestricted === 'public' && restrictedShelterPublicationPattern.test(protectionText)) {
       errors.push(`${measure.slug ?? 'measure'} appears to publish restricted shelter data as public content`);
     }
     for (const sourceId of collectRefs(measure)) if (!sourceIds.has(sourceId)) errors.push(`${measure.slug ?? 'measure'} references missing source ${sourceId}`);
@@ -205,6 +242,7 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
 
   const sensitiveKeys = containsSensitiveStructuredKey(graph);
   sensitiveKeys.forEach((key) => errors.push(`generated content exposes sensitive structured key ${key}`));
+  validateRestrictedShelterLocationSurfaces(errors, graph);
   validateGeneratedArtifacts(errors, graph);
   return errors;
 }

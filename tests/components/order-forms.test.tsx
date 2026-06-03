@@ -11,6 +11,9 @@ vi.mock('next/navigation', () => ({
 
 it('requires all five order points and renders exported markdown', async () => {
   render(<FivePointOrderForm />);
+  expect(screen.getByText(/lagres bare lokalt/i)).toBeInTheDocument();
+  expect(screen.getByText(/ikke legg inn persondata/i)).toBeInTheDocument();
+  expect(screen.getByText(/eksporterte filer kan inneholde operasjonelt sensitiv informasjon/i)).toBeInTheDocument();
   for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
     const field = screen.getByLabelText(new RegExp(label, 'i'));
     expect(field).toBeRequired();
@@ -20,10 +23,14 @@ it('requires all five order points and renders exported markdown', async () => {
   await userEvent.click(screen.getByRole('button', { name: /Eksporter 5-punktsordre/i }));
   expect(screen.getByText(/# 5-punktsordre/i)).toBeInTheDocument();
   expect(screen.getByText(/src-5-punktsordre/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/operasjonelt sensitiv informasjon/i).length).toBeGreaterThan(0);
 });
 
 it('requires samband fields and renders exported markdown', async () => {
   render(<CommsPlanForm />);
+  expect(screen.getByText(/lagres bare lokalt/i)).toBeInTheDocument();
+  expect(screen.getByText(/ikke legg inn persondata/i)).toBeInTheDocument();
+  expect(screen.getByText(/eksporterte filer kan inneholde operasjonelt sensitiv informasjon/i)).toBeInTheDocument();
   const channel = screen.getByLabelText(/Kanal\/talegruppe/i);
   const callsign = screen.getByLabelText(/Kallesignal/i);
   const phone = screen.getByLabelText(/Telefon\/ISSI/i);
@@ -37,6 +44,7 @@ it('requires samband fields and renders exported markdown', async () => {
   expect(screen.getByText(/# Sambandsplan/i)).toBeInTheDocument();
   expect(screen.getByText(/Talegruppe Innsats-1/i)).toBeInTheDocument();
   expect(screen.getByText(/src-kommunikasjons-og-sambandsdiagram/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/operasjonelt sensitiv informasjon/i).length).toBeGreaterThan(0);
 });
 
 it('mounts order and comms forms in the mission route', () => {

@@ -441,7 +441,7 @@ export function ReleaseReadinessTool() {
 
             <section id="release-export" className="mt-6 rounded-2xl bg-slate-100 p-4">
               <h2 className="text-xl font-black">Local export</h2>
-              <p className="mt-1 text-sm font-semibold text-slate-600">Stored only in this browser. Copy this snapshot into a release issue or planning note when needed.</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">Stored only in this browser. Copy this snapshot into a release issue or planning note when needed. Exported snapshots may contain operationally sensitive planning information; handle them according to local routines.</p>
               <pre className="mt-3 max-h-56 overflow-auto rounded-xl bg-slate-950 p-3 text-xs text-slate-100">{exportText}</pre>
             </section>
           </main>
