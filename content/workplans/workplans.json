@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T14:12:17.968Z",
+  "generatedAt": "2026-06-03T15:14:15.636Z",
   "sourceCount": 4,
   "workplans": [
     {
@@ -8,90 +8,127 @@
       "sourcePath": ".hermes/plans/2026-06-02_220432-beredskapsboka-webapp-plan.md",
       "sourceType": "hermes-plan",
       "summary": "Build a mobile-first, offline-capable PWA that turns the existing Beredskapsboka Obsidian knowledge bank into fast operational support for Sivilforsvaret before, during, and after incidents.",
-      "stage": "build",
+      "stage": "release",
       "risk": "high",
-      "status": "active",
+      "status": "completed",
+      "owner": "AR",
+      "completedAt": "2026-06-03T13:59:34.000Z",
+      "evidence": [
+        "Superseded by the comprehensive implementation plan and current repository implementation.",
+        "npm run check PASS — 39 test files / 97 tests, next build generated 95 pages.",
+        "PLAYWRIGHT_PORT=3007 npm run e2e:prod PASS — 9/9 production E2E tests."
+      ],
       "taskCount": 10,
-      "updatedAt": "2026-06-02T20:17:44.233Z",
+      "updatedAt": "2026-06-03T15:14:15.632Z",
       "tasks": [
         {
           "id": "2026-06-02_220432-beredskapsboka-webapp-plan-task-1",
           "title": "Scaffold project",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Covered by the implemented comprehensive plan, npm run check PASS, and production E2E PASS."
+          ],
           "sourceHeading": "Task 1: Scaffold project"
         },
         {
           "id": "2026-06-02_220432-beredskapsboka-webapp-plan-task-2",
           "title": "Add schemas and seed content",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Covered by the implemented comprehensive plan, npm run check PASS, and production E2E PASS."
+          ],
           "sourceHeading": "Task 2: Add schemas and seed content"
         },
         {
           "id": "2026-06-02_220432-beredskapsboka-webapp-plan-task-3",
           "title": "Build mobile navigation and card browser",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Covered by the implemented comprehensive plan, npm run check PASS, and production E2E PASS."
+          ],
           "sourceHeading": "Task 3: Build mobile navigation and card browser"
         },
         {
           "id": "2026-06-02_220432-beredskapsboka-webapp-plan-task-4",
           "title": "Add source documents and card detail",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Covered by the implemented comprehensive plan, npm run check PASS, and production E2E PASS."
+          ],
           "sourceHeading": "Task 4: Add source documents and card detail"
         },
         {
           "id": "2026-06-02_220432-beredskapsboka-webapp-plan-task-5",
           "title": "Add Obsidian import",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Covered by the implemented comprehensive plan, npm run check PASS, and production E2E PASS."
+          ],
           "sourceHeading": "Task 5: Add Obsidian import"
         },
         {
           "id": "2026-06-02_220432-beredskapsboka-webapp-plan-task-6",
           "title": "Add search",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Covered by the implemented comprehensive plan, npm run check PASS, and production E2E PASS."
+          ],
           "sourceHeading": "Task 6: Add search"
         },
         {
           "id": "2026-06-02_220432-beredskapsboka-webapp-plan-task-7",
           "title": "Add PWA/offline support",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Covered by the implemented comprehensive plan, npm run check PASS, and production E2E PASS."
+          ],
           "sourceHeading": "Task 7: Add PWA/offline support"
         },
         {
           "id": "2026-06-02_220432-beredskapsboka-webapp-plan-task-8",
           "title": "Add local MissionContext",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Covered by the implemented comprehensive plan, npm run check PASS, and production E2E PASS."
+          ],
           "sourceHeading": "Task 8: Add local MissionContext"
         },
         {
           "id": "2026-06-02_220432-beredskapsboka-webapp-plan-task-9",
           "title": "Add public API context adapters",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Covered by the implemented comprehensive plan, npm run check PASS, and production E2E PASS."
+          ],
           "sourceHeading": "Task 9: Add public API context adapters"
         },
         {
           "id": "2026-06-02_220432-beredskapsboka-webapp-plan-task-10",
           "title": "Add exportable operational forms",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Covered by the implemented comprehensive plan, npm run check PASS, and production E2E PASS."
+          ],
           "sourceHeading": "Task 10: Add exportable operational forms"
         }
       ]
@@ -102,362 +139,501 @@
       "sourcePath": ".hermes/plans/2026-06-02_222210-comprehensive-implementation-plan.md",
       "sourceType": "hermes-plan",
       "summary": "Build a mobile-first, offline-capable PWA that turns the Obsidian Beredskapsboka knowledge bank into fast, source-backed operational support for Sivilforsvaret personnel before, during, and after incidents.",
-      "stage": "build",
+      "stage": "release",
       "risk": "high",
-      "status": "active",
+      "status": "completed",
+      "owner": "AR",
+      "completedAt": "2026-06-03T13:59:34.000Z",
+      "evidence": [
+        "npm run check PASS — content build, typecheck, lint, Vitest 97 tests, next build 95 pages.",
+        "PLAYWRIGHT_PORT=3007 npm run e2e:prod PASS — 9/9 production E2E tests.",
+        "Production app includes PWA/offline shell, source-backed cards, mission dashboard, context adapters, local exports, release board, and deploy docs."
+      ],
       "taskCount": 44,
-      "updatedAt": "2026-06-02T20:48:27.928Z",
+      "updatedAt": "2026-06-03T15:14:15.636Z",
       "tasks": [
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-1",
           "title": "Initialize git and repository hygiene",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 1: Initialize git and repository hygiene"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-2",
           "title": "Create Node/Next package manifest",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 2: Create Node/Next package manifest"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-3",
           "title": "Add TypeScript, Next, Tailwind, and test config",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 3: Add TypeScript, Next, Tailwind, and test config"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-4",
           "title": "Add minimal app shell with smoke test",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 4: Add minimal app shell with smoke test"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-5",
           "title": "Define taxonomy constants and labels",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 5: Define taxonomy constants and labels"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-6",
           "title": "Add Zod source and card schemas",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 6: Add Zod source and card schemas"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-7",
           "title": "Add checklist, training, protection, and glossary schemas",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 7: Add checklist, training, protection, and glossary schemas"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-8",
           "title": "Seed curated content YAML",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 8: Seed curated content YAML"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-9",
           "title": "Import Obsidian source extracts",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 9: Import Obsidian source extracts"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-10",
           "title": "Compile curated YAML to generated JSON",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 10: Compile curated YAML to generated JSON"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-11",
           "title": "Add content validation script",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 11: Add content validation script"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-12",
           "title": "Copy approved Obsidian assets",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 12: Copy approved Obsidian assets"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-13",
           "title": "Build search index",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 13: Build search index"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-14",
           "title": "Add content loader and wire content build",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 14: Add content loader and wire content build"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-15",
           "title": "Add mobile app shell and bottom navigation",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 15: Add mobile app shell and bottom navigation"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-16",
           "title": "Add role/phase/scenario filter helpers",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 16: Add role/phase/scenario filter helpers"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-17",
           "title": "Build Hurtigkort page",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 17: Build Hurtigkort page"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-18",
           "title": "Add phase pages Før/Under/Etter",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 18: Add phase pages Før/Under/Etter"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-19",
           "title": "Add card detail and source badges",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 19: Add card detail and source badges"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-20",
           "title": "Add source browser",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 20: Add source browser"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-21",
           "title": "Add search UI",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 21: Add search UI"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-22",
           "title": "Add PWA manifest and service worker registration",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 22: Add PWA manifest and service worker registration"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-23",
           "title": "Add mission schemas",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 23: Add mission schemas"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-24",
           "title": "Add IndexedDB local mission store",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 24: Add IndexedDB local mission store"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-25",
           "title": "Add mission create/list UI",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 25: Add mission create/list UI"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-26",
           "title": "Add checklist runner",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 26: Add checklist runner"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-27",
           "title": "Add Markdown export",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 27: Add Markdown export"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-28",
           "title": "Add privacy reset controls",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 28: Add privacy reset controls"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-29",
           "title": "Add integration type model and route guards",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 29: Add integration type model and route guards"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-30",
           "title": "Add source health state for adapters",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 30: Add source health state for adapters"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-31",
           "title": "Add Kartverket geocoding adapter",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 31: Add Kartverket geocoding adapter"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-32",
           "title": "Add MET weather adapter",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 32: Add MET weather adapter"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-33",
           "title": "Add NVE hazard adapter",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 33: Add NVE hazard adapter"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-34",
           "title": "Add mission context signal panel",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 34: Add mission context signal panel"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-35",
           "title": "Add tilfluktsrom module page",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 35: Add tilfluktsrom module page"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-36",
           "title": "Add CBRN, RADIAC, and MFE module landing pages",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 36: Add CBRN, RADIAC, and MFE module landing pages"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-37",
           "title": "Add training path page",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 37: Add training path page"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-38",
           "title": "Add 5-punktsordre and samband forms",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 38: Add 5-punktsordre and samband forms"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-39",
           "title": "Add first mobile Playwright journey",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 39: Add first mobile Playwright journey"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-40",
           "title": "Add content coverage regression tests",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 40: Add content coverage regression tests"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-41",
           "title": "Add accessibility and mobile quality checks",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 41: Add accessibility and mobile quality checks"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-42",
           "title": "Add security/privacy regression tests",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 42: Add security/privacy regression tests"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-43",
           "title": "Add README runbook and content editing guide",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 43: Add README runbook and content editing guide"
         },
         {
           "id": "2026-06-02_222210-comprehensive-implementation-plan-task-44",
           "title": "Final integrated gate",
-          "status": "planned",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
+          "evidence": [
+            "Verified by current repository implementation plus npm run check and production E2E gates."
+          ],
           "sourceHeading": "Task 44: Final integrated gate"
         }
       ]
@@ -470,56 +646,80 @@
       "summary": "Turn the MVP from a passing prototype into a safer, more operable offline PWA by fixing the highest-value audit findings found in the comprehensive review.",
       "stage": "verify",
       "risk": "high",
-      "status": "active",
+      "status": "completed",
+      "owner": "AR",
+      "completedAt": "2026-06-03T13:59:34.000Z",
+      "evidence": [
+        "npm run check PASS after lint, privacy, content validation, offline, E2E build, and route guard remediation.",
+        "PLAYWRIGHT_PORT=3007 npm run e2e:prod PASS — 9/9 production E2E tests."
+      ],
       "taskCount": 6,
-      "updatedAt": "2026-06-02T23:40:55.423Z",
+      "updatedAt": "2026-06-03T15:14:15.636Z",
       "tasks": [
         {
           "id": "2026-06-03_014024-comprehensive-review-remediation-plan-task-1",
           "title": "Restore lint as a real quality gate",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "evidence": [
+            "npm run lint PASS inside npm run check."
+          ],
           "sourceHeading": "Task 1: Restore lint as a real quality gate"
         },
         {
           "id": "2026-06-03_014024-comprehensive-review-remediation-plan-task-2",
           "title": "Redact local filesystem provenance from generated/public source content",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "evidence": [
+            "tests/security/privacy-boundaries.test.ts PASS inside npm run check."
+          ],
           "sourceHeading": "Task 2: Redact local filesystem provenance from generated/public source content"
         },
         {
           "id": "2026-06-03_014024-comprehensive-review-remediation-plan-task-3",
           "title": "Harden content graph validation and source policy",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "evidence": [
+            "tests/content/validate-content.test.ts and tests/security/privacy-boundaries.test.ts PASS inside npm run check."
+          ],
           "sourceHeading": "Task 3: Harden content graph validation and source policy"
         },
         {
           "id": "2026-06-03_014024-comprehensive-review-remediation-plan-task-4",
           "title": "Precache generated routes for cold offline navigation",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "evidence": [
+            "tests/e2e/offline.spec.ts PASS inside production E2E."
+          ],
           "sourceHeading": "Task 4: Precache generated routes for cold offline navigation"
         },
         {
           "id": "2026-06-03_014024-comprehensive-review-remediation-plan-task-5",
           "title": "Make production E2E self-building",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "evidence": [
+            "package.json e2e/e2e:prod self-build scripts present; production E2E PASS."
+          ],
           "sourceHeading": "Task 5: Make production E2E self-building"
         },
         {
           "id": "2026-06-03_014024-comprehensive-review-remediation-plan-task-6",
           "title": "Harden context route query handling and provenance refs",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "evidence": [
+            "tests/integrations/route-guards.test.ts PASS inside npm run check."
+          ],
           "sourceHeading": "Task 6: Harden context route query handling and provenance refs"
         }
       ]
