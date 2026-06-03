@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T20:51:00.951Z",
+  "generatedAt": "2026-06-03T21:31:11.223Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-03T20:51:00.951Z",
+      "updatedAt": "2026-06-03T21:31:11.223Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -2267,177 +2267,265 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-118",
           "title": "Expand 5-punktsordre form with role-specific templates for lagleder.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 118: Expand 5-punktsordre form with role-specific templates for lagleder."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-119",
           "title": "Expand 5-punktsordre form with role-specific templates for FIG-leder.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 119: Expand 5-punktsordre form with role-specific templates for FIG-leder."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-120",
           "title": "Expand 5-punktsordre form with role-specific templates for MFE.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 120: Expand 5-punktsordre form with role-specific templates for MFE."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-121",
           "title": "Expand 5-punktsordre form with role-specific templates for LIA/liaison.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 121: Expand 5-punktsordre form with role-specific templates for LIA/liaison."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-122",
           "title": "Expand 5-punktsordre form with role-specific templates for beredskapsvakt.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 122: Expand 5-punktsordre form with role-specific templates for beredskapsvakt."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-123",
           "title": "Add explicit readback/forstått confirmation to 5-punktsordre workflow.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 123: Add explicit readback/forstått confirmation to 5-punktsordre workflow."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-124",
           "title": "Add printable 5-punktsordre view.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 124: Add printable 5-punktsordre view."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-125",
           "title": "Add source/version metadata to 5-punktsordre exports.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 125: Add source/version metadata to 5-punktsordre exports."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-126",
           "title": "Add PDF export for 5-punktsordre after Markdown/JSON output is stable.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 126: Add PDF export for 5-punktsordre after Markdown/JSON output is stable."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-127",
           "title": "Expand sambandsplan form with primary talegruppe/channel field.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 127: Expand sambandsplan form with primary talegruppe/channel field."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-128",
           "title": "Expand sambandsplan form with fallback channel/contact method field.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 128: Expand sambandsplan form with fallback channel/contact method field."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-129",
           "title": "Expand sambandsplan form with callsign/kallesignal field.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 129: Expand sambandsplan form with callsign/kallesignal field."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-130",
           "title": "Expand sambandsplan form with IL-KO contact field.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 130: Expand sambandsplan form with IL-KO contact field."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-131",
           "title": "Expand sambandsplan form with district/beredskapsvakt contact field.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 131: Expand sambandsplan form with district/beredskapsvakt contact field."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-132",
           "title": "Expand sambandsplan form with check-in interval field.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 132: Expand sambandsplan form with check-in interval field."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-133",
           "title": "Expand sambandsplan form with lost-comms procedure field.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 133: Expand sambandsplan form with lost-comms procedure field."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-134",
           "title": "Expand sambandsplan form with battery/charging status field.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 134: Expand sambandsplan form with battery/charging status field."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-135",
           "title": "Add generic role-specific sambandsplan templates without sensitive Nødnett details.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 135: Add generic role-specific sambandsplan templates without sensitive Nødnett details."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-136",
           "title": "Add sambandsjekk checklist.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 136: Add sambandsjekk checklist."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-137",
           "title": "Add printable sambandsplan view.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 137: Add printable sambandsplan view."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-138",
           "title": "Add source/version metadata to sambandsplan exports.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 138: Add source/version metadata to sambandsplan exports."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-139",
           "title": "Add PDF export for sambandsplan after Markdown/JSON output is stable.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-03T21:31:01.000Z",
+          "evidence": [
+            "Implemented in commits a5961e3 and 7e4a67d (role-specific 5-punktsordre and sambandsplan templates, readback confirmation, source/version metadata, Markdown/JSON/PDF-ready HTML exports, sambandsjekk checklist, stale-preview/contentVersion/readback hardening). Gates: targeted vitest 3 files/17 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec reviews PASS; code quality reviews APPROVED."
+          ],
           "sourceHeading": "Task 139: Add PDF export for sambandsplan after Markdown/JSON output is stable."
         },
         {
