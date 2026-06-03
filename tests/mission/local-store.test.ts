@@ -86,6 +86,33 @@ it('stores local mission tasks, quick status log and resource requests with allo
   expect(stored.resourceRequests.map((request) => request.kind)).toEqual(['water', 'ppe']);
 });
 
+it('stores structured field log entries and defaults old missions to an empty field log', async () => {
+  const oldMission = MissionContextSchema.parse({ ...baseMission, id: 'mission-old-field-log-default' });
+  const mission = MissionContextSchema.parse({
+    ...baseMission,
+    id: 'mission-field-log-roundtrip',
+    fieldLogEntries: [
+      {
+        id: 'field-log-1',
+        timestamp: '2026-06-03T10:06:00.000Z',
+        locationText: 'Sperrepunkt øst',
+        category: 'observasjon',
+        text: 'Vannstand stiger uten persondata',
+        linkedMissionId: 'mission-field-log-roundtrip',
+        criticalObservation: true,
+        mustBeForwarded: true,
+      },
+    ],
+  });
+
+  await saveMission(oldMission);
+  await saveMission(mission);
+
+  expect((await getMission(oldMission.id))?.fieldLogEntries).toEqual([]);
+  expect((await getMission(mission.id))?.fieldLogEntries).toEqual(mission.fieldLogEntries);
+  expect((await listMissions()).find((stored) => stored.id === mission.id)?.fieldLogEntries[0]?.category).toBe('observasjon');
+});
+
 it('rejects unsupported local task statuses and quick status messages', () => {
   expect(MissionContextSchema.safeParse({
     ...baseMission,

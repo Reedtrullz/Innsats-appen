@@ -18,6 +18,7 @@ const mission: MissionContext = {
   tasks: [],
   statusLog: [],
   resourceRequests: [],
+  fieldLogEntries: [],
   contentVersion: 'test-v1',
   schemaVersion: 1,
 };

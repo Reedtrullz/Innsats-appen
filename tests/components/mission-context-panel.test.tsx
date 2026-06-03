@@ -253,6 +253,95 @@ it('archives pending lessons and feedback typed without clicking the separate sa
   });
 });
 
+it('lets users add, filter and export a structured local field log with patient-data safeguards', async () => {
+  await saveMission({
+    id: 'm6a-field-log-ui',
+    title: 'FIG feltlogg UI',
+    createdAt: '2026-06-04T08:00:00.000Z',
+    updatedAt: '2026-06-04T08:30:00.000Z',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'generelt',
+    locationText: 'Innsatsområde feltlogg',
+    externalSignals: [],
+    activeChecklistIds: ['fig-under-innsats'],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [],
+    fieldLogEntries: [
+      {
+        id: 'field-log-existing-ui',
+        timestamp: '2026-06-04T08:40:00.000Z',
+        locationText: 'Depot',
+        category: 'ressursbehov',
+        text: 'Trenger ekstra lysmast',
+        criticalObservation: false,
+        mustBeForwarded: true,
+      },
+    ],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  } as any);
+
+  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+
+  expect(await screen.findByRole('heading', { name: /Lokal feltlogg/i })).toBeInTheDocument();
+  expect(screen.getAllByText(/Ikke offisiell logg/i).length).toBeGreaterThan(0);
+  expect(screen.getByText(/ikke registrer navn, ID, fødselsdato, fødselsnummer, diagnose, behandling, journal, helseopplysninger eller pasientdata/i)).toBeInTheDocument();
+  expect(screen.getByText(/Trenger ekstra lysmast/i)).toBeInTheDocument();
+
+  await userEvent.clear(screen.getByLabelText(/Feltlogg tidspunkt/i));
+  await userEvent.type(screen.getByLabelText(/Feltlogg tidspunkt/i), '2026-06-04T09:05');
+  await userEvent.type(screen.getByLabelText(/Feltlogg lokasjon/i), 'Sperrepunkt A');
+  await userEvent.selectOptions(screen.getByLabelText(/Feltlogg kategori/i), 'observasjon');
+  await userEvent.type(screen.getByLabelText(/Feltlogg tekst/i), 'Vannstand stiger ved bekk');
+  await userEvent.click(screen.getByRole('checkbox', { name: /Kritisk observasjon/i }));
+  await userEvent.click(screen.getByRole('checkbox', { name: /Må videresendes/i }));
+  const expectedFieldLogTimestamp = new Date('2026-06-04T09:05').toISOString();
+  await userEvent.click(screen.getByRole('button', { name: /Legg til feltlogg/i }));
+
+  await waitFor(async () => {
+    const [mission] = await listMissions();
+    expect(mission.fieldLogEntries.map((entry) => entry.text)).toEqual(expect.arrayContaining(['Trenger ekstra lysmast', 'Vannstand stiger ved bekk']));
+    expect(mission.fieldLogEntries.find((entry) => entry.text === 'Vannstand stiger ved bekk')).toMatchObject({
+      timestamp: expectedFieldLogTimestamp,
+      locationText: 'Sperrepunkt A',
+      category: 'observasjon',
+      criticalObservation: true,
+      mustBeForwarded: true,
+    });
+  });
+
+  expect(screen.getByText(/Sperrepunkt A/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/Kritisk observasjon/i).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/Må videresendes/i).length).toBeGreaterThan(0);
+
+  await userEvent.type(screen.getByLabelText(/Søk i feltlogg/i), 'vannstand');
+  expect(screen.getByText(/Vannstand stiger ved bekk/i)).toBeInTheDocument();
+  await waitFor(() => expect(screen.queryByText(/Trenger ekstra lysmast/i)).not.toBeInTheDocument());
+  await userEvent.selectOptions(screen.getByLabelText(/Filtrer feltloggkategori/i), 'observasjon');
+  expect(screen.getByText(/Vannstand stiger ved bekk/i)).toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('button', { name: /Lag feltlogg Markdown/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Lag feltlogg JSON/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Lag PDF-klar feltlogg/i }));
+
+  const markdownPreview = screen.getByLabelText(/Feltlogg Markdown/i) as HTMLTextAreaElement;
+  const jsonPreview = screen.getByLabelText(/Feltlogg JSON/i) as HTMLTextAreaElement;
+  const pdfPreview = screen.getByLabelText(/PDF-klar feltlogg HTML/i) as HTMLTextAreaElement;
+  expect(markdownPreview.value).toContain('# Lokal feltlogg');
+  expect(markdownPreview.value).toContain('Vannstand stiger ved bekk');
+  expect(markdownPreview.value).toContain('ikke registrer navn, ID, fødselsdato');
+  const exportedFieldLogJson = JSON.parse(jsonPreview.value);
+  expect(exportedFieldLogJson.mission.id).toBeUndefined();
+  expect(exportedFieldLogJson.entries[0].id).toBeUndefined();
+  expect(exportedFieldLogJson.entries[0].linkedMissionId).toBe('m6a-field-log-ui');
+  expect(jsonPreview.value).not.toMatch(/indexedDB|objectStore/i);
+  expect(pdfPreview.value).toContain('<!doctype html>');
+  expect(pdfPreview.value).toContain('Skriv ut &gt; Lagre som PDF');
+});
+
 it('shows current situation and lets users add local tasks, quick status and resource requests', async () => {
   await saveMission({
     id: 'm2b-ui',

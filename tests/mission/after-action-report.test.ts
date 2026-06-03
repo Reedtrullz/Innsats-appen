@@ -35,6 +35,7 @@ const mission: MissionContext = {
     { id: 'resource-1', kind: 'fuel', status: 'done', createdAt: '2026-06-03T09:30:00.000Z', quantity: '15 liter', note: 'Brukt på kjøretøy' },
     { id: 'resource-2', kind: 'equipment', status: 'blocked', createdAt: '2026-06-03T09:45:00.000Z', quantity: '1 stk', note: 'Skadet arbeidslys' },
   ],
+  fieldLogEntries: [],
   lessonsLearned: {
     summary: 'Kort læring fra lokal etterkontroll',
     whatWorked: 'Rask rollefordeling og tydelig depotpunkt',

@@ -53,6 +53,31 @@ export const MissionStatusLogItemSchema = z
 
 export const ResourceRequestKindSchema = z.enum(['water', 'food', 'ppe', 'medical-support', 'transport', 'fuel', 'equipment']);
 
+export const FieldLogCategorySchema = z.enum([
+  'funn',
+  'skadet-person',
+  'ressursbehov',
+  'hms-avvik',
+  'observasjon',
+  'samband',
+  'materiell',
+  'vaer-fare',
+  'beslutning',
+]);
+
+export const FieldLogEntrySchema = z
+  .object({
+    id: z.string().min(1),
+    timestamp: z.string().datetime(),
+    locationText: z.string().optional(),
+    category: FieldLogCategorySchema,
+    text: z.string().min(1),
+    linkedMissionId: z.string().optional(),
+    criticalObservation: z.boolean().default(false),
+    mustBeForwarded: z.boolean().default(false),
+  })
+  .strict();
+
 export const MissionResourceRequestSchema = z
   .object({
     id: z.string().min(1),
@@ -102,6 +127,7 @@ export const MissionContextSchema = z
     tasks: z.array(MissionTaskSchema).default([]),
     statusLog: z.array(MissionStatusLogItemSchema).default([]),
     resourceRequests: z.array(MissionResourceRequestSchema).default([]),
+    fieldLogEntries: z.array(FieldLogEntrySchema).default([]),
     lessonsLearned: MissionLessonsLearnedSchema.optional(),
     feedback: MissionFeedbackSchema.optional(),
     completedAt: z.string().datetime().optional(),
@@ -135,5 +161,7 @@ export type QuickStatusMessage = z.infer<typeof QuickStatusMessageSchema>;
 export type MissionStatusLogItem = z.infer<typeof MissionStatusLogItemSchema>;
 export type ResourceRequestKind = z.infer<typeof ResourceRequestKindSchema>;
 export type MissionResourceRequest = z.infer<typeof MissionResourceRequestSchema>;
+export type FieldLogCategory = z.infer<typeof FieldLogCategorySchema>;
+export type FieldLogEntry = z.infer<typeof FieldLogEntrySchema>;
 export type MissionLessonsLearned = z.infer<typeof MissionLessonsLearnedSchema>;
 export type MissionFeedback = z.infer<typeof MissionFeedbackSchema>;
