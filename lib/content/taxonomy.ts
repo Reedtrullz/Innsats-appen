@@ -33,7 +33,22 @@ export const scenarios = [
 ] as const;
 export type Scenario = (typeof scenarios)[number];
 
-export const competenceCodes = ['FIG10', 'RAD10', 'MRE10', 'MFE10', 'FIG20', 'FIG30', 'FIG31', 'RAD30', 'MRE30'] as const;
+export const competenceCodes = [
+  'FIG10',
+  'FIG20',
+  'FIG30',
+  'FIG31',
+  'MFE10',
+  'MRE10',
+  'MRE30',
+  'RAD10',
+  'RAD30',
+  'ATV',
+  'BAT',
+  'LETT_LASTEBIL',
+  'SPS40',
+  'SPS41',
+] as const;
 export type CompetenceCode = (typeof competenceCodes)[number];
 
 export const equipmentTerms = [
@@ -91,15 +106,20 @@ export const scenarioLabels: Record<Scenario, string> = {
 };
 
 export const competenceLabels: Record<CompetenceCode, string> = {
-  FIG10: 'FIG10 grunnkurs',
-  RAD10: 'RAD10 RADIAC mannskap',
-  MRE10: 'MRE10 mobil renseenhet',
-  MFE10: 'MFE10 mobil forsterkningsenhet',
+  FIG10: 'FIG10 grunnkurs FIG/FIGP',
   FIG20: 'FIG20 lagfører FIG/FIGP',
   FIG30: 'FIG30 leder FIG/FIGP',
   FIG31: 'FIG31 videregående leder/nestleder',
-  RAD30: 'RAD30 lagfører RADIAC',
+  MFE10: 'MFE10 mobil forsterkningsenhet',
+  MRE10: 'MRE10 mobil renseenhet',
   MRE30: 'MRE30 lagfører/leder MRE',
+  RAD10: 'RAD10 RADIAC mannskap',
+  RAD30: 'RAD30 lagfører RADIAC',
+  ATV: 'ATV føreropplæring',
+  BAT: 'Båtføreropplæring',
+  LETT_LASTEBIL: 'Fører lett lastebil med tilhenger',
+  SPS40: 'SPS40 samvirke på skadested',
+  SPS41: 'SPS41 samvirke på forurenset skadested CBRN/E',
 };
 
 export const equipmentLabels: Record<EquipmentTerm, string> = {

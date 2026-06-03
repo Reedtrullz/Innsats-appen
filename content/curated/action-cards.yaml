@@ -53,6 +53,7 @@
     - Rapporter åpning, kapasitet, teknisk status, avvik og behov.
   sourceIds: [src-deep-research-tilfluktsrom]
   competenceRequired: []
+  competenceRationale: Tilfluktsromstøtte varierer lokalt og må styres av ansvarlig myndighet, eier og lokal opplæring.
   equipmentRequired: [ventilasjon, nodstrom, vann, sanitaer, belysning, samband]
   warning: Researchbasert støtte, ikke offisiell ordre eller fullstendig oversikt. Bruk bare godkjent informasjon.
 
@@ -109,6 +110,7 @@
     - Loggfør anmodning, tidspunkt, beslutning og ressursstatus.
   sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-mobile-forsterkningsenheter-mfe]
   competenceRequired: []
+  competenceRationale: Anmodning og mottak av MFE er leder-/beredskapsvaktprosess; selve MFE-oppgaven utføres av trent MFE-personell.
   warning: Kontroller mot gjeldende distriktets tiltakskort.
 
 - slug: psykososial-forstehjelp
@@ -181,6 +183,7 @@
     - Loggfør informasjonsbehov og henvendelser.
   sourceIds: [src-jodtabletter-i-sivilforsvaret, src-atomberedskap-i-norge-og-sivilforsvarets-rolle]
   competenceRequired: []
+  competenceRationale: Jodtablettkortet peker kun til offisiell myndighetsinformasjon; radiac måling og dosevurdering krever RADIAC-kompetanse.
   warning: Følg alltid offisielle råd fra myndighetene.
 
 - slug: fig-for-innsats

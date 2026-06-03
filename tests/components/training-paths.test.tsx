@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
+import { TrainingPathDetail } from '@/app/(app)/laering/[slug]/page';
 import { TrainingPathsPageContent } from '@/app/(app)/laering/page';
-import type { ActionCard, TrainingPath } from '@/lib/content/schemas';
+import type { ActionCard, SourceDocument, TrainingPath } from '@/lib/content/schemas';
 
 const paths = [
   {
@@ -57,6 +58,21 @@ const cards = [
   { slug: 'mfe-anmodning', title: 'Anmodning om MFE-støtte', phase: 'for', roles: ['mfe'], scenarios: ['mfe-stotte'], priority: 'medium', steps: ['anmodning'], safety: [], reporting: [], sourceIds: ['src-mfe'], competenceRequired: [] },
 ] satisfies ActionCard[];
 
+const testSource = (overrides: Partial<SourceDocument>): SourceDocument => ({
+  id: 'src-test',
+  title: 'SRC - Test',
+  sourcePath: 'source-extracts/SRC - Test.md',
+  sourceType: 'source-extract',
+  status: 'verified',
+  verifiedAt: '2026-06-03',
+  owner: 'content-team',
+  reviewer: 'fagansvarlig',
+  reviewRisk: 'low',
+  body: 'Test',
+  warnings: [],
+  ...overrides,
+});
+
 it('shows FIG10 baseline, specialist training paths, source IDs, and linked cards', () => {
   render(<TrainingPathsPageContent paths={paths} cards={cards} />);
   expect(screen.getByRole('heading', { name: /Opplæring/i, level: 1 })).toBeInTheDocument();
@@ -69,7 +85,32 @@ it('shows FIG10 baseline, specialist training paths, source IDs, and linked card
   for (const cardTitle of ['RADIAC dosekontroll', 'Startkort CBRN/CBRNE', 'Anmodning om MFE-støtte']) {
     expect(screen.getByRole('link', { name: new RegExp(cardTitle, 'i') })).toHaveAttribute('href', expect.stringMatching(/^\/kort\//));
   }
+  for (const path of paths) {
+    expect(screen.getByRole('link', { name: new RegExp(path.title, 'i') })).toHaveAttribute('href', `/laering/${path.slug}`);
+  }
   expect(screen.getByText(/src-kursplan-grunnkurs-fig10/i)).toBeInTheDocument();
   expect(screen.getByText(/src-grunnopplaering-mfe-10-mannskap/i)).toBeInTheDocument();
   expect(screen.getAllByText(/RAD10/i).length).toBeGreaterThan(1);
+});
+
+it('renders training path detail from injected source documents', () => {
+  const path = {
+    slug: 'sps-detail',
+    courseCode: 'SPS41',
+    title: 'SPS41 samvirke på forurenset skadested CBRN/E',
+    targetRoles: ['lagforer', 'leder'],
+    duration: 'Etter kursplan',
+    prerequisites: ['FIG10'],
+    skills: ['CBRN/E-samvirke'],
+    sourceIds: ['src-injected-sps41'],
+    linkedCardSlugs: ['cbrne-startkort'],
+  } satisfies TrainingPath;
+  const sources = [testSource({ id: 'src-injected-sps41', title: 'SRC - Injected SPS41 source', body: 'Injected SPS41 source body' })];
+
+  render(<TrainingPathDetail path={path} cards={cards} sources={sources} />);
+
+  expect(screen.getByRole('heading', { name: /SPS41 samvirke/i })).toBeInTheDocument();
+  expect(screen.getByText(/Lagfører, Leder/i)).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /Startkort CBRN\/CBRNE/i })).toHaveAttribute('href', '/kort/cbrne-startkort');
+  expect(screen.getByText(/SRC - Injected SPS41 source/i)).toBeInTheDocument();
 });

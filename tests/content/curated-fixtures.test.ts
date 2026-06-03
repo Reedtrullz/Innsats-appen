@@ -1,7 +1,40 @@
 import fs from 'node:fs';
 import yaml from 'js-yaml';
+import { competenceCodes, competenceLabels } from '@/lib/content/taxonomy';
 
 const readYaml = (path: string) => yaml.load(fs.readFileSync(path, 'utf8')) as any[];
+
+const group5ACompetenceLabels: Record<string, RegExp> = {
+  FIG10: /FIG10|grunnkurs/i,
+  FIG20: /FIG20|lagfører/i,
+  FIG30: /FIG30|leder/i,
+  FIG31: /FIG31|videregående/i,
+  MFE10: /MFE10|mobil forsterkningsenhet/i,
+  MRE10: /MRE10|mobil renseenhet/i,
+  MRE30: /MRE30|lagfører.*MRE|leder.*MRE/i,
+  RAD10: /RAD10|RADIAC/i,
+  RAD30: /RAD30|RADIAC/i,
+  ATV: /ATV/i,
+  BAT: /båt|BAT/i,
+  LETT_LASTEBIL: /lett lastebil/i,
+  SPS40: /SPS40|samvirke på skadested/i,
+  SPS41: /SPS41|forurenset skadested|CBRN/i,
+};
+
+const group5ATrainingCodes = [
+  'FIG20',
+  'FIG30',
+  'FIG31',
+  'RAD30',
+  'MRE30',
+  'ATV',
+  'BAT',
+  'LETT_LASTEBIL',
+  'SPS40',
+  'SPS41',
+];
+
+const highRiskCompetenceScenarios = new Set(['cbrn-cbrne', 'radiac-nedfall', 'mfe-stotte', 'skogbrann', 'skred', 'samleplass-skadde']);
 
 const group4ActionCardSlugs = [
   'oppdragsanalyse',
@@ -161,6 +194,61 @@ it('curated YAML includes required starter slugs', () => {
     expect(template?.sourceIds).toEqual(['src-kommunikasjons-og-sambandsdiagram']);
     expect(template?.audienceRoles).toEqual(expect.arrayContaining(['lagforer', 'leder', 'mfe', 'liaison', 'beredskapsvakt']));
     expect(template?.description).toMatch(/lokal|PDF-klar|JSON|Markdown/i);
+  }
+});
+
+it('taxonomy includes Group 5A competence codes with Norwegian labels', () => {
+  for (const [code, labelPattern] of Object.entries(group5ACompetenceLabels)) {
+    expect(competenceCodes, `missing competence code ${code}`).toContain(code);
+    expect(competenceLabels[code as keyof typeof competenceLabels], `${code} must have a Norwegian label`).toMatch(labelPattern);
+  }
+});
+
+it('curated training paths include Group 5A competence records with source IDs and useful card links', () => {
+  const training = readYaml('content/curated/training-paths.yaml');
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const sourceIds = new Set(readYaml('content/generated/source-documents.json').map((source) => source.id));
+  const cardSlugs = new Set(cards.map((card) => card.slug));
+  const byCode = new Map(training.map((path) => [path.courseCode, path]));
+
+  expect([...byCode.keys()]).toEqual(expect.arrayContaining([...Object.keys(group5ACompetenceLabels)]));
+
+  for (const code of group5ATrainingCodes) {
+    const path = byCode.get(code);
+    expect(path, `missing training path for ${code}`).toBeTruthy();
+    expect(path.slug, `${code} slug`).toEqual(expect.any(String));
+    expect(path.title, `${code} title`).toMatch(group5ACompetenceLabels[code]);
+    expect(path.sourceIds?.length, `${code} must cite at least one existing source`).toBeGreaterThan(0);
+    for (const sourceId of path.sourceIds ?? []) {
+      expect(sourceIds, `${code} references missing source ${sourceId}`).toContain(sourceId);
+    }
+    for (const linkedSlug of path.linkedCardSlugs ?? []) {
+      expect(cardSlugs, `${code} links missing action card ${linkedSlug}`).toContain(linkedSlug);
+    }
+  }
+
+  expect(byCode.get('FIG20')?.linkedCardSlugs).toEqual(expect.arrayContaining(['oppdragsanalyse', 'ledelse-kommando-kontroll']));
+  expect(byCode.get('RAD30')?.linkedCardSlugs).toEqual(expect.arrayContaining(['radiac-malepunkt', 'radiac-oppholdstid-rullering']));
+  expect(byCode.get('MRE30')?.linkedCardSlugs).toEqual(expect.arrayContaining(['mre-ren-uren-side-grovrens']));
+  expect(byCode.get('ATV')?.linkedCardSlugs).toEqual(expect.arrayContaining(['kjoretoy-transportberedskap']));
+  expect(byCode.get('BAT')?.linkedCardSlugs).toEqual(expect.arrayContaining(['evakueringsstotte']));
+  expect(byCode.get('LETT_LASTEBIL')?.linkedCardSlugs).toEqual(expect.arrayContaining(['kjoretoy-transportberedskap']));
+  expect(byCode.get('SPS41')?.linkedCardSlugs).toEqual(expect.arrayContaining(['cbrne-soneinndeling']));
+  expect(byCode.get('SPS40')?.targetRoles).toEqual(['lagforer', 'leder']);
+  expect(byCode.get('SPS41')?.targetRoles).toEqual(['lagforer', 'leder']);
+});
+
+it('high-risk action cards declare competence requirements or an explicit competence rationale', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const highRiskCards = cards.filter(
+    (card) => card.priority === 'high' || (card.scenarios ?? []).some((scenario: string) => highRiskCompetenceScenarios.has(scenario)),
+  );
+
+  expect(highRiskCards.length).toBeGreaterThan(0);
+  for (const card of highRiskCards) {
+    const hasCompetence = (card.competenceRequired ?? []).length > 0;
+    const hasRationale = typeof card.competenceRationale === 'string' && card.competenceRationale.trim().length > 0;
+    expect(hasCompetence || hasRationale, `${card.slug} must have competenceRequired or competenceRationale`).toBe(true);
   }
 });
 

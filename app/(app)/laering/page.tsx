@@ -45,7 +45,7 @@ export function TrainingPathsPageContent({ paths, cards }: { paths: TrainingPath
       <section className="rounded-3xl bg-sky-950 p-5 text-white">
         <p className="text-sm font-semibold uppercase tracking-wide text-sky-100">Kompetanseoversikt</p>
         <h1 className="text-3xl font-black">Opplæring</h1>
-        <p className="mt-2 text-sm text-sky-100">FIG10 som baseline for mannskap og videre specialistløp for RADIAC, MRE og MFE.</p>
+        <p className="mt-2 text-sm text-sky-100">FIG10 som baseline for mannskap og videre kompetanseløp for ledelse, RADIAC, MRE, MFE, ATV/båt, transport og samvirke.</p>
       </section>
 
       <section className="rounded-3xl border border-amber-200 bg-amber-50 p-4 text-amber-950">
@@ -59,7 +59,9 @@ export function TrainingPathsPageContent({ paths, cards }: { paths: TrainingPath
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-black uppercase tracking-wide text-sky-800">{path.courseCode}</p>
-                <h2 className="text-2xl font-black">{path.title}</h2>
+                <h2 className="text-2xl font-black">
+                  <Link className="text-slate-950 hover:text-sky-800" href={`/laering/${path.slug}`}>{path.title}</Link>
+                </h2>
               </div>
               {path.courseCode === 'FIG10' ? <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-900">Baseline for mannskap</span> : null}
             </div>

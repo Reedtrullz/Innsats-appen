@@ -16,7 +16,7 @@
   prerequisites: [FIG10]
   skills: [dosimeter, dosekontroll, målepunkter, rapportering]
   sourceIds: [src-grunnopplaering-rad-10-mannskap]
-  linkedCardSlugs: [radiac-dosekontroll, jod-atomberedskap]
+  linkedCardSlugs: [radiac-dosekontroll, radiac-malepunkt, radiac-oppholdstid-rullering, jod-atomberedskap]
 
 - slug: mre10-grunnkurs
   courseCode: MRE10
@@ -26,7 +26,7 @@
   prerequisites: [FIG10]
   skills: [rens, CBRN, verneutstyr, soneinndeling]
   sourceIds: [src-opplaering-mannskap-mre10]
-  linkedCardSlugs: [cbrne-startkort, mre-rens-start]
+  linkedCardSlugs: [cbrne-startkort, cbrne-soneinndeling, cbrne-verneutstyr-stoppkriterier, mre-rens-start, mre-ren-uren-side-grovrens]
 
 - slug: mfe10-grunnkurs
   courseCode: MFE10
@@ -36,4 +36,104 @@
   prerequisites: [FIG10]
   skills: [mobilisering, logistikk, ressursstøtte]
   sourceIds: [src-grunnopplaering-mfe-10-mannskap]
-  linkedCardSlugs: [mfe-anmodning]
+  linkedCardSlugs: [mfe-anmodning, mfe-anmodning-mottak-oppfolging]
+
+- slug: fig20-lagforer
+  courseCode: FIG20
+  title: FIG20 lagfører FIG/FIGP
+  targetRoles: [lagforer]
+  duration: 2 uker
+  prerequisites: [FIG10]
+  skills: [lagledelse, oppdragsanalyse, ordre, sikkerhetsvurdering, samvirke]
+  sourceIds: [src-opplaering-lagforer-fig-figp-fig20]
+  linkedCardSlugs: [oppdragsanalyse, obbo-beslutningssloyfe, ledelse-kommando-kontroll, alvorlig-ulykke-dod-eget-personell]
+
+- slug: fig30-leder
+  courseCode: FIG30
+  title: FIG30 leder FIG/FIGP
+  targetRoles: [leder]
+  duration: 2 uker
+  prerequisites: [FIG20]
+  skills: [avdelingsledelse, kommando, kontroll, innsatsledelse, ressursprioritering]
+  sourceIds: [src-opplaering-leder-fig-figp-fig30]
+  linkedCardSlugs: [ledelse-kommando-kontroll, oppdragsanalyse, obbo-beslutningssloyfe, presse-og-mediahandtering]
+
+- slug: fig31-videregaende-leder
+  courseCode: FIG31
+  title: FIG31 videregående kurs for ledere og nestledere
+  targetRoles: [leder, lagforer]
+  duration: 3 dager
+  prerequisites: [FIG30]
+  skills: [psykologisk førstehjelp, stressforebygging, lederstøtte, oppfølging]
+  sourceIds: [src-videregaende-kurs-ledere-og-nestledere-fig31]
+  linkedCardSlugs: [psykologisk-forstehjelp-sekvens, psykososial-ikke-tvungen-debrief, alvorlig-ulykke-dod-eget-personell]
+
+- slug: rad30-lagforer
+  courseCode: RAD30
+  title: RAD30 lagfører RADIAC måletjeneste
+  targetRoles: [rad, lagforer]
+  duration: Etter lokal plan
+  prerequisites: [RAD10]
+  skills: [lagledelse RADIAC, måleplan, doseoppfølging, rapportering, rullering]
+  sourceIds: [src-opplaering-lagforer-radiac-rad30]
+  linkedCardSlugs: [radiac-malepunkt, radiac-oppholdstid-rullering, radiac-dosekontroll]
+
+- slug: mre30-lagforer-leder
+  courseCode: MRE30
+  title: MRE30 lagfører og leder mobil renseenhet
+  targetRoles: [mre, lagforer, leder]
+  duration: Etter lokal plan
+  prerequisites: [MRE10]
+  skills: [MRE-ledelse, ren og uren side, grovrens, CBRN-sikkerhet, ressursstyring]
+  sourceIds: [src-opplaering-lagforer-og-leder-mre30]
+  linkedCardSlugs: [mre-ren-uren-side-grovrens, cbrne-soneinndeling, cbrne-verneutstyr-stoppkriterier, mre-rens-start]
+
+- slug: atv-foreropplaering
+  courseCode: ATV
+  title: ATV føreropplæring
+  targetRoles: [atv-bat]
+  duration: Etter lokal plan
+  prerequisites: [FIG10]
+  skills: [terrengkjøring, sikker kjøretøybruk, tilhenger, kontroll og stell]
+  sourceIds: [src-opplaering-forer-av-atb]
+  linkedCardSlugs: [kjoretoy-transportberedskap, rute-og-evakueringsvei]
+
+- slug: bat-foreropplaering
+  courseCode: BAT
+  title: Båtføreropplæring
+  targetRoles: [atv-bat]
+  duration: Etter lokal plan
+  prerequisites: [FIG10]
+  skills: [sikker ferdsel på sjø, praktisk båtføring, stell av båt, risikovurdering]
+  sourceIds: [src-opplaering-forer-av-bat]
+  linkedCardSlugs: [evakueringsstotte, rute-og-evakueringsvei]
+
+- slug: lett-lastebil-forer
+  courseCode: LETT_LASTEBIL
+  title: Fører lett lastebil med tilhenger
+  targetRoles: [materiellansvarlig, stab-logistikk]
+  duration: Etter lokal plan
+  prerequisites: [FIG10]
+  skills: [transportberedskap, kjøretøykontroll, tilhenger, last og sikkerhet]
+  sourceIds: [src-vedlegg-b-kurs-i-sivilforsvaret, src-sjekkliste-fig-og-figp]
+  linkedCardSlugs: [kjoretoy-transportberedskap, fig-for-innsats, fig-etterinnsats-klargjoring]
+
+- slug: sps40-samvirke-skadested
+  courseCode: SPS40
+  title: SPS40 samvirke på skadested
+  targetRoles: [lagforer, leder]
+  duration: Etter kursoversikt
+  prerequisites: [FIG10]
+  skills: [samvirke, skadestedsforståelse, rolleavklaring, sikker innsats]
+  sourceIds: [src-vedlegg-b-kurs-i-sivilforsvaret]
+  linkedCardSlugs: [ledelse-kommando-kontroll, oppdragsanalyse, skred-sikkerhet-samvirke, samleplass-skadde-utvidet]
+
+- slug: sps41-forurenset-skadested-cbrne
+  courseCode: SPS41
+  title: SPS41 samvirke på forurenset skadested CBRN/E
+  targetRoles: [lagforer, leder]
+  duration: Etter kursplan
+  prerequisites: [FIG10]
+  skills: [CBRN/E-samvirke, forurenset skadested, felles begrepsforståelse, soneforståelse]
+  sourceIds: [src-samvirke-pa-forurenset-skadested-cbrne-sps41, src-vedlegg-b-kurs-i-sivilforsvaret]
+  linkedCardSlugs: [cbrne-soneinndeling, cbrne-verneutstyr-stoppkriterier, mre-ren-uren-side-grovrens, kontaminert-utstyr-handtering]
