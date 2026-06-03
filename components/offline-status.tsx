@@ -5,12 +5,13 @@ import { useEffect, useState } from 'react';
 import { registerServiceWorker } from './service-worker-registration';
 
 export function OfflineStatus() {
-  const [online, setOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine));
+  const [online, setOnline] = useState(true);
   const [ready, setReady] = useState(false);
   const [contentVersion, setContentVersion] = useState<string>('ukjent');
 
   useEffect(() => {
     const update = () => setOnline(navigator.onLine);
+    update();
     window.addEventListener('online', update);
     window.addEventListener('offline', update);
 

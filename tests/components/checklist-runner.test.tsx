@@ -13,7 +13,10 @@ it('renders required items, source links, and persists checked state', async () 
   render(<ChecklistRunner checklist={checklist} missionId="mission-1" />);
   const checkbox = screen.getByRole('checkbox', { name: /Kontroller ventilasjon/i });
   expect(checkbox).toBeInTheDocument();
+  expect(screen.getByText('0/1 fullført')).toBeInTheDocument();
+  expect(screen.getByText(/Påkrevd: 0\/1 kontrollert/i)).toBeInTheDocument();
   expect(screen.getAllByText(/src-deep-research-tilfluktsrom/i).length).toBeGreaterThan(0);
   await userEvent.click(checkbox);
+  expect(screen.getByText('1/1 fullført')).toBeInTheDocument();
   expect((await getChecklistRun('mission-1:tilfluktsrom-teknisk-status'))?.checkedItemIds).toContain('ventilasjon');
 });
