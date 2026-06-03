@@ -86,7 +86,7 @@ it('stores local mission tasks, quick status log and resource requests with allo
   expect(stored.resourceRequests.map((request) => request.kind)).toEqual(['water', 'ppe']);
 });
 
-it('stores structured field log entries and defaults old missions to an empty field log', async () => {
+it('stores structured field log entries and defaults old missions to empty field log, RUH and welfare arrays', async () => {
   const oldMission = MissionContextSchema.parse({ ...baseMission, id: 'mission-old-field-log-default' });
   const mission = MissionContextSchema.parse({
     ...baseMission,
@@ -103,14 +103,47 @@ it('stores structured field log entries and defaults old missions to an empty fi
         mustBeForwarded: true,
       },
     ],
+    ruhReports: [
+      {
+        id: 'ruh-store-1',
+        timestamp: '2026-06-03T10:07:00.000Z',
+        category: 'hms',
+        whatHappened: 'Glatt dekke ved depot uten persondata',
+        immediateMeasure: 'Strødd og varslet laget',
+        risk: 'middels',
+        followUpNeeded: true,
+        linkedMissionId: 'mission-field-log-roundtrip',
+      },
+    ],
+    welfareChecks: [
+      {
+        id: 'welfare-store-1',
+        timestamp: '2026-06-03T10:08:00.000Z',
+        physicalLoad: 'moderat',
+        mentalLoad: 'lav',
+        needsRest: false,
+        needsRelief: true,
+        reminders: { water: true, food: true, warmth: false, rest: false, dryClothing: true },
+        note: 'Planlegg avløsning',
+      },
+    ],
   });
 
   await saveMission(oldMission);
   await saveMission(mission);
 
-  expect((await getMission(oldMission.id))?.fieldLogEntries).toEqual([]);
-  expect((await getMission(mission.id))?.fieldLogEntries).toEqual(mission.fieldLogEntries);
-  expect((await listMissions()).find((stored) => stored.id === mission.id)?.fieldLogEntries[0]?.category).toBe('observasjon');
+  const storedOldMission = await getMission(oldMission.id);
+  const storedMission = await getMission(mission.id);
+  expect(storedOldMission?.fieldLogEntries).toEqual([]);
+  expect(storedOldMission?.ruhReports).toEqual([]);
+  expect(storedOldMission?.welfareChecks).toEqual([]);
+  expect(storedMission?.fieldLogEntries).toEqual(mission.fieldLogEntries);
+  expect(storedMission?.ruhReports).toEqual(mission.ruhReports);
+  expect(storedMission?.welfareChecks).toEqual(mission.welfareChecks);
+  const listedMission = (await listMissions()).find((stored) => stored.id === mission.id);
+  expect(listedMission?.fieldLogEntries[0]?.category).toBe('observasjon');
+  expect(listedMission?.ruhReports[0]?.category).toBe('hms');
+  expect(listedMission?.welfareChecks[0]?.needsRelief).toBe(true);
 });
 
 it('rejects unsupported local task statuses and quick status messages', () => {

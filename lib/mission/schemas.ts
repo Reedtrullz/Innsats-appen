@@ -78,6 +78,47 @@ export const FieldLogEntrySchema = z
   })
   .strict();
 
+export const RuhCategorySchema = z.enum(['hms', 'materiell', 'samband', 'nestenulykke', 'annet']);
+export const RuhRiskSchema = z.enum(['lav', 'middels', 'hoy']);
+
+export const RuhReportSchema = z
+  .object({
+    id: z.string().min(1),
+    timestamp: z.string().datetime(),
+    category: RuhCategorySchema,
+    whatHappened: z.string().min(1),
+    immediateMeasure: z.string().min(1),
+    risk: RuhRiskSchema,
+    followUpNeeded: z.boolean().default(false),
+    linkedMissionId: z.string().optional(),
+  })
+  .strict();
+
+export const WelfareLoadSchema = z.enum(['lav', 'moderat', 'hoy']);
+
+export const WelfareReminderSchema = z
+  .object({
+    water: z.boolean().default(false),
+    food: z.boolean().default(false),
+    warmth: z.boolean().default(false),
+    rest: z.boolean().default(false),
+    dryClothing: z.boolean().default(false),
+  })
+  .strict();
+
+export const WelfareCheckSchema = z
+  .object({
+    id: z.string().min(1),
+    timestamp: z.string().datetime(),
+    physicalLoad: WelfareLoadSchema,
+    mentalLoad: WelfareLoadSchema,
+    needsRest: z.boolean().default(false),
+    needsRelief: z.boolean().default(false),
+    reminders: WelfareReminderSchema.default({ water: false, food: false, warmth: false, rest: false, dryClothing: false }),
+    note: z.string().optional(),
+  })
+  .strict();
+
 export const MissionResourceRequestSchema = z
   .object({
     id: z.string().min(1),
@@ -128,6 +169,8 @@ export const MissionContextSchema = z
     statusLog: z.array(MissionStatusLogItemSchema).default([]),
     resourceRequests: z.array(MissionResourceRequestSchema).default([]),
     fieldLogEntries: z.array(FieldLogEntrySchema).default([]),
+    ruhReports: z.array(RuhReportSchema).default([]),
+    welfareChecks: z.array(WelfareCheckSchema).default([]),
     lessonsLearned: MissionLessonsLearnedSchema.optional(),
     feedback: MissionFeedbackSchema.optional(),
     completedAt: z.string().datetime().optional(),
@@ -163,5 +206,10 @@ export type ResourceRequestKind = z.infer<typeof ResourceRequestKindSchema>;
 export type MissionResourceRequest = z.infer<typeof MissionResourceRequestSchema>;
 export type FieldLogCategory = z.infer<typeof FieldLogCategorySchema>;
 export type FieldLogEntry = z.infer<typeof FieldLogEntrySchema>;
+export type RuhCategory = z.infer<typeof RuhCategorySchema>;
+export type RuhRisk = z.infer<typeof RuhRiskSchema>;
+export type RuhReport = z.infer<typeof RuhReportSchema>;
+export type WelfareLoad = z.infer<typeof WelfareLoadSchema>;
+export type WelfareCheck = z.infer<typeof WelfareCheckSchema>;
 export type MissionLessonsLearned = z.infer<typeof MissionLessonsLearnedSchema>;
 export type MissionFeedback = z.infer<typeof MissionFeedbackSchema>;

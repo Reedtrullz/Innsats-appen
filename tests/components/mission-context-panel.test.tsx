@@ -342,6 +342,103 @@ it('lets users add, filter and export a structured local field log with patient-
   expect(pdfPreview.value).toContain('Skriv ut &gt; Lagre som PDF');
 });
 
+it('lets users add local RUH reports, welfare checks and see media/man-down safety notes', async () => {
+  await saveMission({
+    id: 'm6b-ruh-welfare-ui',
+    title: 'FIG RUH velferd UI',
+    createdAt: '2026-06-04T08:00:00.000Z',
+    updatedAt: '2026-06-04T08:30:00.000Z',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'generelt',
+    locationText: 'Innsatsområde RUH',
+    externalSignals: [],
+    activeChecklistIds: ['fig-under-innsats'],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [],
+    fieldLogEntries: [],
+    ruhReports: [],
+    welfareChecks: [],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  } as any);
+
+  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+
+  expect(await screen.findByRole('heading', { name: /RUH og velferd/i })).toBeInTheDocument();
+  expect(screen.getByText(/ikke offisiell HMS\/RUH-innsending/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/ikke legg inn navn, ID, pasientdata eller persondata/i).length).toBeGreaterThan(0);
+  expect(screen.getByText(/Foto\/video-vedlegg er utsatt i MVP/i)).toBeInTheDocument();
+  expect(screen.getByText(/EXIF\/GPS-metadata/i)).toBeInTheDocument();
+  expect(screen.getByText(/sikkerhetskritisk post-MVP/i)).toBeInTheDocument();
+
+  await userEvent.clear(screen.getByLabelText(/RUH tidspunkt/i));
+  await userEvent.type(screen.getByLabelText(/RUH tidspunkt/i), '2026-06-04T09:10');
+  await userEvent.selectOptions(screen.getByLabelText(/RUH kategori/i), 'nestenulykke');
+  await userEvent.type(screen.getByLabelText(/Hva skjedde/i), 'Nesten fall ved glatt dekke');
+  await userEvent.type(screen.getByLabelText(/Umiddelbart tiltak/i), 'Strødd og sperret lokalt');
+  await userEvent.selectOptions(screen.getByLabelText(/RUH risiko/i), 'hoy');
+  await userEvent.click(screen.getByRole('checkbox', { name: /RUH trenger videre tiltak/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Legg til RUH/i }));
+
+  await waitFor(async () => {
+    const [mission] = await listMissions();
+    expect(mission.ruhReports[0]).toMatchObject({
+      category: 'nestenulykke',
+      whatHappened: 'Nesten fall ved glatt dekke',
+      immediateMeasure: 'Strødd og sperret lokalt',
+      risk: 'hoy',
+      followUpNeeded: true,
+    });
+  });
+  expect(screen.getByText(/Nesten fall ved glatt dekke/i)).toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('button', { name: /Lag RUH Markdown/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Lag RUH JSON/i }));
+  const ruhMarkdownPreview = screen.getByLabelText(/RUH Markdown/i) as HTMLTextAreaElement;
+  const ruhJsonPreview = screen.getByLabelText(/RUH JSON/i) as HTMLTextAreaElement;
+  expect(ruhMarkdownPreview.value).toContain('# Lokal forenklet RUH');
+  expect(ruhMarkdownPreview.value).toContain('Ikke offisiell HMS/RUH-innsending');
+  expect(ruhMarkdownPreview.value).toContain('Nesten fall ved glatt dekke');
+  expect(ruhMarkdownPreview.value).not.toContain('m6b-ruh-welfare-ui');
+  const exportedRuhJson = JSON.parse(ruhJsonPreview.value);
+  expect(exportedRuhJson.mission.id).toBeUndefined();
+  expect(exportedRuhJson.reports[0].linkedMissionId).toBeUndefined();
+  expect(ruhJsonPreview.value).not.toMatch(/indexedDB|objectStore|Exif|GPSLatitude|GPSLongitude/i);
+
+  await userEvent.selectOptions(screen.getByLabelText(/Fysisk belastning/i), 'hoy');
+  await userEvent.selectOptions(screen.getByLabelText(/Mental belastning/i), 'moderat');
+  await userEvent.click(screen.getByRole('checkbox', { name: /Trenger hvile/i }));
+  await userEvent.click(screen.getByRole('checkbox', { name: /Trenger avløsning/i }));
+  await userEvent.click(screen.getByRole('checkbox', { name: /Vann påminnelse/i }));
+  await userEvent.click(screen.getByRole('checkbox', { name: /Mat påminnelse/i }));
+  await userEvent.click(screen.getByRole('checkbox', { name: /Varme påminnelse/i }));
+  await userEvent.click(screen.getByRole('checkbox', { name: /Hvile påminnelse/i }));
+  await userEvent.click(screen.getByRole('checkbox', { name: /Tørt tøy påminnelse/i }));
+  await userEvent.type(screen.getByLabelText(/Velferdsnotat/i), 'Lang innsats, planlegg pause');
+  await userEvent.click(screen.getByRole('button', { name: /Lagre velferdssjekk/i }));
+
+  await waitFor(async () => {
+    const [mission] = await listMissions();
+    expect(mission.welfareChecks[0]).toMatchObject({
+      physicalLoad: 'hoy',
+      mentalLoad: 'moderat',
+      needsRest: true,
+      needsRelief: true,
+    });
+  });
+  expect(screen.getByText(/Fysisk: Høy/i)).toBeInTheDocument();
+  expect(screen.getByText(/Lang innsats, planlegg pause/i)).toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('button', { name: /Lag velferd Markdown/i }));
+  const welfareMarkdownPreview = screen.getByLabelText(/Velferd Markdown/i) as HTMLTextAreaElement;
+  expect(welfareMarkdownPreview.value).toContain('# Lokal velferds- og belastningssjekk');
+  expect(welfareMarkdownPreview.value).toContain('Ikke medisinsk vurdering');
+  expect(welfareMarkdownPreview.value).toContain('Trenger avløsning');
+});
+
 it('shows current situation and lets users add local tasks, quick status and resource requests', async () => {
   await saveMission({
     id: 'm2b-ui',

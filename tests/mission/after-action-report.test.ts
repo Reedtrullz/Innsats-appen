@@ -36,6 +36,8 @@ const mission: MissionContext = {
     { id: 'resource-2', kind: 'equipment', status: 'blocked', createdAt: '2026-06-03T09:45:00.000Z', quantity: '1 stk', note: 'Skadet arbeidslys' },
   ],
   fieldLogEntries: [],
+  ruhReports: [],
+  welfareChecks: [],
   lessonsLearned: {
     summary: 'Kort læring fra lokal etterkontroll',
     whatWorked: 'Rask rollefordeling og tydelig depotpunkt',

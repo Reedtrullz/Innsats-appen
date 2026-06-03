@@ -19,6 +19,8 @@ const mission: MissionContext = {
   statusLog: [],
   resourceRequests: [],
   fieldLogEntries: [],
+  ruhReports: [],
+  welfareChecks: [],
   contentVersion: 'test-v1',
   schemaVersion: 1,
 };
