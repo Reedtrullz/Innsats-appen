@@ -40,6 +40,49 @@ it('parses a workplan markdown file into release-ready workplan metadata and tas
   expect(workplan.tasks.map((task) => task.title)).toEqual(['Build sync script', 'Verify release page']);
 });
 
+it('preserves optional workplan and task evidence metadata', () => {
+  const snapshot = WorkplansSnapshotSchema.parse({
+    generatedAt: '2026-06-03T13:59:34.000Z',
+    sourceCount: 1,
+    workplans: [
+      {
+        id: 'metadata-plan',
+        title: 'Metadata Plan',
+        sourcePath: '.hermes/plans/metadata-plan.md',
+        sourceType: 'hermes-plan',
+        summary: 'Prove workplan metadata survives parsing.',
+        stage: 'verify',
+        risk: 'high',
+        status: 'completed',
+        owner: 'AR',
+        completedAt: '2026-06-03T13:59:34.000Z',
+        evidence: ['npm run check PASS'],
+        taskCount: 1,
+        updatedAt: '2026-06-03T13:59:34.000Z',
+        tasks: [
+          {
+            id: 'metadata-plan-task-1',
+            title: 'Verify generated JSON',
+            status: 'completed',
+            stage: 'verify',
+            risk: 'high',
+            owner: 'AR',
+            completedAt: '2026-06-03T13:59:34.000Z',
+            evidence: ['sync test PASS'],
+          },
+        ],
+      },
+    ],
+  });
+
+  expect(snapshot.workplans[0].owner).toBe('AR');
+  expect(snapshot.workplans[0].completedAt).toBe('2026-06-03T13:59:34.000Z');
+  expect(snapshot.workplans[0].evidence).toEqual(['npm run check PASS']);
+  expect(snapshot.workplans[0].tasks[0].owner).toBe('AR');
+  expect(snapshot.workplans[0].tasks[0].completedAt).toBe('2026-06-03T13:59:34.000Z');
+  expect(snapshot.workplans[0].tasks[0].evidence).toEqual(['sync test PASS']);
+});
+
 it('rejects inconsistent workplan and task counts', () => {
   const snapshot = {
     generatedAt: '2026-06-04T12:00:00.000Z',

@@ -8,12 +8,19 @@ export const WorkplanStatusSchema = z.enum(['planned', 'active', 'blocked', 'com
 export const WorkplanRiskSchema = z.enum(['low', 'medium', 'high']);
 export const WorkplanSourceTypeSchema = z.enum(['hermes-plan', 'manual-snapshot']);
 
+const EvidenceSchema = z.array(z.string().min(1)).optional();
+const isoTimestampSchema = z.string().datetime({ offset: true }).optional();
+const ownerSchema = z.string().min(1).max(48).optional();
+
 export const WorkplanTaskSchema = z.object({
   id: z.string().min(1).regex(slugPattern, 'workplan task id must be lowercase kebab-case'),
   title: z.string().min(1),
   status: WorkplanStatusSchema.default('planned'),
   stage: WorkplanStageSchema.default('build'),
   risk: WorkplanRiskSchema.default('medium'),
+  owner: ownerSchema,
+  completedAt: isoTimestampSchema,
+  evidence: EvidenceSchema,
   sourceHeading: z.string().optional(),
 });
 
@@ -26,12 +33,18 @@ export const WorkplanSchema = z.object({
   stage: WorkplanStageSchema,
   risk: WorkplanRiskSchema,
   status: WorkplanStatusSchema,
+  owner: ownerSchema,
+  completedAt: isoTimestampSchema,
+  evidence: EvidenceSchema,
   taskCount: z.number().int().nonnegative(),
   updatedAt: z.string().min(1),
   tasks: z.array(WorkplanTaskSchema),
 }).superRefine((workplan, ctx) => {
   if (workplan.taskCount !== workplan.tasks.length) {
     ctx.addIssue({ code: 'custom', message: 'taskCount must match tasks.length', path: ['taskCount'] });
+  }
+  if (workplan.status === 'completed' && !workplan.completedAt) {
+    ctx.addIssue({ code: 'custom', message: 'completed workplans must include completedAt', path: ['completedAt'] });
   }
 });
 
