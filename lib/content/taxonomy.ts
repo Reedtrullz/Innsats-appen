@@ -66,6 +66,9 @@ export const equipmentTerms = [
   'belysning',
   'renseutstyr',
   'kjoretoy',
+  'telt',
+  'varmeapparat',
+  'aggregat',
 ] as const;
 export type EquipmentTerm = (typeof equipmentTerms)[number];
 
@@ -137,6 +140,9 @@ export const equipmentLabels: Record<EquipmentTerm, string> = {
   belysning: 'Belysning',
   renseutstyr: 'Renseutstyr',
   kjoretoy: 'Kjøretøy',
+  telt: 'Telt',
+  varmeapparat: 'Varmeapparat',
+  aggregat: 'Aggregat',
 };
 
 export const priorityLabels = {

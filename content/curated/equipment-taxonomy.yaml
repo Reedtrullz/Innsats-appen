@@ -1,84 +1,102 @@
 - id: personlig-utrustning
   label: Personlig utrustning
   category: personlig
-  aliases: [PU, personlig verneutrustning]
+  aliases: [PU, personlig utstyr, bekledning, grunnsats personlig]
   approvedForPublicUse: true
-  sourceIds: [src-grunnsats-personlig-utrustning-april-2026]
+  sourceIds: [src-grunnsats-personlig-utrustning-april-2026, src-sjekkliste-fig-og-figp]
 - id: verneutstyr
   label: Verneutstyr
   category: personlig
-  aliases: [PPE, beskyttelsesutstyr]
+  aliases: [PPE, beskyttelsesutstyr, hjelm, hansker, vernebekledning]
   approvedForPublicUse: true
-  sourceIds: [src-tiltakskort-for-innsats]
+  sourceIds: [src-grunnsats-personlig-utrustning-april-2026, src-tiltakskort-for-innsats]
 - id: samband
   label: Samband
   category: samband
-  aliases: [radio, talegruppe, kallesignal]
+  aliases: [radio, sambandsutstyr, talekommunikasjon, talegruppe, kallesignal]
   approvedForPublicUse: true
-  sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+  sourceIds: [src-kommunikasjons-og-sambandsdiagram, src-sjekkliste-fig-og-figp]
 - id: dosimeter
   label: Dosimeter
   category: radiac
-  aliases: [dosemåler]
+  aliases: [dosemåler, persondosimeter]
   approvedForPublicUse: true
   sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
 - id: maleinstrument
   label: Måleinstrument
   category: radiac
-  aliases: [måleutstyr, radiacmåler]
+  aliases: [måleutstyr, radiacmåler, måleapparat]
   approvedForPublicUse: true
   sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
 - id: pumpe
   label: Pumpe
   category: logistikk
-  aliases: [lensepumpe]
+  aliases: [lensepumpe, vannpumpe, pumpeutstyr]
   approvedForPublicUse: true
-  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-under-innsats]
 - id: slangeutlegg
   label: Slangeutlegg
   category: logistikk
-  aliases: [slange]
+  aliases: [slange, slangeutstyr, vannforsyning, utlegg fra pumpe]
   approvedForPublicUse: true
-  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-under-innsats]
 - id: ventilasjon
   label: Ventilasjon
   category: tilfluktsrom
-  aliases: [luft]
+  aliases: [luft, lufting, ventilasjonsutstyr]
   approvedForPublicUse: true
   sourceIds: [src-deep-research-tilfluktsrom]
 - id: nodstrom
   label: Nødstrøm
   category: tilfluktsrom
-  aliases: [reservekraft]
+  aliases: [reservekraft, strømberedskap i tilfluktsrom]
   approvedForPublicUse: true
   sourceIds: [src-deep-research-tilfluktsrom]
 - id: vann
   label: Vann
   category: tilfluktsrom
-  aliases: [drikkevann]
+  aliases: [drikkevann, vannforsyning]
   approvedForPublicUse: true
   sourceIds: [src-deep-research-tilfluktsrom]
 - id: sanitaer
   label: Sanitær
   category: tilfluktsrom
-  aliases: [toalett]
+  aliases: [toalett, hygiene, sanitærutstyr]
   approvedForPublicUse: true
   sourceIds: [src-deep-research-tilfluktsrom]
 - id: belysning
   label: Belysning
-  category: tilfluktsrom
-  aliases: [lys]
+  category: logistikk
+  aliases: [lys, arbeidslys, lyskaster, områdebelysning]
   approvedForPublicUse: true
-  sourceIds: [src-deep-research-tilfluktsrom]
+  sourceIds: [src-deep-research-tilfluktsrom, src-sjekkliste-fig-og-figp]
 - id: renseutstyr
   label: Renseutstyr
   category: cbrn
-  aliases: [rens]
+  aliases: [rens, dekontaminering, grovrens]
   approvedForPublicUse: true
-  sourceIds: [src-veileder-for-sivilforsvarets-renseenheter-cbrn]
+  sourceIds: [src-veileder-for-sivilforsvarets-renseenheter-cbrn, src-renhold-etter-branninnsats]
 - id: kjoretoy
   label: Kjøretøy
   category: logistikk
-  aliases: [bil, transport]
+  aliases: [bil, transport, kjøretøyberedskap, tilhenger]
+  approvedForPublicUse: true
+  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-under-innsats]
+- id: telt
+  label: Telt
+  category: logistikk
+  aliases: [innsatstelt, feltoppsett, skjerming, midlertidig opphold]
+  approvedForPublicUse: true
+  sourceIds: [src-sjekkliste-fig-og-figp]
+- id: varmeapparat
+  label: Varmeapparat
+  category: logistikk
+  aliases: [varme, oppvarming, byggvarmer, feltvarme]
+  approvedForPublicUse: true
+  sourceIds: [src-sjekkliste-fig-og-figp]
+- id: aggregat
+  label: Aggregat
+  category: logistikk
+  aliases: [generator, strømaggregat, bærbar strøm]
   approvedForPublicUse: true
   sourceIds: [src-sjekkliste-fig-og-figp]

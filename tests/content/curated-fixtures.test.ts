@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import yaml from 'js-yaml';
-import { competenceCodes, competenceLabels } from '@/lib/content/taxonomy';
+import { competenceCodes, competenceLabels, equipmentLabels, equipmentTerms } from '@/lib/content/taxonomy';
 
 const readYaml = (path: string) => yaml.load(fs.readFileSync(path, 'utf8')) as any[];
 
@@ -32,6 +32,27 @@ const group5ATrainingCodes = [
   'LETT_LASTEBIL',
   'SPS40',
   'SPS41',
+];
+
+const group5BEquipmentIds = [
+  'personlig-utrustning',
+  'verneutstyr',
+  'kjoretoy',
+  'slangeutlegg',
+  'telt',
+  'varmeapparat',
+  'pumpe',
+  'aggregat',
+  'belysning',
+  'samband',
+] as const;
+
+const unsafeEquipmentTaxonomyTerms = [
+  /\b(?:serienummer|serial\s*number|s\/n)\b/i,
+  /\b(?:materiellnummer|inventarnummer|utstyrsnummer)\b/i,
+  /\b(?:privat|skjermet|sensitiv)(?:e)?\s+(?:depot|lager|lokasjon|adresse|plassering|sted)(?:er)?\b/i,
+  /\b(?:personnummer|fødselsnummer|fodselsnummer|persondata|personopplysninger)\b/i,
+  /\b(?:ISSI[-\s]?(?:liste|lister)|abonnent(?:liste|lister)|Nødnett-abonnent|Nodnett-abonnent)\b/i,
 ];
 
 const highRiskCompetenceScenarios = new Set(['cbrn-cbrne', 'radiac-nedfall', 'mfe-stotte', 'skogbrann', 'skred', 'samleplass-skadde']);
@@ -201,6 +222,50 @@ it('taxonomy includes Group 5A competence codes with Norwegian labels', () => {
   for (const [code, labelPattern] of Object.entries(group5ACompetenceLabels)) {
     expect(competenceCodes, `missing competence code ${code}`).toContain(code);
     expect(competenceLabels[code as keyof typeof competenceLabels], `${code} must have a Norwegian label`).toMatch(labelPattern);
+  }
+});
+
+it('curated equipment taxonomy covers every equipment term and required Group 5B equipment groups', () => {
+  const equipmentTaxonomy = readYaml('content/curated/equipment-taxonomy.yaml');
+  const sourceIds = new Set(readYaml('content/generated/source-documents.json').map((source) => source.id));
+  const recordsById = new Map(equipmentTaxonomy.map((record) => [record.id, record]));
+
+  expect(equipmentTaxonomy.map((record) => record.id)).toHaveLength(recordsById.size);
+  expect(equipmentTerms).toEqual(expect.arrayContaining([...group5BEquipmentIds]));
+
+  for (const id of equipmentTerms) {
+    const label = equipmentLabels[id];
+    const record = recordsById.get(id);
+
+    expect(label, `${id} must have a label in equipmentLabels`).toEqual(expect.any(String));
+    expect(label.length, `${id} label must not be empty`).toBeGreaterThan(0);
+    expect(record, `${id} must have a curated equipment-taxonomy record`).toBeTruthy();
+    expect(record?.label, `${id} record label must match equipmentLabels`).toBe(label);
+  }
+
+  for (const id of group5BEquipmentIds) {
+    expect(recordsById.has(id), `missing Group 5B equipment taxonomy record ${id}`).toBe(true);
+  }
+
+  for (const record of equipmentTaxonomy) {
+    expect(record.approvedForPublicUse, `${record.id} must be public-approved`).toBe(true);
+    expect(record.sourceIds?.length, `${record.id} must cite at least one source`).toBeGreaterThan(0);
+    for (const sourceId of record.sourceIds ?? []) {
+      expect(sourceIds, `${record.id} references missing source ${sourceId}`).toContain(sourceId);
+    }
+  }
+});
+
+it('curated equipment taxonomy avoids private inventories and sensitive samband list language', () => {
+  const equipmentTaxonomy = readYaml('content/curated/equipment-taxonomy.yaml');
+
+  for (const record of equipmentTaxonomy) {
+    const recordText = [record.id, record.label, record.category, ...(record.aliases ?? [])].join('\n');
+    for (const unsafeTerm of unsafeEquipmentTaxonomyTerms) {
+      expect(recordText, `${record.id} contains unsafe equipment taxonomy language matching ${unsafeTerm}`).not.toMatch(
+        unsafeTerm,
+      );
+    }
   }
 });
 
