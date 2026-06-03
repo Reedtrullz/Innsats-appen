@@ -3,6 +3,133 @@ import yaml from 'js-yaml';
 
 const readYaml = (path: string) => yaml.load(fs.readFileSync(path, 'utf8')) as any[];
 
+const group4ActionCardSlugs = [
+  'oppdragsanalyse',
+  'obbo-beslutningssloyfe',
+  'ledelse-kommando-kontroll',
+  'presse-og-mediahandtering',
+  'etikk-og-rollegrenser',
+  'alvorlig-ulykke-dod-eget-personell',
+  'akutt-113-livreddende-forstehjelp',
+  'psykologisk-forstehjelp-sekvens',
+  'psykososial-ikke-tvungen-debrief',
+  'skogbrann-startkort',
+  'brann-vannforsyning-slange',
+  'sok-og-redning-startkort',
+  'soketeig-sektor',
+  'flom-pumpe-vannforsyning',
+  'skred-sikkerhet-samvirke',
+  'evakueringsstotte',
+  'samleplass-skadde-utvidet',
+  'tilfluktsrom-offentlig-beredskap',
+  'cbrne-soneinndeling',
+  'cbrne-verneutstyr-stoppkriterier',
+  'mre-ren-uren-side-grovrens',
+  'radiac-malepunkt',
+  'radiac-oppholdstid-rullering',
+  'mfe-anmodning-mottak-oppfolging',
+  'posisjonsrapport-kart-kompass-gps',
+  'rute-og-evakueringsvei',
+  'kjoretoy-transportberedskap',
+  'pumpe-stromfare',
+  'kontaminert-utstyr-handtering',
+];
+
+const cardText = (card: any) => [
+  card.title,
+  card.slug,
+  ...(card.steps ?? []),
+  ...(card.safety ?? []),
+  ...(card.reporting ?? []),
+  card.warning ?? '',
+].join('\n');
+
+const sensitiveDataTerms = [
+  /\b(?:personnummer|fødselsnummer|fodselsnummer)\b/i,
+  /\bpasientjournal\w*\b/i,
+  /\bISSI[-\s]?list(?:e|er)?\b/i,
+  /\babonnentlist(?:e|er)?\b/i,
+  /\bpersonidentifiserende\s+(?:detaljer|informasjon|opplysninger)\b/i,
+  /\b(?:hemmelig|gradert)(?:e)?(?:\s+(?:innhold|informasjon|dokumenter?|opplysninger?))?\b/i,
+  /\b(?:private?|skjermede?|sensitive?)(?:\/(?:private?|skjermede?|sensitive?))*\s+(?:lokasjoner?|adresser?|rom|steder?|lokasjonsdata)\b/i,
+];
+
+const unsafeSensitiveDataActionPattern =
+  '(?:lagre|registrer(?:e|er)?|del(?:e|er)?|send(?:e|er)?|publiser(?:e|er)?|loggfør(?:e|er)?|noter(?:e|er)?|oppgi|legg\\s+inn|før\\s+inn)';
+const unsafeSensitiveDataActions = new RegExp(`\\b${unsafeSensitiveDataActionPattern}\\b`, 'i');
+const clauseBoundaries = ['\n', ',', '.', ';', ':', '!', '?'];
+
+const globalTerm = (term: RegExp) => new RegExp(term.source, 'gi');
+
+const actionSensitiveSegmentBefore = (line: string, index: number) => {
+  const punctuationStart = clauseBoundaries.reduce(
+    (start, boundary) => Math.max(start, line.lastIndexOf(boundary, index - 1) + 1),
+    0,
+  );
+  const clausePrefix = line.slice(punctuationStart, index);
+  const positiveConjunction = /\bog\b/gi;
+  let segmentStart = 0;
+
+  for (const match of clausePrefix.matchAll(positiveConjunction)) {
+    if (match.index !== undefined) segmentStart = match.index + match[0].length;
+  }
+
+  return clausePrefix.slice(segmentStart);
+};
+
+const hasQualifiedSafeSensitiveDataBoundary = (segmentBeforeSensitiveTerm: string) => {
+  const actionMatches = [...segmentBeforeSensitiveTerm.matchAll(new RegExp(`\\b${unsafeSensitiveDataActionPattern}\\b`, 'gi'))];
+  const lastAction = actionMatches.at(-1);
+  if (!lastAction || lastAction.index === undefined) return true;
+
+  const beforeAction = segmentBeforeSensitiveTerm.slice(0, lastAction.index);
+  const afterAction = segmentBeforeSensitiveTerm.slice(lastAction.index + lastAction[0].length);
+
+  return (
+    /\bikke\b/i.test(beforeAction) ||
+    /\bikke\b/i.test(afterAction) ||
+    /\b(?:ingen|uten|bare\s+offentlig|kun\s+anonymisert|anonymiser(?:t|e))\b[^\n,.;:!?]*$/i.test(afterAction)
+  );
+};
+
+const hasUnsafeSensitiveDataInstruction = (line: string) => {
+  for (const term of sensitiveDataTerms) {
+    for (const match of line.matchAll(globalTerm(term))) {
+      if (match.index === undefined) continue;
+
+      const segmentBeforeSensitiveTerm = actionSensitiveSegmentBefore(line, match.index);
+      const usesUnsafeActionBeforeTerm = unsafeSensitiveDataActions.test(segmentBeforeSensitiveTerm);
+
+      if (usesUnsafeActionBeforeTerm && !hasQualifiedSafeSensitiveDataBoundary(segmentBeforeSensitiveTerm)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
+
+const expectNoUnsafeSensitiveDataInstruction = (slug: string, content: string) => {
+  for (const line of content.split('\n')) {
+    expect(
+      hasUnsafeSensitiveDataInstruction(line),
+      `${slug} must not positively store/share sensitive data: ${line}`,
+    ).toBe(false);
+  }
+};
+
+it('unsafe-sensitive-data guard requires a qualified safe boundary', () => {
+  expect(hasUnsafeSensitiveDataInstruction('Registrer private adresser uten forsinkelse')).toBe(true);
+  expect(hasUnsafeSensitiveDataInstruction('Lagre gradert informasjon, ikke slett den')).toBe(true);
+  expect(hasUnsafeSensitiveDataInstruction('Lagre gradert informasjon og send rapport uten gradert informasjon')).toBe(true);
+  expect(hasUnsafeSensitiveDataInstruction('Ikke registrer private adresser og lagre gradert informasjon')).toBe(true);
+  expect(hasUnsafeSensitiveDataInstruction('Lagre ikke noe og registrer private adresser')).toBe(true);
+  expect(hasUnsafeSensitiveDataInstruction('Ikke del sensitive lokasjoner og publiser gradert informasjon')).toBe(true);
+  expect(hasUnsafeSensitiveDataInstruction('Ikke registrer private adresser')).toBe(false);
+  expect(hasUnsafeSensitiveDataInstruction('Rapporter status uten personidentifiserende detaljer')).toBe(false);
+  expect(hasUnsafeSensitiveDataInstruction('Loggfør status uten personidentifiserende detaljer')).toBe(false);
+});
+
 it('curated YAML includes required starter slugs', () => {
   const cards = readYaml('content/curated/action-cards.yaml');
   const training = readYaml('content/curated/training-paths.yaml');
@@ -134,4 +261,64 @@ it('curated Group 2A/2B checklists cover før utrykning, expanded under innsats 
     'dimittering-avklart-distrikt',
     'oppfolging',
   ]);
+});
+
+it('curated Group 4 action cards exist with source-backed public/offline boundaries', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const bySlug = new Map(cards.map((card) => [card.slug, card]));
+
+  expect(cards.map((card) => card.slug)).toEqual(expect.arrayContaining(group4ActionCardSlugs));
+
+  for (const slug of group4ActionCardSlugs) {
+    const card = bySlug.get(slug);
+    expect(card, `missing Group 4 card ${slug}`).toBeTruthy();
+    expect(card.sourceIds?.length, `${slug} must have sourceIds`).toBeGreaterThan(0);
+    expect(card.steps?.length, `${slug} must have steps`).toBeGreaterThan(0);
+    expect(card.warning, `${slug} must have warning text`).toEqual(expect.any(String));
+    expect(card.warning.length, `${slug} warning must not be empty`).toBeGreaterThan(0);
+    expectNoUnsafeSensitiveDataInstruction(slug, cardText(card));
+  }
+});
+
+it('curated Group 4 action cards enforce operational safety and data-minimization constraints', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const bySlug = new Map(cards.map((card) => [card.slug, card]));
+  const text = (slug: string) => cardText(bySlug.get(slug));
+
+  expect(text('psykososial-ikke-tvungen-debrief')).toMatch(/ikke\s+(gjennomfør|bruk).*tvungen debrief/i);
+  expect(text('psykososial-ikke-tvungen-debrief')).toMatch(/ikke\s+press.*detalj/i);
+  expect(text('psykologisk-forstehjelp-sekvens')).toMatch(/ro|trygghet/i);
+  expect(text('psykologisk-forstehjelp-sekvens')).toMatch(/ikke\s+press/i);
+
+  expect(text('samleplass-skadde-utvidet')).toMatch(/ikke\s+registrer.*journalfelt/i);
+  expect(text('samleplass-skadde-utvidet')).toMatch(/uten\s+personidentifiserende/i);
+
+  expect(text('tilfluktsrom-offentlig-beredskap')).toMatch(/bare\s+offentlig/i);
+  expect(text('tilfluktsrom-offentlig-beredskap')).toMatch(/ikke\s+lagre.*private/i);
+  expect(text('tilfluktsrom-offentlig-beredskap')).toMatch(/skjermede\s+lokasjoner/i);
+
+  for (const slug of [
+    'cbrne-soneinndeling',
+    'cbrne-verneutstyr-stoppkriterier',
+    'mre-ren-uren-side-grovrens',
+    'radiac-malepunkt',
+    'radiac-oppholdstid-rullering',
+  ]) {
+    expect(text(slug), `${slug} must include stop/abort criteria`).toMatch(/stopp|stans|avbryt/i);
+    expect(text(slug), `${slug} must defer to orders or professional authority`).toMatch(/ordre|fagmyndighet/i);
+  }
+
+  expect(text('pumpe-stromfare')).toMatch(/strømfare|elektrisk/i);
+  expect(text('pumpe-stromfare')).toMatch(/stans|stopp|avbryt/i);
+
+  for (const slug of ['posisjonsrapport-kart-kompass-gps', 'rute-og-evakueringsvei']) {
+    expect(text(slug), `${slug} must be local/offline only`).toMatch(/lokal|offline/i);
+    expect(text(slug), `${slug} must ban live tracking`).toMatch(/ikke\s+(lagre|send|bruk|del).*live tracking/i);
+    expect(text(slug), `${slug} must ban sensitive-location sharing`).toMatch(
+      /ikke\s+(lagre|send|del|publiser).*sensitive lokasjoner/i,
+    );
+  }
+
+  expect(text('kontaminert-utstyr-handtering')).toMatch(/kontaminert.*skadet|skadet.*kontaminert/i);
+  expect(text('kontaminert-utstyr-handtering')).toMatch(/lokal prosedyre/i);
 });
