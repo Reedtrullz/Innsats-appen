@@ -1,0 +1,14 @@
+name: Install npm dependencies
+
+description: Install npm dependencies and lockfile-pinned linux native packages for clean Linux runners.
+
+runs:
+  using: composite
+  steps:
+    - name: npm ci
+      shell: bash
+      run: npm ci --include=optional
+
+    - name: Install lockfile-pinned linux native packages
+      shell: bash
+      run: node scripts/install-linux-native-deps.mjs

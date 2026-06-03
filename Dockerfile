@@ -9,14 +9,9 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 COPY package.json package-lock.json ./
+COPY scripts/install-linux-native-deps.mjs ./scripts/install-linux-native-deps.mjs
 RUN npm ci --include=optional \
-  && npm install --no-save --no-package-lock \
-    lightningcss-linux-x64-gnu@1.32.0 \
-    @rolldown/binding-linux-x64-gnu@1.0.3 \
-    @unrs/resolver-binding-linux-x64-gnu@1.12.2 \
-    @img/sharp-linux-x64@0.34.5 \
-    @img/sharp-libvips-linux-x64@1.2.4 \
-    @next/swc-linux-x64-gnu@16.2.7
+  && node scripts/install-linux-native-deps.mjs
 
 FROM node:${NODE_VERSION}-slim AS builder
 WORKDIR /app

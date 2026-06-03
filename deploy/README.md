@@ -16,7 +16,25 @@ The VPS never clones this source repository. The intended flow is:
 local build with generated content -> GHCR image -> Ansible pulls image on VPS -> Caddy reverse proxy
 ```
 
+The GitHub Actions version of the flow is:
+
+```text
+push/PR -> automatic checks -> main-only Docker build/push -> main-only Ansible deploy -> exact-SHA public health verification
+```
+
 ## One-time prerequisites
+
+### GitHub Actions secret
+
+The automatic deploy job requires this repository secret:
+
+```text
+VPS_SSH_PRIVATE_KEY = private SSH key for deploy@198.23.137.16
+```
+
+The workflow writes it to `~/.ssh/id_rsa_racknerd` on the runner, matching `deploy/inventory/hosts.yml`. Do not commit the key or copy it into inventory.
+
+### Local/VPS prerequisites
 
 Install the collection locally:
 
@@ -75,10 +93,10 @@ The playbook uses `force_source: true` when pulling, so a mutable `:latest` tag 
 - Caddy exists on VPS.
 - GHCR image is pulled.
 - Compose starts/recreates the container and waits for Docker health.
-- Local health endpoint answers healthy:
+- Local health endpoint answers healthy and exposes the exact `APP_VERSION` SHA:
   `http://127.0.0.1:3006/api/health`
 - Caddy config validates before reload.
-- Public HTTPS health endpoint answers healthy:
+- Public HTTPS health endpoint answers healthy and exposes the exact `APP_VERSION` SHA:
   `https://innsats.reidar.tech/api/health`
 
 ## Useful manual checks
@@ -93,5 +111,5 @@ curl -fsS https://innsats.reidar.tech/ | head
 ## Notes
 
 - `next.config.ts` must keep `output: 'standalone'` for Docker runtime.
-- Docker builds set `ALLOW_PREGENERATED_CONTENT=1` so the container build can use pregenerated source documents copied from the local build context instead of requiring the private Obsidian vault inside the image.
-- Keep `content/generated/*.json`, `public/generated-content/`, and `public/content-assets/` out of git, but present in the local Docker build context after `npm run build:content`.
+- Docker builds set `ALLOW_PREGENERATED_CONTENT=1` so the container build can use the committed sanitized `content/generated/source-documents.json` snapshot instead of requiring the private Obsidian vault inside GitHub Actions or the image.
+- Other generated files under `content/generated/`, `public/generated-content/`, and `public/content-assets/` are build outputs and stay out of git.

@@ -106,7 +106,10 @@
         status_code: 200
         timeout: 5
       register: local_health
-      until: local_health.status == 200 and (local_health.json.status | default('')) == 'healthy'
+      until: >-
+        local_health.status == 200
+        and (local_health.json.status | default('')) == 'healthy'
+        and (local_health.json.version | default('')) == app_version
       retries: 12
       delay: 5
       failed_when: false
@@ -115,7 +118,10 @@
     - name: Fail if local health endpoint is not healthy
       ansible.builtin.fail:
         msg: "Local health check failed for {{ health_url }}: {{ local_health }}"
-      when: local_health.status | default(0) != 200 or (local_health.json.status | default('')) != 'healthy'
+      when: >-
+        local_health.status | default(0) != 200
+        or (local_health.json.status | default('')) != 'healthy'
+        or (local_health.json.version | default('')) != app_version
       tags: [verify]
 
     - name: Manage Caddy reverse proxy block
@@ -148,7 +154,10 @@
         status_code: 200
         timeout: 10
       register: public_health
-      until: public_health.status == 200 and (public_health.json.status | default('')) == 'healthy'
+      until: >-
+        public_health.status == 200
+        and (public_health.json.status | default('')) == 'healthy'
+        and (public_health.json.version | default('')) == app_version
       retries: 12
       delay: 5
       failed_when: false
@@ -159,7 +168,10 @@
     - name: Fail if public health endpoint is not healthy
       ansible.builtin.fail:
         msg: "Public health check failed for {{ public_health_url }}: {{ public_health }}"
-      when: public_health.status | default(0) != 200 or (public_health.json.status | default('')) != 'healthy'
+      when: >-
+        public_health.status | default(0) != 200
+        or (public_health.json.status | default('')) != 'healthy'
+        or (public_health.json.version | default('')) != app_version
       tags: [verify]
 
     - name: Report successful deployment

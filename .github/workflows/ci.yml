@@ -1,0 +1,188 @@
+name: CI / Deploy
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  NODE_VERSION: 22.22.3
+  IMAGE_NAME: ghcr.io/reedtrullz/innsats-appen
+  NEXT_TELEMETRY_DISABLED: "1"
+  ALLOW_PREGENERATED_CONTENT: "1"
+  MET_USER_AGENT: Beredskapsboka/0.1 (+https://innsats.reidar.tech)
+
+concurrency:
+  group: innsats-ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  checks:
+    name: Automatic checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-deps
+
+      - name: Audit for high or critical vulnerabilities
+        run: npm run audit:ci
+
+      - name: Build content artifacts
+        run: npm run build:content
+
+      - name: TypeScript
+        run: npm run typecheck
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Vitest
+        run: npm run test
+
+      - name: Production build
+        run: npm run build:app
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Playwright production smoke/E2E
+        run: PLAYWRIGHT_PROD=1 npx playwright test
+
+  build-and-push:
+    name: Build and push GHCR image
+    runs-on: ubuntu-latest
+    needs: checks
+    timeout-minutes: 30
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+      tag: ${{ steps.image.outputs.tag }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set image tag
+        id: image
+        shell: bash
+        run: |
+          echo "tag=${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          build-args: |
+            VERSION=${{ github.sha }}
+          tags: |
+            ${{ steps.image.outputs.image }}:${{ steps.image.outputs.tag }}
+            ${{ steps.image.outputs.image }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to VPS with Ansible
+    runs-on: ubuntu-latest
+    needs:
+      - checks
+      - build-and-push
+    timeout-minutes: 20
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install Ansible
+        shell: bash
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install ansible
+          ansible-galaxy collection install -r deploy/requirements.yml
+
+      - name: Configure SSH key
+        shell: bash
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_racknerd
+          chmod 600 ~/.ssh/id_rsa_racknerd
+          ssh-keyscan -H 198.23.137.16 >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_rsa_racknerd -o BatchMode=yes -o StrictHostKeyChecking=yes deploy@198.23.137.16 'echo "SSH OK"'
+
+      - name: Deploy immutable image tag
+        shell: bash
+        env:
+          APP_VERSION: ${{ github.sha }}
+          MET_USER_AGENT: Beredskapsboka/0.1 (+https://innsats.reidar.tech)
+          ANSIBLE_CONFIG: deploy/ansible.cfg
+        run: |
+          ansible-playbook \
+            -i deploy/inventory/hosts.yml \
+            deploy/playbook.yml \
+            -e "docker_image=${{ needs.build-and-push.outputs.image }}:${{ needs.build-and-push.outputs.tag }}"
+
+      - name: Verify public deployment version
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+          import time
+          import urllib.request
+
+          expected = os.environ['GITHUB_SHA']
+          url = 'https://innsats.reidar.tech/api/health'
+          last = None
+          for _ in range(12):
+              try:
+                  with urllib.request.urlopen(url, timeout=10) as response:
+                      last = response.read().decode('utf-8')
+                      payload = json.loads(last)
+                      if payload.get('status') == 'healthy' and payload.get('version') == expected:
+                          print(json.dumps(payload, indent=2))
+                          sys.exit(0)
+              except Exception as exc:
+                  last = repr(exc)
+              time.sleep(5)
+          print(f'Public health check did not expose expected version {expected}. Last response: {last}', file=sys.stderr)
+          sys.exit(1)
+          PY

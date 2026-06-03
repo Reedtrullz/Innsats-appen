@@ -12,6 +12,7 @@ tsconfig.tsbuildinfo
 .env.*
 !.env.example
 content/generated/*.json
+!content/generated/source-documents.json
 public/generated-content/
 public/content-assets/
 
