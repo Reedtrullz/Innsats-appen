@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T17:17:09.127Z",
+  "generatedAt": "2026-06-03T18:16:07.200Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-03T17:17:09.127Z",
+      "updatedAt": "2026-06-03T18:16:07.200Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -1295,161 +1295,241 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-37",
           "title": "Extend curated content to support FAQ entries.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 37: Extend curated content to support FAQ entries."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-38",
           "title": "Extend curated content to support glossary aliases and synonyms.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 38: Extend curated content to support glossary aliases and synonyms."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-39",
           "title": "Extend curated content to support equipment taxonomy.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 39: Extend curated content to support equipment taxonomy."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-40",
           "title": "Extend curated content to support export-template metadata.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 40: Extend curated content to support export-template metadata."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-41",
           "title": "Extend curated content to support image/illustration metadata.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 41: Extend curated content to support image/illustration metadata."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-42",
           "title": "Extend curated content to support local/district-specific approved content overlays in the future.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 42: Extend curated content to support local/district-specific approved content overlays in the future."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-43",
           "title": "Validate that all roles in content exist in the role taxonomy.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 43: Validate that all roles in content exist in the role taxonomy."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-44",
           "title": "Validate that all equipment terms in content exist in the equipment taxonomy.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 44: Validate that all equipment terms in content exist in the equipment taxonomy."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-45",
           "title": "Validate that all competence codes in content exist in the competence taxonomy.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 45: Validate that all competence codes in content exist in the competence taxonomy."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-46",
           "title": "Validate that all scenarios in content exist in the scenario taxonomy.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 46: Validate that all scenarios in content exist in the scenario taxonomy."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-47",
           "title": "Validate that all images referenced by content exist and are approved for publication.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 47: Validate that all images referenced by content exist and are approved for publication."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-48",
           "title": "Add generated content version display inside the app.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 48: Add generated content version display inside the app."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-49",
           "title": "Add content changelog generation.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 49: Add content changelog generation."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-50",
           "title": "Add 'new and updated procedures' view.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 50: Add 'new and updated procedures' view."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-51",
           "title": "Add 'must read' notices for critical content changes.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 51: Add 'must read' notices for critical content changes."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-52",
           "title": "Add source-to-card reverse navigation.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 52: Add source-to-card reverse navigation."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-53",
           "title": "Add card-to-source deep links with section anchors where possible.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 53: Add card-to-source deep links with section anchors where possible."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-54",
           "title": "Add source excerpt display with clear 'excerpt not full official document' warning.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 54: Add source excerpt display with clear 'excerpt not full official document' warning."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-55",
           "title": "Add a simple FAQ page populated from curated content.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 55: Add a simple FAQ page populated from curated content."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-56",
           "title": "Create a feedback-driven FAQ update process.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T18:15:55.000Z",
+          "evidence": [
+            "Implemented in commit f0beab6 (curated FAQ/taxonomy/template/image/overlay/changelog/must-read foundations, source/card navigation, FAQ/changelog/must-read pages, generated/public validation, service-worker image precache). Gates: targeted vitest 3 files/20 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; full vitest 40 files/124 tests PASS; spec review PASS; code quality review APPROVED."
+          ],
           "sourceHeading": "Task 56: Create a feedback-driven FAQ update process."
         },
         {
