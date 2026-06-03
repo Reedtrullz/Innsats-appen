@@ -47,6 +47,18 @@ const group5BEquipmentIds = [
   'samband',
 ] as const;
 
+const group5CMbkChecklists: Record<string, string[]> = {
+  'mbk-kjoretoy': ['kjoretoy'],
+  'mbk-brann-slange': ['slangeutlegg'],
+  'mbk-telt': ['telt'],
+  'mbk-varmeapparat': ['varmeapparat'],
+  'mbk-pumpe': ['pumpe'],
+  'mbk-aggregat': ['aggregat'],
+  'mbk-belysning': ['belysning'],
+  'mbk-samband': ['samband'],
+  'mbk-personlig-utstyr': ['personlig-utrustning', 'verneutstyr'],
+};
+
 const unsafeEquipmentTaxonomyTerms = [
   /\b(?:serienummer|serial\s*number|s\/n)\b/i,
   /\b(?:materiellnummer|inventarnummer|utstyrsnummer)\b/i,
@@ -338,6 +350,41 @@ it('curated sambandsjekk checklist covers required local-only samband controls',
   ]);
   for (const item of sambandsjekk?.items ?? []) {
     expect(item.sourceIds).toContain('src-kommunikasjons-og-sambandsdiagram');
+  }
+});
+
+it('curated Group 5C MBK checklists cover grouped equipment status without unsafe inventory language', () => {
+  const checklists = readYaml('content/curated/checklists.yaml');
+  const sourceIds = new Set(readYaml('content/generated/source-documents.json').map((source) => source.id));
+  const bySlug = new Map(checklists.map((checklist) => [checklist.slug, checklist]));
+
+  for (const [slug, requiredEquipment] of Object.entries(group5CMbkChecklists)) {
+    const checklist = bySlug.get(slug);
+    expect(checklist, `missing Group 5C MBK checklist ${slug}`).toBeTruthy();
+    expect(checklist.phase, `${slug} phase`).toMatch(/^(for|etter)$/);
+    expect(checklist.roles, `${slug} roles`).toEqual(expect.arrayContaining(['materiellansvarlig', 'lagforer', 'stab-logistikk']));
+    expect(checklist.scenarios, `${slug} scenarios`).toEqual(['generelt']);
+    expect(checklist.equipmentRequired, `${slug} equipmentRequired`).toEqual(expect.arrayContaining(requiredEquipment));
+    expect(checklist.warning, `${slug} warning`).toMatch(/lokal/i);
+    expect(checklist.warning, `${slug} warning`).toMatch(/ikke offisiell inventarliste|ingen sentral/i);
+    expect(checklist.items?.length, `${slug} items`).toBeGreaterThanOrEqual(4);
+    expect(checklist.items?.map((item: any) => item.id), `${slug} required controls`).toEqual(expect.arrayContaining([
+      'status-kontrollert',
+      'mangler-skade-forbruk-notert-lokalt',
+      'vask-service-karantene-vurdert',
+      'klarstatus-rapportert',
+    ]));
+    for (const sourceId of checklist.sourceIds ?? []) {
+      expect(sourceIds, `${slug} references missing source ${sourceId}`).toContain(sourceId);
+    }
+    for (const item of checklist.items ?? []) {
+      expect(item.required, `${slug}/${item.id} should be required`).toBe(true);
+      expect(item.sourceIds?.length, `${slug}/${item.id} sourceIds`).toBeGreaterThan(0);
+    }
+    const text = [checklist.slug, checklist.title, checklist.warning, ...(checklist.items ?? []).map((item: any) => item.label)].join('\n');
+    expect(text, `${slug} should mention status states`).toMatch(/klar|mangler|skadet|forbrukt|vask|service|karantene/i);
+    expect(text, `${slug} must not include sensitive inventory words`).not.toMatch(/serienummer|serial|materiellnummer|inventarnummer|depot|lager|ISSI|abonnentliste|Nødnett-detalj/i);
+    expectNoUnsafeSensitiveDataInstruction(slug, text);
   }
 });
 

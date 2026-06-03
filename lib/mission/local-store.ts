@@ -1,5 +1,5 @@
 import { openDB, type DBSchema } from 'idb';
-import { ChecklistRunSchema, MissionContextSchema, type ChecklistRun, type MissionContext } from './schemas';
+import { ChecklistRunSchema, MissionContextSchema, type ChecklistRun, type ChecklistRunInput, type MissionContext } from './schemas';
 
 interface BeredskapsbokaDb extends DBSchema {
   missions: {
@@ -120,18 +120,20 @@ export async function clearArchivedMissions(): Promise<void> {
   await Promise.all(archived.map((mission) => deleteMission(mission.id)));
 }
 
-export async function saveChecklistRun(input: ChecklistRun): Promise<ChecklistRun> {
+export async function saveChecklistRun(input: ChecklistRunInput): Promise<ChecklistRun> {
   const parsed = ChecklistRunSchema.parse({ ...input, schemaVersion: input.schemaVersion ?? 1 });
   await (await db()).put('checklistRuns', parsed);
   return parsed;
 }
 
 export async function getChecklistRun(id: string): Promise<ChecklistRun | undefined> {
-  return (await db()).get('checklistRuns', id);
+  const run = await (await db()).get('checklistRuns', id);
+  return run ? ChecklistRunSchema.parse({ ...run, schemaVersion: run.schemaVersion ?? 1 }) : undefined;
 }
 
 export async function listChecklistRuns(missionId: string): Promise<ChecklistRun[]> {
-  return (await db()).getAllFromIndex('checklistRuns', 'by-mission', missionId);
+  const runs = await (await db()).getAllFromIndex('checklistRuns', 'by-mission', missionId);
+  return runs.map((run) => ChecklistRunSchema.parse({ ...run, schemaVersion: run.schemaVersion ?? 1 }));
 }
 
 export async function clearLocalMissionData(): Promise<void> {

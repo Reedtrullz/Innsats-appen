@@ -7,6 +7,7 @@ import type { ActionCard, OperationalChecklist } from '@/lib/content/schemas';
 import { filterActionCards, sortActionCards } from '@/lib/content/filters';
 import { phaseLabels, priorityLabels, roleLabels, roles, scenarioLabels, scenarios, phases, type Phase, type Role, type Scenario } from '@/lib/content/taxonomy';
 import { buildAfterActionReport, exportAfterActionJson, exportAfterActionMarkdown, exportAfterActionPdfReadyHtml } from '@/lib/mission/after-action-report';
+import { buildEquipmentReadinessSummary, exportEquipmentReadinessJson, exportEquipmentReadinessMarkdown } from '@/lib/mission/equipment-readiness';
 import { exportMissionStatusSummaryMarkdown } from '@/lib/mission/export-markdown';
 import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArchivedMission, listArchivedMissions, listChecklistRuns, listMissions, saveMission } from '@/lib/mission/local-store';
 import type { MissionContext, MissionTaskStatus, QuickStatusMessage, ResourceRequestKind } from '@/lib/mission/schemas';
@@ -275,6 +276,50 @@ function activeAfterActionChecklists(checklists: OperationalChecklist[], mission
   return fallbackChecklist ? [fallbackChecklist] : [];
 }
 
+function EquipmentReadinessExportControls({ mission, checklists }: { mission: MissionContext; checklists: OperationalChecklist[] }) {
+  const [markdown, setMarkdown] = useState('');
+  const [json, setJson] = useState('');
+
+  async function buildSummary() {
+    const runs = await listChecklistRuns(mission.id);
+    return buildEquipmentReadinessSummary({ mission, checklists, runs });
+  }
+
+  async function generateMarkdown() {
+    setMarkdown(exportEquipmentReadinessMarkdown(await buildSummary()));
+  }
+
+  async function generateJson() {
+    setJson(exportEquipmentReadinessJson(await buildSummary()));
+  }
+
+  return (
+    <section className="space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+      <div>
+        <p className="text-xs font-black uppercase tracking-wide text-sky-700">Materiellberedskap / MBK</p>
+        <h3 className="text-xl font-black">Materiellberedskap / MBK</h3>
+        <p className="mt-1 text-sm font-semibold text-amber-900">Kun lokal beslutningsstøtte. Ikke offisiell inventarliste, lagerstatus eller innsending. Ikke legg inn serienummer, persondata eller sensitive samband-lister.</p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => void generateMarkdown()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag MBK Markdown</button>
+        <button type="button" onClick={() => void generateJson()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag MBK JSON</button>
+      </div>
+      {markdown ? (
+        <label htmlFor="mbk-equipment-markdown" className="block text-sm font-bold">
+          MBK materiellstatus Markdown
+          <textarea id="mbk-equipment-markdown" readOnly value={markdown} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
+        </label>
+      ) : null}
+      {json ? (
+        <label htmlFor="mbk-equipment-json" className="block text-sm font-bold">
+          MBK materiellstatus JSON
+          <textarea id="mbk-equipment-json" readOnly value={json} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
+        </label>
+      ) : null}
+    </section>
+  );
+}
+
 function AfterActionReportControls({ mission, displaySignals, checklists, fallbackChecklist }: { mission: MissionContext; displaySignals: MissionContext['externalSignals']; checklists: OperationalChecklist[]; fallbackChecklist?: OperationalChecklist }) {
   const [localOrderText, setLocalOrderText] = useState('');
   const [localSambandText, setLocalSambandText] = useState('');
@@ -409,6 +454,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
       </section>
 
       <LocalMissionControls mission={mission} displaySignals={staleSignals} onMissionChange={onMissionChange} />
+      <EquipmentReadinessExportControls mission={mission} checklists={checklists} />
       <StructuredLessonsFeedbackControls key={mission.id} mission={mission} onMissionChange={onMissionChange} onArchive={onArchive} />
       <AfterActionReportControls mission={mission} displaySignals={staleSignals} checklists={checklists} fallbackChecklist={checklist} />
 

@@ -9,6 +9,18 @@ afterEach(async () => clearLocalMissionData());
 
 const checklist = { slug: 'tilfluktsrom-teknisk-status', title: 'Tilfluktsrom teknisk status', phase: 'for', roles: ['beredskapsvakt'], scenarios: ['tilfluktsrom'], sourceIds: ['src-deep-research-tilfluktsrom'], warning: 'bruk bare godkjent informasjon', items: [{ id: 'ventilasjon', label: 'Kontroller ventilasjon', required: true, sourceIds: ['src-deep-research-tilfluktsrom'] }] } as OperationalChecklist;
 
+const equipmentChecklist = {
+  slug: 'mbk-kjoretoy',
+  title: 'MBK kjøretøy',
+  phase: 'for',
+  roles: ['materiellansvarlig'],
+  scenarios: ['generelt'],
+  equipmentRequired: ['kjoretoy'],
+  sourceIds: ['src-sjekkliste-fig-og-figp'],
+  warning: 'Kun lokal MBK-status uten persondata.',
+  items: [{ id: 'status-kontrollert', label: 'Status kontrollert', required: true, sourceIds: ['src-sjekkliste-fig-og-figp'] }],
+} as OperationalChecklist;
+
 it('renders required items, source links, and persists checked state with local item notes', async () => {
   const { unmount } = render(<ChecklistRunner checklist={checklist} missionId="mission-1" />);
   const checkbox = screen.getByRole('checkbox', { name: /Kontroller ventilasjon/i });
@@ -60,4 +72,34 @@ it('hydrates saved checklist state before edits can overwrite local data', async
   await waitFor(async () => expect((await getChecklistRun('mission-2:tilfluktsrom-teknisk-status'))?.notesByItemId.ventilasjon).toBe('Oppdatert lokal note'));
   const run = await getChecklistRun('mission-2:tilfluktsrom-teknisk-status');
   expect(run?.checkedItemIds).toEqual(['ventilasjon']);
+});
+
+it('hydrates and persists equipment status for equipment and MBK checklists', async () => {
+  await saveChecklistRun({
+    id: 'mission-3:mbk-kjoretoy',
+    missionId: 'mission-3',
+    templateSlug: 'mbk-kjoretoy',
+    checkedItemIds: ['status-kontrollert'],
+    notesByItemId: {},
+    equipmentStatusByItemId: { 'status-kontrollert': 'damaged' },
+    updatedAt: '2026-06-04T08:10:00.000Z',
+    schemaVersion: 1,
+  });
+
+  render(<ChecklistRunner checklist={equipmentChecklist} missionId="mission-3" />);
+
+  const statusSelect = await screen.findByLabelText(/Materiellstatus for Status kontrollert/i);
+  await waitFor(() => expect(statusSelect).toBeEnabled());
+  expect(statusSelect).toHaveValue('damaged');
+  expect(screen.getByRole('option', { name: 'Klar' })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: 'Mangler' })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: 'Skadet' })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: 'Forbrukt' })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: 'Må vaskes' })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: 'Trenger service' })).toBeInTheDocument();
+  expect(screen.getByRole('option', { name: 'Karantene' })).toBeInTheDocument();
+
+  await userEvent.selectOptions(statusSelect, 'needs-service');
+
+  await waitFor(async () => expect((await getChecklistRun('mission-3:mbk-kjoretoy'))?.equipmentStatusByItemId['status-kontrollert']).toBe('needs-service'));
 });

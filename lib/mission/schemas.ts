@@ -27,6 +27,7 @@ export const ExternalContextSignalSchema = z
   .strict();
 
 export const MissionTaskStatusSchema = z.enum(['not-started', 'in-progress', 'done', 'blocked', 'needs-assistance']);
+export const EquipmentStatusSchema = z.enum(['ready', 'missing', 'damaged', 'consumed', 'needs-wash', 'needs-service', 'quarantined']);
 
 export const MissionTaskSchema = z
   .object({
@@ -117,6 +118,7 @@ export const ChecklistRunSchema = z
     templateSlug: z.string().min(1),
     checkedItemIds: z.array(z.string()).default([]),
     notesByItemId: z.record(z.string(), z.string()).default({}),
+    equipmentStatusByItemId: z.record(z.string(), EquipmentStatusSchema).default({}),
     updatedAt: z.string().datetime(),
     schemaVersion: z.number().int().positive().default(1),
   })
@@ -124,6 +126,8 @@ export const ChecklistRunSchema = z
 
 export type MissionContext = z.infer<typeof MissionContextSchema>;
 export type ChecklistRun = z.infer<typeof ChecklistRunSchema>;
+export type ChecklistRunInput = z.input<typeof ChecklistRunSchema>;
+export type EquipmentStatus = z.infer<typeof EquipmentStatusSchema>;
 export type ExternalContextSignal = z.infer<typeof ExternalContextSignalSchema>;
 export type MissionTaskStatus = z.infer<typeof MissionTaskStatusSchema>;
 export type MissionTask = z.infer<typeof MissionTaskSchema>;

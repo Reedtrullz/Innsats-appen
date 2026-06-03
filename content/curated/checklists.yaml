@@ -352,3 +352,237 @@
       sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
   sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
   warning: Følg gjeldende radiacordre.
+
+- slug: mbk-kjoretoy
+  title: MBK kjøretøy
+  phase: etter
+  roles: [materiellansvarlig, lagforer, stab-logistikk]
+  scenarios: [generelt]
+  equipmentRequired: [kjoretoy]
+  items:
+    - id: status-kontrollert
+      label: Kjøretøyets offentlige klarstatus kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
+    - id: mangler-skade-forbruk-notert-lokalt
+      label: Mangler, skade eller forbruk er notert lokalt uten persondata eller utstyrsidentifikatorer
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
+    - id: vask-service-karantene-vurdert
+      label: Behov for vask, service eller karantene er vurdert før ny utdeployering
+      required: true
+      sourceIds: [src-renhold-etter-branninnsats, src-tiltakskort-etter-innsats]
+    - id: klarstatus-rapportert
+      label: Klar eller ikke klar er rapportert i lokal MBK-status
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats, src-renhold-etter-branninnsats]
+  warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller skjermet operativ informasjon.
+
+- slug: mbk-brann-slange
+  title: MBK brann og slangeutlegg
+  phase: etter
+  roles: [materiellansvarlig, lagforer, stab-logistikk]
+  scenarios: [generelt]
+  equipmentRequired: [slangeutlegg]
+  items:
+    - id: status-kontrollert
+      label: Brann- og slangeutstyr kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
+      required: true
+      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-etter-innsats]
+    - id: mangler-skade-forbruk-notert-lokalt
+      label: Mangler, skade eller forbruk er notert lokalt uten persondata eller utstyrsidentifikatorer
+      required: true
+      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-sjekkliste-fig-og-figp]
+    - id: vask-service-karantene-vurdert
+      label: Behov for vask, service eller karantene er vurdert etter bruk
+      required: true
+      sourceIds: [src-renhold-etter-branninnsats, src-tiltakskort-etter-innsats]
+    - id: klarstatus-rapportert
+      label: Klar eller ikke klar er rapportert i lokal MBK-status
+      required: true
+      sourceIds: [src-tiltakskort-etter-innsats]
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-etter-innsats, src-renhold-etter-branninnsats]
+  warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller sensitive samband-lister.
+
+- slug: mbk-telt
+  title: MBK telt
+  phase: etter
+  roles: [materiellansvarlig, lagforer, stab-logistikk]
+  scenarios: [generelt]
+  equipmentRequired: [telt]
+  items:
+    - id: status-kontrollert
+      label: Teltmateriell kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom]
+    - id: mangler-skade-forbruk-notert-lokalt
+      label: Mangler, skade eller forbruk er notert lokalt uten persondata eller utstyrsidentifikatorer
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: vask-service-karantene-vurdert
+      label: Behov for vask, service, tørk eller karantene er vurdert før pakking
+      required: true
+      sourceIds: [src-renhold-etter-branninnsats, src-tiltakskort-etter-innsats]
+    - id: klarstatus-rapportert
+      label: Klar eller ikke klar er rapportert i lokal MBK-status
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom, src-renhold-etter-branninnsats]
+  warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller skjermet operativ informasjon.
+
+- slug: mbk-varmeapparat
+  title: MBK varmeapparat
+  phase: etter
+  roles: [materiellansvarlig, lagforer, stab-logistikk]
+  scenarios: [generelt]
+  equipmentRequired: [varmeapparat]
+  items:
+    - id: status-kontrollert
+      label: Varmeapparat kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom]
+    - id: mangler-skade-forbruk-notert-lokalt
+      label: Mangler, skade eller forbruk er notert lokalt uten persondata eller utstyrsidentifikatorer
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: vask-service-karantene-vurdert
+      label: Behov for vask, service eller karantene er vurdert før ny bruk
+      required: true
+      sourceIds: [src-renhold-etter-branninnsats, src-tiltakskort-etter-innsats]
+    - id: klarstatus-rapportert
+      label: Klar eller ikke klar er rapportert i lokal MBK-status
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom, src-tiltakskort-etter-innsats]
+  warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller skjermet operativ informasjon.
+
+- slug: mbk-pumpe
+  title: MBK pumper
+  phase: etter
+  roles: [materiellansvarlig, lagforer, stab-logistikk]
+  scenarios: [generelt]
+  equipmentRequired: [pumpe]
+  items:
+    - id: status-kontrollert
+      label: Pumpe kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
+      required: true
+      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-etter-innsats]
+    - id: mangler-skade-forbruk-notert-lokalt
+      label: Mangler, skade eller forbruk er notert lokalt uten persondata eller utstyrsidentifikatorer
+      required: true
+      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-sjekkliste-fig-og-figp]
+    - id: vask-service-karantene-vurdert
+      label: Behov for vask, service eller karantene er vurdert etter pumpebruk
+      required: true
+      sourceIds: [src-renhold-etter-branninnsats, src-tiltakskort-etter-innsats]
+    - id: klarstatus-rapportert
+      label: Klar eller ikke klar er rapportert i lokal MBK-status
+      required: true
+      sourceIds: [src-tiltakskort-etter-innsats]
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-etter-innsats, src-renhold-etter-branninnsats]
+  warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller skjermet operativ informasjon.
+
+- slug: mbk-aggregat
+  title: MBK aggregater og generatorer
+  phase: etter
+  roles: [materiellansvarlig, lagforer, stab-logistikk]
+  scenarios: [generelt]
+  equipmentRequired: [aggregat]
+  items:
+    - id: status-kontrollert
+      label: Aggregat eller generator kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom]
+    - id: mangler-skade-forbruk-notert-lokalt
+      label: Mangler, skade eller forbruk er notert lokalt uten persondata eller utstyrsidentifikatorer
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: vask-service-karantene-vurdert
+      label: Behov for vask, service eller karantene er vurdert før ny bruk
+      required: true
+      sourceIds: [src-renhold-etter-branninnsats, src-tiltakskort-etter-innsats]
+    - id: klarstatus-rapportert
+      label: Klar eller ikke klar er rapportert i lokal MBK-status
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom, src-tiltakskort-etter-innsats]
+  warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller skjermet operativ informasjon.
+
+- slug: mbk-belysning
+  title: MBK belysning
+  phase: etter
+  roles: [materiellansvarlig, lagforer, stab-logistikk]
+  scenarios: [generelt]
+  equipmentRequired: [belysning]
+  items:
+    - id: status-kontrollert
+      label: Belysning kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom]
+    - id: mangler-skade-forbruk-notert-lokalt
+      label: Mangler, skade eller forbruk er notert lokalt uten persondata eller utstyrsidentifikatorer
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: vask-service-karantene-vurdert
+      label: Behov for vask, service eller karantene er vurdert før ny bruk
+      required: true
+      sourceIds: [src-renhold-etter-branninnsats, src-tiltakskort-etter-innsats]
+    - id: klarstatus-rapportert
+      label: Klar eller ikke klar er rapportert i lokal MBK-status
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom, src-tiltakskort-etter-innsats]
+  warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller skjermet operativ informasjon.
+
+- slug: mbk-samband
+  title: MBK samband
+  phase: etter
+  roles: [materiellansvarlig, lagforer, stab-logistikk]
+  scenarios: [generelt]
+  equipmentRequired: [samband]
+  items:
+    - id: status-kontrollert
+      label: Sambandsmateriell kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram, src-sjekkliste-fig-og-figp]
+    - id: mangler-skade-forbruk-notert-lokalt
+      label: Mangler, skade eller forbruk er notert lokalt uten persondata eller sensitive samband-lister
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram, src-sjekkliste-fig-og-figp]
+    - id: vask-service-karantene-vurdert
+      label: Behov for vask, service eller karantene er vurdert uten å lagre sambandstabeller
+      required: true
+      sourceIds: [src-renhold-etter-branninnsats, src-kommunikasjons-og-sambandsdiagram]
+    - id: klarstatus-rapportert
+      label: Klar eller ikke klar er rapportert i lokal MBK-status
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+  sourceIds: [src-kommunikasjons-og-sambandsdiagram, src-sjekkliste-fig-og-figp, src-renhold-etter-branninnsats]
+  warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller sensitive samband-lister.
+
+- slug: mbk-personlig-utstyr
+  title: MBK personlig utstyr og verneutstyr
+  phase: etter
+  roles: [materiellansvarlig, lagforer, stab-logistikk]
+  scenarios: [generelt]
+  equipmentRequired: [personlig-utrustning, verneutstyr]
+  items:
+    - id: status-kontrollert
+      label: Personlig utstyr og verneutstyr kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
+    - id: mangler-skade-forbruk-notert-lokalt
+      label: Mangler, skade eller forbruk er notert lokalt uten persondata eller utstyrsidentifikatorer
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+    - id: vask-service-karantene-vurdert
+      label: Behov for vask, service eller karantene er vurdert før ny utlevering
+      required: true
+      sourceIds: [src-renhold-etter-branninnsats, src-tiltakskort-etter-innsats]
+    - id: klarstatus-rapportert
+      label: Klar eller ikke klar er rapportert i lokal MBK-status
+      required: true
+      sourceIds: [src-sjekkliste-fig-og-figp]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats, src-renhold-etter-branninnsats]
+  warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller helsedata.

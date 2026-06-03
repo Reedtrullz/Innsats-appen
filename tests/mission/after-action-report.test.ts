@@ -79,6 +79,7 @@ const runs: ChecklistRun[] = [
     templateSlug: 'etterkontroll-lag',
     checkedItemIds: ['materiell-sikret'],
     notesByItemId: { 'skade-tap-notert': 'Arbeidslys merket for lokal oppfølging' },
+    equipmentStatusByItemId: {},
     updatedAt: '2026-06-03T10:05:00.000Z',
     schemaVersion: 1,
   },

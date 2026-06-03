@@ -91,6 +91,69 @@ it('lets users generate a local task/status/resource markdown export from the mi
   });
 });
 
+it('lets users generate local MBK equipment readiness Markdown and JSON exports from the mission UI', async () => {
+  const mbkChecklists = [
+    {
+      slug: 'mbk-kjoretoy',
+      title: 'MBK kjøretøy',
+      phase: 'for',
+      roles: ['materiellansvarlig'],
+      scenarios: ['generelt'],
+      equipmentRequired: ['kjoretoy'],
+      sourceIds: ['src-sjekkliste-fig-og-figp'],
+      warning: 'Kun lokal status uten persondata.',
+      items: [
+        { id: 'status-kontrollert', label: 'Status kontrollert', required: true, sourceIds: ['src-sjekkliste-fig-og-figp'] },
+        { id: 'vask-service-karantene-vurdert', label: 'Vask service karantene vurdert', required: true, sourceIds: ['src-tiltakskort-etter-innsats'] },
+      ],
+    },
+  ] as OperationalChecklist[];
+  await saveMission({
+    id: 'm5c-mbk-ui',
+    title: 'MBK UI eksport',
+    createdAt: '2026-06-04T08:00:00.000Z',
+    updatedAt: '2026-06-04T08:30:00.000Z',
+    phase: 'for',
+    role: 'materiellansvarlig',
+    scenario: 'generelt',
+    locationText: 'Lokalt område',
+    externalSignals: [],
+    activeChecklistIds: ['mbk-kjoretoy'],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  } as any);
+  await saveChecklistRun({
+    id: 'run-mbk-ui',
+    missionId: 'm5c-mbk-ui',
+    templateSlug: 'mbk-kjoretoy',
+    checkedItemIds: ['status-kontrollert', 'vask-service-karantene-vurdert'],
+    notesByItemId: { 'status-kontrollert': 'SERIAL 123 privat depot' },
+    equipmentStatusByItemId: { 'status-kontrollert': 'ready', 'vask-service-karantene-vurdert': 'needs-service' },
+    updatedAt: '2026-06-04T08:20:00.000Z',
+    schemaVersion: 1,
+  });
+
+  render(<MissionContextPanel contentVersion="test-v1" checklists={mbkChecklists} />);
+
+  expect(await screen.findByRole('heading', { name: /Materiellberedskap \/ MBK/i })).toBeInTheDocument();
+  expect(screen.getByText(/ikke offisiell inventarliste/i)).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: /Lag MBK Markdown/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Lag MBK JSON/i }));
+
+  const markdownPreview = screen.getByLabelText(/MBK materiellstatus Markdown/i) as HTMLTextAreaElement;
+  const jsonPreview = screen.getByLabelText(/MBK materiellstatus JSON/i) as HTMLTextAreaElement;
+  expect(markdownPreview.value).toContain('# Materiellberedskap / MBK');
+  expect(markdownPreview.value).toContain('Klar for ny utdeployering: Nei');
+  expect(markdownPreview.value).toContain('Trenger service');
+  expect(markdownPreview.value).not.toMatch(/indexedDB|SERIAL 123|privat depot|depot/i);
+  expect(jsonPreview.value).toContain('"readyForNewDeployment": false');
+  expect(jsonPreview.value).not.toMatch(/indexedDB|SERIAL 123|privat depot|depot/i);
+});
+
 it('lets users generate after-action Markdown, JSON and PDF-ready exports from the mission UI', async () => {
   const afterActionChecklists = [
     {

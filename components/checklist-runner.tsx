@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { OperationalChecklist } from '@/lib/content/schemas';
 import { getChecklistRun, saveChecklistRun } from '@/lib/mission/local-store';
+import { equipmentStatusLabels, equipmentStatuses } from '@/lib/mission/equipment-readiness';
+import type { EquipmentStatus } from '@/lib/mission/schemas';
 
 export function ChecklistRunner({ checklist, missionId }: { checklist: OperationalChecklist; missionId: string }) {
   const runId = `${missionId}:${checklist.slug}`;
@@ -12,11 +14,14 @@ export function ChecklistRunner({ checklist, missionId }: { checklist: Operation
 function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: OperationalChecklist; missionId: string; runId: string }) {
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [notesByItemId, setNotesByItemId] = useState<Record<string, string>>({});
+  const [equipmentStatusByItemId, setEquipmentStatusByItemId] = useState<Record<string, EquipmentStatus>>({});
   const [hydrated, setHydrated] = useState(false);
   const checkedRef = useRef<Set<string>>(new Set());
   const notesByItemIdRef = useRef<Record<string, string>>({});
+  const equipmentStatusByItemIdRef = useRef<Record<string, EquipmentStatus>>({});
   const writeQueueRef = useRef<Promise<void>>(Promise.resolve());
   const sourceIds = useMemo(() => [...new Set([...(checklist.sourceIds ?? []), ...checklist.items.flatMap((item) => item.sourceIds ?? [])])], [checklist]);
+  const isEquipmentChecklist = checklist.slug.startsWith('mbk-') || (checklist.equipmentRequired ?? []).length > 0;
   const requiredItems = useMemo(() => checklist.items.filter((item) => item.required), [checklist]);
   const requiredDone = requiredItems.filter((item) => checked.has(item.id)).length;
   const progress = checklist.items.length > 0 ? Math.round((checked.size / checklist.items.length) * 100) : 0;
@@ -25,12 +30,15 @@ function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: Oper
     let cancelled = false;
     getChecklistRun(runId).then((run) => {
       if (cancelled) return;
-      const nextChecked = run ? new Set(run.checkedItemIds) : new Set<string>();
+      const nextChecked = new Set(run?.checkedItemIds ?? []);
       const nextNotesByItemId = run?.notesByItemId ?? {};
+      const nextEquipmentStatusByItemId = run?.equipmentStatusByItemId ?? {};
       checkedRef.current = nextChecked;
       notesByItemIdRef.current = nextNotesByItemId;
+      equipmentStatusByItemIdRef.current = nextEquipmentStatusByItemId;
       setChecked(nextChecked);
       setNotesByItemId(nextNotesByItemId);
+      setEquipmentStatusByItemId(nextEquipmentStatusByItemId);
       setHydrated(true);
     });
     return () => {
@@ -38,13 +46,14 @@ function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: Oper
     };
   }, [runId]);
 
-  function persist(nextChecked: Set<string>, nextNotesByItemId: Record<string, string>) {
+  function persist(nextChecked: Set<string>, nextNotesByItemId: Record<string, string>, nextEquipmentStatusByItemId: Record<string, EquipmentStatus>) {
     const snapshot = {
       id: runId,
       missionId,
       templateSlug: checklist.slug,
       checkedItemIds: [...nextChecked],
       notesByItemId: nextNotesByItemId,
+      equipmentStatusByItemId: nextEquipmentStatusByItemId,
       updatedAt: new Date().toISOString(),
       schemaVersion: 1,
     };
@@ -61,7 +70,7 @@ function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: Oper
     else next.add(itemId);
     checkedRef.current = next;
     setChecked(next);
-    await persist(next, notesByItemIdRef.current);
+    await persist(next, notesByItemIdRef.current, equipmentStatusByItemIdRef.current);
   }
 
   function updateNote(itemId: string, note: string) {
@@ -74,7 +83,14 @@ function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: Oper
     const nextNotesByItemId = notesByItemIdRef.current[itemId] === note ? notesByItemIdRef.current : { ...notesByItemIdRef.current, [itemId]: note };
     notesByItemIdRef.current = nextNotesByItemId;
     setNotesByItemId(nextNotesByItemId);
-    await persist(checkedRef.current, nextNotesByItemId);
+    await persist(checkedRef.current, nextNotesByItemId, equipmentStatusByItemIdRef.current);
+  }
+
+  async function updateEquipmentStatus(itemId: string, status: EquipmentStatus) {
+    const nextEquipmentStatusByItemId = { ...equipmentStatusByItemIdRef.current, [itemId]: status };
+    equipmentStatusByItemIdRef.current = nextEquipmentStatusByItemId;
+    setEquipmentStatusByItemId(nextEquipmentStatusByItemId);
+    await persist(checkedRef.current, notesByItemIdRef.current, nextEquipmentStatusByItemId);
   }
 
   return (
@@ -103,6 +119,19 @@ function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: Oper
               </span>
             </label>
             <p className="mt-1 text-xs text-slate-500">Kilder: {(item.sourceIds ?? []).join(', ')}</p>
+            {isEquipmentChecklist ? (
+              <label className="mt-2 block text-xs font-bold text-slate-700">
+                Materiellstatus for {item.label}
+                <select
+                  value={equipmentStatusByItemId[item.id] ?? 'ready'}
+                  disabled={!hydrated}
+                  onChange={(event) => void updateEquipmentStatus(item.id, event.currentTarget.value as EquipmentStatus)}
+                  className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm font-bold text-slate-900"
+                >
+                  {equipmentStatuses.map((status) => <option key={status} value={status}>{equipmentStatusLabels[status]}</option>)}
+                </select>
+              </label>
+            ) : null}
             <label className="mt-2 block text-xs font-bold text-slate-700">
               Lokal note for {item.label}
               <textarea
