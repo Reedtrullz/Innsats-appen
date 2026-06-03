@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T21:31:11.223Z",
+  "generatedAt": "2026-06-03T22:22:51.742Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-03T21:31:11.223Z",
+      "updatedAt": "2026-06-03T22:22:51.742Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -2531,233 +2531,349 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-140",
           "title": "Add dedicated oppdragsanalyse action card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 140: Add dedicated oppdragsanalyse action card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-141",
           "title": "Add OBBO/beslutningssløyfe action card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 141: Add OBBO/beslutningssløyfe action card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-142",
           "title": "Add leadership/command-and-control action card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 142: Add leadership/command-and-control action card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-143",
           "title": "Add presse/media handling action card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 143: Add presse/media handling action card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-144",
           "title": "Add ethics/role-boundary action card.",
-          "status": "active",
+          "status": "completed",
           "stage": "scope",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 144: Add ethics/role-boundary action card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-145",
           "title": "Add alvorlig ulykke/død eget personell action card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 145: Add alvorlig ulykke/død eget personell action card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-146",
           "title": "Add immediate 113/life-saving-first-aid escalation card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 146: Add immediate 113/life-saving-first-aid escalation card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-147",
           "title": "Add psychological first aid action sequence cards.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 147: Add psychological first aid action sequence cards."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-148",
           "title": "Add forced-debrief warning to psychological support content.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 148: Add forced-debrief warning to psychological support content."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-149",
           "title": "Add skogbrann action cards.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 149: Add skogbrann action cards."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-150",
           "title": "Add brann water-supply/slange support cards.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 150: Add brann water-supply/slange support cards."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-151",
           "title": "Add SAR/ettersøkning action cards.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 151: Add SAR/ettersøkning action cards."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-152",
           "title": "Add search sector/teig action card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 152: Add search sector/teig action card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-153",
           "title": "Add flom/pumpe/vannforsyning expanded cards.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 153: Add flom/pumpe/vannforsyning expanded cards."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-154",
           "title": "Add skred safety/samvirke card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 154: Add skred safety/samvirke card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-155",
           "title": "Add evacuation support cards.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 155: Add evacuation support cards."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-156",
           "title": "Add samleplass skadde expanded cards without patient journal fields.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 156: Add samleplass skadde expanded cards without patient journal fields."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-157",
           "title": "Add tilfluktsrom/public protection readiness cards.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 157: Add tilfluktsrom/public protection readiness cards."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-158",
           "title": "Add CBRNE soneinndeling card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 158: Add CBRNE soneinndeling card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-159",
           "title": "Add CBRNE verneutstyr/stoppkriterier card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 159: Add CBRNE verneutstyr/stoppkriterier card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-160",
           "title": "Add MRE clean/dirty-side and grovrens cards.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 160: Add MRE clean/dirty-side and grovrens cards."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-161",
           "title": "Add RADIAC measure-point card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 161: Add RADIAC measure-point card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-162",
           "title": "Add RADIAC oppholdstid/rullering card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 162: Add RADIAC oppholdstid/rullering card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-163",
           "title": "Add MFE request/receive/follow-up cards.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 163: Add MFE request/receive/follow-up cards."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-164",
           "title": "Add map/compass/GPS position-reporting cards.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 164: Add map/compass/GPS position-reporting cards."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-165",
           "title": "Add route/evacuation-way card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 165: Add route/evacuation-way card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-166",
           "title": "Add vehicle/transport readiness card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 166: Add vehicle/transport readiness card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-167",
           "title": "Add pump electrical hazard card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 167: Add pump electrical hazard card."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-168",
           "title": "Add contaminated-equipment handling warning card.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-03T22:22:40.000Z",
+          "evidence": [
+            "Implemented in commit e1ffabb (29 source-backed operational action cards for oppdragsanalyse/OBBO/ELS/media/ethics/serious-incident/113/psychological support/fire/SAR/flood/skred/evacuation/samleplass/tilfluktsrom/CBRNE/MRE/RADIAC/MFE/map-route-transport/pump/contaminated-equipment, plus privacy/safety fixture coverage). Gates: content vitest 3 files/22 tests PASS; build:content PASS with valid graph; typecheck PASS; lint PASS; git diff --check PASS; spec review PASS; code quality re-review APPROVED."
+          ],
           "sourceHeading": "Task 168: Add contaminated-equipment handling warning card."
         },
         {
