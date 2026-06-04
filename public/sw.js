@@ -13,6 +13,7 @@ const STATIC_APP_SHELL = [
   '/oppdrag',
   '/oppdrag/ny',
   '/laering',
+  '/kart',
   '/moduler/cbrn',
   '/moduler/mfe',
   '/moduler/radiac',
@@ -47,6 +48,31 @@ async function precacheUrl(cache, url) {
   }
 }
 
+async function precacheHtmlAssets(cache, response, baseUrl) {
+  if (!response || !response.ok) return;
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('text/html')) return;
+  let html = '';
+  try {
+    html = await response.clone().text();
+  } catch (_) {
+    return;
+  }
+  const assets = new Set();
+  const attrPattern = /\b(?:src|href)=["']([^"']+)["']/g;
+  for (const match of html.matchAll(attrPattern)) {
+    try {
+      const assetUrl = new URL(match[1], baseUrl);
+      if (assetUrl.origin === self.location.origin && assetUrl.pathname.startsWith('/_next/')) {
+        assets.add(`${assetUrl.pathname}${assetUrl.search}`);
+      }
+    } catch (_) {
+      // Ignore malformed relative URLs in generated HTML.
+    }
+  }
+  await Promise.all([...assets].map((url) => precacheUrl(cache, url)));
+}
+
 async function fetchGeneratedJson(cache, url) {
   const response = await precacheUrl(cache, url);
   if (!response || !response.ok) return [];
@@ -74,7 +100,10 @@ async function discoverGeneratedRoutes(cache) {
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      await Promise.all(STATIC_APP_SHELL.map((url) => precacheUrl(cache, url)));
+      await Promise.all(STATIC_APP_SHELL.map(async (url) => {
+        const response = await precacheUrl(cache, url);
+        await precacheHtmlAssets(cache, response, new URL(url, self.location.origin).href);
+      }));
       const generatedRoutes = await discoverGeneratedRoutes(cache);
       await Promise.all(generatedRoutes.map((url) => precacheUrl(cache, url)));
     }).then(() => self.skipWaiting()),

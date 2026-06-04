@@ -1,12 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { AppShell } from '@/components/app-shell';
 
 it('shows mobile navigation links with current route', () => {
-  render(<AppShell currentPath="/hurtigkort"><p>Innhold</p></AppShell>);
-  for (const label of ['Hurtigkort', 'Før', 'Under', 'Etter', 'Oppdrag', 'Kilder']) {
-    expect(screen.getByRole('link', { name: label })).toBeInTheDocument();
+  render(<AppShell currentPath="/kart"><p>Innhold</p></AppShell>);
+  const navigation = within(screen.getByRole('navigation', { name: /Hovednavigasjon/i }));
+  for (const label of ['Hurtigkort', 'Før', 'Under', 'Etter', 'Oppdrag', 'Kart', 'Kilder']) {
+    expect(navigation.getByRole('link', { name: label })).toBeInTheDocument();
   }
-  expect(screen.getByRole('link', { name: 'Hurtigkort' })).toHaveAttribute('aria-current', 'page');
+  expect(navigation.getByRole('link', { name: 'Kart' })).toHaveAttribute('aria-current', 'page');
 });
 
 it('keeps a visible decision-support and local-only disclaimer in the persistent shell', () => {
@@ -27,6 +28,7 @@ it('shows generated content version and expanded content navigation', () => {
   expect(screen.getByTestId('shell-content-version')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /Kildegjennomgang/i })).toHaveAttribute('href', '/kildegjennomgang');
   expect(screen.getByRole('link', { name: /Datakilder/i })).toHaveAttribute('href', '/datakilder');
+  expect(screen.getAllByRole('link', { name: /Kart/i }).some((link) => link.getAttribute('href') === '/kart')).toBe(true);
   expect(screen.getByRole('link', { name: /FAQ/i })).toHaveAttribute('href', '/faq');
   expect(screen.getByRole('link', { name: /Endringer/i })).toHaveAttribute('href', '/endringer');
   expect(screen.getByRole('link', { name: /Må leses/i })).toHaveAttribute('href', '/ma-leses');
