@@ -1,0 +1,62 @@
+import { render, screen } from '@testing-library/react';
+import { expect, it } from 'vitest';
+import { MissionCommandHeader, MissionExportShortcuts, MissionProgressSummary } from '@/components/mission-command-summary';
+import type { OperationalChecklist } from '@/lib/content/schemas';
+import type { MissionContext } from '@/lib/mission/schemas';
+
+const mission: MissionContext = {
+  id: 'mission-flom-jaren',
+  title: 'Flom Jaren',
+  createdAt: '2026-06-04T08:00:00.000Z',
+  updatedAt: '2026-06-04T08:30:00.000Z',
+  phase: 'under',
+  role: 'lagforer',
+  scenario: 'flom',
+  locationText: 'Jaren',
+  externalSignals: [],
+  externalSignalHistory: [],
+  activeChecklistIds: ['fig-under-innsats'],
+  notes: '',
+  tasks: [{ id: 'task-done', title: 'Sikre pumpepunkt', status: 'done', createdAt: '2026-06-04T08:05:00.000Z', updatedAt: '2026-06-04T08:20:00.000Z' }],
+  statusLog: [],
+  resourceRequests: [],
+  fieldLogEntries: [],
+  ruhReports: [],
+  welfareChecks: [],
+  contentVersion: 'test-v1',
+  schemaVersion: 1,
+};
+
+const checklists: OperationalChecklist[] = [
+  {
+    slug: 'fig-under-innsats',
+    title: 'FIG under innsats',
+    phase: 'under',
+    roles: ['lagforer'],
+    scenarios: ['flom'],
+    sourceIds: ['src-fig-under-innsats'],
+    items: [{ id: 'trygg-innsats', label: 'Trygg innsats vurdert', required: true, sourceIds: ['src-fig-under-innsats'] }],
+  },
+];
+
+it('renders a situation-first mission command header', () => {
+  render(<MissionCommandHeader mission={mission} />);
+
+  expect(screen.getByRole('heading', { name: 'Oppdrag' })).toBeInTheDocument();
+  expect(screen.getByText('Flom Jaren · Jaren')).toBeInTheDocument();
+  expect(screen.getByText('Lokal lagring · Ikke delt')).toBeInTheDocument();
+});
+
+it('renders progress status and export shortcuts', () => {
+  render(
+    <>
+      <MissionProgressSummary mission={mission} checklists={checklists} />
+      <MissionExportShortcuts />
+    </>,
+  );
+
+  expect(screen.getByRole('heading', { name: 'Fremdrift' })).toBeInTheDocument();
+  expect(screen.getByText('Under innsats')).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: '5-punktsordre' })).toHaveAttribute('href', '#5-punktsordre');
+  expect(screen.getByRole('link', { name: 'Sambandsplan' })).toHaveAttribute('href', '#sambandsplan');
+});
