@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T14:33:36.977Z",
+  "generatedAt": "2026-06-04T17:28:59.756Z",
   "sourceCount": 7,
   "workplans": [
     {
@@ -5452,172 +5452,253 @@
       "sourcePath": ".hermes/plans/2026-06-04_161415-offline-map-mission-integration-plan.md",
       "sourceType": "hermes-plan",
       "summary": "Make Innsats-appen more operationally useful during real field work by deeply integrating the existing offline schematic map, local field logging, active missions, phases and Feltmodus without adding backend sync, auth, live tracking, patient/persondata or official command-system claims.",
-      "stage": "build",
+      "stage": "release",
       "risk": "high",
-      "status": "active",
+      "status": "completed",
+      "owner": "AR",
+      "completedAt": "2026-06-04T17:27:57.000Z",
+      "evidence": [
+        "Completed through final audit and export/privacy remediation in commit 1cecc14aefc9492d024b2c11e833d127ba59563b.",
+        "Local closeout gates passed after audit fixes: npm run check:ci PASS (403 Vitest tests, 29 production Playwright E2E tests, performance budget PASS, Lighthouse mobile score 97/resource budget PASS) and focused production E2E PASS (13/13).",
+        "Post-implementation audit PASS and provenance/privacy UI re-audit APPROVED after sanitizing local operational exports.",
+        "GitHub Actions CI / Deploy run 26967774163 completed successfully for exact SHA 1cecc14aefc9492d024b2c11e833d127ba59563b: Automatic checks, GHCR image build/push, and Deploy to VPS with Ansible all success, including the workflow public deployment version verification step.",
+        "Architecture docs read: docs/adr/2026-06-04-offline-map-architecture.md, docs/adr/2026-06-04-offline-map-operational-overlays.md, docs/integration-architecture-guardrails.md, docs/mvp-boundaries.md, docs/ui-operational-command-surface.md."
+      ],
       "taskCount": 18,
-      "updatedAt": "2026-06-04T14:33:36.977Z",
+      "updatedAt": "2026-06-04T17:28:59.756Z",
       "tasks": [
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-1",
           "title": "Lock the offline tile-engine boundary before map work",
-          "status": "planned",
-          "stage": "scope",
+          "status": "completed",
+          "stage": "release",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 6883b11 locked local-only map boundary in ADR/docs guard; docs test PASS."
+          ],
           "sourceHeading": "Task 1: Lock the offline tile-engine boundary before map work"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-2",
           "title": "Add map-reference fields to local field-log entries",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 14f6c19 added schematic field-log map references with privacy/schema tests PASS."
+          ],
           "sourceHeading": "Task 2: Add map-reference fields to local field-log entries"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-3",
           "title": "Preserve map references in field-log filters and exports",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 53aacbb added map-to-field-log helper with mission/link privacy tests PASS."
+          ],
           "sourceHeading": "Task 3: Preserve map references in field-log filters and exports"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-4",
           "title": "Add pure helper for creating field-log entries from map objects",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 53aacbb wired map panel field-log creation from schematic markers with component tests PASS."
+          ],
           "sourceHeading": "Task 4: Add pure helper for creating field-log entries from map objects"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-5",
           "title": "Let the map page create a local mission log entry from a marker",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 2d8ba35 added explicit map-to-log privacy copy and audit trail coverage PASS."
+          ],
           "sourceHeading": "Task 5: Let the map page create a local mission log entry from a marker"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-6",
           "title": "Show map/log summary on the mission dashboard",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 9eb43c8 added mission dashboard map/log summary with component tests PASS."
+          ],
           "sourceHeading": "Task 6: Show map/log summary on the mission dashboard"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-7",
           "title": "Add /under phase map/log operational entry points",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit ca2d301 added Under phase map/log operational entry points with route/component coverage PASS."
+          ],
           "sourceHeading": "Task 7: Add /under phase map/log operational entry points"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-8",
           "title": "Add map-first Feltmodus quick actions",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 5cc2f19 added map-first Feltmodus quick actions with field-mode tests PASS."
+          ],
           "sourceHeading": "Task 8: Add map-first Feltmodus quick actions"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-9",
           "title": "Adapt map page touch targets when Feltmodus/hanskemodus is active",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 5cc2f19 adapted map controls for Feltmodus/hanskemodus with touch-target tests PASS."
+          ],
           "sourceHeading": "Task 9: Adapt map page touch targets when Feltmodus/hanskemodus is active"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-10",
           "title": "Add order-update suggestions from important field logs",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 43303e4 suggested manual order updates from critical field logs with mission-dashboard tests PASS."
+          ],
           "sourceHeading": "Task 10: Add order-update suggestions from important field logs"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-11",
           "title": "Strengthen Etter phase with RUH/welfare/field-log summary CTA",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 94092c8 strengthened Etter phase RUH/welfare/field-log summary CTA with component tests PASS."
+          ],
           "sourceHeading": "Task 11: Strengthen Etter phase with RUH/welfare/field-log summary CTA"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-12",
           "title": "Include field-log entries in after-action reports by default",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 2dedf7a included structured field-log entries in after-action reports by default with report tests PASS."
+          ],
           "sourceHeading": "Task 12: Include field-log entries in after-action reports by default"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-13",
           "title": "Add map summary to after-action report",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit ff2ab65 included sanitized map summary in after-action reports and UI export wiring with tests PASS."
+          ],
           "sourceHeading": "Task 13: Add map summary to after-action report"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-14",
           "title": "Create local oppdragsmappe export bundle",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 5874b9a built local oppdragsmappe export bundle with mission-folder export tests PASS."
+          ],
           "sourceHeading": "Task 14: Create local oppdragsmappe export bundle"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-15",
           "title": "Add oppdragsmappe UI export on mission dashboard",
-          "status": "planned",
-          "stage": "build",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 90e36af added oppdragsmappe UI export on mission dashboard with component tests PASS."
+          ],
           "sourceHeading": "Task 15: Add oppdragsmappe UI export on mission dashboard"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-16",
           "title": "Add mobile/offline E2E for map → log → mission → after-action flow",
-          "status": "planned",
-          "stage": "verify",
+          "status": "completed",
+          "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit 0632e0d added production mobile/offline E2E for map → log → mission → after-action/oppdragsmappe flow; full production Playwright suite PASS."
+          ],
           "sourceHeading": "Task 16: Add mobile/offline E2E for map → log → mission → after-action flow"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-17",
           "title": "Update docs for map/log/Feltmodus operational workflow",
-          "status": "planned",
-          "stage": "verify",
+          "status": "completed",
+          "stage": "release",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Commit d8947bf documented map/log/Feltmodus workflow with docs tests PASS."
+          ],
           "sourceHeading": "Task 17: Update docs for map/log/Feltmodus operational workflow"
         },
         {
           "id": "2026-06-04_161415-offline-map-mission-integration-plan-task-18",
           "title": "Final audit, workplan sync, CI and deployment verification",
-          "status": "planned",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-04T17:27:57.000Z",
+          "evidence": [
+            "Final closeout completed in commit 1cecc14aefc9492d024b2c11e833d127ba59563b: check:ci PASS, focused production E2E PASS, post-implementation/provenance re-audits PASS/APPROVED, workplan sync verified, GitHub Actions run 26967774163 success for exact SHA with deploy job success."
+          ],
           "sourceHeading": "Task 18: Final audit, workplan sync, CI and deployment verification"
         }
       ]
