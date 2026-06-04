@@ -19,6 +19,8 @@ Beredskapsboka will support only local schematic 0-100 map overlays in the MVP:
 
 The map remains a decision-support sketch, not an authoritative navigation map and not an official command system.
 
+For this iteration, schematic 0-100 coordinates remain the only supported coordinates for markers, sectors, logging links, mission summaries and exports.
+
 ## Privacy and governance constraints
 
 Exports and imports must show this warning:

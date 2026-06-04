@@ -79,3 +79,9 @@ The implementation must include:
 - Cache size warning.
 - Performance guard for capped rendered features.
 - Unit/component tests and an E2E test asserting the page does not request tile/map-provider URLs.
+
+## Next iteration boundary
+
+The operational map/logging/Feltmodus integration iteration continues to use the accepted schematic local map architecture. No MapLibre, Leaflet, MBTiles or Kartverket tile runtime is added by the operational-integration iteration.
+
+If real offline tiles are needed later, create a separate governed package plan before coding. That plan must cover license/attribution, tile source approval, package generation, package signing or integrity, update cadence, offline storage quota, user consent, cache eviction, bundle/performance budgets, and production verification that no external tile network calls occur during offline use.

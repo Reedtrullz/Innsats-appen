@@ -104,4 +104,20 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(maintenance).toMatch(/EVENT_SCHEDULE/);
     expect(maintenance).toMatch(/issues: write/);
   });
+
+  it('keeps the next map iteration local-only until tile-package governance exists', () => {
+    const architecture = read('docs/adr/2026-06-04-offline-map-architecture.md');
+    const overlays = read('docs/adr/2026-06-04-offline-map-operational-overlays.md');
+    const packageJson = JSON.parse(read('package.json')) as { dependencies: Record<string, string>; devDependencies: Record<string, string> };
+    const allDependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
+
+    expect(architecture).toContain('Next iteration boundary');
+    expect(architecture).toContain('No MapLibre, Leaflet, MBTiles or Kartverket tile runtime is added by the operational-integration iteration');
+    expect(architecture).toContain('separate governed package plan');
+    expect(overlays).toContain('schematic 0-100 coordinates remain the only supported coordinates');
+    const forbiddenMapDependencies = ['maplibre-gl', 'leaflet', '@maplibre/maplibre-gl-js-amplify', 'mbtiles'];
+    for (const dependency of forbiddenMapDependencies) {
+      expect(Object.keys(allDependencies)).not.toContain(dependency);
+    }
+  });
 });
