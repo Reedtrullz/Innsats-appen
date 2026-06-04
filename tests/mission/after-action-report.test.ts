@@ -100,7 +100,7 @@ it('builds a structured after-action report template autofilled from mission, ch
     localLogText: 'Logg: laget returnerte depot kl 10:20',
   });
 
-  expect(report.schemaVersion).toBe(1);
+  expect(report.schemaVersion).toBe(2);
   expect(report.generatedAt).toBe('2026-06-03T11:00:00.000Z');
   expect(report.mission.title).toBe('FIG etterinnsats lokal rapport');
   expect(report.warnings.join(' ')).toContain('Lagres bare lokalt');
@@ -159,6 +159,39 @@ it('uses structured mission field-log entries in after-action local log section'
   expect(report.sections.localLog.entries.join('\n')).toContain('Vannstand synker ved sektor A');
   expect(report.sections.localLog.entries.join('\n')).toContain('Sektor A 20,30');
   expect(JSON.stringify(report)).not.toMatch(/lat|lon|geometry|rawRef/i);
+});
+
+it('includes sanitized schematic map summary in after-action report when provided', () => {
+  const report = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapState: {
+      markers: [{ id: 'marker-ko', itemType: 'marker', kind: 'il-ko', label: 'KO lokal', point: { x: 22, y: 33 }, createdAt: '2026-06-03T09:00:00.000Z' }],
+      drawings: [{ id: 'sector-a', itemType: 'drawing', kind: 'sector', label: 'Sektor A', points: [{ x: 10, y: 10 }, { x: 30, y: 10 }, { x: 20, y: 30 }], createdAt: '2026-06-03T09:10:00.000Z' }],
+    },
+  });
+
+  expect(report.sections.mapSummary).toMatchObject({ markerCount: 1, drawingCount: 1 });
+  expect(report.sections.mapSummary.items.join(' ')).toContain('KO lokal');
+  expect(report.sections.mapSummary.items.join(' ')).toContain('Sektor A');
+  expect(JSON.stringify(report.sections.mapSummary)).not.toMatch(/lat|lon|geometry|rawRef|marker-ko|sector-a/i);
+  expect(exportAfterActionMarkdown(report)).toContain('## Kart (skjematisk lokal oppsummering)');
+  expect(exportAfterActionMarkdown(report)).toContain('KO lokal');
+  expect(exportAfterActionPdfReadyHtml(report)).toContain('Sektor A');
+
+  const malformedReport = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapState: {
+      markers: [{ id: 'real-marker', itemType: 'marker', kind: 'il-ko', label: 'Ekte koordinat', point: { lat: 63.4, lon: 10.4 }, createdAt: '2026-06-03T09:00:00.000Z', rawRef: 'secret' }],
+      drawings: [{ id: 'bad-sector', itemType: 'drawing', kind: 'sector', label: 'For få punkter', points: [{ x: 10, y: 10 }], createdAt: '2026-06-03T09:10:00.000Z', geometry: { type: 'Point' } }],
+    } as any,
+  });
+  expect(malformedReport.sections.mapSummary).toMatchObject({ markerCount: 0, drawingCount: 0, items: [] });
 });
 
 it('does not classify medical personellskade resource notes as equipment damage or loss', () => {
@@ -383,7 +416,7 @@ it('exports after-action Markdown, JSON and PDF-ready HTML with local-only warni
   expect(markdown).toContain('Ikke offisiell innsending');
 
   const parsed = JSON.parse(json);
-  expect(parsed.schemaVersion).toBe(1);
+  expect(parsed.schemaVersion).toBe(2);
   expect(parsed.generatedAt).toBe('2026-06-03T11:00:00.000Z');
   expect(parsed.sections.lessonsLearned.followUp).toContain('skiftbytte');
   expect(parsed.sections.feedback.equipment).toContain('arbeidslys');

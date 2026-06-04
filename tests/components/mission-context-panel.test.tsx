@@ -195,6 +195,10 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
     schemaVersion: 1,
   } as any);
   await saveChecklistRun({ id: 'run-aar-ui', missionId: 'm2c2-after-action-ui', templateSlug: 'fig-under-innsats', checkedItemIds: ['materiell-sjekket'], notesByItemId: { 'ressursbruk-notert': 'Fylles etter retur' }, updatedAt: '2026-06-03T09:25:00.000Z', schemaVersion: 1 });
+  localStorage.setItem(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({
+    markers: [{ id: 'marker-aar-ui', itemType: 'marker', kind: 'il-ko', label: 'KO etterrapport', point: { x: 22, y: 33 }, createdAt: '2026-06-03T09:15:00.000Z' }],
+    drawings: [{ id: 'sector-aar-ui', itemType: 'drawing', kind: 'sector', label: 'Sektor etterrapport', points: [{ x: 10, y: 10 }, { x: 30, y: 10 }, { x: 20, y: 30 }], createdAt: '2026-06-03T09:16:00.000Z' }],
+  }));
 
   render(<MissionContextPanel contentVersion="test-v1" checklists={afterActionChecklists} />);
 
@@ -218,8 +222,11 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
   expect(markdownPreview.value).toContain('Eksporterte filer kan inneholde operasjonelt sensitiv informasjon');
   expect(markdownPreview.value).toContain('Ordre fra lokal tavle');
   expect(markdownPreview.value).toContain('MBK-status / materiellberedskap');
+  expect(markdownPreview.value).toContain('KO etterrapport');
   expect(jsonPreview.value).toContain('"schemaVersion"');
   expect(jsonPreview.value).toContain('Skadet arbeidslys');
+  expect(jsonPreview.value).toContain('Sektor etterrapport');
+  expect(jsonPreview.value).not.toMatch(/lat|lon|geometry|rawRef|marker-aar-ui|sector-aar-ui/i);
   expect(pdfPreview.value).toContain('PDF-klar utskrift / bruk nettleserens Skriv ut &gt; Lagre som PDF');
   expect(pdfPreview.value).toContain('<!doctype html>');
 });

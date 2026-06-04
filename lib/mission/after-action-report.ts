@@ -1,10 +1,11 @@
 import type { OperationalChecklist } from '@/lib/content/schemas';
 import { EXPORT_SENSITIVITY_WARNING } from './order-export';
 import { FIELD_LOG_CATEGORY_LABELS, sortFieldLogEntries } from './field-log';
+import { MAP_DRAWING_LABELS, MAP_MARKER_LABELS, normalizeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
 import type { ChecklistRun, MissionContext, MissionFeedback, MissionLessonsLearned, MissionResourceRequest } from './schemas';
 
 export const AFTER_ACTION_LOCAL_WARNING = 'Lagres bare lokalt i denne nettleseren. Ikke offisiell innsending eller offisiell logg alene. Ikke legg inn eller del navn, ID, pasientdetaljer, helsejournal, skjermet operativ informasjon, sensitive private lokasjoner eller annet sensitivt innhold.';
-export const AFTER_ACTION_SCHEMA_VERSION = 1;
+export const AFTER_ACTION_SCHEMA_VERSION = 2;
 
 const NOT_REGISTERED = 'Ikke registrert i lokal oppdragstavle';
 
@@ -121,6 +122,12 @@ export type AfterActionReport = {
     order: TextSection;
     samband: TextSection;
     localLog: { entries: string[]; registered: boolean };
+    mapSummary: {
+      markerCount: number;
+      drawingCount: number;
+      items: string[];
+      warning: string;
+    };
     contextSignals: Array<{
       source: MissionContext['externalSignals'][number]['source'];
       kind: string;
@@ -154,6 +161,7 @@ export type BuildAfterActionReportInput = {
   localOrderText?: string;
   localSambandText?: string;
   localLogText?: string;
+  mapState?: MissionMapState;
 };
 
 function trimToSection(value: string | undefined): TextSection {
@@ -177,6 +185,20 @@ function structuredFieldLogEntries(mission: MissionContext) {
     const flagText = flags.length ? ` — ${flags.join(', ')}` : '';
     return `${entry.timestamp} — ${FIELD_LOG_CATEGORY_LABELS[entry.category]}${location}${map}${flagText}: ${entry.text}`;
   }).join('\n');
+}
+
+
+function buildMapSummary(mapState: MissionMapState | undefined) {
+  const state = normalizeMissionMapState(mapState ?? { markers: [], drawings: [] });
+  return {
+    markerCount: state.markers.length,
+    drawingCount: state.drawings.length,
+    items: [
+      ...state.markers.slice(0, 10).map((marker) => `${MAP_MARKER_LABELS[marker.kind]}: ${marker.label} (${marker.point.x},${marker.point.y})`),
+      ...state.drawings.slice(0, 10).map((drawing) => `${MAP_DRAWING_LABELS[drawing.kind]}: ${drawing.label} (${drawing.points.length} punkter)`),
+    ],
+    warning: 'Skjematiske 0-100 kartdata fra lokal nettleser. Ikke autoritativ navigasjon eller offisiell posisjon.',
+  };
 }
 
 function withNote(note: string | undefined) {
@@ -339,7 +361,7 @@ function buildMbkSummary(checklists: OperationalChecklist[], runs: ChecklistRun[
   };
 }
 
-export function buildAfterActionReport({ mission, checklists, checklistRuns, generatedAt, localOrderText, localSambandText, localLogText }: BuildAfterActionReportInput): AfterActionReport {
+export function buildAfterActionReport({ mission, checklists, checklistRuns, generatedAt, localOrderText, localSambandText, localLogText, mapState }: BuildAfterActionReportInput): AfterActionReport {
   const reportChecklists = checklistSummaries(checklists, checklistRuns);
   const resourceEntries = mission.resourceRequests.map(resourceEntry);
   const equipmentDamageLoss = resourceEntries.filter(isEquipmentDamageOrLoss);
@@ -366,6 +388,7 @@ export function buildAfterActionReport({ mission, checklists, checklistRuns, gen
       order: trimToSection(localOrderText),
       samband: trimToSection(localSambandText),
       localLog: logEntries(localLogSource),
+      mapSummary: buildMapSummary(mapState),
       contextSignals: mission.externalSignals.map((signal) => ({
         source: signal.source,
         kind: signal.kind,
@@ -461,6 +484,13 @@ export function exportAfterActionMarkdown(report: AfterActionReport) {
   lines.push('');
   lines.push('## Lokal logg');
   bulletOrPlaceholder(lines, report.sections.localLog.entries, NOT_REGISTERED);
+  lines.push('');
+  const reportMapSummary = report.sections.mapSummary ?? buildMapSummary(undefined);
+  lines.push('## Kart (skjematisk lokal oppsummering)');
+  lines.push(`- Markører: ${reportMapSummary.markerCount}`);
+  lines.push(`- Tegninger/sektorer: ${reportMapSummary.drawingCount}`);
+  lines.push(`- Advarsel: ${reportMapSummary.warning}`);
+  bulletOrPlaceholder(lines, reportMapSummary.items, 'Ingen lokale kartmarkører eller sektorer registrert');
   lines.push('');
   lines.push('## Vær/farer (saniterte lokale sammendrag)');
   bulletOrPlaceholder(lines, report.sections.contextSignals.map((signal) => `${signal.title}: ${signal.summary} (${signal.source}, ${signal.severity}, ${signal.staleness})`), 'Ingen lokale sammendrag lagret');

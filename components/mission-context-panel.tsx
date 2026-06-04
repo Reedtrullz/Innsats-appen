@@ -21,7 +21,7 @@ import { DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS, disabledExternalDataSources, dis
 import { MissionCommandHeader, MissionExportShortcuts, MissionProgressSummary } from './mission-command-summary';
 import { TiltakCard } from './tiltak-card';
 import { MissionMapSummary } from './mission-map-summary';
-import { missionMapStateSnapshot, normalizeMissionMapState, subscribeMissionMapState } from '@/lib/maps/operations-map';
+import { missionMapStateSnapshot, normalizeMissionMapState, subscribeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
 
 function formatUpdatedAt(value: string) {
   return new Intl.DateTimeFormat('nb-NO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
@@ -672,7 +672,7 @@ function EquipmentReadinessExportControls({ mission, checklists }: { mission: Mi
   );
 }
 
-function AfterActionReportControls({ mission, displaySignals, checklists, fallbackChecklist }: { mission: MissionContext; displaySignals: MissionContext['externalSignals']; checklists: OperationalChecklist[]; fallbackChecklist?: OperationalChecklist }) {
+function AfterActionReportControls({ mission, displaySignals, checklists, fallbackChecklist, mapState }: { mission: MissionContext; displaySignals: MissionContext['externalSignals']; checklists: OperationalChecklist[]; fallbackChecklist?: OperationalChecklist; mapState: MissionMapState }) {
   const [localOrderText, setLocalOrderText] = useState('');
   const [localSambandText, setLocalSambandText] = useState('');
   const [localLogText, setLocalLogText] = useState('');
@@ -690,6 +690,7 @@ function AfterActionReportControls({ mission, displaySignals, checklists, fallba
       localOrderText,
       localSambandText,
       localLogText,
+      mapState,
     });
   }
 
@@ -827,7 +828,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
       <RuhWelfareControls mission={mission} onMissionChange={onMissionChange} />
       <EquipmentReadinessExportControls mission={mission} checklists={checklists} />
       <StructuredLessonsFeedbackControls key={mission.id} mission={mission} onMissionChange={onMissionChange} onArchive={onArchive} />
-      <AfterActionReportControls mission={mission} displaySignals={staleSignals} checklists={checklists} fallbackChecklist={checklist} />
+      <AfterActionReportControls mission={mission} displaySignals={staleSignals} checklists={checklists} fallbackChecklist={checklist} mapState={mapState} />
 
       <section className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
         <div className="flex items-start justify-between gap-3">
