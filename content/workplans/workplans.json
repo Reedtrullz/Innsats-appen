@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T10:59:30.718Z",
+  "generatedAt": "2026-06-04T13:49:55.013Z",
   "sourceCount": 6,
   "workplans": [
     {
@@ -5275,20 +5275,26 @@
       "sourcePath": ".hermes/plans/2026-06-04_123416-operational-command-surface-ui-plan.md",
       "sourceType": "hermes-plan",
       "summary": "Transform Innsats-appen from a document/card portal feel into an operational field-support command surface centered on situation, phase, next action, checklist, export, and source confidence.",
-      "stage": "build",
+      "stage": "release",
       "risk": "high",
-      "status": "active",
+      "status": "completed",
       "owner": "AR",
+      "completedAt": "2026-06-04T13:49:20Z",
       "evidence": [
-        "Plan drafted 2026-06-04T10:34:16Z from user-provided Operational command surface UI direction after inspecting README.md, app/page.tsx, AppShell, BottomNav, mission dashboard, SearchBox, ActionCardList, ActionCardDetail, tests, and workplan sync conventions."
+        "Plan drafted 2026-06-04T10:34:16Z from user-provided Operational command surface UI direction after inspecting README.md, app/page.tsx, AppShell, BottomNav, mission dashboard, SearchBox, ActionCardList, ActionCardDetail, tests, and workplan sync conventions.",
+        "Implemented Tasks 1-16 across signed commits 8210878..71a2a08 with subagent implementation/review loops and parent-direct Task 14 mission dashboard wiring.",
+        "Final gate npm run check:ci passed after docs commit: build content, typecheck, lint, 69 Vitest files / 378 tests, production build, 28 production E2E, performance budget, Lighthouse mobile score 97.",
+        "Focused production E2E passed: PLAYWRIGHT_PROD=1 PLAYWRIGHT_PORT=3041 npx playwright test tests/e2e/core-mobile-journey.spec.ts tests/e2e/critical-search.spec.ts tests/e2e/accessibility-mobile.spec.ts --workers=1 --timeout=120000 (12/12 passed).",
+        "Post-implementation audit passes A/B/C completed; release absent from home/bottom nav, /mer marks admin/release non-field, /sok offline shell covered, local-only/persondata boundaries preserved, public generated JSON scan passed.",
+        "Audit follow-up fixed stale verified source overclaim in search metadata; commit 8eedf3ca22714868dc953855bd29744bb9276f9a; full npm run check:ci passed again with 69 Vitest files / 379 tests, 28 production E2E, performance budget, Lighthouse mobile score 97."
       ],
       "taskCount": 17,
-      "updatedAt": "2026-06-04T10:59:30.718Z",
+      "updatedAt": "2026-06-04T13:49:55.013Z",
       "tasks": [
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-1",
           "title": "Create shared operational status pills",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
@@ -5297,7 +5303,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-2",
           "title": "Replace home smoke expectations with command-surface behavior",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
@@ -5306,7 +5312,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-3",
           "title": "Implement the operational command-surface home page",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
@@ -5315,7 +5321,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-4",
           "title": "Extract shared search document builder",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
@@ -5324,7 +5330,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-5",
           "title": "Refactor Hurtigkort to use shared search builder",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "low",
           "owner": "AR",
@@ -5333,7 +5339,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-6",
           "title": "Make search UI operational and add /sok",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
@@ -5342,7 +5348,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-7",
           "title": "Add /mer route for secondary/admin links",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "low",
           "owner": "AR",
@@ -5351,7 +5357,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-8",
           "title": "Replace bottom nav with five operational tabs",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
@@ -5360,7 +5366,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-9",
           "title": "Refine AppShell header into compact operational chrome",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
@@ -5369,7 +5375,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-10",
           "title": "Create reusable TiltakCard presentation component",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
@@ -5378,7 +5384,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-11",
           "title": "Wire TiltakCard into card list and phase pages",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
@@ -5387,7 +5393,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-12",
           "title": "Add source confidence panel to card detail",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
@@ -5396,7 +5402,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-13",
           "title": "Extract mission dashboard presentation helpers",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "owner": "AR",
@@ -5405,7 +5411,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-14",
           "title": "Wire mission command summary into /oppdrag [PARENT-DIRECT]",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "owner": "AR",
@@ -5414,7 +5420,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-15",
           "title": "Add production mobile/accessibility/performance verification for the new shell",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
@@ -5423,7 +5429,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-16",
           "title": "Update README/docs for the operational command surface",
-          "status": "planned",
+          "status": "completed",
           "stage": "release",
           "risk": "medium",
           "owner": "AR",
@@ -5432,7 +5438,7 @@
         {
           "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-17",
           "title": "Final implementation audit, sync, and deployment verification",
-          "status": "planned",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
           "owner": "AR",
