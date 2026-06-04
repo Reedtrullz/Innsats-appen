@@ -41,3 +41,12 @@ test('search typo with no direct hit suggests canonical operational query and fo
   await expect(page.getByText(/Ingen treff/i)).toHaveCount(0);
   await expect(page.getByRole('link', { name: /Jodtabletter/i }).first()).toBeVisible();
 });
+
+test('search tab opens first-class operational search', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto('/sok');
+  await expect(page.getByRole('heading', { name: /Søk i tiltak, kilder og moduler/i })).toBeVisible();
+  await page.getByRole('searchbox').fill('pumpe');
+  await expect(page.getByText(/Søkeord:/i).first()).toBeVisible();
+  await expect(page.getByText(/Kilde:/i).first()).toBeVisible();
+});

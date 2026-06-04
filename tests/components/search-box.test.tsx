@@ -76,3 +76,50 @@ it('shows missing offline search-index indicator when explicitly requested witho
   render(<SearchBox documents={docs} showFreshnessIndicator />);
   expect(screen.getByText(/Lokalt søkeindeks/i)).toHaveTextContent(/mangler genereringstidspunkt/i);
 });
+
+it('shows operational result metadata and query terms', async () => {
+  render(<SearchBox documents={[{ ...docs[2], sourceStatus: 'verified', sourceIds: ['src-flom'] }]} />);
+  await userEvent.type(screen.getByRole('searchbox'), 'pumpe');
+
+  expect(screen.getByRole('link', { name: /Pumpe og vannforsyning/i })).toBeInTheDocument();
+  expect(screen.getByText(/Søkeord:/i)).toHaveTextContent(/pumpe/i);
+  expect(screen.getByText(/Fase:/i)).toHaveTextContent(/under/i);
+  expect(screen.getByText(/Kilde: verified/i)).toBeInTheDocument();
+});
+
+it('filters operational search results by phase, type and source status', async () => {
+  render(<SearchBox documents={[
+    { id: 'kort:flom', title: 'Flom og pumpe', body: 'pumpe', type: 'kort', phase: 'under', href: '/kort/flom', sourceStatus: 'verified' },
+    { id: 'kilde:flom', title: 'SRC - Flom', body: 'pumpe', type: 'kilde', href: '/kilder/src-flom', sourceStatus: 'unverified' },
+  ]} enableFilters />);
+
+  await userEvent.type(screen.getByRole('searchbox'), 'pumpe');
+  await userEvent.click(screen.getByRole('button', { name: /Fase: Under/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Type: kort/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Kilde: verified/i }));
+
+  expect(screen.getByRole('link', { name: 'Flom og pumpe' })).toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: 'SRC - Flom' })).not.toBeInTheDocument();
+});
+
+it('filters matching results before applying the visible result limit', async () => {
+  const highRankingKortDocs = Array.from({ length: 12 }, (_, index) => ({
+    id: `kort:limit-${index}`,
+    title: `Aa pumpe tiltak ${String(index).padStart(2, '0')}`,
+    body: 'pumpe',
+    type: 'kort',
+    href: `/kort/limit-${index}`,
+  }));
+  render(<SearchBox documents={[
+    ...highRankingKortDocs,
+    { id: 'kilde:late-match', title: 'Zz kilde etter limit', body: 'pumpe', type: 'kilde', href: '/kilder/late-match' },
+  ]} enableFilters />);
+
+  await userEvent.type(screen.getByRole('searchbox'), 'pumpe');
+  expect(screen.queryByRole('link', { name: 'Zz kilde etter limit' })).not.toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('button', { name: /Type: kilde/i }));
+
+  expect(screen.getByRole('link', { name: 'Zz kilde etter limit' })).toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: 'Aa pumpe tiltak 00' })).not.toBeInTheDocument();
+});

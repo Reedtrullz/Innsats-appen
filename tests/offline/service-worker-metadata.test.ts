@@ -9,14 +9,22 @@ import {
   parseServiceWorkerClientMessage,
 } from '@/lib/offline/service-worker-metadata';
 
+function extractStaticAppShell(sw: string) {
+  const match = sw.match(/const STATIC_APP_SHELL = \[([\s\S]*?)\];/);
+  expect(match).not.toBeNull();
+  return Array.from(match![1].matchAll(/'([^']+)'/g), ([, route]) => route);
+}
+
 describe('service worker metadata helpers', () => {
   it('keeps the public service-worker cache version aligned with the typed metadata', () => {
     const sw = fs.readFileSync(path.join(process.cwd(), 'public', 'sw.js'), 'utf8');
+    const staticAppShell = extractStaticAppShell(sw);
     expect(sw).toContain(`const SW_CACHE_VERSION = '${SW_CACHE_VERSION}'`);
     expect(sw).toContain('BEREDSKAPSBOKA_GET_SW_STATUS');
     expect(sw).toContain('BEREDSKAPSBOKA_SKIP_WAITING');
-    expect(sw).toContain("'/nytt'");
-    expect(sw).toContain("'/release'");
+    expect(staticAppShell).toContain('/nytt');
+    expect(staticAppShell).toContain('/sok');
+    expect(staticAppShell).not.toContain('/release');
   });
 
   it('detects stale generated content using the mobile/offline threshold', () => {

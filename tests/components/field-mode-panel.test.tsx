@@ -31,7 +31,7 @@ describe('FieldModePanel', () => {
     expect(quickActions.getByRole('link', { name: /5-punktsordre/i })).toHaveAttribute('href', '/oppdrag#5-punktsordre');
     expect(quickActions.getByRole('link', { name: /Sambandsplan/i })).toHaveAttribute('href', '/oppdrag#sambandsplan');
     expect(quickActions.getByRole('link', { name: /Eksporter status/i })).toHaveAttribute('href', '/oppdrag#statusrapport');
-    expect(quickActions.getByRole('link', { name: /Søk/i })).toHaveAttribute('href', '/hurtigkort#stress-search');
+    expect(quickActions.getByRole('link', { name: /Søk/i })).toHaveAttribute('href', '/sok#stress-search');
   });
 
   it('loads persisted field settings after mount without making first render depend on localStorage', async () => {

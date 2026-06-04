@@ -18,6 +18,7 @@ self.__BEREDSKAPSBOKA_SW_META__ = {
 const STATIC_APP_SHELL = [
   '/',
   '/hurtigkort',
+  '/sok',
   '/for',
   '/under',
   '/etter',
@@ -26,7 +27,6 @@ const STATIC_APP_SHELL = [
   '/faq',
   '/endringer',
   '/nytt',
-  '/release',
   '/ma-leses',
   '/oppdrag',
   '/oppdrag/ny',

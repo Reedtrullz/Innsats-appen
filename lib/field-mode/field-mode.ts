@@ -38,7 +38,7 @@ export const QUICK_ACTIONS = [
   { id: 'five-point-order', label: '5-punktsordre', href: '/oppdrag#5-punktsordre', helpText: 'Åpner lokal 5-punktsordre-mal.' },
   { id: 'comms-plan', label: 'Sambandsplan', href: '/oppdrag#sambandsplan', helpText: 'Åpner lokal sambandsplan-mal uten sensitive lister.' },
   { id: 'export-status', label: 'Eksporter status', href: '/oppdrag#statusrapport', helpText: 'Åpner lokal statusrapport/eksport. Ikke offisiell innsending.' },
-  { id: 'search', label: 'Søk', href: '/hurtigkort#stress-search', helpText: 'Åpner lokalt søk i hurtigkort og kilder.' },
+  { id: 'search', label: 'Søk', href: '/sok#stress-search', helpText: 'Åpner lokalt søk i tiltak, kilder og moduler.' },
 ] as const;
 
 export const VOICE_INPUT_EVALUATION = {
