@@ -12,12 +12,12 @@ export function AppShell({ children, currentPath }: { children: React.ReactNode;
   const manifest = getContentManifest();
   const mustReadCount = getMustReadNotices().length;
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-950">
+    <div className="min-h-screen overflow-x-clip bg-slate-50 text-slate-950">
       <FieldModeRuntime />
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
+        <div className="mx-auto flex max-w-3xl flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
           <a href="/hurtigkort" className="text-base font-black tracking-tight">Beredskapsboka</a>
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex min-w-0 flex-wrap items-center justify-start gap-2 sm:justify-end">
             <a href="/ma-leses" className="rounded-full bg-red-100 px-3 py-1 text-xs font-black text-red-900">Må leses {mustReadCount}</a>
             <a href="/faq" className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800">FAQ</a>
             <a href="/endringer" className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800">Endringer</a>
