@@ -16,3 +16,11 @@ it('filters cards by tilfluktsrom scenario', async () => {
   expect(screen.getByText('Klargjør tilfluktsrom')).toBeInTheDocument();
   expect(screen.queryByText('RADIAC dosekontroll')).not.toBeInTheDocument();
 });
+
+it('uses operational TiltakCard anatomy in the list', () => {
+  render(<ActionCardList cards={cards} showFilters={false} />);
+
+  expect(screen.getAllByText(/Gjør først/i).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/Kildebelagt/i).length).toBeGreaterThan(0);
+  expect(screen.getByRole('link', { name: /Åpne tiltakskort: Klargjør.*tilfluktsrom/i })).toHaveAttribute('href', '/kort/tilfluktsrom-klargjoring');
+});
