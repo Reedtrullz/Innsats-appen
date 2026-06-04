@@ -948,7 +948,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
       </section>
 
       {checklist ? <div id="sjekkliste"><ChecklistRunner checklist={checklist} missionId={mission.id} /></div> : null}
-      {staleSignals.length > 0 ? <ContextSignalPanel signals={staleSignals} unavailableSources={disabledSources} /> : null}
+      {staleSignals.length > 0 || disabledSources.length > 0 ? <ContextSignalPanel signals={staleSignals} unavailableSources={disabledSources} /> : null}
     </article>
   );
 }

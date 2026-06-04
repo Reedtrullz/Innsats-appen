@@ -1053,6 +1053,23 @@ it('keeps disabled-source last-known-good mission context visibly stale, not act
   expect(screen.queryByText(/Lagret MET-varsel: Sist vellykket \(fresh\)/i)).not.toBeInTheDocument();
 });
 
+it('shows disabled context sources even when no signals exist', async () => {
+  localStorage.setItem(EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY, JSON.stringify({ kartverket: false, met: false, nve: false }));
+  await saveMission(mission({
+    id: 'm2b-disabled-zero-signals',
+    title: 'FIG disabled sources without signals',
+    externalSignals: [],
+  }));
+
+  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+
+  const panel = await screen.findByRole('region', { name: /offentlig kontekst/i });
+  expect(panel).toHaveTextContent(/ingen ferske offentlige kontekstsignaler/i);
+  expect(panel).toHaveTextContent(/kartverket.*utilgjengelig eller avslått lokalt/i);
+  expect(panel).toHaveTextContent(/met.*utilgjengelig eller avslått lokalt/i);
+  expect(panel).toHaveTextContent(/nve.*utilgjengelig eller avslått lokalt/i);
+});
+
 it('lets users save structured lessons and feedback before locally completing and archiving a mission', async () => {
   await saveMission({
     id: 'm2c3-active-archive-ui',

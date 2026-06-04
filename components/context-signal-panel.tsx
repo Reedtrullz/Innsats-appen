@@ -13,6 +13,7 @@ export function ContextSignalPanel({ signals, unavailableSources = [] }: { signa
       <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Offentlige API-signaler erstatter ikke offisielle ordre, fagmyndighet eller kildebelagte tiltakskort.</p>
       {hasStaleSignals ? <p className="mt-2 rounded-2xl bg-slate-100 p-3 text-sm font-semibold text-slate-800">Viser sist vellykkede lokale kontekstsignal som stale etter manglende eller feilet oppfrisking.</p> : null}
       {unavailableSources.map((source) => <p key={source} className="mt-2 text-sm font-semibold text-red-800">{source} utilgjengelig eller avslått lokalt – viser eventuelt sist vellykkede signal som stale.</p>)}
+      {signals.length === 0 ? <p className="mt-2 rounded-2xl bg-slate-100 p-3 text-sm font-semibold text-slate-800">Ingen ferske offentlige kontekstsignaler tilgjengelig. Sjekk datakilde-status før du tolker fravær av signaler som fravær av fare.</p> : null}
       <div className="mt-3 space-y-3">
         {signals.map((signal, index) => (
           <article key={`${signal.source}-${signal.kind}-${signal.upstreamId ?? signal.rawRef ?? signal.title}-${index}`} className="rounded-2xl border border-slate-200 p-3">
