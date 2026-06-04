@@ -551,8 +551,20 @@ export function exportAfterActionMarkdown(report: AfterActionReport) {
   return `${lines.join('\n')}\n`;
 }
 
+const AFTER_ACTION_JSON_OMIT_KEYS = new Set(['id', 'objectId', 'linkedMissionId', 'rawRef', 'activeChecklistIds', 'notes', 'note']);
+
+function stripInternalExportFields(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stripInternalExportFields);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>)
+      .filter(([key]) => !AFTER_ACTION_JSON_OMIT_KEYS.has(key))
+      .map(([key, item]) => [key, stripInternalExportFields(item)]),
+  );
+}
+
 export function exportAfterActionJson(report: AfterActionReport) {
-  return `${JSON.stringify(report, null, 2)}\n`;
+  return `${JSON.stringify(stripInternalExportFields(report), null, 2)}\n`;
 }
 
 function escapeHtml(value: string) {

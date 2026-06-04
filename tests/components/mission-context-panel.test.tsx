@@ -224,7 +224,7 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
   expect(markdownPreview.value).toContain('MBK-status / materiellberedskap');
   expect(markdownPreview.value).toContain('KO etterrapport');
   expect(jsonPreview.value).toContain('"schemaVersion"');
-  expect(jsonPreview.value).toContain('Skadet arbeidslys');
+  expect(jsonPreview.value).not.toContain('Skadet arbeidslys');
   expect(jsonPreview.value).toContain('Sektor etterrapport');
   expect(jsonPreview.value).not.toMatch(/lat|lon|geometry|rawRef|marker-aar-ui|sector-aar-ui/i);
   expect(pdfPreview.value).toContain('PDF-klar utskrift / bruk nettleserens Skriv ut &gt; Lagre som PDF');
@@ -402,7 +402,7 @@ it('lets users add, filter and export a structured local field log with patient-
   const exportedFieldLogJson = JSON.parse(jsonPreview.value);
   expect(exportedFieldLogJson.mission.id).toBeUndefined();
   expect(exportedFieldLogJson.entries[0].id).toBeUndefined();
-  expect(exportedFieldLogJson.entries[0].linkedMissionId).toBe('m6a-field-log-ui');
+  expect(exportedFieldLogJson.entries[0].linkedMissionId).toBeUndefined();
   expect(jsonPreview.value).not.toMatch(/indexedDB|objectStore/i);
   expect(pdfPreview.value).toContain('<!doctype html>');
   expect(pdfPreview.value).toContain('Skriv ut &gt; Lagre som PDF');

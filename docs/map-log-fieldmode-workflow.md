@@ -31,7 +31,7 @@ Feltmodus prioritizes map and log quick actions so a user can move quickly from 
 
 - Field-log exports include the sanitized map reference label and schematic reference when present.
 - After-action exports include structured field-log entries by default and a sanitized map summary.
-- Oppdragsmappe export bundles mission summary, checklist summary, field-log Markdown/JSON, map GeoJSON/SVG and after-action Markdown/JSON in a local browser-generated package.
+- Oppdragsmappe export bundles mission summary, checklist summary, field-log Markdown, map GeoJSON/SVG, after-action Markdown and a local JSON manifest in a browser-generated package.
 - Free-text map notes and internal local IDs are not part of the oppdragsmappe map artifacts.
 
 ## Non-goals

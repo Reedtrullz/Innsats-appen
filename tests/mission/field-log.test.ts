@@ -147,11 +147,10 @@ it('searches and exports field-log map references as schematic local context onl
   expect(markdown).toContain('Kart: KO lokal (map-marker 22,33)');
   expect(json.entries[0].mapReference).toEqual({
     source: 'map-marker',
-    objectId: 'marker-ko',
     label: 'KO lokal',
     point: { x: 22, y: 33 },
   });
-  expect(JSON.stringify(json)).not.toMatch(/lat|lon|geometry|rawRef/i);
+  expect(JSON.stringify(json)).not.toMatch(/lat|lon|geometry|rawRef|objectId|linkedMissionId|marker-ko/i);
 });
 
 it('exposes the required quick categories with privacy-preserving labels and help text', () => {
@@ -199,7 +198,7 @@ it('exports field log Markdown, JSON and PDF-ready HTML without hidden browser m
   expect(markdown).toContain('Observasjon');
   expect(markdown).toContain('Kritisk observasjon');
   expect(markdown).toContain('Må videresendes');
-  expect(markdown).not.toMatch(/indexedDB|objectStore|geometry|rawRef/i);
+  expect(markdown).not.toMatch(/indexedDB|objectStore|geometry|rawRef|linkedMissionId|field-log-mission/i);
 
   const unsafeText = '<script>alert("x")</script> & \'quote\'';
   const htmlWithUnsafeEntry = exportFieldLogPdfReadyHtml({
@@ -219,7 +218,7 @@ it('exports field log Markdown, JSON and PDF-ready HTML without hidden browser m
   expect(parsedJson.entries).toHaveLength(2);
   expect(parsedJson.entries[0]).toMatchObject({ categoryLabel: 'Observasjon', flags: { criticalObservation: true, mustBeForwarded: false } });
   expect(parsedJson.entries[0].id).toBeUndefined();
-  expect(json).not.toMatch(/indexedDB|objectStore|geometry|rawRef/i);
+  expect(json).not.toMatch(/indexedDB|objectStore|geometry|rawRef|linkedMissionId|objectId|field-log-mission/i);
 
   expect(html).toContain('<!doctype html>');
   expect(html).toContain('PDF-klar feltlogg');

@@ -314,7 +314,7 @@ export function buildGeoJsonExport(state: MissionMapState) {
       ...normalized.markers.map((marker) => ({
         type: 'Feature' as const,
         geometry: { type: 'Point' as const, coordinates: [marker.point.x, marker.point.y] },
-        properties: { itemType: 'marker', kind: marker.kind, label: marker.label, note: marker.note ?? '', localOnly: true },
+        properties: { itemType: 'marker', kind: marker.kind, label: marker.label, localOnly: true },
       })),
       ...normalized.drawings.map((drawing) => ({
         type: 'Feature' as const,
@@ -323,7 +323,7 @@ export function buildGeoJsonExport(state: MissionMapState) {
           : drawing.kind === 'line'
             ? { type: 'LineString' as const, coordinates: drawing.points.map((point) => [point.x, point.y]) }
             : { type: 'Polygon' as const, coordinates: polygonCoordinates(drawing.points) },
-        properties: { itemType: 'drawing', kind: drawing.kind, label: drawing.label, note: drawing.note ?? '', localOnly: true },
+        properties: { itemType: 'drawing', kind: drawing.kind, label: drawing.label, localOnly: true },
       })),
     ],
   };

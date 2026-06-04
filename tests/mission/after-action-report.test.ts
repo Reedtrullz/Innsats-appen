@@ -418,10 +418,13 @@ it('exports after-action Markdown, JSON and PDF-ready HTML with local-only warni
   const parsed = JSON.parse(json);
   expect(parsed.schemaVersion).toBe(2);
   expect(parsed.generatedAt).toBe('2026-06-03T11:00:00.000Z');
+  expect(parsed.mission.id).toBeUndefined();
+  expect(parsed.mission.activeChecklistIds).toBeUndefined();
+  expect(parsed.mission.notes).toBeUndefined();
   expect(parsed.sections.lessonsLearned.followUp).toContain('skiftbytte');
   expect(parsed.sections.feedback.equipment).toContain('arbeidslys');
   expect(parsed.warnings.join(' ')).toContain('Lagres bare lokalt');
-  expect(JSON.stringify(parsed)).not.toContain('geometry');
+  expect(JSON.stringify(parsed)).not.toMatch(/geometry|aar-mission-1|task-1|task-2|status-1|status-2|resource-1|resource-2|\"id\"|\"note\"|\"notes\"|activeChecklistIds|rawRef|objectId|linkedMissionId/);
 
   expect(html).toContain('<!doctype html>');
   expect(html).toContain('PDF-klar utskrift / bruk nettleserens Skriv ut &gt; Lagre som PDF');

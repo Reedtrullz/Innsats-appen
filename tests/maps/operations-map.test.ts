@@ -78,6 +78,7 @@ it('exports sanitized schematic GeoJSON and imports only supported local fields'
   expect(exported.privacyWarning).toBe(LOCATION_EXPORT_PRIVACY_WARNING);
   expect(exported.coordinateSystem).toBe('schematic-0-100-local-only');
   expect(geoJsonExportText(state)).toContain('FeatureCollection');
+  expect(JSON.stringify(exported)).not.toMatch(/\"note\"/);
 
   const imported = importGeoJsonText(JSON.stringify({
     type: 'FeatureCollection',

@@ -31,7 +31,7 @@ test('critical mobile routes have no automated WCAG A/AA accessibility violation
 });
 
 test('mobile layout has no horizontal overflow and nav touch targets are large enough', async ({ page }) => {
-  for (const route of ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/moduler/tilfluktsrom']) {
+  for (const route of ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/under', '/etter', '/feltmodus', '/moduler/tilfluktsrom']) {
     await page.goto(route);
     await expectNoHorizontalOverflow(page);
   }

@@ -80,7 +80,6 @@ function exportedEntry(entry: FieldLogEntry) {
   const mapReference = entry.mapReference
     ? {
         source: entry.mapReference.source,
-        objectId: entry.mapReference.objectId,
         label: entry.mapReference.label,
         point: {
           x: entry.mapReference.point.x,
@@ -96,7 +95,6 @@ function exportedEntry(entry: FieldLogEntry) {
     categoryLabel: FIELD_LOG_CATEGORY_LABELS[entry.category],
     text: entry.text,
     mapReference,
-    linkedMissionId: entry.linkedMissionId,
     flags: {
       criticalObservation: entry.criticalObservation,
       mustBeForwarded: entry.mustBeForwarded,
@@ -143,8 +141,7 @@ export function exportFieldLogMarkdown({ mission, entries }: { mission: MissionC
       const mapReference = mapReferenceText(entry);
       const flags = entryFlags(entry);
       const flagSuffix = flags.length > 0 ? ` — ${flags.join(', ')}` : '';
-      const linked = entry.linkedMissionId ? ` — Koblet oppdrag: ${entry.linkedMissionId}` : '';
-      lines.push(`- ${entry.timestamp} — ${FIELD_LOG_CATEGORY_LABELS[entry.category]}${location}${mapReference}${flagSuffix}${linked}: ${entry.text}`);
+      lines.push(`- ${entry.timestamp} — ${FIELD_LOG_CATEGORY_LABELS[entry.category]}${location}${mapReference}${flagSuffix}: ${entry.text}`);
     }
   }
 
