@@ -1,11 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ActionCard, OperationalChecklist } from '@/lib/content/schemas';
 import { filterActionCards, sortActionCards } from '@/lib/content/filters';
-import { phaseLabels, priorityLabels, roleLabels, roles, scenarioLabels, scenarios, phases, type Phase, type Role, type Scenario } from '@/lib/content/taxonomy';
+import { phaseLabels, roleLabels, roles, scenarioLabels, scenarios, phases, type Phase, type Role, type Scenario } from '@/lib/content/taxonomy';
 import { buildAfterActionReport, exportAfterActionJson, exportAfterActionMarkdown, exportAfterActionPdfReadyHtml } from '@/lib/mission/after-action-report';
 import { FIELD_LOG_CATEGORY_OPTIONS, FIELD_LOG_CATEGORY_LABELS, FIELD_LOG_LOCAL_ONLY_WARNING, FIELD_LOG_PATIENT_DATA_WARNING, exportFieldLogJson, exportFieldLogMarkdown, exportFieldLogPdfReadyHtml, filterFieldLogEntries } from '@/lib/mission/field-log';
 import { MAN_DOWN_POST_MVP_NOTE, MEDIA_ATTACHMENT_SAFETY_NOTES } from '@/lib/mission/media-safety';
@@ -18,6 +17,8 @@ import type { MissionContext, MissionTaskStatus, QuickStatusMessage, ResourceReq
 import { ChecklistRunner } from './checklist-runner';
 import { ContextSignalPanel, markStoredContextSignalsStale } from './context-signal-panel';
 import { DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS, disabledExternalDataSources, displaySignalsForExternalDataSourceSettings, externalDataSourceSettingsSnapshot, parseExternalDataSourceSettings, subscribeExternalDataSourceSettings } from '@/lib/integrations/source-settings';
+import { MissionCommandHeader, MissionExportShortcuts, MissionProgressSummary } from './mission-command-summary';
+import { TiltakCard } from './tiltak-card';
 
 function formatUpdatedAt(value: string) {
   return new Intl.DateTimeFormat('nb-NO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
@@ -33,13 +34,6 @@ function datetimeLocalToIso(value: string) {
   return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
 }
 
-function moduleHref(scenario: Scenario) {
-  if (scenario === 'tilfluktsrom') return '/moduler/tilfluktsrom';
-  if (scenario === 'cbrn-cbrne') return '/moduler/cbrn';
-  if (scenario === 'radiac-nedfall') return '/moduler/radiac';
-  if (scenario === 'mfe-stotte') return '/moduler/mfe';
-  return '/hurtigkort';
-}
 
 function missionCards(cards: ActionCard[], mission: MissionContext) {
   const exact = filterActionCards(cards, { phase: mission.phase, role: mission.role, scenario: mission.scenario });
@@ -773,49 +767,27 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
     return displaySignalsForExternalDataSourceSettings(storedSignals, sourceSettings);
   }, [mission.externalSignals, sourceSettings]);
   const disabledSources = useMemo(() => disabledExternalDataSources(sourceSettings), [sourceSettings]);
+  const nextActionSteps = firstActions[0]?.steps.length
+    ? firstActions[0].steps.slice(0, 3)
+    : ['Åpne sjekklisten og bekreft fase, samband og sikkerhet.'];
 
   return (
     <article className="space-y-4">
-      <section className="overflow-hidden rounded-2xl border border-slate-900 bg-slate-950 text-white shadow-sm">
-        <div className="border-b border-white/10 px-4 py-3">
-          <p className="text-xs font-black uppercase tracking-wide text-sky-200">Aktivt lokalt oppdrag</p>
-          <h2 className="mt-1 text-2xl font-black tracking-tight">{mission.title}</h2>
-          <p className="mt-1 text-sm font-semibold text-slate-200">{mission.locationText}</p>
-        </div>
-        <dl className="grid grid-cols-2 gap-px bg-white/10 text-sm sm:grid-cols-4">
-          <div className="bg-slate-950 px-4 py-3">
-            <dt className="text-xs font-bold uppercase tracking-wide text-slate-400">Fase</dt>
-            <dd className="mt-1 font-black">{phaseLabels[mission.phase]}</dd>
-          </div>
-          <div className="bg-slate-950 px-4 py-3">
-            <dt className="text-xs font-bold uppercase tracking-wide text-slate-400">Rolle</dt>
-            <dd className="mt-1 font-black">{roleLabels[mission.role]}</dd>
-          </div>
-          <div className="bg-slate-950 px-4 py-3">
-            <dt className="text-xs font-bold uppercase tracking-wide text-slate-400">Scenario</dt>
-            <dd className="mt-1 font-black">{scenarioLabels[mission.scenario]}</dd>
-          </div>
-          <div className="bg-slate-950 px-4 py-3">
-            <dt className="text-xs font-bold uppercase tracking-wide text-slate-400">Status</dt>
-            <dd className="mt-1 font-black">Offline-klar</dd>
-          </div>
-        </dl>
+      <MissionCommandHeader mission={mission} />
+
+      <section className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <p className="text-xs font-black uppercase tracking-wide text-sky-700">Neste anbefalte handling</p>
+        <h3 className="mt-1 text-xl font-black">Neste anbefalte handling</h3>
+        <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm font-semibold leading-6 text-slate-800">
+          {nextActionSteps.map((step) => <li key={step}>{step}</li>)}
+        </ol>
+        {checklist ? <a href="#sjekkliste" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-slate-950 px-4 text-sm font-black text-white">Åpne sjekkliste</a> : null}
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-3">
-        <Link className="rounded-2xl bg-white p-4 text-sm font-black text-slate-950 shadow-sm ring-1 ring-slate-200" href="/hurtigkort">
-          Søk tiltakskort
-          <span className="mt-1 block text-xs font-semibold text-slate-600">Finn kildebelagt støtte raskt</span>
-        </Link>
-        <Link className="rounded-2xl bg-white p-4 text-sm font-black text-slate-950 shadow-sm ring-1 ring-slate-200" href={moduleHref(mission.scenario)}>
-          Åpne modul
-          <span className="mt-1 block text-xs font-semibold text-slate-600">{scenarioLabels[mission.scenario]}</span>
-        </Link>
-        <Link className="rounded-2xl bg-white p-4 text-sm font-black text-slate-950 shadow-sm ring-1 ring-slate-200" href="#ordre-samband-heading">
-          Ordre og samband
-          <span className="mt-1 block text-xs font-semibold text-slate-600">Fyll ut lokalt og eksporter</span>
-        </Link>
-      </section>
+      <div className="grid gap-3 lg:grid-cols-2">
+        <MissionProgressSummary mission={mission} checklists={checklists} />
+        <MissionExportShortcuts />
+      </div>
 
       <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950">
         <p className="text-xs font-black uppercase tracking-wide">Operativ grense</p>
@@ -829,26 +801,16 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
       <StructuredLessonsFeedbackControls key={mission.id} mission={mission} onMissionChange={onMissionChange} onArchive={onArchive} />
       <AfterActionReportControls mission={mission} displaySignals={staleSignals} checklists={checklists} fallbackChecklist={checklist} />
 
-      <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+      <section className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-black uppercase tracking-wide text-sky-700">Gjør først</p>
-            <h3 className="text-xl font-black">Anbefalte tiltak nå</h3>
+            <p className="text-xs font-black uppercase tracking-wide text-sky-700">Anbefalte tiltak</p>
+            <h3 className="text-xl font-black">Anbefalte tiltak</h3>
           </div>
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">Oppdatert {formatUpdatedAt(mission.updatedAt)}</span>
         </div>
         <div className="mt-3 space-y-3">
-          {firstActions.length > 0 ? firstActions.map((card) => (
-            <Link key={card.slug} href={`/kort/${card.slug}`} className="block rounded-2xl border border-slate-200 p-3 hover:bg-slate-50">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`rounded-full px-2.5 py-1 text-xs font-black ${card.priority === 'high' ? 'bg-red-100 text-red-900' : card.priority === 'medium' ? 'bg-amber-100 text-amber-900' : 'bg-slate-100 text-slate-700'}`}>{priorityLabels[card.priority]}</span>
-                <span className="rounded-full bg-sky-100 px-2.5 py-1 text-xs font-bold text-sky-900">{phaseLabels[card.phase]}</span>
-              </div>
-              <h4 className="mt-2 text-lg font-black">{card.title}</h4>
-              <p className="mt-1 text-sm font-semibold text-slate-700">{card.steps[0]}</p>
-              {card.warning ? <p className="mt-2 text-sm font-semibold text-amber-900">{card.warning}</p> : null}
-            </Link>
-          )) : (
+          {firstActions.length > 0 ? firstActions.map((card) => <TiltakCard key={card.slug} card={card} compact />) : (
             <p className="rounded-2xl bg-slate-100 p-3 text-sm font-semibold text-slate-700">Ingen tiltakskort matcher dette oppdraget ennå. Bruk søk eller endre fase/scenario.</p>
           )}
         </div>

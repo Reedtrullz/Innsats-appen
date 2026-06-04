@@ -50,7 +50,8 @@ test('mobile user can search, open source-backed card, create mission, run check
   await page.getByLabel('Scenario').selectOption('tilfluktsrom');
   await page.getByLabel('Sted/lokasjon').fill('Trondheim sentrum');
   await page.getByRole('button', { name: /Lagre oppdrag/i }).click();
-  await expect(page.getByRole('heading', { name: missionTitle, exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
+  await expect(page.getByText(new RegExp(`${missionTitle}\\s*·\\s*Trondheim sentrum`, 'i'))).toBeVisible();
 
   const checklistItem = page.getByRole('checkbox', { name: /Kontroller ventilasjon/i });
   await checklistItem.check();
@@ -65,7 +66,8 @@ test('mobile user can search, open source-backed card, create mission, run check
   await context.setOffline(true);
   try {
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: missionTitle, exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
+    await expect(page.getByText(new RegExp(`${missionTitle}\\s*·\\s*Trondheim sentrum`, 'i'))).toBeVisible();
     await expect(page.getByRole('checkbox', { name: /Kontroller ventilasjon/i })).toBeChecked();
   } finally {
     await context.setOffline(false);

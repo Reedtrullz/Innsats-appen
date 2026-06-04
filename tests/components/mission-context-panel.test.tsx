@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it, vi } from 'vitest';
 import { MissionContextPanel } from '@/components/mission-context-panel';
@@ -447,6 +447,116 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
   expect(welfareMarkdownPreview.value).toContain('Trenger avløsning');
   expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'welfare-markdown')).toBe(true);
   expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'welfare-json')).toBe(true);
+});
+
+it('shows a situation-first mission dashboard with next action, progress and exports', async () => {
+  await saveMission({
+    id: 'm-command-surface',
+    title: 'Flom Jaren',
+    createdAt: '2026-06-04T12:00:00.000Z',
+    updatedAt: '2026-06-04T12:32:00.000Z',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'flom',
+    locationText: 'Jaren',
+    externalSignals: [],
+    activeChecklistIds: ['fig-under-innsats'],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  } as any);
+
+  const flomCards = [{
+    slug: 'flom-pumpe-start',
+    title: 'Flom og pumpeutlegg',
+    phase: 'under',
+    roles: ['lagforer'],
+    scenarios: ['flom'],
+    priority: 'high',
+    steps: ['Etabler sikkerhet', 'Bekreft samband', 'Fordel roller'],
+    safety: [],
+    reporting: [],
+    sourceIds: ['src-flom'],
+    competenceRequired: [],
+  }] as any;
+
+  render(<MissionContextPanel
+    contentVersion="test-v1"
+    checklists={[{
+      ...checklists[0],
+      slug: 'fig-under-innsats',
+      phase: 'under',
+      scenarios: ['flom'],
+      items: [{ id: 'sikkerhet', label: 'Etabler sikkerhet', required: true, sourceIds: ['src-flom'] }],
+    } as any]}
+    actionCards={flomCards}
+  />);
+
+  expect(await screen.findByRole('heading', { name: 'Oppdrag' })).toBeInTheDocument();
+  expect(screen.getByText(/Flom Jaren · Jaren/i)).toBeInTheDocument();
+  expect(screen.getByText(/Lokal lagring · Ikke delt/i)).toBeInTheDocument();
+  const nextActionSection = screen.getByRole('heading', { name: /Neste anbefalte handling/i }).closest('section');
+  expect(nextActionSection).not.toBeNull();
+  expect(within(nextActionSection!).getByText(/Etabler sikkerhet/i)).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Fremdrift/i })).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /5-punktsordre/i })).toHaveAttribute('href', '#5-punktsordre');
+  expect(screen.getByRole('link', { name: /Sambandsplan/i })).toHaveAttribute('href', '#sambandsplan');
+  const text = document.body.textContent ?? '';
+  expect(text.indexOf('Oppdrag')).toBeLessThan(text.indexOf('Neste anbefalte handling'));
+  expect(text.indexOf('Neste anbefalte handling')).toBeLessThan(text.indexOf('Fremdrift'));
+  expect(text.indexOf('Fremdrift')).toBeLessThan(text.indexOf('Anbefalte tiltak'));
+});
+
+it('shows a fallback next action when the matching action card has no steps', async () => {
+  await saveMission({
+    id: 'm-command-surface-empty-step',
+    title: 'Flom uten steg',
+    createdAt: '2026-06-04T12:00:00.000Z',
+    updatedAt: '2026-06-04T12:32:00.000Z',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'flom',
+    locationText: 'Jaren',
+    externalSignals: [],
+    activeChecklistIds: ['fig-under-innsats'],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  } as any);
+
+  render(<MissionContextPanel
+    contentVersion="test-v1"
+    checklists={[{
+      ...checklists[0],
+      slug: 'fig-under-innsats',
+      phase: 'under',
+      scenarios: ['flom'],
+      items: [{ id: 'sikkerhet', label: 'Etabler sikkerhet', required: true, sourceIds: ['src-flom'] }],
+    } as any]}
+    actionCards={[{
+      slug: 'flom-uten-steg',
+      title: 'Flom uten steg',
+      phase: 'under',
+      roles: ['lagforer'],
+      scenarios: ['flom'],
+      priority: 'high',
+      steps: [],
+      safety: [],
+      reporting: [],
+      sourceIds: ['src-flom'],
+      competenceRequired: [],
+    } as any]}
+  />);
+
+  const nextActionSection = (await screen.findByRole('heading', { name: /Neste anbefalte handling/i })).closest('section');
+  expect(nextActionSection).not.toBeNull();
+  expect(within(nextActionSection!).getByText(/Åpne sjekklisten og bekreft fase, samband og sikkerhet/i)).toBeInTheDocument();
 });
 
 it('shows current situation and lets users add local tasks, quick status and resource requests', async () => {
