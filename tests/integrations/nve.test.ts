@@ -1,8 +1,11 @@
 import { GET } from '@/app/api/context/hazards/route';
-import { fetchNveHazardSignals, refreshNveSourceHealth } from '@/lib/integrations/nve';
+import { fetchNveHazardSignals, getNveAvalancheSourceStatus, refreshNveSourceHealth } from '@/lib/integrations/nve';
 
 function nveFetchFixture() {
   return async (url: string) => {
+    if (url.includes('/avalanche/')) {
+      return new Response(JSON.stringify({ error: `unsupported avalanche fetch ${url}` }), { status: 500 });
+    }
     if (!url.includes('/api/Warning/Municipality/5001/1/2026-06-02/2026-06-03')) {
       return new Response(JSON.stringify({ error: `unexpected url ${url}` }), { status: 404 });
     }
@@ -17,8 +20,11 @@ function nveFetchFixture() {
 }
 
 it('maps NVE flood and landslide warnings as context signals, not action cards', async () => {
-  const signals = await fetchNveHazardSignals({ municipality: '5001', start: '2026-06-02', end: '2026-06-03', fetchImpl: nveFetchFixture() });
+  const seenUrls: string[] = [];
+  const fixture = nveFetchFixture();
+  const signals = await fetchNveHazardSignals({ municipality: '5001', start: '2026-06-02', end: '2026-06-03', fetchImpl: async (url) => { seenUrls.push(url); return fixture(url); } });
   expect(signals.map((signal) => signal.kind)).toEqual(expect.arrayContaining(['flood-warning', 'landslide-warning']));
+  expect(seenUrls.some((url) => url.includes('/avalanche/'))).toBe(false);
   expect(signals[0]?.source).toBe('nve');
   expect(signals.every((signal) => signal.upstreamId && signal.upstreamHash)).toBe(true);
   expect(new Set(signals.map((signal) => signal.upstreamId)).size).toBe(signals.length);
@@ -40,4 +46,13 @@ it('keeps last successful NVE source health after failed snapshot', async () => 
   const failed = await refreshNveSourceHealth(success, { municipality: '5001', start: '2026-06-02', end: '2026-06-03', fetchImpl: async () => new Response('{}', { status: 502 }) });
   expect(failed.lastSuccessfulSignals).toEqual(success.lastSuccessfulSignals);
   expect(failed.lastError).toMatch(/NVE returned/);
+});
+
+it('documents avalanche as pending and preserves NVE cache on 429', async () => {
+  expect(getNveAvalancheSourceStatus()?.status).toBe('pending-verification');
+  const success = await refreshNveSourceHealth({ source: 'nve', lastSuccessfulSignals: [] }, { municipality: '5001', start: '2026-06-02', end: '2026-06-03', fetchImpl: nveFetchFixture() });
+  const rateLimited = await refreshNveSourceHealth(success, { municipality: '5001', start: '2026-06-02', end: '2026-06-03', fetchImpl: async () => new Response('{}', { status: 429, headers: { 'Retry-After': '45' } }) });
+  expect(rateLimited.lastSuccessfulSignals).toEqual(success.lastSuccessfulSignals);
+  expect(rateLimited.lastErrorStatus).toBe(429);
+  expect(rateLimited.retryAfterSeconds).toBe(45);
 });

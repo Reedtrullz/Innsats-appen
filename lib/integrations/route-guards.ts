@@ -19,7 +19,6 @@ const ALLOWED_SIGNAL_KEYS = new Set([
   'upstreamVersion',
   'etag',
   'upstreamHash',
-  'geometry',
   'rawRef',
 ]);
 const MAX_PUBLIC_LOOKUP_LENGTH = 120;

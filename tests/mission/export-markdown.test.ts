@@ -61,7 +61,7 @@ it('exports local task, quick status and resource summary without raw external p
       scenario: 'generelt',
       locationText: 'Innsatsområde nord',
       externalSignals: [
-        { source: 'met', kind: 'weather', severity: 'yellow', title: 'Kraftig regn', summary: 'Lokalt sammendrag av varsel', validFrom: null, validTo: null, fetchedAt: '2026-06-03T10:00:00.000Z', staleness: 'fresh', rawRef: 'met:regn-1', geometry: { coordinates: [10, 63] } },
+        { source: 'met', kind: 'weather', severity: 'yellow', title: 'Kraftig regn', summary: 'Lokalt sammendrag av varsel', validFrom: null, validTo: null, fetchedAt: '2026-06-03T10:00:00.000Z', staleness: 'fresh', rawRef: 'met:regn-1' },
       ],
       activeChecklistIds: ['fig-under-innsats'],
       notes: 'Kort situasjonsnote uten persondata',

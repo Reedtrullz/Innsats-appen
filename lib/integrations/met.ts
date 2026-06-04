@@ -6,7 +6,7 @@
 // - MetAlerts 2.0 current endpoint: https://api.met.no/weatherapi/metalerts/2.0/current.json?lat=...&lon=...&lang=no.
 // - MetAlerts CAP files are immutable once issued; do not repeatedly refetch the same CAP file. MVP keeps warnings as context only.
 import { createHash } from 'node:crypto';
-import { recordSourceFailure, recordSourceSuccess, type SourceHealthState } from './source-health';
+import { ExternalApiError, recordSourceFailure, recordSourceSuccess, retryAfterSecondsFromHeaders, sourceFailureDetailsFromError, type SourceHealthState } from './source-health';
 import type { ExternalContextSignal } from './types';
 
 type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
@@ -24,9 +24,33 @@ function severityFromLevel(level: unknown): ExternalContextSignal['severity'] {
   return 'info';
 }
 
+function isGenericMetUserAgent(ua: string) {
+  const normalized = ua.toLowerCase();
+  return [
+    'example.invalid',
+    'example.com',
+    'contact@example',
+    'support@example',
+    'your-email',
+    'yourdomain',
+    'localhost',
+    'change-me',
+    'changeme',
+    'test@example',
+    'node',
+    'undici',
+    'curl',
+    'mozilla',
+  ].some((placeholder) => normalized.includes(placeholder));
+}
+
+function hasContactBearingMetUserAgent(ua: string) {
+  return /\S+@\S+\.\S+/.test(ua) || /https?:\/\/\S+\.\S+/.test(ua);
+}
+
 export function getMetUserAgent() {
   const ua = process.env.MET_USER_AGENT ?? 'Beredskapsboka/0.1 contact@example.invalid';
-  if (process.env.NODE_ENV === 'production' && (!process.env.MET_USER_AGENT || ua.includes('example.invalid'))) {
+  if (process.env.NODE_ENV === 'production' && (!process.env.MET_USER_AGENT || !hasContactBearingMetUserAgent(ua) || isGenericMetUserAgent(ua))) {
     throw new Error('MET_USER_AGENT must include real contact information in production');
   }
   return ua;
@@ -40,8 +64,12 @@ async function fetchMetSignalsDetailed({ lat, lon, userAgent = getMetUserAgent()
   const forecastUrl = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${roundedLat}&lon=${roundedLon}`;
   const alertUrl = `https://api.met.no/weatherapi/metalerts/2.0/current.json?lat=${roundedLat}&lon=${roundedLon}&lang=no`;
   const [forecastRes, alertRes] = await Promise.all([fetchImpl(forecastUrl, { headers }), fetchImpl(alertUrl, { headers })]);
-  if (!forecastRes.ok && forecastRes.status !== 304) throw new Error(`MET locationforecast returned ${forecastRes.status}`);
-  if (!alertRes.ok && alertRes.status !== 304) throw new Error(`MET alerts returned ${alertRes.status}`);
+  if (!forecastRes.ok && forecastRes.status !== 304) {
+    throw new ExternalApiError(`MET locationforecast returned ${forecastRes.status}`, forecastRes.status, retryAfterSecondsFromHeaders(forecastRes.headers));
+  }
+  if (!alertRes.ok && alertRes.status !== 304) {
+    throw new ExternalApiError(`MET alerts returned ${alertRes.status}`, alertRes.status, retryAfterSecondsFromHeaders(alertRes.headers));
+  }
 
   const signals: ExternalContextSignal[] = [];
   const notModifiedKinds: MetSignalKind[] = [];
@@ -89,7 +117,6 @@ async function fetchMetSignalsDetailed({ lat, lon, userAgent = getMetUserAgent()
         staleness: 'fresh',
         upstreamId: String(feature.id ?? props.identifier ?? props.capId ?? hash(feature)),
         upstreamHash: hash(feature),
-        geometry: feature.geometry,
         rawRef: 'met:alerts-current',
       });
     }
@@ -110,6 +137,6 @@ export async function refreshMetSourceHealth(
     const preserved = state.lastSuccessfulSignals.filter((signal) => signal.source === 'met' && notModifiedKinds.includes(signal.kind as MetSignalKind));
     return recordSourceSuccess(state, [...signals, ...preserved]);
   } catch (error) {
-    return recordSourceFailure(state, error instanceof Error ? error.message : 'MET refresh failed');
+    return recordSourceFailure(state, error instanceof Error ? error.message : 'MET refresh failed', new Date().toISOString(), sourceFailureDetailsFromError(error));
   }
 }

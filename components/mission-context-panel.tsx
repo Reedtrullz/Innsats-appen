@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ActionCard, OperationalChecklist } from '@/lib/content/schemas';
 import { filterActionCards, sortActionCards } from '@/lib/content/filters';
@@ -16,6 +16,7 @@ import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArc
 import type { MissionContext, MissionTaskStatus, QuickStatusMessage, ResourceRequestKind, FieldLogCategory, RuhCategory, RuhRisk, WelfareLoad } from '@/lib/mission/schemas';
 import { ChecklistRunner } from './checklist-runner';
 import { ContextSignalPanel, markStoredContextSignalsStale } from './context-signal-panel';
+import { DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS, disabledExternalDataSources, displaySignalsForExternalDataSourceSettings, externalDataSourceSettingsSnapshot, parseExternalDataSourceSettings, subscribeExternalDataSourceSettings } from '@/lib/integrations/source-settings';
 
 function formatUpdatedAt(value: string) {
   return new Intl.DateTimeFormat('nb-NO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
@@ -730,7 +731,18 @@ function AfterActionReportControls({ mission, displaySignals, checklists, fallba
 
 function MissionCommandDashboard({ mission, cards, checklist, checklists, onMissionChange, onArchive }: { mission: MissionContext; cards: ActionCard[]; checklist?: OperationalChecklist; checklists: OperationalChecklist[]; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
   const firstActions = missionCards(cards, mission);
-  const staleSignals = useMemo(() => (mission.externalSignals.length > 0 ? markStoredContextSignalsStale(mission.externalSignals) : []), [mission.externalSignals]);
+  const settingsSnapshot = useSyncExternalStore(
+    subscribeExternalDataSourceSettings,
+    externalDataSourceSettingsSnapshot,
+    () => JSON.stringify(DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS),
+  );
+  const sourceSettings = useMemo(() => parseExternalDataSourceSettings(settingsSnapshot), [settingsSnapshot]);
+
+  const staleSignals = useMemo(() => {
+    const storedSignals = mission.externalSignals.length > 0 ? markStoredContextSignalsStale(mission.externalSignals) : [];
+    return displaySignalsForExternalDataSourceSettings(storedSignals, sourceSettings);
+  }, [mission.externalSignals, sourceSettings]);
+  const disabledSources = useMemo(() => disabledExternalDataSources(sourceSettings), [sourceSettings]);
 
   return (
     <article className="space-y-4">
@@ -813,7 +825,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
       </section>
 
       {checklist ? <ChecklistRunner checklist={checklist} missionId={mission.id} /> : null}
-      {staleSignals.length > 0 ? <ContextSignalPanel signals={staleSignals} /> : null}
+      {staleSignals.length > 0 ? <ContextSignalPanel signals={staleSignals} unavailableSources={disabledSources} /> : null}
     </article>
   );
 }
@@ -861,6 +873,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
       createdAt: now,
       updatedAt: now,
       externalSignals: [],
+      externalSignalHistory: [],
       activeChecklistIds: [],
       notes: '',
       tasks: [],

@@ -16,7 +16,6 @@ export interface ExternalContextSignal {
   upstreamVersion?: string;
   etag?: string;
   upstreamHash?: string;
-  geometry?: unknown;
   rawRef: string;
 }
 

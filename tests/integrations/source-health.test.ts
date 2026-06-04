@@ -3,6 +3,7 @@ import {
   recordSourceFailure,
   recordSourceSuccess,
   staleLastSuccessfulSignals,
+  retryAfterSecondsFromHeaders,
 } from '@/lib/integrations/source-health';
 import type { ExternalContextSignal } from '@/lib/integrations/types';
 
@@ -46,4 +47,19 @@ it('classifies stale by configured max age and exposes stored signals as stale',
   expect(classifySourceHealth(success, '2026-06-02T20:02:00.000Z', 60_000).staleness).toBe('stale');
   expect(classifySourceHealth({ source: 'met', lastSuccessfulSignals: [] }, '2026-06-02T20:02:00.000Z').staleness).toBe('unavailable');
   expect(staleLastSuccessfulSignals(success)[0]?.staleness).toBe('stale');
+});
+
+it('records 429 rate limits without dropping last-known-good signals', () => {
+  const success = recordSourceSuccess({ source: 'met', lastSuccessfulSignals: [] }, [signal], '2026-06-02T20:00:00.000Z');
+  const failed = recordSourceFailure(success, 'MET returned 429', '2026-06-02T20:05:00.000Z', { status: 429, retryAfterSeconds: 120 });
+  expect(failed.lastSuccessfulSignals).toEqual([signal]);
+  expect(failed.lastErrorStatus).toBe(429);
+  expect(failed.lastRateLimitAt).toBe('2026-06-02T20:05:00.000Z');
+  expect(failed.retryAfterSeconds).toBe(120);
+  expect(classifySourceHealth(failed, '2026-06-02T20:06:00.000Z').staleness).toBe('stale');
+});
+
+it('parses Retry-After seconds defensively for rate-limit handling', () => {
+  expect(retryAfterSecondsFromHeaders(new Headers({ 'Retry-After': '60' }))).toBe(60);
+  expect(retryAfterSecondsFromHeaders(new Headers({ 'Retry-After': 'bad' }))).toBeUndefined();
 });

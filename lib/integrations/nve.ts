@@ -1,12 +1,15 @@
-// Official docs verified 2026-06-02:
+// Official docs verified 2026-06-04:
 // - NVE Flomvarsling REST API base: https://api01.nve.no/hydrology/forecast/flood/v1.0.10
 //   Per-municipality forecast snapshot endpoint: /api/Warning/Municipality/{Kommunenummer}/{Språknøkkel}/{Start}/{Slutt}
-// - NVE Jordskredvarsling REST API base: https://api01.nve.no/hydrology/forecast/landslide/v1.0.6
+// - NVE Jordskredvarsling REST API base: https://api01.nve.no/hydrology/forecast/landslide/v1.0.10
 //   Per-municipality forecast snapshot endpoint: /api/Warning/Municipality/{Kommunenummer}/{Språknøkkel}/{Start}/{Slutt}
+// - NVE avalanche/Varsom was checked via NVE's public GitHub client and live api01.nve.no attempts; no live endpoint was verified, so avalanche fetches stay disabled/pending.
 // - Responses are context snapshots for a period/area, not durable incident events. Credit flood data as
-//   "Varsler fra Flomvarslingen i Norge og www.varsom.no".
+//   "Varsler fra Flomvarslingen i Norge og www.varsom.no" and landslide data as
+//   "Varsler fra Jordskredvarslingen i Norge og www.varsom.no".
 import { createHash } from 'node:crypto';
-import { recordSourceFailure, recordSourceSuccess, type SourceHealthState } from './source-health';
+import { ExternalApiError, recordSourceFailure, recordSourceSuccess, retryAfterSecondsFromHeaders, sourceFailureDetailsFromError, type SourceHealthState } from './source-health';
+import { getNveAvalancheSupport } from './source-contracts';
 import type { ExternalContextSignal } from './types';
 
 type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
@@ -18,7 +21,7 @@ type NveEndpoint = {
 
 const NVE_ENDPOINTS: NveEndpoint[] = [
   { kind: 'flood-warning', base: 'https://api01.nve.no/hydrology/forecast/flood/v1.0.10' },
-  { kind: 'landslide-warning', base: 'https://api01.nve.no/hydrology/forecast/landslide/v1.0.6' },
+  { kind: 'landslide-warning', base: 'https://api01.nve.no/hydrology/forecast/landslide/v1.0.10' },
 ];
 
 function hash(value: unknown) {
@@ -111,7 +114,7 @@ export async function fetchNveHazardSignals({
   const groups = await Promise.all(NVE_ENDPOINTS.map(async (endpoint) => {
     const url = endpointUrl(endpoint, municipality, range.start, range.end);
     const res = await fetchImpl(url, { headers: { Accept: 'application/json' } });
-    if (!res.ok) throw new Error(`NVE returned ${res.status} for ${endpoint.kind}`);
+    if (!res.ok) throw new ExternalApiError(`NVE returned ${res.status} for ${endpoint.kind}`, res.status, retryAfterSecondsFromHeaders(res.headers));
     const data = await res.json();
     return warningArray(data).map((warning) => {
       const upstreamHash = hash(warning);
@@ -127,12 +130,15 @@ export async function fetchNveHazardSignals({
         staleness: 'fresh',
         upstreamId: stableWarningId(endpoint, municipality, warning, upstreamHash),
         upstreamHash,
-        geometry: { municipality, area: warning.Area ?? null },
         rawRef: `nve:${endpoint.kind}`,
       } satisfies ExternalContextSignal;
     });
   }));
   return groups.flat();
+}
+
+export function getNveAvalancheSourceStatus() {
+  return getNveAvalancheSupport();
 }
 
 export async function refreshNveSourceHealth(
@@ -142,6 +148,6 @@ export async function refreshNveSourceHealth(
   try {
     return recordSourceSuccess(state, await fetchNveHazardSignals(options));
   } catch (error) {
-    return recordSourceFailure(state, error instanceof Error ? error.message : 'NVE refresh failed');
+    return recordSourceFailure(state, error instanceof Error ? error.message : 'NVE refresh failed', new Date().toISOString(), sourceFailureDetailsFromError(error));
   }
 }

@@ -21,7 +21,6 @@ export const ExternalContextSignalSchema = z
     upstreamVersion: z.string().optional(),
     etag: z.string().optional(),
     upstreamHash: z.string().optional(),
-    geometry: z.unknown().optional(),
     rawRef: z.string().regex(/^[a-z]+:[a-z0-9-]+$/, 'rawRef must be a sanitized source reference'),
   })
   .strict();
@@ -163,6 +162,7 @@ export const MissionContextSchema = z
     coordinates: CoordinatesSchema.optional(),
     municipality: z.string().optional(),
     externalSignals: z.array(ExternalContextSignalSchema).default([]),
+    externalSignalHistory: z.array(ExternalContextSignalSchema).default([]),
     activeChecklistIds: z.array(z.string()).default([]),
     notes: z.string().default(''),
     tasks: z.array(MissionTaskSchema).default([]),

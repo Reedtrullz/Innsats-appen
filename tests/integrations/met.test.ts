@@ -1,6 +1,7 @@
 import { afterEach, vi } from 'vitest';
 import { GET } from '@/app/api/context/weather/route';
 import { fetchMetSignals, getMetUserAgent, refreshMetSourceHealth } from '@/lib/integrations/met';
+import { getMetNowcastSupport } from '@/lib/integrations/source-contracts';
 
 afterEach(() => {
   delete process.env.MET_USER_AGENT;
@@ -36,8 +37,16 @@ it('fails loudly in production when MET_USER_AGENT is missing or placeholder', (
   expect(() => getMetUserAgent()).toThrow(/MET_USER_AGENT/);
   process.env.MET_USER_AGENT = 'Beredskapsboka/0.1 contact@example.invalid';
   expect(() => getMetUserAgent()).toThrow(/MET_USER_AGENT/);
-  process.env.MET_USER_AGENT = 'Beredskapsboka/0.1 ops@example.com';
-  expect(getMetUserAgent()).toContain('ops@example.com');
+  process.env.MET_USER_AGENT = 'curl/8.0 ops@beredskapsboka.no';
+  expect(() => getMetUserAgent()).toThrow(/MET_USER_AGENT/);
+  process.env.MET_USER_AGENT = 'Beredskapsboka/0.1 ops@beredskapsboka.no';
+  expect(getMetUserAgent()).toContain('ops@beredskapsboka.no');
+});
+
+it('documents Nowcast as verified but not claimed enabled in the MVP', () => {
+  const support = getMetNowcastSupport();
+  expect(support?.status).toBe('deferred');
+  expect(support?.reason).toMatch(/not enabled|ikke aktivert|MVP/i);
 });
 
 it('rejects malformed weather route coordinates', async () => {
@@ -71,4 +80,14 @@ it('keeps last successful weather source health after failed refresh', async () 
   const failed = await refreshMetSourceHealth(success, { lat: 63.43, lon: 10.39, userAgent: 'Beredskapsboka/0.1 ops@example.invalid', fetchImpl: async () => { throw new Error('network down'); } });
   expect(failed.lastSuccessfulSignals).toEqual(success.lastSuccessfulSignals);
   expect(failed.lastError).toMatch(/network down/);
+
+  const rateLimited = await refreshMetSourceHealth(success, {
+    lat: 63.43,
+    lon: 10.39,
+    userAgent: 'Beredskapsboka/0.1 ops@example.invalid',
+    fetchImpl: async () => new Response(JSON.stringify({ error: 'slow down' }), { status: 429, headers: { 'Retry-After': '90' } }),
+  });
+  expect(rateLimited.lastSuccessfulSignals).toEqual(success.lastSuccessfulSignals);
+  expect(rateLimited.lastErrorStatus).toBe(429);
+  expect(rateLimited.retryAfterSeconds).toBe(90);
 });

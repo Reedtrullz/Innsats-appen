@@ -13,6 +13,7 @@ const mission: MissionContext = {
   scenario: 'generelt',
   locationText: 'Lokalt område',
   externalSignals: [],
+  externalSignalHistory: [],
   activeChecklistIds: ['mbk-kjoretoy'],
   notes: '',
   tasks: [],

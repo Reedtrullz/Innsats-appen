@@ -3,13 +3,17 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it, vi } from 'vitest';
 import { MissionContextPanel } from '@/components/mission-context-panel';
 import { archiveMission, clearLocalMissionData, listArchivedMissions, listMissions, saveChecklistRun, saveMission } from '@/lib/mission/local-store';
+import { EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY } from '@/lib/integrations/source-settings';
 import type { OperationalChecklist } from '@/lib/content/schemas';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
 
-afterEach(async () => clearLocalMissionData());
+afterEach(async () => {
+  localStorage.clear();
+  await clearLocalMissionData();
+});
 
 const checklists = [
   {
@@ -560,6 +564,36 @@ it('shows and exports stored context signals with the same stale normalization a
   expect(preview.value).toContain('Gammelt regnvarsel: Lagret sammendrag (met, yellow, stale)');
   expect(preview.value).toContain('Gammelt vindvarsel: Lagret sammendrag to (met, yellow, stale)');
   expect(preview.value).not.toContain('(met, yellow, fresh)');
+});
+
+it('keeps disabled-source last-known-good mission context visibly stale, not active fresh', async () => {
+  localStorage.setItem(EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY, JSON.stringify({ kartverket: true, met: false, nve: true }));
+  await saveMission({
+    id: 'm2b-disabled-met-stale',
+    title: 'FIG disabled MET signal',
+    createdAt: '2026-06-03T08:00:00.000Z',
+    updatedAt: '2026-06-03T08:30:00.000Z',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'generelt',
+    locationText: 'Innsatsområde øst',
+    externalSignals: [
+      { source: 'met', kind: 'weather', severity: 'yellow', title: 'Lagret MET-varsel', summary: 'Sist vellykket', validFrom: null, validTo: null, fetchedAt: '2026-06-01T08:00:00.000Z', staleness: 'fresh', rawRef: 'met:disabled' },
+    ],
+    activeChecklistIds: ['fig-under-innsats'],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  } as any);
+
+  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+
+  expect(await screen.findByText(/met utilgjengelig eller avslått lokalt/i)).toBeInTheDocument();
+  expect(screen.getByText(/Lagret MET-varsel: Sist vellykket \(stale\)/i)).toBeInTheDocument();
+  expect(screen.queryByText(/Lagret MET-varsel: Sist vellykket \(fresh\)/i)).not.toBeInTheDocument();
 });
 
 it('lets users save structured lessons and feedback before locally completing and archiving a mission', async () => {

@@ -19,8 +19,9 @@ const mission: MissionContext = {
   locationText: 'Innsatsområde sør',
   municipality: 'Trondheim',
   externalSignals: [
-    { source: 'met', kind: 'weather', severity: 'yellow', title: 'Kraftig regn', summary: 'Lagret sammendrag av regnvarsel', validFrom: null, validTo: null, fetchedAt: '2026-06-03T07:30:00.000Z', staleness: 'stale', rawRef: 'met:regn-1', geometry: { coordinates: [10, 63] } },
+    { source: 'met', kind: 'weather', severity: 'yellow', title: 'Kraftig regn', summary: 'Lagret sammendrag av regnvarsel', validFrom: null, validTo: null, fetchedAt: '2026-06-03T07:30:00.000Z', staleness: 'stale', rawRef: 'met:regn-1' },
   ],
+  externalSignalHistory: [],
   activeChecklistIds: ['etterkontroll-lag'],
   notes: 'Kort lokal oppsummering uten persondata',
   tasks: [

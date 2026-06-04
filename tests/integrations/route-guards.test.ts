@@ -45,6 +45,8 @@ it('rejects unsupported upstream paths and generic proxy/query parameters', () =
   expect(guardAllowedQuery(new URLSearchParams('q=Trondheim&extra=1'), ['q']).ok).toBe(false);
   expect(guardAllowedQuery(new URLSearchParams('q=Trondheim&q=Oslo'), ['q']).ok).toBe(false);
   expect(guardAllowedQuery(new URLSearchParams('Q=Trondheim'), ['q']).ok).toBe(false);
+  expect(guardAllowedQuery(new URLSearchParams('lat=63.4&lon=10.4&q=unsupported'), ['lat', 'lon']).ok).toBe(false);
+  expect(guardAllowedQuery(new URLSearchParams('municipality=5001&lat=63.4'), ['municipality', 'start', 'end']).ok).toBe(false);
 });
 
 it('rejects sensitive or oversized public geocode lookup text', () => {
@@ -58,6 +60,7 @@ it('accepts only external context signals, not action-card-shaped payloads', () 
   expect(guardExternalContextSignals([validSignal]).ok).toBe(true);
   expect(guardExternalContextSignals([{ ...validSignal, steps: ['Tiltak'], sourceIds: ['src-1'] }]).ok).toBe(false);
   expect(guardExternalContextSignals([{ ...validSignal, rawPayload: { secret: true } }]).ok).toBe(false);
+  expect(guardExternalContextSignals([{ ...validSignal, geometry: { type: 'Point', coordinates: [10.39, 63.43] } }]).ok).toBe(false);
   expect(guardExternalContextSignals([{ ...validSignal, source: 123 }]).ok).toBe(false);
   expect(guardExternalContextSignals([{ ...validSignal, validFrom: 123 }]).ok).toBe(false);
   expect(guardExternalContextSignals([{ ...validSignal, upstreamHash: { hash: 'bad' } }]).ok).toBe(false);

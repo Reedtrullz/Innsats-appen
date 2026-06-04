@@ -1,3 +1,4 @@
+import { openDB } from 'idb';
 import { afterEach, expect, it } from 'vitest';
 import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArchivedMission, deleteMission, getChecklistRun, getMission, listArchivedMissions, listMissions, saveChecklistRun, saveMission } from '@/lib/mission/local-store';
 import { MissionContextSchema } from '@/lib/mission/schemas';
@@ -59,6 +60,22 @@ it('persists checklist runs and complete source-health-like signals locally', as
 
   expect((await getChecklistRun('run-1'))?.checkedItemIds).toContain('ventilasjon');
   expect((await getMission(mission.id))?.externalSignals[0]?.title).toBe('Vær');
+});
+
+it('migrates old local missions by stripping retired geometry fields from context signals', async () => {
+  await saveMission(MissionContextSchema.parse({ ...baseMission, id: 'mission-store-migration-seed' }));
+  const database = await openDB('beredskapsboka-local', 1);
+  await database.put('missions', {
+    ...baseMission,
+    id: 'mission-store-legacy-context-shape',
+    updatedAt: '2026-06-03T10:06:00.000Z',
+    externalSignals: [{ source: 'met', kind: 'weather', severity: 'info', title: 'Vær', summary: 'OK', validFrom: null, validTo: null, fetchedAt: '2026-06-02T20:00:00.000Z', staleness: 'fresh', upstreamHash: 'abc123', rawRef: 'met:locationforecast', geometry: { type: 'Point', coordinates: [10.39, 63.43] } }],
+    externalSignalHistory: [{ source: 'met', kind: 'weather', severity: 'info', title: 'Historisk vær', summary: 'OK', validFrom: null, validTo: null, fetchedAt: '2026-06-02T19:00:00.000Z', staleness: 'stale', upstreamHash: 'old123', rawRef: 'met:locationforecast', geometry: { type: 'Point', coordinates: [10.39, 63.43] } }],
+  });
+
+  const stored = (await listMissions()).find((mission) => mission.id === 'mission-store-legacy-context-shape');
+  expect(stored?.externalSignals[0]).toMatchObject({ title: 'Vær', rawRef: 'met:locationforecast' });
+  expect(JSON.stringify(stored)).not.toContain('geometry');
 });
 
 it('stores local mission tasks, quick status log and resource requests with allowed status values only', async () => {

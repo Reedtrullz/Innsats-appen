@@ -64,7 +64,6 @@ export async function fetchKartverketSignals({ q, lat, lon, fetchImpl = fetch }:
         staleness: 'fresh',
         upstreamId: firstAddress.adressekode?.toString(),
         upstreamHash: hash(firstAddress),
-        geometry: firstAddress.representasjonspunkt,
         rawRef: 'kartverket:adresse-sok',
       });
     }
@@ -82,7 +81,6 @@ export async function fetchKartverketSignals({ q, lat, lon, fetchImpl = fetch }:
         staleness: 'fresh',
         upstreamId: firstPlace.stedsnummer?.toString() ?? firstPlace.stednummer?.toString(),
         upstreamHash: hash(firstPlace),
-        geometry: firstPlace.representasjonspunkt,
         rawRef: 'kartverket:stedsnavn-sok',
       });
     }
@@ -124,7 +122,6 @@ export async function fetchKartverketSignals({ q, lat, lon, fetchImpl = fetch }:
       staleness: 'fresh',
       upstreamId: data.kommunenummer?.toString(),
       upstreamHash: hash(data),
-      geometry: data.representasjonspunkt,
       rawRef: 'kartverket:kommune-punkt',
     });
   }

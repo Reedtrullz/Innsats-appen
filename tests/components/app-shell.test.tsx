@@ -25,6 +25,8 @@ it('shows generated content version and expanded content navigation', () => {
   render(<AppShell currentPath="/hurtigkort"><p>Innhold</p></AppShell>);
 
   expect(screen.getByTestId('shell-content-version')).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /Kildegjennomgang/i })).toHaveAttribute('href', '/kildegjennomgang');
+  expect(screen.getByRole('link', { name: /Datakilder/i })).toHaveAttribute('href', '/datakilder');
   expect(screen.getByRole('link', { name: /FAQ/i })).toHaveAttribute('href', '/faq');
   expect(screen.getByRole('link', { name: /Endringer/i })).toHaveAttribute('href', '/endringer');
   expect(screen.getByRole('link', { name: /Må leses/i })).toHaveAttribute('href', '/ma-leses');

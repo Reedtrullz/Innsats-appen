@@ -1,5 +1,5 @@
 import { openDB, type DBSchema } from 'idb';
-import { ChecklistRunSchema, MissionContextSchema, type ChecklistRun, type ChecklistRunInput, type MissionContext } from './schemas';
+import { ChecklistRunSchema, MissionContextSchema, type ChecklistRun, type ChecklistRunInput, type MissionContext, type ExternalContextSignal } from './schemas';
 
 interface BeredskapsbokaDb extends DBSchema {
   missions: {
@@ -15,6 +15,36 @@ interface BeredskapsbokaDb extends DBSchema {
 }
 
 const DB_NAME = 'beredskapsboka-local';
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function sanitizeStoredSignals(value: unknown): ExternalContextSignal[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  return value.map((signal) => {
+    if (!isRecord(signal)) return signal;
+    const { geometry: _geometry, ...sanitizedSignal } = signal;
+    return sanitizedSignal;
+  }) as ExternalContextSignal[];
+}
+
+function sanitizeStoredMission(input: unknown) {
+  if (!isRecord(input)) return input;
+  const externalSignals = sanitizeStoredSignals(input.externalSignals);
+  const externalSignalHistory = sanitizeStoredSignals(input.externalSignalHistory);
+  return {
+    ...input,
+    ...(externalSignals ? { externalSignals } : {}),
+    ...(externalSignalHistory ? { externalSignalHistory } : {}),
+  };
+}
+
+function parseMissionContext(input: unknown): MissionContext {
+  const mission = sanitizeStoredMission(input);
+  if (!isRecord(mission)) return MissionContextSchema.parse(mission);
+  return MissionContextSchema.parse({ ...mission, schemaVersion: mission.schemaVersion ?? 1 });
+}
 
 function db() {
   return openDB<BeredskapsbokaDb>(DB_NAME, 1, {
@@ -32,20 +62,20 @@ function db() {
 }
 
 export async function saveMission(input: MissionContext): Promise<MissionContext> {
-  const parsed = MissionContextSchema.parse({ ...input, schemaVersion: input.schemaVersion ?? 1 });
+  const parsed = parseMissionContext(input);
   await (await db()).put('missions', parsed);
   return parsed;
 }
 
 export async function getMission(id: string): Promise<MissionContext | undefined> {
   const mission = await (await db()).get('missions', id);
-  return mission ? MissionContextSchema.parse({ ...mission, schemaVersion: mission.schemaVersion ?? 1 }) : undefined;
+  return mission ? parseMissionContext(mission) : undefined;
 }
 
 export async function listMissions(): Promise<MissionContext[]> {
   const missions = await (await db()).getAll('missions');
   return missions
-    .map((mission) => MissionContextSchema.parse({ ...mission, schemaVersion: mission.schemaVersion ?? 1 }))
+    .map(parseMissionContext)
     .filter((mission) => !mission.archivedAt)
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
@@ -79,7 +109,7 @@ export async function archiveMission(id: string, fields: ArchiveMissionFields = 
   const mission = await database.get('missions', id);
   if (!mission) return undefined;
   const now = new Date().toISOString();
-  const archived = MissionContextSchema.parse({
+  const archived = parseMissionContext({
     ...mission,
     completedAt: fields.completedAt ?? mission.completedAt ?? now,
     archivedAt: fields.archivedAt ?? now,
@@ -94,7 +124,7 @@ export async function listArchivedMissions(query = ''): Promise<MissionContext[]
   const normalizedQuery = query.trim().toLowerCase();
   const missions = await (await db()).getAll('missions');
   return missions
-    .map((mission) => MissionContextSchema.parse({ ...mission, schemaVersion: mission.schemaVersion ?? 1 }))
+    .map(parseMissionContext)
     .filter((mission) => Boolean(mission.archivedAt))
     .filter((mission) => !normalizedQuery || archiveSearchText(mission).includes(normalizedQuery))
     .sort((a, b) => (b.archivedAt ?? b.updatedAt).localeCompare(a.archivedAt ?? a.updatedAt));
