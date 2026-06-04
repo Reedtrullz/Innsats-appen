@@ -1,18 +1,19 @@
 import { fetchMetSignals } from '@/lib/integrations/met';
-import { guardAllowedQuery, guardExternalContextSignals, guardLatLon, jsonGuardError } from '@/lib/integrations/route-guards';
+import { guardAllowedQuery, guardExternalContextSignals, guardLatLon } from '@/lib/integrations/route-guards';
+import { contextGuardError, contextJson } from '../private-context-response';
 
 export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
   const allowed = guardAllowedQuery(params, ['lat', 'lon']);
-  if (!allowed.ok) return jsonGuardError(allowed);
+  if (!allowed.ok) return contextGuardError(allowed);
   const latLon = guardLatLon(params);
-  if (!latLon.ok) return jsonGuardError(latLon);
+  if (!latLon.ok) return contextGuardError(latLon);
   try {
     const signals = await fetchMetSignals(latLon.value);
     const guarded = guardExternalContextSignals(signals);
-    if (!guarded.ok) return jsonGuardError(guarded);
-    return Response.json(guarded.value, { headers: { 'Cache-Control': 's-maxage=900, stale-while-revalidate=3600' } });
+    if (!guarded.ok) return contextGuardError(guarded);
+    return contextJson(guarded.value);
   } catch (error) {
-    return Response.json({ error: error instanceof Error ? error.message : 'weather unavailable' }, { status: 502 });
+    return contextJson({ error: error instanceof Error ? error.message : 'weather unavailable' }, { status: 502 });
   }
 }
