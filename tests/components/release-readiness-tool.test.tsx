@@ -37,7 +37,7 @@ it('tracks open release work and can mark it completed', async () => {
   expect(screen.getAllByText(/Write release notes/).length).toBeGreaterThan(0);
 });
 
-it('loads synced workplans into the release board', async () => {
+it('describes workplans as generated local artifacts without backend sync', async () => {
   globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
     const url = String(input);
     if (url.includes('content-coverage-report')) {
@@ -57,14 +57,14 @@ it('loads synced workplans into the release board', async () => {
             title: 'Pilot Workplan',
             sourcePath: '.hermes/plans/pilot-workplan.md',
             sourceType: 'hermes-plan',
-            summary: 'Ship synced workplans.',
+            summary: 'Ship generated local workplan artifacts.',
             stage: 'verify',
             risk: 'high',
             status: 'active',
             taskCount: 2,
             updatedAt: '2026-06-04T12:00:00.000Z',
             tasks: [
-              { id: 'pilot-workplan-task-1', title: 'Sync Obsidian note', status: 'completed', stage: 'verify', risk: 'medium' },
+              { id: 'pilot-workplan-task-1', title: 'Generate Obsidian note', status: 'completed', stage: 'verify', risk: 'medium' },
               { id: 'pilot-workplan-task-2', title: 'Verify release page', status: 'active', stage: 'release', risk: 'high' },
             ],
           },
@@ -75,12 +75,13 @@ it('loads synced workplans into the release board', async () => {
 
   render(<ReleaseReadinessTool />);
 
-  expect(await screen.findByRole('heading', { name: 'Synced workplans' })).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { name: 'Genererte lokale workplan-artefakter' })).toBeInTheDocument();
   expect((await screen.findAllByRole('heading', { name: 'Pilot Workplan' })).length).toBeGreaterThan(0);
   expect(screen.getByText(/1\/2 tasks completed/i)).toBeInTheDocument();
   expect(screen.getByText(/Open: Verify release page/i)).toBeInTheDocument();
-  expect(screen.getByText(/1 synced from Obsidian/i)).toBeInTheDocument();
-  expect(screen.getByText(/Last sync: 2026-06-04T12:00:00.000Z/i)).toBeInTheDocument();
+  expect(screen.getByText(/1 workplan lastet fra `\/generated-content\/workplans\.json` — ingen backend-synk/i)).toBeInTheDocument();
+  expect(screen.getByText(/Artefakt generert: 2026-06-04T12:00:00.000Z/i)).toBeInTheDocument();
+  expect(screen.queryByText(/Automatic sync|Synced workplans|Last sync|synced from Obsidian/i)).not.toBeInTheDocument();
 
   await userEvent.click(screen.getByRole('button', { name: 'Reset' }));
   await waitFor(() => {

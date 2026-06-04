@@ -26,7 +26,7 @@ npm run build:content
 
 `validate:content` enforces schema validity, source references, warning/status constraints, workplan snapshot shape, public mirror parity, and sensitive structured key policy.
 
-## Workplan sync
+## Workplan artifact generation
 
 - Local planning files live under `.hermes/plans/*.md`.
 - `npm run sync:workplans` parses the H1, `**Goal:**` summary, and `### Task N:` headings into a safe workplan snapshot.
@@ -35,7 +35,7 @@ npm run build:content
   - `content/generated/workplans.json` for server/build-time validation;
   - `public/generated-content/workplans.json` for `/release` and offline cache;
   - `20-Workplans.md` in the Obsidian project folder when `OBSIDIAN_BEREDSKAPSBOKA_PATH` or the default local vault path exists.
-- `/release` fetches `/generated-content/workplans.json`, displays the synced workplans, and merges them into the local release board. Manual browser status changes are preserved in `localStorage`; the static app does not write browser edits back to Obsidian.
+- `/release` fetches the generated local workplan artifact from `/generated-content/workplans.json`, displays its safe metadata, and merges it into the local release board. Manual browser status changes are preserved in `localStorage`; the static app does not write browser edits back to Obsidian and has ingen backend-synk.
 
 ## Add a card
 

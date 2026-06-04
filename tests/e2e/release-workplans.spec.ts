@@ -23,9 +23,9 @@ test('release page displays generated workplans from the production artifact', a
   const completedTasks = workplan.tasks.filter((task) => task.status === 'completed').length;
 
   await page.goto('/release');
-  await expect(page.getByRole('heading', { name: /Synced workplans/i })).toBeVisible();
-  await expect(page.getByText(/synced from Obsidian/i)).toBeVisible();
-  await expect(page.getByText(`Last sync: ${snapshot.generatedAt}`).first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Genererte lokale workplan-artefakter/i })).toBeVisible();
+  await expect(page.getByText(/lastet fra `\/generated-content\/workplans\.json` — ingen backend-synk/i)).toBeVisible();
+  await expect(page.getByText(`Artefakt generert: ${snapshot.generatedAt}`).first()).toBeVisible();
   await expect(page.getByRole('heading', { name: workplan.title }).first()).toBeVisible();
   await expect(page.getByText(workplan.summary).first()).toBeVisible();
   await expect(page.getByText(`${completedTasks}/${workplan.taskCount} tasks completed`).first()).toBeVisible();

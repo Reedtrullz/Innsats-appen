@@ -15,7 +15,7 @@ Operational navigation:
 - Kort: tiltakskort / hurtigkort for source-backed action cards and phase filters.
 - Mer: sources, modules, field mode, privacy, map, device-data controls, and admin/release links.
 
-/release stays outside the operational shell. It is an admin/release-readiness surface, not a field action, and it must not appear as a primary field navigation tab.
+/release stays outside the operational shell. It is an admin/release-readiness surface, not a field action, and it must not appear as a primary field navigation tab. Its workplan panel reads a generated local workplan artifact from `/generated-content/workplans.json`; it has ingen backend-synk.
 
 ## What changed
 

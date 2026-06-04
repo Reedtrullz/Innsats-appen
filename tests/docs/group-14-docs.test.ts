@@ -63,6 +63,26 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(doc).toContain('no login');
     expect(doc).toContain('no central incident database');
     expect(doc).toContain('no patient/persondata');
+    expect(doc).toContain('generated local workplan artifact');
+    expect(doc).toContain('/generated-content/workplans.json');
+    expect(doc).toContain('ingen backend-synk');
+  });
+
+  it('documents release workplans as generated local artifacts, not backend sync', () => {
+    const readme = read('README.md');
+    expect(readme).toContain('generated local workplan artifact');
+    expect(readme).toContain('/generated-content/workplans.json');
+    expect(readme).toContain('ingen backend-synk');
+    expect(readme).not.toMatch(/synced workplans|sync workplans into Obsidian/i);
+  });
+
+  it('documents content-editing workplans as generated local artifacts', () => {
+    const doc = read('docs/content-editing.md');
+    expect(doc).toContain('Workplan artifact generation');
+    expect(doc).toContain('generated local workplan artifact');
+    expect(doc).toContain('/generated-content/workplans.json');
+    expect(doc).toContain('ingen backend-synk');
+    expect(doc).not.toMatch(/displays the synced workplans/i);
   });
 
   it('adds release/stale notification scripts without adding backend sync or push services', () => {

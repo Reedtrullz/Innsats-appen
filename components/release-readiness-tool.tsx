@@ -187,7 +187,7 @@ export function ReleaseReadinessTool() {
     if (!hydrated) return undefined;
     let cancelled = false;
 
-    async function loadSyncedWorkplans() {
+    async function loadGeneratedWorkplanArtifacts() {
       const response = await fetch('/generated-content/workplans.json', { cache: 'no-store' });
       if (!response.ok) throw new Error(`Failed to load workplans: ${response.status}`);
       const snapshot = WorkplansSnapshotSchema.parse(await response.json());
@@ -197,8 +197,8 @@ export function ReleaseReadinessTool() {
       setPlan((current) => mergeSyncedWorkplansIntoPlan(current, snapshot));
     }
 
-    loadSyncedWorkplans().catch(() => {
-      if (!cancelled) setWorkplansError('Workplan sync is unavailable in this browser session.');
+    loadGeneratedWorkplanArtifacts().catch(() => {
+      if (!cancelled) setWorkplansError('Generert workplan-artefakt er utilgjengelig i denne nettleserøkten.');
     });
 
     return () => {
@@ -419,14 +419,14 @@ export function ReleaseReadinessTool() {
             <section className="mt-8 rounded-2xl border border-blue-100 bg-blue-50 p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-wide text-blue-700">Automatic sync</p>
-                  <h2 className="text-2xl font-black">Synced workplans</h2>
-                  <p className="mt-1 text-sm font-semibold text-slate-600">{syncedWorkplans.length} synced from Obsidian</p>
+                  <p className="text-xs font-black uppercase tracking-wide text-blue-700">Generert lokal artefakt</p>
+                  <h2 className="text-2xl font-black">Genererte lokale workplan-artefakter</h2>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">{syncedWorkplans.length} workplan{syncedWorkplans.length === 1 ? '' : 's'} lastet fra `/generated-content/workplans.json` — ingen backend-synk</p>
                 </div>
-                <p className="rounded-xl bg-white px-3 py-2 text-xs font-black text-blue-700">{workplansSnapshot ? `Last sync: ${workplansSnapshot.generatedAt}` : workplansError ?? 'Waiting for generated workplan sync.'}</p>
+                <p className="rounded-xl bg-white px-3 py-2 text-xs font-black text-blue-700">{workplansSnapshot ? `Artefakt generert: ${workplansSnapshot.generatedAt}` : workplansError ?? 'Venter på generert lokal workplan-artefakt.'}</p>
               </div>
               {syncedWorkplans.length === 0 ? (
-                <p className="mt-4 rounded-xl bg-white p-3 text-sm font-semibold text-slate-600">No generated workplans are available yet. Run <code>npm run sync:workplans</code> locally to sync `.hermes/plans` into Obsidian and the release board.</p>
+                <p className="mt-4 rounded-xl bg-white p-3 text-sm font-semibold text-slate-600">Ingen genererte workplans er tilgjengelige ennå. Kjør <code>npm run sync:workplans</code> lokalt for å generere trygge metadata fra `.hermes/plans` til `content/workplans` og `/generated-content/workplans.json`; ingen backend-synk utføres.</p>
               ) : (
                 <div className="mt-4 grid gap-3 lg:grid-cols-2">
                   {syncedWorkplans.map((workplan) => (

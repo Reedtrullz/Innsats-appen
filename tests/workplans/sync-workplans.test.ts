@@ -285,7 +285,7 @@ it('rejects inconsistent workplan and task counts', () => {
         title: 'Pilot Workplan',
         sourcePath: '.hermes/plans/pilot-workplan.md',
         sourceType: 'hermes-plan',
-        summary: 'Ship synced workplans.',
+        summary: 'Ship generated workplan artifacts.',
         stage: 'build',
         risk: 'medium',
         status: 'active',

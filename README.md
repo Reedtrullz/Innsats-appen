@@ -29,7 +29,7 @@ OBSIDIAN_BEREDSKAPSBOKA_PATH=/path/to/your/Obsidian/Beredskapsboka
 
 Curated MVP content lives in `content/curated/*.yaml`. Build scripts compile it to `content/generated/*` and mirror browser-readable JSON to `public/generated-content/*`. The sanitized `content/generated/source-documents.json` snapshot is committed so clean GitHub Actions runners can build and test without access to the private Obsidian vault; refresh it with `npm run build:content` and rely on the privacy tests before committing changes.
 
-Workplans live in `.hermes/plans/*.md` when developing locally. `npm run sync:workplans` extracts safe metadata/task headings into `content/workplans/workplans.json`, mirrors `content/generated/workplans.json` + `public/generated-content/workplans.json`, and writes `20-Workplans.md` in the Obsidian project folder when the vault is available. `/release` fetches that generated snapshot and merges it into the browser-local release board while preserving local status overrides.
+Workplans live in `.hermes/plans/*.md` when developing locally. `npm run sync:workplans` extracts safe metadata/task headings into `content/workplans/workplans.json`, mirrors `content/generated/workplans.json` + `public/generated-content/workplans.json`, and writes `20-Workplans.md` in the Obsidian project folder when the vault is available. `/release` fetches the generated local workplan artifact from `/generated-content/workplans.json` and merges it into the browser-local release board while preserving local status overrides; dette er en statisk artefakt uten backend-synk.
 
 ## App commands
 
@@ -37,8 +37,8 @@ Workplans live in `.hermes/plans/*.md` when developing locally. `npm run sync:wo
 source ~/.nvm/nvm.sh && nvm use 22
 npm install
 npm run dev              # local Next dev server
-npm run build:content    # import Obsidian, compile curated YAML, build search index, sync workplans, validate graph/artifacts
-npm run sync:workplans    # mirror .hermes/plans into Obsidian + generated workplans for /release
+npm run build:content    # import Obsidian, compile curated YAML, build search index, generate workplan artifacts, validate graph/artifacts
+npm run sync:workplans    # generate safe .hermes/plans metadata into Obsidian + generated local workplan artifacts for /release
 npm run typecheck        # TypeScript gate
 npm run test             # Vitest unit/component/integration/security/content tests
 npm run build            # content build + production Next build
@@ -64,7 +64,7 @@ npm run e2e:prod -- tests/e2e/offline.spec.ts
 - `/oppdrag/ny` creates a local mission context; `/oppdrag` shows the active mission dashboard with situation, next recommended action, recommended cards, matching checklist progress, map/log summaries, after-action/oppdragsmappe exports, order/comms export tools, and cached/stale public context signals.
 - `/kart`, `/under`, Feltmodus quick actions and `/oppdrag` support the local-only Kart → Logg → Oppdrag → Etterrapport → Oppdragsmappe workflow documented in `docs/map-log-fieldmode-workflow.md`.
 - `/mer` keeps secondary support surfaces together: sources, learning/modules, map, field mode, privacy, device-data controls, and admin links.
-- `/release` is a standalone release-readiness board for launch planning, stage gates, active work, synced workplans, risk attention, local JSON export, and launch-material links. It intentionally avoids the operational app shell.
+- `/release` is a standalone release-readiness board for launch planning, stage gates, active work, generated local workplan artifacts, risk attention, local JSON export, and launch-material links. It intentionally avoids the operational app shell and has ingen backend-synk.
 
 ## Runbook
 

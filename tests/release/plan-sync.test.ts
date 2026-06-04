@@ -11,21 +11,21 @@ const snapshot: WorkplansSnapshot = {
       title: 'Pilot Workplan',
       sourcePath: '.hermes/plans/pilot-workplan.md',
       sourceType: 'hermes-plan',
-      summary: 'Ship synced workplans.',
+      summary: 'Ship generated workplan artifacts.',
       stage: 'verify',
       risk: 'high',
       status: 'active',
       taskCount: 2,
       updatedAt: '2026-06-04T12:00:00.000Z',
       tasks: [
-        { id: 'pilot-workplan-task-1', title: 'Sync Obsidian note', status: 'active', stage: 'verify', risk: 'medium' },
+        { id: 'pilot-workplan-task-1', title: 'Generate Obsidian note', status: 'active', stage: 'verify', risk: 'medium' },
         { id: 'pilot-workplan-task-2', title: 'Verify release page', status: 'planned', stage: 'release', risk: 'high' },
       ],
     },
   ],
 };
 
-it('merges synced workplans into the release plan while preserving local status overrides', () => {
+it('merges generated workplan artifacts into the release plan while preserving local status overrides', () => {
   const localPlan = {
     ...defaultReleasePlan,
     items: [
@@ -53,12 +53,12 @@ it('merges synced workplans into the release plan while preserving local status 
     stage: 'verify',
     risk: 'high',
   });
-  expect(item?.notes).toContain('Ship synced workplans.');
+  expect(item?.notes).toContain('Ship generated workplan artifacts.');
   expect(item?.notes).toContain('.hermes/plans/pilot-workplan.md');
   expect(merged.syncedAt).toBe('2026-06-04T12:00:00.000Z');
 });
 
-it('summarizes synced task progress and omits completed tasks from open-task notes', () => {
+it('summarizes generated task progress and omits completed tasks from open-task notes', () => {
   const progressSnapshot: WorkplansSnapshot = {
     generatedAt: '2026-06-04T12:00:00.000Z',
     sourceCount: 1,
@@ -68,7 +68,7 @@ it('summarizes synced task progress and omits completed tasks from open-task not
         title: 'Pilot Workplan',
         sourcePath: '.hermes/plans/pilot-workplan.md',
         sourceType: 'hermes-plan',
-        summary: 'Ship synced workplans.',
+        summary: 'Ship generated workplan artifacts.',
         stage: 'verify',
         risk: 'high',
         status: 'active',
@@ -76,7 +76,7 @@ it('summarizes synced task progress and omits completed tasks from open-task not
         updatedAt: '2026-06-04T12:00:00.000Z',
         evidence: [],
         tasks: [
-          { id: 'pilot-workplan-task-1', title: 'Sync Obsidian note', status: 'completed', stage: 'verify', risk: 'medium', evidence: ['sync PASS'] },
+          { id: 'pilot-workplan-task-1', title: 'Generate Obsidian note', status: 'completed', stage: 'verify', risk: 'medium', evidence: ['artifact generation PASS'] },
           { id: 'pilot-workplan-task-2', title: 'Verify release page', status: 'active', stage: 'release', risk: 'high', evidence: [] },
         ],
       },
@@ -88,10 +88,10 @@ it('summarizes synced task progress and omits completed tasks from open-task not
 
   expect(item?.notes).toContain('Task progress: 1/2 completed');
   expect(item?.notes).toContain('• Verify release page');
-  expect(item?.notes).not.toContain('• Sync Obsidian note');
+  expect(item?.notes).not.toContain('• Generate Obsidian note');
 });
 
-it('includes blocked task count in synced task progress summaries', () => {
+it('includes blocked task count in generated task progress summaries', () => {
   const blockedSnapshot: WorkplansSnapshot = {
     generatedAt: '2026-06-04T12:00:00.000Z',
     sourceCount: 1,
@@ -101,7 +101,7 @@ it('includes blocked task count in synced task progress summaries', () => {
         title: 'Pilot Workplan',
         sourcePath: '.hermes/plans/pilot-workplan.md',
         sourceType: 'hermes-plan',
-        summary: 'Ship synced workplans.',
+        summary: 'Ship generated workplan artifacts.',
         stage: 'verify',
         risk: 'high',
         status: 'blocked',
@@ -109,7 +109,7 @@ it('includes blocked task count in synced task progress summaries', () => {
         updatedAt: '2026-06-04T12:00:00.000Z',
         evidence: [],
         tasks: [
-          { id: 'pilot-workplan-task-1', title: 'Sync Obsidian note', status: 'completed', stage: 'verify', risk: 'medium', evidence: ['sync PASS'] },
+          { id: 'pilot-workplan-task-1', title: 'Generate Obsidian note', status: 'completed', stage: 'verify', risk: 'medium', evidence: ['artifact generation PASS'] },
           { id: 'pilot-workplan-task-2', title: 'Run iPhone Safari', status: 'blocked', stage: 'release', risk: 'high', evidence: [] },
           { id: 'pilot-workplan-task-3', title: 'Run Android Chrome', status: 'blocked', stage: 'release', risk: 'high', evidence: [] },
           { id: 'pilot-workplan-task-4', title: 'Run home-screen install', status: 'blocked', stage: 'release', risk: 'high', evidence: [] },
