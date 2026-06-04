@@ -1,4 +1,5 @@
-import { getActionCards, getSourceDocuments } from '@/lib/content/load-content';
+import { buildContentCoverageReport } from '@/lib/content/coverage-report';
+import { getActionCards, getChecklists, getGlossaryTerms, getProtectionMeasures, getSourceDocuments, getTrainingPaths } from '@/lib/content/load-content';
 import type { ActionCard, SourceDocument } from '@/lib/content/schemas';
 
 const requiredMarkers = [
@@ -61,4 +62,18 @@ it('keeps coverage backed by both action cards and source documents', () => {
   expect(cardsText).toContain('sjekkliste');
   expect(cardsText).toContain('psykologisk');
   expect(sourcesText).toContain('5-punktsordre');
+});
+
+it('does not leave orphan sources without accepted-risk metadata', () => {
+  const report = buildContentCoverageReport({
+    sources: getSourceDocuments(),
+    actionCards: getActionCards(),
+    checklists: getChecklists(),
+    trainingPaths: getTrainingPaths(),
+    protectionMeasures: getProtectionMeasures(),
+    glossary: getGlossaryTerms(),
+  }, '2026-06-04T00:00:00.000Z');
+
+  expect(report.linkage.sourcesWithoutReferences).toEqual([]);
+  expect(report.releaseBoard.gaps.find((gap) => gap.id === 'content-orphan-sources')?.count ?? 0).toBe(0);
 });

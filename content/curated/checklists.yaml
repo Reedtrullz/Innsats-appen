@@ -78,7 +78,7 @@
       label: Klar til avreise meldt til distrikt/beredskapsvakt etter lokale rutiner
       required: true
       sourceIds: [src-sjekkliste-fig-og-figp, src-kommunikasjons-og-sambandsdiagram]
-  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram, src-laeringsportal-plis-tjenestepliktige]
   warning: Lokal ordre gjelder. Bruk sjekklisten som offentlig beslutningsstøtte; ikke legg inn persondata, pasientdata eller skjermet operativ informasjon.
 
 - slug: for-utrykning-samlet
@@ -134,7 +134,7 @@
       label: Eventuelle mangler er notert lokalt uten navn eller sentral personlig inventarliste
       required: false
       sourceIds: [src-sjekkliste-fig-og-figp]
-  sourceIds: [src-sjekkliste-fig-og-figp]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-grunnsats-personlig-utrustning-april-2026]
   warning: Ingen sentral personlig inventarliste i MVP. Bruk bare lokal sjekklistestatus/notat, ikke persondata eller helsedata.
 
 - slug: lagsutstyr-for-utrykning
@@ -226,7 +226,7 @@
       label: Ved avmarsj er oppdrag, restanser, farer, sperringer, ressursbehov og kontaktpunkt overlevert til innsatsleder eller neste enhet
       required: true
       sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram]
-  sourceIds: [src-tiltakskort-for-innsats, src-sjekkliste-fig-og-figp, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram, src-psykososial-oppfolging-og-kollegastotte]
+  sourceIds: [src-tiltakskort-for-innsats, src-tiltakskort-03-innsats, src-sjekkliste-fig-og-figp, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram, src-psykososial-oppfolging-og-kollegastotte]
   warning: Følg innsatsleders føringer og lokal ordre. Ikke legg inn navn, ID, persondata, pasientdata, helsejournal eller skjermet operativ informasjon.
 
 - slug: fig-etter-innsats

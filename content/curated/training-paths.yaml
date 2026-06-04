@@ -5,7 +5,7 @@
   duration: 3 uker
   prerequisites: []
   skills: [egensikkerhet, samband, førstehjelp, ordre, HMS]
-  sourceIds: [src-kursplan-grunnkurs-fig10]
+  sourceIds: [src-kursplan-grunnkurs-fig10, src-oving-og-lokal-opplaering-i-sivilforsvaret, src-opplaering-bruker-av-sikringsutstyr]
   linkedCardSlugs: [fem-punktsordre, sambandsplan-start, fig-for-innsats]
 
 - slug: rad10-grunnkurs

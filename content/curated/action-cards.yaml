@@ -181,7 +181,7 @@
     - Ikke gi medisinske råd utover offisielle myndighetsråd.
   reporting:
     - Loggfør informasjonsbehov og henvendelser.
-  sourceIds: [src-jodtabletter-i-sivilforsvaret, src-atomberedskap-i-norge-og-sivilforsvarets-rolle]
+  sourceIds: [src-jodtabletter-i-sivilforsvaret, src-atomberedskap-i-norge-og-sivilforsvarets-rolle, src-slik-gjor-vi-ved-radioaktivt-nedfall]
   competenceRequired: []
   competenceRationale: Jodtablettkortet peker kun til offisiell myndighetsinformasjon; radiac måling og dosevurdering krever RADIAC-kompetanse.
   warning: Følg alltid offisielle råd fra myndighetene.
@@ -293,7 +293,7 @@
     - Unngå parallelle ordrelinjer; avklar konfliktende beskjeder før tiltak fortsetter.
   reporting:
     - Rapporter status, avvik, ressursbehov og beslutninger etter avtalt intervall.
-  sourceIds: [src-enhetlig-ledelsessystem-els, src-operativt-konsept-for-sivilforsvaret]
+  sourceIds: [src-enhetlig-ledelsessystem-els, src-operativt-konsept-for-sivilforsvaret, src-vedlegg-a-styrende-dokumenter]
   competenceRequired: [FIG20]
   equipmentRequired: [samband]
   warning: Offentlig rolle- og ordrestøtte; ikke legg inn sensitive sambandstabeller eller interne lister.
@@ -650,7 +650,7 @@
     - Avbryt ved uventet høy verdi, instrumentfeil, uklar ordre eller behov for fagmyndighet.
   reporting:
     - Rapporter måleverdi, tid, metode, posisjon og usikkerhet via avtalt kanal.
-  sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i, src-veileder-radiacmaletjeneste-del-ii, src-sjekkliste-radiaclag-rad]
+  sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i, src-veileder-radiacmaletjeneste-del-ii, src-sjekkliste-radiaclag-rad, src-den-nasjonale-maleberedskapen]
   competenceRequired: [RAD10]
   equipmentRequired: [dosimeter, maleinstrument, samband]
   warning: RADIAC-data er beslutningsgrunnlag; følg ordre, fagmyndighet og gjeldende målebestemmelse.
@@ -669,7 +669,7 @@
     - Stans/avbryt ved uklar ordre, manglende dosimeter, instrumentfeil eller tegn til overskridelse.
   reporting:
     - Rapporter oppholdstid, dose-/rateobservasjoner, rullering og behov for fagmyndighet.
-  sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i, src-veileder-radiacmaletjeneste-del-ii]
+  sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i, src-veileder-radiacmaletjeneste-del-ii, src-sentrale-stralebegreper]
   competenceRequired: [RAD10]
   equipmentRequired: [dosimeter, maleinstrument, samband]
   warning: Ikke beregn egne grenser i appen; bruk ordre, fagmyndighet og RADIAC-bestemmelser.
@@ -688,7 +688,7 @@
     - Ikke send eller motta MFE uten tydelig kontaktpunkt, oppdragsforståelse og sikkerhetsbrief.
   reporting:
     - Loggfør anmodning, beslutning, ankomst, oppdrag, avvik og avslutning lokalt.
-  sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-tiltakskort-06-oppsettende-mfe-distrikt, src-mobile-forsterkningsenheter-mfe]
+  sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-tiltakskort-06-oppsettende-mfe-distrikt, src-mobile-forsterkningsenheter-mfe, src-sjekkliste-mobil-forsterkningsenhet-mfe]
   competenceRequired: [MFE10]
   equipmentRequired: [samband, kjoretoy]
   warning: Følg gjeldende tiltakskort og distriktets ordre; appen sender ingen offisiell anmodning.
