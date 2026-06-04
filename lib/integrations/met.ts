@@ -6,11 +6,13 @@
 // - MetAlerts 2.0 current endpoint: https://api.met.no/weatherapi/metalerts/2.0/current.json?lat=...&lon=...&lang=no.
 // - MetAlerts CAP files are immutable once issued; do not repeatedly refetch the same CAP file. MVP keeps warnings as context only.
 import { createHash } from 'node:crypto';
-import { ExternalApiError, recordSourceFailure, recordSourceSuccess, retryAfterSecondsFromHeaders, sourceFailureDetailsFromError, type SourceHealthState } from './source-health';
+import { fetchJsonWithTimeout } from './fetch-json';
+import { recordSourceFailure, recordSourceSuccess, sourceFailureDetailsFromError, type SourceHealthState } from './source-health';
 import type { ExternalContextSignal } from './types';
 
 type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
 type MetSignalKind = 'weather' | 'weather-alert';
+type MetFetchOptions = { lat: number; lon: number; userAgent?: string; fetchImpl?: FetchLike; timeoutMs?: number };
 
 function hash(value: unknown) {
   return createHash('sha256').update(JSON.stringify(value)).digest('hex').slice(0, 16);
@@ -56,27 +58,35 @@ export function getMetUserAgent() {
   return ua;
 }
 
-async function fetchMetSignalsDetailed({ lat, lon, userAgent = getMetUserAgent(), fetchImpl = fetch }: { lat: number; lon: number; userAgent?: string; fetchImpl?: FetchLike }): Promise<{ signals: ExternalContextSignal[]; notModifiedKinds: MetSignalKind[] }> {
+async function fetchMetSignalsDetailed({ lat, lon, userAgent = getMetUserAgent(), fetchImpl = fetch, timeoutMs }: MetFetchOptions): Promise<{ signals: ExternalContextSignal[]; notModifiedKinds: MetSignalKind[] }> {
   const roundedLat = Number(lat.toFixed(4));
   const roundedLon = Number(lon.toFixed(4));
   const headers = { 'User-Agent': userAgent };
   const fetchedAt = new Date().toISOString();
   const forecastUrl = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${roundedLat}&lon=${roundedLon}`;
   const alertUrl = `https://api.met.no/weatherapi/metalerts/2.0/current.json?lat=${roundedLat}&lon=${roundedLon}&lang=no`;
-  const [forecastRes, alertRes] = await Promise.all([fetchImpl(forecastUrl, { headers }), fetchImpl(alertUrl, { headers })]);
-  if (!forecastRes.ok && forecastRes.status !== 304) {
-    throw new ExternalApiError(`MET locationforecast returned ${forecastRes.status}`, forecastRes.status, retryAfterSecondsFromHeaders(forecastRes.headers));
-  }
-  if (!alertRes.ok && alertRes.status !== 304) {
-    throw new ExternalApiError(`MET alerts returned ${alertRes.status}`, alertRes.status, retryAfterSecondsFromHeaders(alertRes.headers));
-  }
+  const [forecast, alerts] = await Promise.all([
+    fetchJsonWithTimeout<any>(forecastUrl, {
+      fetchImpl,
+      timeoutMs,
+      init: { headers },
+      allowNotModified: true,
+      errorMessage: (response) => `MET locationforecast returned ${response.status}`,
+    }),
+    fetchJsonWithTimeout<any>(alertUrl, {
+      fetchImpl,
+      timeoutMs,
+      init: { headers },
+      allowNotModified: true,
+      errorMessage: (response) => `MET alerts returned ${response.status}`,
+    }),
+  ]);
 
   const signals: ExternalContextSignal[] = [];
   const notModifiedKinds: MetSignalKind[] = [];
-  if (forecastRes.status === 304) {
+  if (forecast === null) {
     notModifiedKinds.push('weather');
-  } else if (forecastRes.ok) {
-    const forecast = await forecastRes.json();
+  } else {
     const timeseries = forecast.properties?.timeseries ?? [];
     const first = timeseries[0];
     const details = first?.data?.instant?.details ?? {};
@@ -99,10 +109,9 @@ async function fetchMetSignalsDetailed({ lat, lon, userAgent = getMetUserAgent()
     }
   }
 
-  if (alertRes.status === 304) {
+  if (alerts === null) {
     notModifiedKinds.push('weather-alert');
-  } else if (alertRes.ok) {
-    const alerts = await alertRes.json();
+  } else {
     for (const feature of alerts.features ?? []) {
       const props = feature.properties ?? {};
       signals.push({
@@ -124,7 +133,7 @@ async function fetchMetSignalsDetailed({ lat, lon, userAgent = getMetUserAgent()
   return { signals, notModifiedKinds };
 }
 
-export async function fetchMetSignals(options: { lat: number; lon: number; userAgent?: string; fetchImpl?: FetchLike }): Promise<ExternalContextSignal[]> {
+export async function fetchMetSignals(options: MetFetchOptions): Promise<ExternalContextSignal[]> {
   return (await fetchMetSignalsDetailed(options)).signals;
 }
 

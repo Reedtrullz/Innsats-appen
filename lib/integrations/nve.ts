@@ -8,11 +8,13 @@
 //   "Varsler fra Flomvarslingen i Norge og www.varsom.no" and landslide data as
 //   "Varsler fra Jordskredvarslingen i Norge og www.varsom.no".
 import { createHash } from 'node:crypto';
-import { ExternalApiError, recordSourceFailure, recordSourceSuccess, retryAfterSecondsFromHeaders, sourceFailureDetailsFromError, type SourceHealthState } from './source-health';
+import { fetchJsonWithTimeout } from './fetch-json';
+import { recordSourceFailure, recordSourceSuccess, sourceFailureDetailsFromError, type SourceHealthState } from './source-health';
 import { getNveAvalancheSupport } from './source-contracts';
 import type { ExternalContextSignal } from './types';
 
 type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
+type NveFetchOptions = { municipality: string; start?: string; end?: string; fetchImpl?: FetchLike; timeoutMs?: number };
 
 type NveEndpoint = {
   kind: 'flood-warning' | 'landslide-warning';
@@ -108,14 +110,18 @@ export async function fetchNveHazardSignals({
   start = isoDate(new Date()),
   end = isoDate(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)),
   fetchImpl = fetch,
-}: { municipality: string; start?: string; end?: string; fetchImpl?: FetchLike }): Promise<ExternalContextSignal[]> {
+  timeoutMs,
+}: NveFetchOptions): Promise<ExternalContextSignal[]> {
   const range = normalizeNveDateRange(start, end);
   const fetchedAt = new Date().toISOString();
   const groups = await Promise.all(NVE_ENDPOINTS.map(async (endpoint) => {
     const url = endpointUrl(endpoint, municipality, range.start, range.end);
-    const res = await fetchImpl(url, { headers: { Accept: 'application/json' } });
-    if (!res.ok) throw new ExternalApiError(`NVE returned ${res.status} for ${endpoint.kind}`, res.status, retryAfterSecondsFromHeaders(res.headers));
-    const data = await res.json();
+    const data = await fetchJsonWithTimeout(url, {
+      fetchImpl,
+      timeoutMs,
+      init: { headers: { Accept: 'application/json' } },
+      errorMessage: (response) => `NVE returned ${response.status} for ${endpoint.kind}`,
+    });
     return warningArray(data).map((warning) => {
       const upstreamHash = hash(warning);
       return {
