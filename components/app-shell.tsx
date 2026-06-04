@@ -1,6 +1,7 @@
 import { getContentManifest, getMustReadNotices } from '@/lib/content/load-content';
 import { BottomNav } from './bottom-nav';
 import { DecisionSupportNotice } from './decision-support-notice';
+import { ActiveMissionShortcut, FieldModeRuntime } from './field-mode-panel';
 import { OfflineStatus } from './offline-status';
 
 function shortVersion(version: string) {
@@ -12,6 +13,7 @@ export function AppShell({ children, currentPath }: { children: React.ReactNode;
   const mustReadCount = getMustReadNotices().length;
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950">
+      <FieldModeRuntime />
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
           <a href="/hurtigkort" className="text-base font-black tracking-tight">Beredskapsboka</a>
@@ -23,6 +25,7 @@ export function AppShell({ children, currentPath }: { children: React.ReactNode;
             <a href="/datakilder" className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800">Datakilder</a>
             <a href="/personvern" className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800">Personvern</a>
             <a href="/kart" className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800">Kart</a>
+            <a href="/feltmodus" className="rounded-full bg-sky-100 px-3 py-1 text-xs font-black text-sky-900">Feltmodus</a>
             <a href="/release" className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800">Release</a>
             <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">Kildebelagt MVP</span>
           </div>
@@ -32,6 +35,7 @@ export function AppShell({ children, currentPath }: { children: React.ReactNode;
         </div>
       </header>
       <OfflineStatus />
+      <ActiveMissionShortcut />
       <main className="mx-auto max-w-3xl px-4 pb-28 pt-4">
         <div className="mb-4">
           <DecisionSupportNotice />

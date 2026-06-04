@@ -145,7 +145,7 @@ function LocalMissionControls({ mission, displaySignals, onMissionChange }: { mi
   }
 
   return (
-    <section className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <section id="statusrapport" className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Situasjonsoversikt nå</p>
         <h3 className="text-xl font-black">Situasjonsoversikt nå</h3>
@@ -267,7 +267,7 @@ function FieldLogControls({ mission, onMissionChange }: { mission: MissionContex
   }
 
   return (
-    <section className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <section id="feltlogg" className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Strukturert lokal feltlogg</p>
         <h3 className="text-xl font-black">Lokal feltlogg</h3>
@@ -854,7 +854,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
         </div>
       </section>
 
-      {checklist ? <ChecklistRunner checklist={checklist} missionId={mission.id} /> : null}
+      {checklist ? <div id="sjekkliste"><ChecklistRunner checklist={checklist} missionId={mission.id} /></div> : null}
       {staleSignals.length > 0 ? <ContextSignalPanel signals={staleSignals} unavailableSources={disabledSources} /> : null}
     </article>
   );

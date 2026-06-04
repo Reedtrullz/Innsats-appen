@@ -1,10 +1,19 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import { afterEach } from 'vitest';
 import { AppShell } from '@/components/app-shell';
+import { FIELD_MODE_STORAGE_KEY, serializeFieldModeSettings } from '@/lib/field-mode/field-mode';
+
+afterEach(() => {
+  localStorage.clear();
+  delete document.documentElement.dataset.fieldMode;
+  delete document.documentElement.dataset.fieldGloveMode;
+  delete document.documentElement.dataset.fieldTheme;
+});
 
 it('shows mobile navigation links with current route', () => {
   render(<AppShell currentPath="/kart"><p>Innhold</p></AppShell>);
   const navigation = within(screen.getByRole('navigation', { name: /Hovednavigasjon/i }));
-  for (const label of ['Hurtigkort', 'Før', 'Under', 'Etter', 'Oppdrag', 'Kart', 'Kilder']) {
+  for (const label of ['Hurtigkort', 'Før', 'Under', 'Etter', 'Oppdrag', 'Kart', 'Felt', 'Kilder']) {
     expect(navigation.getByRole('link', { name: label })).toBeInTheDocument();
   }
   expect(navigation.getByRole('link', { name: 'Kart' })).toHaveAttribute('aria-current', 'page');
@@ -22,6 +31,20 @@ it('keeps a visible decision-support and local-only disclaimer in the persistent
   expect(screen.getByRole('link', { name: /data på enheten/i })).toHaveAttribute('href', '/data-pa-enheten');
 });
 
+it('applies field mode runtime CSS for night mode and 48x48 touch targets', async () => {
+  localStorage.setItem(FIELD_MODE_STORAGE_KEY, serializeFieldModeSettings({ enabled: true, gloveMode: false, theme: 'night', outdoorReadabilityReviewed: true }));
+
+  render(<AppShell currentPath="/feltmodus"><button type="button">Kritisk valg</button></AppShell>);
+
+  await waitFor(() => expect(document.documentElement.dataset.fieldMode).toBe('on'));
+  await waitFor(() => expect(document.documentElement.dataset.fieldTheme).toBe('night'));
+  expect(document.documentElement.dataset.fieldGloveMode).toBe('off');
+  const runtimeCss = Array.from(document.querySelectorAll('style')).map((style) => style.textContent ?? '').join('\n');
+  expect(runtimeCss).toContain('min-width: 48px');
+  expect(runtimeCss).toContain('main [class*="bg-white"]');
+  expect(runtimeCss).toContain('background: #020617');
+});
+
 it('shows generated content version and expanded content navigation', () => {
   render(<AppShell currentPath="/hurtigkort"><p>Innhold</p></AppShell>);
 
@@ -30,6 +53,7 @@ it('shows generated content version and expanded content navigation', () => {
   expect(screen.getByRole('link', { name: /Datakilder/i })).toHaveAttribute('href', '/datakilder');
   expect(screen.getByRole('link', { name: /Personvern/i })).toHaveAttribute('href', '/personvern');
   expect(screen.getAllByRole('link', { name: /Kart/i }).some((link) => link.getAttribute('href') === '/kart')).toBe(true);
+  expect(screen.getByRole('link', { name: /Feltmodus/i })).toHaveAttribute('href', '/feltmodus');
   expect(screen.getByRole('link', { name: /FAQ/i })).toHaveAttribute('href', '/faq');
   expect(screen.getByRole('link', { name: /Endringer/i })).toHaveAttribute('href', '/endringer');
   expect(screen.getByRole('link', { name: /Må leses/i })).toHaveAttribute('href', '/ma-leses');

@@ -16,8 +16,12 @@ export default function MissionsPage() {
           <p className="mt-2 text-sm text-sky-100">Strukturer 5-punktsordre og sambandsplan lokalt, og eksporter som Markdown, JSON eller PDF-klar HTML der det støttes.</p>
         </div>
         <div className="grid gap-4 lg:grid-cols-2">
-          <FivePointOrderForm contentVersion={contentVersion} />
-          <CommsPlanForm contentVersion={contentVersion} />
+          <div id="5-punktsordre">
+            <FivePointOrderForm contentVersion={contentVersion} />
+          </div>
+          <div id="sambandsplan">
+            <CommsPlanForm contentVersion={contentVersion} />
+          </div>
         </div>
       </section>
     </div>
