@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T04:00:27.200Z",
+  "generatedAt": "2026-06-04T06:57:54.048Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-04T04:00:27.200Z",
+      "updatedAt": "2026-06-04T06:57:54.048Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -4063,257 +4063,385 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-317",
           "title": "Add dedicated Feltmodus.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 317: Add dedicated Feltmodus."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-318",
           "title": "Add glove mode with extra-large buttons.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 318: Add glove mode with extra-large buttons."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-319",
           "title": "Add dark/night mode.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 319: Add dark/night mode."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-320",
           "title": "Evaluate reduced-blue-light night variant.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 320: Evaluate reduced-blue-light night variant."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-321",
           "title": "Ensure every touch target is at least 48x48 px.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 321: Ensure every touch target is at least 48x48 px."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-322",
           "title": "Improve scrolling for rain/gloves.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 322: Improve scrolling for rain/gloves."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-323",
           "title": "Add outdoor readability review.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 323: Add outdoor readability review."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-324",
           "title": "Add always-visible offline indicator if not persistent everywhere.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 324: Add always-visible offline indicator if not persistent everywhere."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-325",
           "title": "Add quick action menu for create note, run checklist, open 5-punktsordre, open sambandsplan, export status and search.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 325: Add quick action menu for create note, run checklist, open 5-punktsordre, open sambandsplan, export status and search."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-326",
           "title": "Add active mission shortcut on all main operational pages.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 326: Add active mission shortcut on all main operational pages."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-327",
           "title": "Add stress-friendly empty states.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 327: Add stress-friendly empty states."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-328",
           "title": "Research Web Speech API support for note dictation.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 328: Research Web Speech API support for note dictation."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-329",
           "title": "Add optional voice input only with fallback and accuracy warning.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 329: Add optional voice input only with fallback and accuracy warning."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-330",
           "title": "Add real-user field testing with mannskaper.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 330: Add real-user field testing with mannskaper."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-331",
           "title": "Add feedback capture process from field testing.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T04:39:08.000Z",
+          "evidence": [
+            "Implemented in commit 2c8f75a (dedicated Feltmodus, glove/night/reduced-blue settings, 48px touch-target helper, rain/glove scrolling and outdoor-readability guidance, persistent offline indicator, quick-action menu, active mission shortcuts, stress-friendly empty states, Web Speech support notes, optional voice-input fallback warning, field-testing checklist, and local feedback capture). Gates: targeted field-mode/app-shell/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality APPROVED."
+          ],
           "sourceHeading": "Task 331: Add feedback capture process from field testing."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-332",
           "title": "Write ADR for local database choice.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T05:29:48.000Z",
+          "evidence": [
+            "Implemented in commit 544432f (local database ADR/idb choice, local data schema/export versioning, migration/backward-compatibility tests, storage quota handling, full local JSON backup/export, guarded import with destructive confirmation, rollback, strict payload validation, and same-tab local-state notifications). Gates: targeted local-data/local-store/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED after rollback/version/dangerous-field fixes."
+          ],
           "sourceHeading": "Task 332: Write ADR for local database choice."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-333",
           "title": "Evaluate Dexie.js versus raw idb versus SQLite WASM/OPFS.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T05:29:48.000Z",
+          "evidence": [
+            "Implemented in commit 544432f (local database ADR/idb choice, local data schema/export versioning, migration/backward-compatibility tests, storage quota handling, full local JSON backup/export, guarded import with destructive confirmation, rollback, strict payload validation, and same-tab local-state notifications). Gates: targeted local-data/local-store/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED after rollback/version/dangerous-field fixes."
+          ],
           "sourceHeading": "Task 333: Evaluate Dexie.js versus raw idb versus SQLite WASM/OPFS."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-334",
           "title": "Add local data schema versioning.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T05:29:48.000Z",
+          "evidence": [
+            "Implemented in commit 544432f (local database ADR/idb choice, local data schema/export versioning, migration/backward-compatibility tests, storage quota handling, full local JSON backup/export, guarded import with destructive confirmation, rollback, strict payload validation, and same-tab local-state notifications). Gates: targeted local-data/local-store/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED after rollback/version/dangerous-field fixes."
+          ],
           "sourceHeading": "Task 334: Add local data schema versioning."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-335",
           "title": "Add local data migrations.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T05:29:48.000Z",
+          "evidence": [
+            "Implemented in commit 544432f (local database ADR/idb choice, local data schema/export versioning, migration/backward-compatibility tests, storage quota handling, full local JSON backup/export, guarded import with destructive confirmation, rollback, strict payload validation, and same-tab local-state notifications). Gates: targeted local-data/local-store/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED after rollback/version/dangerous-field fixes."
+          ],
           "sourceHeading": "Task 335: Add local data migrations."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-336",
           "title": "Add backward-compatibility tests for local data migrations.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T05:29:48.000Z",
+          "evidence": [
+            "Implemented in commit 544432f (local database ADR/idb choice, local data schema/export versioning, migration/backward-compatibility tests, storage quota handling, full local JSON backup/export, guarded import with destructive confirmation, rollback, strict payload validation, and same-tab local-state notifications). Gates: targeted local-data/local-store/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED after rollback/version/dangerous-field fixes."
+          ],
           "sourceHeading": "Task 336: Add backward-compatibility tests for local data migrations."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-337",
           "title": "Add storage quota handling.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T05:29:48.000Z",
+          "evidence": [
+            "Implemented in commit 544432f (local database ADR/idb choice, local data schema/export versioning, migration/backward-compatibility tests, storage quota handling, full local JSON backup/export, guarded import with destructive confirmation, rollback, strict payload validation, and same-tab local-state notifications). Gates: targeted local-data/local-store/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED after rollback/version/dangerous-field fixes."
+          ],
           "sourceHeading": "Task 337: Add storage quota handling."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-338",
           "title": "Add local backup/export of all local app data.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T05:29:48.000Z",
+          "evidence": [
+            "Implemented in commit 544432f (local database ADR/idb choice, local data schema/export versioning, migration/backward-compatibility tests, storage quota handling, full local JSON backup/export, guarded import with destructive confirmation, rollback, strict payload validation, and same-tab local-state notifications). Gates: targeted local-data/local-store/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED after rollback/version/dangerous-field fixes."
+          ],
           "sourceHeading": "Task 338: Add local backup/export of all local app data."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-339",
           "title": "Add import from previous local export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T05:29:48.000Z",
+          "evidence": [
+            "Implemented in commit 544432f (local database ADR/idb choice, local data schema/export versioning, migration/backward-compatibility tests, storage quota handling, full local JSON backup/export, guarded import with destructive confirmation, rollback, strict payload validation, and same-tab local-state notifications). Gates: targeted local-data/local-store/component tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED after rollback/version/dangerous-field fixes."
+          ],
           "sourceHeading": "Task 339: Add import from previous local export."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-340",
           "title": "Add service-worker update UI.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T06:54:54.000Z",
+          "evidence": [
+            "Implemented in commit 422091f (service-worker update UI, cache/content version display, stale/fallback generated-content warnings, generated-content fallback responses, cache-missing chaos E2E, app-shell bundle reduction, static JS budget, real Lighthouse mobile budget gate, CI Playwright artifacts, and dependency update policy). Gates: npm run check:ci PASS with 59 test files / 313 tests, Next build 149 pages, perf:budget PASS, perf:lighthouse PASS score 98/resource budget checks pass; production offline Playwright spec PASS 3/3; spec review APPROVED; code quality/security APPROVED."
+          ],
           "sourceHeading": "Task 340: Add service-worker update UI."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-341",
           "title": "Add cache version display.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T06:54:54.000Z",
+          "evidence": [
+            "Implemented in commit 422091f (service-worker update UI, cache/content version display, stale/fallback generated-content warnings, generated-content fallback responses, cache-missing chaos E2E, app-shell bundle reduction, static JS budget, real Lighthouse mobile budget gate, CI Playwright artifacts, and dependency update policy). Gates: npm run check:ci PASS with 59 test files / 313 tests, Next build 149 pages, perf:budget PASS, perf:lighthouse PASS score 98/resource budget checks pass; production offline Playwright spec PASS 3/3; spec review APPROVED; code quality/security APPROVED."
+          ],
           "sourceHeading": "Task 341: Add cache version display."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-342",
           "title": "Add content-cache stale warning.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T06:54:54.000Z",
+          "evidence": [
+            "Implemented in commit 422091f (service-worker update UI, cache/content version display, stale/fallback generated-content warnings, generated-content fallback responses, cache-missing chaos E2E, app-shell bundle reduction, static JS budget, real Lighthouse mobile budget gate, CI Playwright artifacts, and dependency update policy). Gates: npm run check:ci PASS with 59 test files / 313 tests, Next build 149 pages, perf:budget PASS, perf:lighthouse PASS score 98/resource budget checks pass; production offline Playwright spec PASS 3/3; spec review APPROVED; code quality/security APPROVED."
+          ],
           "sourceHeading": "Task 342: Add content-cache stale warning."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-343",
           "title": "Add fallback if generated content fails to load.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T06:54:54.000Z",
+          "evidence": [
+            "Implemented in commit 422091f (service-worker update UI, cache/content version display, stale/fallback generated-content warnings, generated-content fallback responses, cache-missing chaos E2E, app-shell bundle reduction, static JS budget, real Lighthouse mobile budget gate, CI Playwright artifacts, and dependency update policy). Gates: npm run check:ci PASS with 59 test files / 313 tests, Next build 149 pages, perf:budget PASS, perf:lighthouse PASS score 98/resource budget checks pass; production offline Playwright spec PASS 3/3; spec review APPROVED; code quality/security APPROVED."
+          ],
           "sourceHeading": "Task 343: Add fallback if generated content fails to load."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-344",
           "title": "Add service-worker cache-corruption/chaos test.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T06:54:54.000Z",
+          "evidence": [
+            "Implemented in commit 422091f (service-worker update UI, cache/content version display, stale/fallback generated-content warnings, generated-content fallback responses, cache-missing chaos E2E, app-shell bundle reduction, static JS budget, real Lighthouse mobile budget gate, CI Playwright artifacts, and dependency update policy). Gates: npm run check:ci PASS with 59 test files / 313 tests, Next build 149 pages, perf:budget PASS, perf:lighthouse PASS score 98/resource budget checks pass; production offline Playwright spec PASS 3/3; spec review APPROVED; code quality/security APPROVED."
+          ],
           "sourceHeading": "Task 344: Add service-worker cache-corruption/chaos test."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-345",
           "title": "Optimize bundle size.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T06:54:54.000Z",
+          "evidence": [
+            "Implemented in commit 422091f (service-worker update UI, cache/content version display, stale/fallback generated-content warnings, generated-content fallback responses, cache-missing chaos E2E, app-shell bundle reduction, static JS budget, real Lighthouse mobile budget gate, CI Playwright artifacts, and dependency update policy). Gates: npm run check:ci PASS with 59 test files / 313 tests, Next build 149 pages, perf:budget PASS, perf:lighthouse PASS score 98/resource budget checks pass; production offline Playwright spec PASS 3/3; spec review APPROVED; code quality/security APPROVED."
+          ],
           "sourceHeading": "Task 345: Optimize bundle size."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-346",
           "title": "Add Lighthouse mobile performance budget.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T06:54:54.000Z",
+          "evidence": [
+            "Implemented in commit 422091f (service-worker update UI, cache/content version display, stale/fallback generated-content warnings, generated-content fallback responses, cache-missing chaos E2E, app-shell bundle reduction, static JS budget, real Lighthouse mobile budget gate, CI Playwright artifacts, and dependency update policy). Gates: npm run check:ci PASS with 59 test files / 313 tests, Next build 149 pages, perf:budget PASS, perf:lighthouse PASS score 98/resource budget checks pass; production offline Playwright spec PASS 3/3; spec review APPROVED; code quality/security APPROVED."
+          ],
           "sourceHeading": "Task 346: Add Lighthouse mobile performance budget."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-347",
           "title": "Add Playwright traces/screenshots artifacts on CI failure.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T06:54:54.000Z",
+          "evidence": [
+            "Implemented in commit 422091f (service-worker update UI, cache/content version display, stale/fallback generated-content warnings, generated-content fallback responses, cache-missing chaos E2E, app-shell bundle reduction, static JS budget, real Lighthouse mobile budget gate, CI Playwright artifacts, and dependency update policy). Gates: npm run check:ci PASS with 59 test files / 313 tests, Next build 149 pages, perf:budget PASS, perf:lighthouse PASS score 98/resource budget checks pass; production offline Playwright spec PASS 3/3; spec review APPROVED; code quality/security APPROVED."
+          ],
           "sourceHeading": "Task 347: Add Playwright traces/screenshots artifacts on CI failure."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-348",
           "title": "Add dependency update policy.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T06:54:54.000Z",
+          "evidence": [
+            "Implemented in commit 422091f (service-worker update UI, cache/content version display, stale/fallback generated-content warnings, generated-content fallback responses, cache-missing chaos E2E, app-shell bundle reduction, static JS budget, real Lighthouse mobile budget gate, CI Playwright artifacts, and dependency update policy). Gates: npm run check:ci PASS with 59 test files / 313 tests, Next build 149 pages, perf:budget PASS, perf:lighthouse PASS score 98/resource budget checks pass; production offline Playwright spec PASS 3/3; spec review APPROVED; code quality/security APPROVED."
+          ],
           "sourceHeading": "Task 348: Add dependency update policy."
         },
         {
