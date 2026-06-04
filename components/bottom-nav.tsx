@@ -4,14 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const items = [
-  { href: '/hurtigkort', label: 'Hurtigkort' },
-  { href: '/for', label: 'Før' },
-  { href: '/under', label: 'Under' },
-  { href: '/etter', label: 'Etter' },
+  { href: '/', label: 'Hjem' },
+  { href: '/sok', label: 'Søk' },
   { href: '/oppdrag', label: 'Oppdrag' },
-  { href: '/kart', label: 'Kart' },
-  { href: '/feltmodus', label: 'Felt' },
-  { href: '/kilder', label: 'Kilder' },
+  { href: '/hurtigkort', label: 'Kort' },
+  { href: '/mer', label: 'Mer' },
 ];
 
 export function BottomNav({ currentPath }: { currentPath?: string }) {
@@ -20,9 +17,9 @@ export function BottomNav({ currentPath }: { currentPath?: string }) {
   if (activePath === '/release' || activePath.startsWith('/release/')) return null;
   return (
     <nav aria-label="Hovednavigasjon" className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-2 pb-[env(safe-area-inset-bottom)] pt-2 shadow-lg backdrop-blur">
-      <ul className="mx-auto grid max-w-3xl grid-cols-4 gap-1 sm:grid-cols-8">
+      <ul className="mx-auto grid max-w-3xl grid-cols-5 gap-1">
         {items.map((item) => {
-          const active = activePath === item.href || activePath.startsWith(`${item.href}/`);
+          const active = item.href === '/' ? activePath === '/' : activePath === item.href || activePath.startsWith(`${item.href}/`);
           return (
             <li key={item.href} className="min-w-0">
               <Link

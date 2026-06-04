@@ -10,13 +10,25 @@ afterEach(() => {
   delete document.documentElement.dataset.fieldTheme;
 });
 
-it('shows mobile navigation links with current route', () => {
-  render(<AppShell currentPath="/kart"><p>Innhold</p></AppShell>);
+it('shows five mobile navigation tabs with current route', () => {
+  render(<AppShell currentPath="/sok"><p>Innhold</p></AppShell>);
   const navigation = within(screen.getByRole('navigation', { name: /Hovednavigasjon/i }));
-  for (const label of ['Hurtigkort', 'Før', 'Under', 'Etter', 'Oppdrag', 'Kart', 'Felt', 'Kilder']) {
+  for (const label of ['Hjem', 'Søk', 'Oppdrag', 'Kort', 'Mer']) {
     expect(navigation.getByRole('link', { name: label })).toBeInTheDocument();
   }
-  expect(navigation.getByRole('link', { name: 'Kart' })).toHaveAttribute('aria-current', 'page');
+  expect(navigation.getByRole('link', { name: 'Søk' })).toHaveAttribute('aria-current', 'page');
+  expect(navigation.getByRole('link', { name: 'Hjem' })).not.toHaveAttribute('aria-current');
+  expect(navigation.queryByRole('link', { name: 'Release' })).not.toBeInTheDocument();
+});
+
+it('suppresses the mobile bottom navigation on release routes', () => {
+  const { rerender } = render(<AppShell currentPath="/release"><p>Release</p></AppShell>);
+
+  expect(screen.queryByRole('navigation', { name: /Hovednavigasjon/i })).not.toBeInTheDocument();
+
+  rerender(<AppShell currentPath="/release/foo"><p>Release details</p></AppShell>);
+
+  expect(screen.queryByRole('navigation', { name: /Hovednavigasjon/i })).not.toBeInTheDocument();
 });
 
 it('keeps a visible decision-support and local-only disclaimer in the persistent shell', () => {
