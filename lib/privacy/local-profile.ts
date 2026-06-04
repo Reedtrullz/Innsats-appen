@@ -515,6 +515,10 @@ export function sanitizeAuditDetails(details: Record<string, unknown> = {}): Rec
     'readbackConfirmed',
     'markerCount',
     'drawingCount',
+    'localStorageKeys',
+    'missions',
+    'checklistRuns',
+    'backupBytes',
   ]);
   const sanitized: Record<string, string | number | boolean> = {};
   for (const [key, value] of Object.entries(details)) {

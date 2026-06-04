@@ -14,7 +14,10 @@ interface BeredskapsbokaDb extends DBSchema {
   };
 }
 
-const DB_NAME = 'beredskapsboka-local';
+export const DB_NAME = 'beredskapsboka-local';
+export const LOCAL_MISSION_DB_VERSION = 1;
+export const LOCAL_MISSION_RECORD_SCHEMA_VERSION = 1;
+export const LOCAL_MISSION_STORES = ['missions', 'checklistRuns'] as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -40,14 +43,19 @@ function sanitizeStoredMission(input: unknown) {
   };
 }
 
-function parseMissionContext(input: unknown): MissionContext {
+export function migrateStoredMissionContext(input: unknown): MissionContext {
   const mission = sanitizeStoredMission(input);
   if (!isRecord(mission)) return MissionContextSchema.parse(mission);
-  return MissionContextSchema.parse({ ...mission, schemaVersion: mission.schemaVersion ?? 1 });
+  return MissionContextSchema.parse({ ...mission, schemaVersion: mission.schemaVersion ?? LOCAL_MISSION_RECORD_SCHEMA_VERSION });
+}
+
+export function migrateStoredChecklistRun(input: unknown): ChecklistRun {
+  if (!isRecord(input)) return ChecklistRunSchema.parse(input);
+  return ChecklistRunSchema.parse({ ...input, schemaVersion: input.schemaVersion ?? LOCAL_MISSION_RECORD_SCHEMA_VERSION });
 }
 
 function db() {
-  return openDB<BeredskapsbokaDb>(DB_NAME, 1, {
+  return openDB<BeredskapsbokaDb>(DB_NAME, LOCAL_MISSION_DB_VERSION, {
     upgrade(database) {
       if (!database.objectStoreNames.contains('missions')) {
         const store = database.createObjectStore('missions', { keyPath: 'id' });
@@ -62,21 +70,28 @@ function db() {
 }
 
 export async function saveMission(input: MissionContext): Promise<MissionContext> {
-  const parsed = parseMissionContext(input);
+  const parsed = migrateStoredMissionContext(input);
   await (await db()).put('missions', parsed);
   return parsed;
 }
 
 export async function getMission(id: string): Promise<MissionContext | undefined> {
   const mission = await (await db()).get('missions', id);
-  return mission ? parseMissionContext(mission) : undefined;
+  return mission ? migrateStoredMissionContext(mission) : undefined;
 }
 
 export async function listMissions(): Promise<MissionContext[]> {
   const missions = await (await db()).getAll('missions');
   return missions
-    .map(parseMissionContext)
+    .map(migrateStoredMissionContext)
     .filter((mission) => !mission.archivedAt)
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+export async function listAllMissions(): Promise<MissionContext[]> {
+  const missions = await (await db()).getAll('missions');
+  return missions
+    .map(migrateStoredMissionContext)
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
@@ -109,7 +124,7 @@ export async function archiveMission(id: string, fields: ArchiveMissionFields = 
   const mission = await database.get('missions', id);
   if (!mission) return undefined;
   const now = new Date().toISOString();
-  const archived = parseMissionContext({
+  const archived = migrateStoredMissionContext({
     ...mission,
     completedAt: fields.completedAt ?? mission.completedAt ?? now,
     archivedAt: fields.archivedAt ?? now,
@@ -124,7 +139,7 @@ export async function listArchivedMissions(query = ''): Promise<MissionContext[]
   const normalizedQuery = query.trim().toLowerCase();
   const missions = await (await db()).getAll('missions');
   return missions
-    .map(parseMissionContext)
+    .map(migrateStoredMissionContext)
     .filter((mission) => Boolean(mission.archivedAt))
     .filter((mission) => !normalizedQuery || archiveSearchText(mission).includes(normalizedQuery))
     .sort((a, b) => (b.archivedAt ?? b.updatedAt).localeCompare(a.archivedAt ?? a.updatedAt));
@@ -151,19 +166,45 @@ export async function clearArchivedMissions(): Promise<void> {
 }
 
 export async function saveChecklistRun(input: ChecklistRunInput): Promise<ChecklistRun> {
-  const parsed = ChecklistRunSchema.parse({ ...input, schemaVersion: input.schemaVersion ?? 1 });
+  const parsed = migrateStoredChecklistRun(input);
   await (await db()).put('checklistRuns', parsed);
   return parsed;
 }
 
 export async function getChecklistRun(id: string): Promise<ChecklistRun | undefined> {
   const run = await (await db()).get('checklistRuns', id);
-  return run ? ChecklistRunSchema.parse({ ...run, schemaVersion: run.schemaVersion ?? 1 }) : undefined;
+  return run ? migrateStoredChecklistRun(run) : undefined;
 }
 
 export async function listChecklistRuns(missionId: string): Promise<ChecklistRun[]> {
   const runs = await (await db()).getAllFromIndex('checklistRuns', 'by-mission', missionId);
-  return runs.map((run) => ChecklistRunSchema.parse({ ...run, schemaVersion: run.schemaVersion ?? 1 }));
+  return runs.map(migrateStoredChecklistRun);
+}
+
+export async function listAllChecklistRuns(): Promise<ChecklistRun[]> {
+  const runs = await (await db()).getAll('checklistRuns');
+  return runs.map(migrateStoredChecklistRun).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+export async function replaceLocalMissionData(missions: MissionContext[], checklistRuns: ChecklistRun[]): Promise<{ missions: number; checklistRuns: number }> {
+  const parsedMissions = missions.map(migrateStoredMissionContext);
+  const parsedRuns = checklistRuns.map(migrateStoredChecklistRun);
+  const database = await db();
+  const tx = database.transaction(['missions', 'checklistRuns'], 'readwrite');
+  try {
+    await Promise.all([tx.objectStore('missions').clear(), tx.objectStore('checklistRuns').clear()]);
+    await Promise.all(parsedMissions.map((mission) => tx.objectStore('missions').put(mission)));
+    await Promise.all(parsedRuns.map((run) => tx.objectStore('checklistRuns').put(run)));
+    await tx.done;
+  } catch (error) {
+    try {
+      tx.abort();
+    } catch {
+      // Transaction may already be inactive/aborted; preserve original error.
+    }
+    throw error;
+  }
+  return { missions: parsedMissions.length, checklistRuns: parsedRuns.length };
 }
 
 export async function clearLocalMissionData(): Promise<void> {

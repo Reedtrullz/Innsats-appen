@@ -1,6 +1,6 @@
 import { openDB } from 'idb';
 import { afterEach, expect, it } from 'vitest';
-import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArchivedMission, deleteMission, getChecklistRun, getMission, listArchivedMissions, listMissions, saveChecklistRun, saveMission } from '@/lib/mission/local-store';
+import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArchivedMission, deleteMission, getChecklistRun, getMission, listArchivedMissions, listMissions, replaceLocalMissionData, saveChecklistRun, saveMission } from '@/lib/mission/local-store';
 import { MissionContextSchema } from '@/lib/mission/schemas';
 
 const baseMission = {
@@ -60,6 +60,21 @@ it('persists checklist runs and complete source-health-like signals locally', as
 
   expect((await getChecklistRun('run-1'))?.checkedItemIds).toContain('ventilasjon');
   expect((await getMission(mission.id))?.externalSignals[0]?.title).toBe('Vær');
+});
+
+it('atomically replaces local missions and checklist runs for local imports', async () => {
+  const oldMission = MissionContextSchema.parse({ ...baseMission, id: 'mission-replace-old', title: 'Gammelt lokalt oppdrag' });
+  const nextMission = MissionContextSchema.parse({ ...baseMission, id: 'mission-replace-new', title: 'Nytt importert oppdrag', updatedAt: '2026-06-03T11:00:00.000Z' });
+  await saveMission(oldMission);
+  await saveChecklistRun({ id: 'run-replace-old', missionId: oldMission.id, templateSlug: 'fig-under-innsats', checkedItemIds: ['old'], notesByItemId: {}, updatedAt: '2026-06-03T10:10:00.000Z', schemaVersion: 1 });
+
+  const counts = await replaceLocalMissionData([nextMission], [{ id: 'run-replace-new', missionId: nextMission.id, templateSlug: 'fig-under-innsats', checkedItemIds: ['new'], notesByItemId: {}, equipmentStatusByItemId: {}, updatedAt: '2026-06-03T11:05:00.000Z', schemaVersion: 1 }]);
+
+  expect(counts).toEqual({ missions: 1, checklistRuns: 1 });
+  expect(await getMission(oldMission.id)).toBeUndefined();
+  expect(await getChecklistRun('run-replace-old')).toBeUndefined();
+  expect((await getMission(nextMission.id))?.title).toBe('Nytt importert oppdrag');
+  expect((await getChecklistRun('run-replace-new'))?.checkedItemIds).toEqual(['new']);
 });
 
 it('migrates old local missions by stripping retired geometry fields from context signals', async () => {

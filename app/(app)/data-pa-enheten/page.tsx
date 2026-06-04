@@ -1,3 +1,5 @@
+import { LocalDataBackupPanel } from '@/components/local-data-backup-panel';
+
 export default function DataOnDevicePage() {
   return (
     <article className="space-y-4">
@@ -16,8 +18,9 @@ export default function DataOnDevicePage() {
       </section>
       <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm font-semibold text-amber-950">
         <h2 className="text-xl font-black">Retensjon, reset og eksport</h2>
-        <p className="mt-2">Data blir liggende til du sletter lokale data i appen, tømmer nettleserdata eller avinstallerer PWA-en. Eksporterte filer kan inneholde operasjonelt sensitiv informasjon. Del, lagre og slett eksporterte filer etter lokale rutiner.</p>
+        <p className="mt-2">Data blir liggende til du sletter lokale data i appen, tømmer nettleserdata eller avinstallerer PWA-en. Eksporterte filer er manuell lokal JSON og kan inneholde operasjonelt sensitiv informasjon. Del, lagre og slett eksporterte filer etter lokale rutiner.</p>
       </section>
+      <LocalDataBackupPanel />
     </article>
   );
 }
