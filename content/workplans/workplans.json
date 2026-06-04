@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T07:53:43.189Z",
+  "generatedAt": "2026-06-04T08:20:59.104Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-04T07:53:43.189Z",
+      "updatedAt": "2026-06-04T08:20:59.104Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -4939,225 +4939,337 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-390",
           "title": "Add staging deployment before broader pilot.",
-          "status": "active",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 390: Add staging deployment before broader pilot."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-391",
           "title": "Add uptime monitoring compatible with privacy boundary.",
-          "status": "active",
+          "status": "completed",
           "stage": "scope",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 391: Add uptime monitoring compatible with privacy boundary."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-392",
           "title": "Add release notes generation.",
-          "status": "active",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 392: Add release notes generation."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-393",
           "title": "Add What's new page after updates.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 393: Add What's new page after updates."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-394",
           "title": "Add content-version-to-release mapping.",
-          "status": "active",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 394: Add content-version-to-release mapping."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-395",
           "title": "Write quick start guide for mannskaper.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 395: Write quick start guide for mannskaper."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-396",
           "title": "Write guide for lagfører/leder.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 396: Write guide for lagfører/leder."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-397",
           "title": "Write offline-use guide.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 397: Write offline-use guide."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-398",
           "title": "Write privacy-reset guide.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 398: Write privacy-reset guide."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-399",
           "title": "Write expanded 5-punktsordre guide.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 399: Write expanded 5-punktsordre guide."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-400",
           "title": "Write expanded sambandsplan guide.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 400: Write expanded sambandsplan guide."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-401",
           "title": "Write checklist-runner guide.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 401: Write checklist-runner guide."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-402",
           "title": "Write export guide.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 402: Write export guide."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-403",
           "title": "Write source/warning interpretation guide.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 403: Write source/warning interpretation guide."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-404",
           "title": "Write field testing guide.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 404: Write field testing guide."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-405",
           "title": "Write guide for distriktsledere to contribute approved content.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 405: Write guide for distriktsledere to contribute approved content."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-406",
           "title": "Add short video or interactive guide for key functions after UI stabilizes.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 406: Add short video or interactive guide for key functions after UI stabilizes."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-407",
           "title": "Plan pilot rollout with one district first.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 407: Plan pilot rollout with one district first."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-408",
           "title": "Define support/contact channel for pilot.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 408: Define support/contact channel for pilot."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-409",
           "title": "Create GitHub Projects or Markdown roadmap.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 409: Create GitHub Projects or Markdown roadmap."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-410",
           "title": "Create technical debt register.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 410: Create technical debt register."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-411",
           "title": "Create regular content update process from Beredskapsboka.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 411: Create regular content update process from Beredskapsboka."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-412",
           "title": "Add automated stale-content notifications.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 412: Add automated stale-content notifications."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-413",
           "title": "Add quarterly dependency review.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 413: Add quarterly dependency review."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-414",
           "title": "Add annual security review.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 414: Add annual security review."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-415",
           "title": "Add annual privacy impact assessment.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 415: Add annual privacy impact assessment."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-416",
           "title": "Evaluate Nynorsk support after Bokmål content stabilizes.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 416: Evaluate Nynorsk support after Bokmål content stabilizes."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-417",
           "title": "Evaluate English support only if operationally useful.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T10:20:41+02:00",
+          "evidence": [
+            "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
+          ],
           "sourceHeading": "Task 417: Evaluate English support only if operationally useful."
         }
       ]
