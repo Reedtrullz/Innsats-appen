@@ -120,7 +120,7 @@ function QuickActions({ gloveMode }: { gloveMode: boolean }) {
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {QUICK_ACTIONS.map((action) => (
-          <Link key={action.id} href={action.href} className={`rounded-2xl border border-slate-200 bg-slate-50 p-4 font-black text-slate-950 shadow-sm ${targetClass(gloveMode)}`}>
+          <Link key={action.id} href={action.href} aria-label={action.label} className={`rounded-2xl border border-slate-200 bg-slate-50 p-4 font-black text-slate-950 shadow-sm ${targetClass(gloveMode)}`}>
             <span className="block">{action.label}</span>
             <span className="mt-1 block text-sm font-semibold text-slate-600">{action.helpText}</span>
           </Link>

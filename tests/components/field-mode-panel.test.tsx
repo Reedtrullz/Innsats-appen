@@ -26,12 +26,14 @@ describe('FieldModePanel', () => {
     expect(screen.getByRole('region', { name: /Offline status/i })).toHaveTextContent(/Online|Offline/i);
 
     const quickActions = within(screen.getByRole('region', { name: /Én trykkflate/i }));
-    expect(quickActions.getByRole('link', { name: /Opprett note/i })).toHaveAttribute('href', '/oppdrag#feltlogg');
-    expect(quickActions.getByRole('link', { name: /Kjør sjekkliste/i })).toHaveAttribute('href', '/oppdrag#sjekkliste');
-    expect(quickActions.getByRole('link', { name: /5-punktsordre/i })).toHaveAttribute('href', '/oppdrag#5-punktsordre');
-    expect(quickActions.getByRole('link', { name: /Sambandsplan/i })).toHaveAttribute('href', '/oppdrag#sambandsplan');
-    expect(quickActions.getByRole('link', { name: /Eksporter status/i })).toHaveAttribute('href', '/oppdrag#statusrapport');
-    expect(quickActions.getByRole('link', { name: /Søk/i })).toHaveAttribute('href', '/sok#stress-search');
+    expect(quickActions.getByRole('link', { name: 'Kart' })).toHaveAttribute('href', '/kart');
+    expect(quickActions.getByRole('link', { name: 'Opprett note' })).toHaveAttribute('href', '/oppdrag#feltlogg');
+    expect(quickActions.getByRole('link', { name: 'Aktivt oppdrag' })).toHaveAttribute('href', '/oppdrag');
+    expect(quickActions.getByRole('link', { name: 'Kjør sjekkliste' })).toHaveAttribute('href', '/oppdrag#sjekkliste');
+    expect(quickActions.getByRole('link', { name: '5-punktsordre' })).toHaveAttribute('href', '/oppdrag#5-punktsordre');
+    expect(quickActions.getByRole('link', { name: 'Sambandsplan' })).toHaveAttribute('href', '/oppdrag#sambandsplan');
+    expect(quickActions.getByRole('link', { name: 'Eksporter status' })).toHaveAttribute('href', '/oppdrag#statusrapport');
+    expect(quickActions.getByRole('link', { name: 'Søk' })).toHaveAttribute('href', '/sok#stress-search');
   });
 
   it('loads persisted field settings after mount without making first render depend on localStorage', async () => {

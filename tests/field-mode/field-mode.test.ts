@@ -103,10 +103,17 @@ describe('field mode helpers', () => {
     expect(parseFieldFeedbackEntries(JSON.stringify([invalid, valid]))).toEqual([valid]);
   });
 
+
+  it('prioritizes map and field-log quick actions for active field use', () => {
+    expect(QUICK_ACTIONS.slice(0, 3).map((action) => action.id)).toEqual(['map', 'create-note', 'active-mission']);
+    expect(QUICK_ACTIONS.find((action) => action.id === 'map')).toMatchObject({ href: '/kart', label: 'Kart' });
+    expect(QUICK_ACTIONS.find((action) => action.id === 'create-note')).toMatchObject({ href: '/oppdrag#feltlogg' });
+  });
+
   it('defines field test process and all required quick actions as local routes', () => {
     expect(FIELD_TESTING_PROCESS.steps.join(' ')).toMatch(/mannskap/i);
     expect(FIELD_TESTING_PROCESS.localOnlyScope).toMatch(/ingen backend/i);
-    expect(QUICK_ACTIONS.map((action) => action.id)).toEqual(['create-note', 'run-checklist', 'five-point-order', 'comms-plan', 'export-status', 'search']);
+    expect(QUICK_ACTIONS.map((action) => action.id)).toEqual(['map', 'create-note', 'active-mission', 'run-checklist', 'five-point-order', 'comms-plan', 'export-status', 'search']);
     expect(QUICK_ACTIONS.every((action) => action.href.startsWith('/'))).toBe(true);
     expect(QUICK_ACTIONS.find((action) => action.id === 'five-point-order')?.href).toContain('5-punktsordre');
     expect(QUICK_ACTIONS.find((action) => action.id === 'comms-plan')?.href).toContain('sambandsplan');
