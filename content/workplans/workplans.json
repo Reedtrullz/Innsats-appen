@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T06:57:54.048Z",
+  "generatedAt": "2026-06-04T07:16:12.416Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-04T06:57:54.048Z",
+      "updatedAt": "2026-06-04T07:16:12.416Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -4447,113 +4447,169 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-349",
           "title": "Write CIM integration concept note limited to possible manual/status exports.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 349: Write CIM integration concept note limited to possible manual/status exports."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-350",
           "title": "Do not implement CIM write integration without formal approval.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 350: Do not implement CIM write integration without formal approval."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-351",
           "title": "Research QR-code import for orders.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 351: Research QR-code import for orders."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-352",
           "title": "Research file import for orders.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 352: Research file import for orders."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-353",
           "title": "Research Nødnett integration possibilities and constraints.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 353: Research Nødnett integration possibilities and constraints."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-354",
           "title": "Document why real Nødnett group lists must not ship in static public content.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 354: Document why real Nødnett group lists must not ship in static public content."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-355",
           "title": "Research push notification architecture as post-MVP.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 355: Research push notification architecture as post-MVP."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-356",
           "title": "Do not implement push until backend/auth/governance exists.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 356: Do not implement push until backend/auth/governance exists."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-357",
           "title": "Write backend sync architecture before any sync work.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 357: Write backend sync architecture before any sync work."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-358",
           "title": "Define conflict resolution for future sync.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 358: Define conflict resolution for future sync."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-359",
           "title": "Define RBAC for future backend.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 359: Define RBAC for future backend."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-360",
           "title": "Define audit logging for future backend.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 360: Define audit logging for future backend."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-361",
           "title": "Define encryption-at-rest for future backend.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 361: Define encryption-at-rest for future backend."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-362",
           "title": "Define incident access model for future backend.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T07:15:53.000Z",
+          "evidence": [
+            "Implemented in commit 0f544ea (post-MVP integration architecture guardrails for CIM manual/status exports, no CIM writes without formal approval, QR/file order-import research, Nødnett constraints and no real group lists in static public content, push notification post-MVP prohibition, backend sync architecture, conflict resolution, RBAC, audit logging, encryption-at-rest, and incident access model). Gates: integration-guardrails/privacy-boundaries tests PASS, typecheck PASS, lint PASS, git diff --check PASS, spec review APPROVED, code quality/security APPROVED with hardened package-lock/API-route/push-listener guardrails."
+          ],
           "sourceHeading": "Task 362: Define incident access model for future backend."
         },
         {
