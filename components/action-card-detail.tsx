@@ -54,7 +54,7 @@ function freshnessClasses(tone: ReturnType<typeof sourceFreshness>['tone']) {
 
 function SourceConfidencePanel({ linkedSources, missingSourceIds }: { linkedSources: SourceDocument[]; missingSourceIds: string[] }) {
   const sourceReviews = linkedSources.map((source) => ({ source, freshness: sourceFreshness(source) }));
-  const hasVerifiedSourceBase = missingSourceIds.length === 0 && sourceReviews.length > 0 && sourceReviews.every((item) => item.freshness.state === 'current');
+  const hasVerifiedSourceBase = missingSourceIds.length === 0 && sourceReviews.length > 0 && sourceReviews.every((item) => item.source.status === 'verified' && item.freshness.state === 'current');
   const panelClasses = hasVerifiedSourceBase
     ? 'rounded-3xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-950 shadow-sm'
     : 'rounded-3xl border border-amber-300 bg-amber-50 p-5 text-amber-950 shadow-sm';

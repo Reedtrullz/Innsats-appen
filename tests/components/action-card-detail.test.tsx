@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { vi } from 'vitest';
 import { ActionCardDetail } from '@/components/action-card-detail';
 import type { ActionCard, SourceDocument } from '@/lib/content/schemas';
 
@@ -98,4 +99,31 @@ it('warns when linked sources mix current and draft source states', () => {
   expect(screen.getAllByText(/Høy kilde-risiko/i).length).toBeGreaterThan(0);
   expect(screen.getByText(/Status: draft/i)).toBeInTheDocument();
   expect(screen.queryByText(/Verifisert kildegrunnlag/i)).not.toBeInTheDocument();
+});
+
+it('warns for unverified sources even when source freshness is current', async () => {
+  vi.resetModules();
+  vi.doMock('@/lib/content/source-review', () => ({
+    sourceFreshness: () => ({
+      state: 'current',
+      label: 'Kilde fersk',
+      detail: 'forced current',
+      tone: 'emerald',
+    }),
+  }));
+
+  try {
+    const { ActionCardDetail: MockedActionCardDetail } = await import('@/components/action-card-detail');
+    const card = { slug: 'flom-pumpe-start', title: 'Flom og pumpeutlegg', phase: 'under', roles: ['lagforer'], scenarios: ['flom'], priority: 'high', steps: ['Start pumpe'], safety: [], reporting: [], sourceIds: ['src-unverified'], competenceRequired: [] } as ActionCard;
+    const sources = [testSource({ id: 'src-unverified', title: 'SRC - Unverified', status: 'unverified', verifiedAt: '2026-06-04', reviewAfter: '2099-01-01', body: 'Unverified' })];
+
+    render(<MockedActionCardDetail card={card} sources={sources} />);
+
+    expect(screen.getByText(/Kilde krever kontroll/i)).toBeInTheDocument();
+    expect(screen.getByText(/Status: unverified/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Verifisert kildegrunnlag/i)).not.toBeInTheDocument();
+  } finally {
+    vi.doUnmock('@/lib/content/source-review');
+    vi.resetModules();
+  }
 });
