@@ -57,16 +57,18 @@ it('applies field mode runtime CSS for night mode and 48x48 touch targets', asyn
   expect(runtimeCss).toContain('background: #020617');
 });
 
-it('shows generated content version and expanded content navigation', () => {
+it('shows compact operational chrome and keeps release/admin under Mer', () => {
   render(<AppShell currentPath="/hurtigkort"><p>Innhold</p></AppShell>);
+  const header = within(screen.getByRole('banner'));
 
   expect(screen.getByTestId('shell-content-version')).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: /Kildegjennomgang/i })).toHaveAttribute('href', '/kildegjennomgang');
-  expect(screen.getByRole('link', { name: /Datakilder/i })).toHaveAttribute('href', '/datakilder');
-  expect(screen.getByRole('link', { name: /Personvern/i })).toHaveAttribute('href', '/personvern');
-  expect(screen.getAllByRole('link', { name: /Kart/i }).some((link) => link.getAttribute('href') === '/kart')).toBe(true);
-  expect(screen.getByRole('link', { name: /Feltmodus/i })).toHaveAttribute('href', '/feltmodus');
-  expect(screen.getByRole('link', { name: /FAQ/i })).toHaveAttribute('href', '/faq');
-  expect(screen.getByRole('link', { name: /Endringer/i })).toHaveAttribute('href', '/endringer');
-  expect(screen.getByRole('link', { name: /Må leses/i })).toHaveAttribute('href', '/ma-leses');
+  expect(header.getByRole('link', { name: /Beredskapsboka/i })).toHaveAttribute('href', '/');
+  expect(header.getByRole('link', { name: /Må leses/i })).toHaveAttribute('href', '/ma-leses');
+  expect(header.getByRole('link', { name: 'Mer' })).toHaveAttribute('href', '/mer');
+  expect(header.getByText('Offline')).toBeInTheDocument();
+  expect(header.getByText('Lokalt')).toBeInTheDocument();
+  expect(header.queryByText('Kilde')).not.toBeInTheDocument();
+  expect(header.queryByText('Ikke kommando')).not.toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: /Release/i })).not.toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: /Kildegjennomgang/i })).not.toBeInTheDocument();
 });

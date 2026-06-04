@@ -18,3 +18,12 @@ it('supports compact labels for tight mobile chrome', () => {
   expect(screen.getByText('Kilde')).toBeInTheDocument();
   expect(screen.getByText('Ikke kommando')).toBeInTheDocument();
 });
+
+it('supports limiting compact pills for constrained shell chrome', () => {
+  render(<OperationalStatusPills compact limit={2} />);
+
+  expect(screen.getByText('Offline')).toBeInTheDocument();
+  expect(screen.getByText('Lokalt')).toBeInTheDocument();
+  expect(screen.queryByText('Kilde')).not.toBeInTheDocument();
+  expect(screen.queryByText('Ikke kommando')).not.toBeInTheDocument();
+});

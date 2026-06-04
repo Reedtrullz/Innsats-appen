@@ -5,10 +5,12 @@ const defaultPills = [
   { label: 'Ikke offisielt kommandosystem', compactLabel: 'Ikke kommando', className: 'bg-amber-100 text-amber-950' },
 ] as const;
 
-export function OperationalStatusPills({ compact = false, className = '' }: { compact?: boolean; className?: string }) {
+export function OperationalStatusPills({ compact = false, className = '', limit }: { compact?: boolean; className?: string; limit?: number }) {
+  const pills = defaultPills.slice(0, limit ?? defaultPills.length);
+
   return (
     <ul aria-label="Operativ status" className={`flex flex-wrap gap-2 ${className}`}>
-      {defaultPills.map((pill) => (
+      {pills.map((pill) => (
         <li key={pill.label} className={`rounded-full px-3 py-1 text-xs font-black ${pill.className}`}>
           {compact ? pill.compactLabel : pill.label}
         </li>
