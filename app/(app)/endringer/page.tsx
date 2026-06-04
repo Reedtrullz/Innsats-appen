@@ -19,7 +19,10 @@ export default function ChangelogPage() {
         <p className="text-sm font-bold uppercase tracking-wide text-slate-500">Innholdsendringer</p>
         <h1 className="text-3xl font-black">Endringslogg</h1>
         <p className="mt-2 text-sm text-slate-700">Generert fra kuratert innhold. Brukes for å se nye og oppdaterte prosedyrer, ikke som operativ ordre.</p>
-        <Link href="/ma-leses" className="mt-3 inline-flex min-h-11 items-center rounded-full bg-red-100 px-4 text-sm font-black text-red-900">Åpne må-leses-varsler</Link>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link href="/ma-leses" className="inline-flex min-h-11 items-center rounded-full bg-red-100 px-4 text-sm font-black text-red-900">Åpne må-leses-varsler</Link>
+          <Link href="/nytt" className="inline-flex min-h-11 items-center rounded-full bg-slate-900 px-4 text-sm font-black text-white">Hva er nytt</Link>
+        </div>
       </section>
       <section className="rounded-3xl bg-white p-5 shadow-sm">
         <h2 className="text-xl font-black">Nye og oppdaterte prosedyrer</h2>

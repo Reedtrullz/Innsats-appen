@@ -1,0 +1,99 @@
+name: Privacy-safe monitoring
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 22.22.3
+  NEXT_TELEMETRY_DISABLED: "1"
+  ALLOW_PREGENERATED_CONTENT: "1"
+  MONITOR_USER_AGENT: Beredskapsboka synthetic uptime monitor (+https://innsats.reidar.tech)
+
+jobs:
+  synthetic-uptime:
+    name: Synthetic public uptime checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check public endpoints only
+        shell: bash
+        run: |
+          set -euo pipefail
+          urls=(
+            "https://innsats.reidar.tech/api/health"
+            "https://innsats.reidar.tech/"
+            "https://innsats.reidar.tech/nytt"
+            "https://innsats.reidar.tech/release"
+            "https://innsats.reidar.tech/generated-content/manifest.json"
+            "https://innsats.reidar.tech/sw.js"
+          )
+          for url in "${urls[@]}"; do
+            echo "Checking ${url}"
+            curl -fsS --max-time 10 --retry 2 --retry-delay 3 \
+              --header "Accept: text/html,application/json,application/javascript" \
+              --header "User-Agent: ${MONITOR_USER_AGENT}" \
+              "${url}" >/dev/null
+          done
+
+  stale-content-notifications:
+    name: Stale content notification issue
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-deps
+
+      - name: Build generated content
+        run: npm run build:content
+
+      - name: Run stale content report
+        id: stale
+        shell: bash
+        run: |
+          set -euo pipefail
+          report_date="$(date -u +%F)"
+          REPORT_DATE="${report_date}" npm run --silent report:stale-content > stale-content-report.md
+          cat stale-content-report.md
+          echo "report_date=${report_date}" >> "$GITHUB_OUTPUT"
+          if grep -q '^No stale or expired content' stale-content-report.md; then
+            echo "has_findings=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_findings=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create privacy-safe maintenance issue when content is stale
+        if: steps.stale.outputs.has_findings == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          title="Stale content report ${{ steps.stale.outputs.report_date }}"
+          existing="$(gh issue list --state open --search "${title} in:title" --json number --jq 'length')"
+          if [ "${existing}" != "0" ]; then
+            echo "Open stale content issue already exists for ${title}."
+            exit 0
+          fi
+          {
+            echo
+            echo "Routing: content-maintenance"
+            echo "Boundary: no personal data, no private positions, no source body copied."
+          } >> stale-content-report.md
+          gh issue create --title "${title}" --body-file stale-content-report.md

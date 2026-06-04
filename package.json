@@ -26,6 +26,8 @@
     "sync:workplans": "tsx scripts/sync-workplans.ts",
     "compile:curated": "tsx scripts/compile-curated.ts",
     "validate:content": "tsx scripts/validate-content.ts",
+    "release:notes": "tsx scripts/generate-release-notes.ts",
+    "report:stale-content": "tsx scripts/report-stale-content.ts",
     "build:search": "tsx scripts/build-search-index.ts",
     "build:content": "npm run import:obsidian && npm run compile:curated && npm run build:search && npm run sync:workplans && npm run validate:content",
     "check": "npm run check:ci",
