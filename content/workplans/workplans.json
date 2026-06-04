@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-03T23:54:32.707Z",
+  "generatedAt": "2026-06-04T01:10:07.679Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-03T23:54:32.707Z",
+      "updatedAt": "2026-06-04T01:10:07.679Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -3391,7 +3391,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-233",
           "title": "Expand search synonyms for jod.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 233: Expand search synonyms for jod."
@@ -3399,7 +3399,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-234",
           "title": "Expand search synonyms for rens.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 234: Expand search synonyms for rens."
@@ -3407,7 +3407,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-235",
           "title": "Expand search synonyms for MFE.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 235: Expand search synonyms for MFE."
@@ -3415,7 +3415,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-236",
           "title": "Expand search synonyms for samband.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 236: Expand search synonyms for samband."
@@ -3423,7 +3423,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-237",
           "title": "Expand search synonyms for samleplass.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 237: Expand search synonyms for samleplass."
@@ -3431,7 +3431,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-238",
           "title": "Expand search synonyms for dose.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 238: Expand search synonyms for dose."
@@ -3439,7 +3439,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-239",
           "title": "Expand search synonyms for ordre.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 239: Expand search synonyms for ordre."
@@ -3447,7 +3447,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-240",
           "title": "Expand search synonyms for KO and IL-KO.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 240: Expand search synonyms for KO and IL-KO."
@@ -3455,7 +3455,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-241",
           "title": "Expand search synonyms for innsatsleder/IL.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 241: Expand search synonyms for innsatsleder/IL."
@@ -3463,7 +3463,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-242",
           "title": "Expand search synonyms for beredskapsvakt/vakt.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 242: Expand search synonyms for beredskapsvakt/vakt."
@@ -3471,7 +3471,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-243",
           "title": "Expand search synonyms for pumpe/flom/vannforsyning.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 243: Expand search synonyms for pumpe/flom/vannforsyning."
@@ -3479,7 +3479,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-244",
           "title": "Expand search synonyms for skadde/samleplass/førstehjelp.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 244: Expand search synonyms for skadde/samleplass/førstehjelp."
@@ -3487,7 +3487,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-245",
           "title": "Expand search synonyms for defuse/EFOK/psykososial.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 245: Expand search synonyms for defuse/EFOK/psykososial."
@@ -3495,7 +3495,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-246",
           "title": "Expand search synonyms for MBK.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 246: Expand search synonyms for MBK."
@@ -3503,7 +3503,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-247",
           "title": "Add typo tolerance for Norwegian operational terms.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 247: Add typo tolerance for Norwegian operational terms."
@@ -3511,7 +3511,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-248",
           "title": "Add role-aware search ranking.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 248: Add role-aware search ranking."
@@ -3519,7 +3519,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-249",
           "title": "Add phase-aware search ranking.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 249: Add phase-aware search ranking."
@@ -3527,7 +3527,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-250",
           "title": "Add scenario-aware search ranking.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 250: Add scenario-aware search ranking."
@@ -3535,7 +3535,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-251",
           "title": "Add no-result suggestions.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 251: Add no-result suggestions."
@@ -3543,7 +3543,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-252",
           "title": "Add offline search-index stale indicator.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 252: Add offline search-index stale indicator."
@@ -3551,7 +3551,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-253",
           "title": "Add E2E tests for all critical search terms.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 253: Add E2E tests for all critical search terms."
