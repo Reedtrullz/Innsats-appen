@@ -16,3 +16,12 @@ For each affected feature, document:
 ## Decision gate
 
 If any item touches auth, sync, push, live tracking or backend storage, it is post-MVP. It needs security architecture, DPIA screening, source-publication review and explicit release approval before code ships.
+
+## Required architecture references
+
+Before designing integration or sync behavior, read and update these docs:
+
+- `docs/integration-architecture-guardrails.md` for CIM manual/status exports, QR/file order-import research, Nødnett boundaries and push prohibition.
+- `docs/post-mvp-backend-sync-architecture.md` for conflict resolution, RBAC, audit logging, encryption-at-rest and incident access.
+
+These references are guardrails only. Their existence does not approve implementation.
