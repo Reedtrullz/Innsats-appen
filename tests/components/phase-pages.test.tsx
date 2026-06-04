@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import UnderPage from '@/app/(app)/under/page';
 import { PhasePageContent } from '@/components/action-card-list';
 import type { ActionCard, ContentChangelogEntry, MustReadNotice, OperationalChecklist } from '@/lib/content/schemas';
 
@@ -47,4 +48,14 @@ it('shows før utrykning combined workflow, latest procedure notice, and must-re
   expect(screen.getByText(/Før utrykning-prosedyre oppdatert/i)).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /Må leses før utrykning/i })).toBeInTheDocument();
   expect(screen.getByText(/Kontroller ordre, vær\/farer/i)).toBeInTheDocument();
+});
+
+it('shows under-phase operational entry points for map, log and active mission', () => {
+  render(<UnderPage />);
+
+  expect(screen.getByRole('heading', { name: /Under innsats/i })).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /Åpne aktivt oppdrag/i })).toHaveAttribute('href', '/oppdrag');
+  expect(screen.getByRole('link', { name: /Åpne kart/i })).toHaveAttribute('href', '/kart');
+  expect(screen.getByRole('link', { name: /Loggfør observasjon/i })).toHaveAttribute('href', '/oppdrag#feltlogg');
+  expect(screen.getByText(/Kart og logg er lokal beslutningsstøtte/i)).toBeInTheDocument();
 });
