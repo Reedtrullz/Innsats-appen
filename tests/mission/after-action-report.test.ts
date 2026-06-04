@@ -133,6 +133,34 @@ it('uses explicit placeholders when optional order, samband, local log, consumpt
   expect(report.sections.equipmentDamageLoss.placeholder).toContain('Ingen skade eller tap');
 });
 
+it('uses structured mission field-log entries in after-action local log section', () => {
+  const report = buildAfterActionReport({
+    mission: {
+      ...mission,
+      fieldLogEntries: [
+        {
+          id: 'field-map-entry',
+          timestamp: '2026-06-03T10:10:00.000Z',
+          category: 'observasjon',
+          text: 'Vannstand synker ved sektor A',
+          locationText: 'Skjematisk 20,30',
+          criticalObservation: false,
+          mustBeForwarded: false,
+          mapReference: { source: 'map-drawing', objectId: 'sector-a', label: 'Sektor A', point: { x: 20, y: 30 } },
+        },
+      ],
+    },
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+  });
+
+  expect(report.sections.localLog.registered).toBe(true);
+  expect(report.sections.localLog.entries.join('\n')).toContain('Vannstand synker ved sektor A');
+  expect(report.sections.localLog.entries.join('\n')).toContain('Sektor A 20,30');
+  expect(JSON.stringify(report)).not.toMatch(/lat|lon|geometry|rawRef/i);
+});
+
 it('does not classify medical personellskade resource notes as equipment damage or loss', () => {
   const report = buildAfterActionReport({
     mission: {

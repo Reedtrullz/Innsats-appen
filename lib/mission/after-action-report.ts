@@ -1,5 +1,6 @@
 import type { OperationalChecklist } from '@/lib/content/schemas';
 import { EXPORT_SENSITIVITY_WARNING } from './order-export';
+import { FIELD_LOG_CATEGORY_LABELS, sortFieldLogEntries } from './field-log';
 import type { ChecklistRun, MissionContext, MissionFeedback, MissionLessonsLearned, MissionResourceRequest } from './schemas';
 
 export const AFTER_ACTION_LOCAL_WARNING = 'Lagres bare lokalt i denne nettleseren. Ikke offisiell innsending eller offisiell logg alene. Ikke legg inn eller del navn, ID, pasientdetaljer, helsejournal, skjermet operativ informasjon, sensitive private lokasjoner eller annet sensitivt innhold.';
@@ -163,6 +164,19 @@ function trimToSection(value: string | undefined): TextSection {
 function logEntries(value: string | undefined) {
   const entries = value?.split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean) ?? [];
   return entries.length > 0 ? { entries, registered: true } : { entries: [NOT_REGISTERED], registered: false };
+}
+
+
+function structuredFieldLogEntries(mission: MissionContext) {
+  const entries = sortFieldLogEntries(mission.fieldLogEntries ?? []);
+  if (entries.length === 0) return undefined;
+  return entries.map((entry) => {
+    const location = entry.locationText ? ` — ${entry.locationText}` : '';
+    const map = entry.mapReference ? ` — Kart: ${entry.mapReference.label} ${entry.mapReference.point.x},${entry.mapReference.point.y}` : '';
+    const flags = [entry.criticalObservation ? 'Kritisk observasjon' : '', entry.mustBeForwarded ? 'Må videresendes' : ''].filter(Boolean);
+    const flagText = flags.length ? ` — ${flags.join(', ')}` : '';
+    return `${entry.timestamp} — ${FIELD_LOG_CATEGORY_LABELS[entry.category]}${location}${map}${flagText}: ${entry.text}`;
+  }).join('\n');
 }
 
 function withNote(note: string | undefined) {
@@ -329,6 +343,7 @@ export function buildAfterActionReport({ mission, checklists, checklistRuns, gen
   const reportChecklists = checklistSummaries(checklists, checklistRuns);
   const resourceEntries = mission.resourceRequests.map(resourceEntry);
   const equipmentDamageLoss = resourceEntries.filter(isEquipmentDamageOrLoss);
+  const localLogSource = localLogText?.trim() ? localLogText : structuredFieldLogEntries(mission);
   return {
     schemaVersion: AFTER_ACTION_SCHEMA_VERSION,
     generatedAt: generatedAt ?? new Date().toISOString(),
@@ -350,7 +365,7 @@ export function buildAfterActionReport({ mission, checklists, checklistRuns, gen
     sections: {
       order: trimToSection(localOrderText),
       samband: trimToSection(localSambandText),
-      localLog: logEntries(localLogText),
+      localLog: logEntries(localLogSource),
       contextSignals: mission.externalSignals.map((signal) => ({
         source: signal.source,
         kind: signal.kind,
