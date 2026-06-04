@@ -3,7 +3,8 @@
 Mobile-first, offline-capable PWA for source-backed Sivilforsvaret decision support.
 
 - Repository: https://github.com/Reedtrullz/Innsats-appen
-- Production domain prepared for deploy: https://innsats.reidar.tech
+- Production domain: https://innsats.reidar.tech
+- Current verified deployment: `e259b39692b48601a7069fe3fbefad5fe74989c5` via GitHub Actions run `26943809255`; see `docs/release/current-deployment-status.md`.
 - GHCR image namespace: `ghcr.io/reedtrullz/innsats-appen`
 
 The app is a local MVP: generated content, mission dashboards, checklist runs, 5-punktsordre exports, sambandsplan exports, and release-readiness board state stay in the browser unless the user manually copies them out.
@@ -41,10 +42,11 @@ npm run sync:workplans    # mirror .hermes/plans into Obsidian + generated workp
 npm run typecheck        # TypeScript gate
 npm run test             # Vitest unit/component/integration/security/content tests
 npm run build            # content build + production Next build
-npm run e2e              # production-mode Playwright E2E (service worker/offline checks)
-npm run e2e:prod         # same production-mode E2E alias; set PLAYWRIGHT_PORT=3007 if local port 3000 is busy
-npm run check            # build content + typecheck + lint + Vitest + production build
-npm run check:ci         # explicit CI alias for the same ordered gate
+npm run e2e              # build + production-mode Playwright E2E (service worker/offline checks)
+npm run e2e:prod         # same build + production-mode E2E alias; set PLAYWRIGHT_PORT=3007 if local port 3000 is busy
+npm run e2e:prod:no-build  # production-mode Playwright E2E against an existing production build
+npm run check            # alias for check:ci
+npm run check:ci         # build content + typecheck + lint + Vitest + production build + production E2E + perf budgets
 ```
 
 Useful targeted gates:
@@ -69,7 +71,7 @@ npm run e2e:prod -- tests/e2e/offline.spec.ts
 3. Run `npm run test` and `npm run typecheck` before committing.
 4. Run `npm run build` before production/mobile/offline verification.
 5. Run `npm run e2e:prod` to prove the production shell, service worker, offline flow, local mission storage, privacy reset, and mobile journey.
-6. Do not claim demo-ready until Task 44's full integrated gate passes and any changed files are committed deliberately.
+6. Before claiming pilot-ready, run `npm run check:ci`, verify the GitHub Actions run for the exact SHA is `completed/success`, verify production `/api/health` returns the same SHA, and keep Tasks 385–389 blocked until real-device/staging evidence exists.
 
 ## Deployment
 

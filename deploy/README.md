@@ -22,6 +22,17 @@ The GitHub Actions version of the flow is:
 push/PR -> automatic checks -> main-only Docker build/push -> main-only Ansible deploy -> exact-SHA public health verification
 ```
 
+## Current verified production deploy
+
+As of 2026-06-04T09:58:17Z:
+
+- SHA: `e259b39692b48601a7069fe3fbefad5fe74989c5`
+- GitHub Actions run: https://github.com/Reedtrullz/Innsats-appen/actions/runs/26943809255
+- Image tag: `ghcr.io/reedtrullz/innsats-appen:e259b39692b4`
+- Public health: `https://innsats.reidar.tech/api/health` returned `status=healthy`, `nodeEnv=production`, and the exact SHA.
+
+See `docs/release/current-deployment-status.md` for the latest verification record and release-board caveats.
+
 ## One-time prerequisites
 
 ### GitHub Actions secret
@@ -112,4 +123,5 @@ curl -fsS https://innsats.reidar.tech/ | head
 
 - `next.config.ts` must keep `output: 'standalone'` for Docker runtime.
 - Docker builds set `ALLOW_PREGENERATED_CONTENT=1` so the container build can use the committed sanitized `content/generated/source-documents.json` snapshot instead of requiring the private Obsidian vault inside GitHub Actions or the image.
-- Other generated files under `content/generated/`, `public/generated-content/`, and `public/content-assets/` are build outputs and stay out of git.
+- `content/generated/*.json` and `public/generated-content/` are build outputs and stay out of git, except the committed sanitized fallback snapshot described above.
+- `public/content-assets/*.png` is intentionally un-ignored and committed when generated public content references DOCX-extracted images; clean GitHub Actions runners must have those assets for content validation and production E2E.

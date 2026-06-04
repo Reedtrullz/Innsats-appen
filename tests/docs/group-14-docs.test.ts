@@ -35,6 +35,21 @@ const requiredDocs: Array<[string, string, RegExp[]]> = [
 ];
 
 describe('Group 14 rollout and maintenance documentation', () => {
+  it('documents the current verified production deployment and remaining evidence blockers', () => {
+    const status = read('docs/release/current-deployment-status.md');
+    expect(status).toMatch(/e259b39692b48601a7069fe3fbefad5fe74989c5/);
+    expect(status).toMatch(/26943809255/);
+    expect(status).toMatch(/status=healthy|\"status\":\"healthy\"/);
+    expect(status).toMatch(/Automatic checks/);
+    expect(status).toMatch(/Build and push GHCR image/);
+    expect(status).toMatch(/Deploy to VPS with Ansible/);
+    expect(status).toMatch(/Completed: 412/);
+    expect(status).toMatch(/Blocked: 5/);
+    expect(status).toMatch(/Task 385/);
+    expect(status).toMatch(/Task 389/);
+    expect(status).toMatch(/not all green|ikke all green|intentionally not all green/i);
+  });
+
   it.each(requiredDocs)('covers task %s in %s', (_task, relativePath, matchers) => {
     const doc = read(relativePath);
     for (const matcher of matchers) expect(doc).toMatch(matcher);
