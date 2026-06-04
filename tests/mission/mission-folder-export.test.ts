@@ -32,7 +32,7 @@ it('builds a local mission folder bundle with map artifacts and privacy warnings
     checklists: [],
     checklistRuns: [],
     mapState: {
-      markers: [{ id: 'marker-1', itemType: 'marker', kind: 'observation', label: 'Observasjon', point: { x: 10, y: 20 }, note: 'rawRef lat lon should not export', createdAt: '2026-06-04T09:00:00.000Z' }],
+      markers: [{ id: 'marker-1', missionId: mission.id, itemType: 'marker', kind: 'observation', label: 'Observasjon', point: { x: 10, y: 20 }, note: 'rawRef lat lon should not export', createdAt: '2026-06-04T09:00:00.000Z' }],
       drawings: [],
     },
     generatedAt: '2026-06-04T11:00:00.000Z',
@@ -57,4 +57,35 @@ it('builds a local mission folder bundle with map artifacts and privacy warnings
   expect(markdown).toContain('# Oppdragsmappe');
   expect(markdown).toContain('Oppdragsmappe test');
   expect(markdown).toContain('Sanitert GeoJSON');
+});
+
+it('excludes unrelated other missions from the current mission folder map artifacts', () => {
+  const bundle = buildMissionFolderExport({
+    mission,
+    checklists: [],
+    checklistRuns: [],
+    mapState: {
+      markers: [
+        { id: 'marker-current', missionId: mission.id, itemType: 'marker', kind: 'observation', label: 'Current', point: { x: 10, y: 20 }, note: 'current note should not export', createdAt: '2026-06-04T09:00:00.000Z' },
+        { id: 'marker-wrong', missionId: 'other-mission', itemType: 'marker', kind: 'observation', label: 'Wrong', point: { x: 30, y: 40 }, note: 'wrong note should not export', createdAt: '2026-06-04T09:01:00.000Z' },
+      ],
+      drawings: [
+        { id: 'drawing-current', missionId: mission.id, itemType: 'drawing', kind: 'sector', label: 'Current sector', points: [{ x: 10, y: 10 }, { x: 30, y: 10 }, { x: 20, y: 30 }], note: 'current drawing note should not export', createdAt: '2026-06-04T09:10:00.000Z' },
+        { id: 'drawing-wrong', missionId: 'other-mission', itemType: 'drawing', kind: 'sector', label: 'Wrong sector', points: [{ x: 40, y: 40 }, { x: 60, y: 40 }, { x: 50, y: 60 }], note: 'wrong drawing note should not export', createdAt: '2026-06-04T09:11:00.000Z' },
+      ],
+    },
+    generatedAt: '2026-06-04T11:00:00.000Z',
+  });
+
+  expect(bundle.artifacts.mapGeoJson).toContain('Current');
+  expect(bundle.artifacts.mapGeoJson).toContain('Current sector');
+  expect(bundle.artifacts.mapGeoJson).not.toContain('Wrong');
+  expect(bundle.artifacts.mapSvg).toContain('Current');
+  expect(bundle.artifacts.mapSvg).toContain('Current sector');
+  expect(bundle.artifacts.mapSvg).not.toContain('Wrong');
+  expect(bundle.artifacts.afterActionMarkdown).toContain('Current');
+  expect(bundle.artifacts.afterActionMarkdown).toContain('Current sector');
+  expect(bundle.artifacts.afterActionMarkdown).not.toContain('Wrong');
+  expect(bundle.artifacts.mapFeatureCollection.features.map((feature) => feature.properties.label)).toEqual(['Current', 'Current sector']);
+  expect(JSON.stringify(bundle)).not.toMatch(/current note|wrong note|folder-mission|other-mission|missionId/i);
 });

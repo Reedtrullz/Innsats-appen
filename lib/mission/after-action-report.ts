@@ -1,7 +1,7 @@
 import type { OperationalChecklist } from '@/lib/content/schemas';
 import { EXPORT_SENSITIVITY_WARNING } from './order-export';
 import { FIELD_LOG_CATEGORY_LABELS, sortFieldLogEntries } from './field-log';
-import { MAP_DRAWING_LABELS, MAP_MARKER_LABELS, normalizeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
+import { MAP_DRAWING_LABELS, MAP_MARKER_LABELS, mapStateForMission, normalizeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
 import type { ChecklistRun, MissionContext, MissionFeedback, MissionLessonsLearned, MissionResourceRequest } from './schemas';
 
 export const AFTER_ACTION_LOCAL_WARNING = 'Lagres bare lokalt i denne nettleseren. Ikke offisiell innsending eller offisiell logg alene. Ikke legg inn eller del navn, ID, pasientdetaljer, helsejournal, skjermet operativ informasjon, sensitive private lokasjoner eller annet sensitivt innhold.';
@@ -366,6 +366,7 @@ export function buildAfterActionReport({ mission, checklists, checklistRuns, gen
   const resourceEntries = mission.resourceRequests.map(resourceEntry);
   const equipmentDamageLoss = resourceEntries.filter(isEquipmentDamageOrLoss);
   const localLogSource = localLogText?.trim() ? localLogText : structuredFieldLogEntries(mission);
+  const scopedMapState = mapStateForMission(normalizeMissionMapState(mapState ?? { markers: [], drawings: [] }), mission.id);
   return {
     schemaVersion: AFTER_ACTION_SCHEMA_VERSION,
     generatedAt: generatedAt ?? new Date().toISOString(),
@@ -388,7 +389,7 @@ export function buildAfterActionReport({ mission, checklists, checklistRuns, gen
       order: trimToSection(localOrderText),
       samband: trimToSection(localSambandText),
       localLog: logEntries(localLogSource),
-      mapSummary: buildMapSummary(mapState),
+      mapSummary: buildMapSummary(scopedMapState),
       contextSignals: mission.externalSignals.map((signal) => ({
         source: signal.source,
         kind: signal.kind,

@@ -22,7 +22,7 @@ import { DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS, disabledExternalDataSources, dis
 import { MissionCommandHeader, MissionExportShortcuts, MissionProgressSummary } from './mission-command-summary';
 import { TiltakCard } from './tiltak-card';
 import { MissionMapSummary } from './mission-map-summary';
-import { missionMapStateSnapshot, normalizeMissionMapState, subscribeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
+import { missionMapStateSnapshot, normalizeMissionMapState, subscribeMissionMapState, mapStateForMission, type MissionMapState } from '@/lib/maps/operations-map';
 
 function formatUpdatedAt(value: string) {
   return new Intl.DateTimeFormat('nb-NO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
@@ -815,6 +815,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
       return { markers: [], drawings: [] };
     }
   }, [mapStateSnapshot]);
+  const scopedMapState = useMemo(() => mapStateForMission(mapState, mission.id), [mapState, mission.id]);
 
   const staleSignals = useMemo(() => {
     const storedSignals = mission.externalSignals.length > 0 ? markStoredContextSignalsStale(mission.externalSignals) : [];
@@ -844,7 +845,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
         <MissionExportShortcuts />
       </div>
 
-      <MissionMapSummary mission={mission} mapState={mapState} />
+      <MissionMapSummary mission={mission} mapState={scopedMapState} />
 
       <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950">
         <p className="text-xs font-black uppercase tracking-wide">Operativ grense</p>
@@ -866,9 +867,9 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
       <RuhWelfareControls mission={mission} onMissionChange={onMissionChange} />
       <EquipmentReadinessExportControls mission={mission} checklists={checklists} />
       <StructuredLessonsFeedbackControls key={mission.id} mission={mission} onMissionChange={onMissionChange} onArchive={onArchive} />
-      <AfterActionReportControls mission={mission} displaySignals={staleSignals} checklists={checklists} fallbackChecklist={checklist} mapState={mapState} />
+      <AfterActionReportControls mission={mission} displaySignals={staleSignals} checklists={checklists} fallbackChecklist={checklist} mapState={scopedMapState} />
 
-      <MissionFolderExportControls mission={mission} checklists={checklists} mapState={mapState} />
+      <MissionFolderExportControls mission={mission} checklists={checklists} mapState={scopedMapState} />
 
       <section className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
         <div className="flex items-start justify-between gap-3">

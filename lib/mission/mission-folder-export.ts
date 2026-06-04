@@ -1,5 +1,5 @@
 import type { OperationalChecklist } from '@/lib/content/schemas';
-import { buildGeoJsonExport, buildMapImageSvg, geoJsonExportText, normalizeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
+import { buildGeoJsonExport, buildMapImageSvg, geoJsonExportText, mapStateForMission, normalizeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
 import { buildAfterActionReport, exportAfterActionMarkdown } from './after-action-report';
 import { exportFieldLogMarkdown } from './field-log';
 import type { ChecklistRun, MissionContext } from './schemas';
@@ -22,11 +22,12 @@ function missionSummary(mission: MissionContext) {
 }
 
 
-function missionFolderMapState(mapState: MissionMapState | undefined): MissionMapState {
+function missionFolderMapState(mapState: MissionMapState | undefined, missionId: string): MissionMapState {
   const normalized = normalizeMissionMapState(mapState ?? { markers: [], drawings: [] });
+  const scoped = mapStateForMission(normalized, missionId);
   return {
-    markers: normalized.markers.map(({ note: _note, ...marker }) => marker),
-    drawings: normalized.drawings.map(({ note: _note, ...drawing }) => drawing),
+    markers: scoped.markers.map(({ note: _note, ...marker }) => marker),
+    drawings: scoped.drawings.map(({ note: _note, ...drawing }) => drawing),
   };
 }
 
@@ -45,7 +46,7 @@ export function buildMissionFolderExport(input: {
   generatedAt?: string;
 }) {
   const generatedAt = input.generatedAt ?? new Date().toISOString();
-  const mapState = missionFolderMapState(input.mapState);
+  const mapState = missionFolderMapState(input.mapState, input.mission.id);
   const afterActionReport = buildAfterActionReport({
     mission: input.mission,
     checklists: input.checklists,

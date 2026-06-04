@@ -168,8 +168,8 @@ it('includes sanitized schematic map summary in after-action report when provide
     checklistRuns: runs,
     generatedAt: '2026-06-03T11:00:00.000Z',
     mapState: {
-      markers: [{ id: 'marker-ko', itemType: 'marker', kind: 'il-ko', label: 'KO lokal', point: { x: 22, y: 33 }, createdAt: '2026-06-03T09:00:00.000Z' }],
-      drawings: [{ id: 'sector-a', itemType: 'drawing', kind: 'sector', label: 'Sektor A', points: [{ x: 10, y: 10 }, { x: 30, y: 10 }, { x: 20, y: 30 }], createdAt: '2026-06-03T09:10:00.000Z' }],
+      markers: [{ id: 'marker-ko', missionId: mission.id, itemType: 'marker', kind: 'il-ko', label: 'KO lokal', point: { x: 22, y: 33 }, createdAt: '2026-06-03T09:00:00.000Z' }],
+      drawings: [{ id: 'sector-a', missionId: mission.id, itemType: 'drawing', kind: 'sector', label: 'Sektor A', points: [{ x: 10, y: 10 }, { x: 30, y: 10 }, { x: 20, y: 30 }], createdAt: '2026-06-03T09:10:00.000Z' }],
     },
   });
 
@@ -192,6 +192,32 @@ it('includes sanitized schematic map summary in after-action report when provide
     } as any,
   });
   expect(malformedReport.sections.mapSummary).toMatchObject({ markerCount: 0, drawingCount: 0, items: [] });
+});
+
+it('excludes map objects from other missions in the current mission after-action report', () => {
+  const report = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapState: {
+      markers: [
+        { id: 'marker-current', missionId: mission.id, itemType: 'marker', kind: 'il-ko', label: 'Current', point: { x: 22, y: 33 }, createdAt: '2026-06-03T09:00:00.000Z' },
+        { id: 'marker-wrong', missionId: 'other-mission', itemType: 'marker', kind: 'observation', label: 'Wrong', point: { x: 44, y: 55 }, createdAt: '2026-06-03T09:01:00.000Z' },
+      ],
+      drawings: [
+        { id: 'drawing-current', missionId: mission.id, itemType: 'drawing', kind: 'sector', label: 'Current sector', points: [{ x: 10, y: 10 }, { x: 30, y: 10 }, { x: 20, y: 30 }], createdAt: '2026-06-03T09:10:00.000Z' },
+        { id: 'drawing-wrong', missionId: 'other-mission', itemType: 'drawing', kind: 'sector', label: 'Wrong sector', points: [{ x: 40, y: 40 }, { x: 60, y: 40 }, { x: 50, y: 60 }], createdAt: '2026-06-03T09:11:00.000Z' },
+      ],
+    },
+  });
+
+  const items = report.sections.mapSummary.items.join(' ');
+  expect(report.sections.mapSummary).toMatchObject({ markerCount: 1, drawingCount: 1 });
+  expect(items).toContain('Current');
+  expect(items).toContain('Current sector');
+  expect(items).not.toContain('Wrong');
+  expect(exportAfterActionMarkdown(report)).not.toContain('Wrong');
 });
 
 it('does not classify medical personellskade resource notes as equipment damage or loss', () => {

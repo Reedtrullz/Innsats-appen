@@ -196,8 +196,8 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
   } as any);
   await saveChecklistRun({ id: 'run-aar-ui', missionId: 'm2c2-after-action-ui', templateSlug: 'fig-under-innsats', checkedItemIds: ['materiell-sjekket'], notesByItemId: { 'ressursbruk-notert': 'Fylles etter retur' }, updatedAt: '2026-06-03T09:25:00.000Z', schemaVersion: 1 });
   localStorage.setItem(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({
-    markers: [{ id: 'marker-aar-ui', itemType: 'marker', kind: 'il-ko', label: 'KO etterrapport', point: { x: 22, y: 33 }, createdAt: '2026-06-03T09:15:00.000Z' }],
-    drawings: [{ id: 'sector-aar-ui', itemType: 'drawing', kind: 'sector', label: 'Sektor etterrapport', points: [{ x: 10, y: 10 }, { x: 30, y: 10 }, { x: 20, y: 30 }], createdAt: '2026-06-03T09:16:00.000Z' }],
+    markers: [{ id: 'marker-aar-ui', missionId: 'm2c2-after-action-ui', itemType: 'marker', kind: 'il-ko', label: 'KO etterrapport', point: { x: 22, y: 33 }, createdAt: '2026-06-03T09:15:00.000Z' }],
+    drawings: [{ id: 'sector-aar-ui', missionId: 'm2c2-after-action-ui', itemType: 'drawing', kind: 'sector', label: 'Sektor etterrapport', points: [{ x: 10, y: 10 }, { x: 30, y: 10 }, { x: 20, y: 30 }], createdAt: '2026-06-03T09:16:00.000Z' }],
   }));
 
   render(<MissionContextPanel contentVersion="test-v1" checklists={afterActionChecklists} />);
@@ -257,7 +257,7 @@ it('generates a local oppdragsmappe export with map and log artifacts', async ()
     schemaVersion: 1,
   } as any);
   localStorage.setItem(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({
-    markers: [{ id: 'marker-1', itemType: 'marker', kind: 'observation', label: 'Obs', point: { x: 11, y: 22 }, note: 'rawRef lat lon should not export', createdAt: '2026-06-04T09:20:00.000Z' }],
+    markers: [{ id: 'marker-1', missionId: 'mission-folder-ui', itemType: 'marker', kind: 'observation', label: 'Obs', point: { x: 11, y: 22 }, note: 'rawRef lat lon should not export', createdAt: '2026-06-04T09:20:00.000Z' }],
     drawings: [],
   }));
 
@@ -279,6 +279,64 @@ it('generates a local oppdragsmappe export with map and log artifacts', async ()
 
   const auditLog = readLocalAuditLog();
   expect(auditLog.some((entry) => entry.type === 'export-created' && entry.details?.exportKind === 'mission-folder')).toBe(true);
+});
+
+it('scopes current mission dashboard, after-action and folder map outputs away from unrelated missions', async () => {
+  await saveMission({
+    id: 'mission-scope-ui',
+    title: 'Mission scoped map UI',
+    createdAt: '2026-06-04T09:00:00.000Z',
+    updatedAt: '2026-06-04T09:30:00.000Z',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'generelt',
+    locationText: 'Lokalt område',
+    externalSignals: [],
+    externalSignalHistory: [],
+    activeChecklistIds: [],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [],
+    fieldLogEntries: [],
+    ruhReports: [],
+    welfareChecks: [],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  } as any);
+  localStorage.setItem(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({
+    markers: [
+      { id: 'marker-scope-current', missionId: 'mission-scope-ui', itemType: 'marker', kind: 'observation', label: 'Current UI marker', point: { x: 11, y: 22 }, createdAt: '2026-06-04T09:20:00.000Z' },
+      { id: 'marker-scope-wrong', missionId: 'other-mission', itemType: 'marker', kind: 'observation', label: 'Wrong UI marker', point: { x: 44, y: 55 }, createdAt: '2026-06-04T09:21:00.000Z' },
+    ],
+    drawings: [
+      { id: 'drawing-scope-current', missionId: 'mission-scope-ui', itemType: 'drawing', kind: 'sector', label: 'Current UI sector', points: [{ x: 10, y: 10 }, { x: 30, y: 10 }, { x: 20, y: 30 }], createdAt: '2026-06-04T09:22:00.000Z' },
+      { id: 'drawing-scope-wrong', missionId: 'other-mission', itemType: 'drawing', kind: 'sector', label: 'Wrong UI sector', points: [{ x: 40, y: 40 }, { x: 60, y: 40 }, { x: 50, y: 60 }], createdAt: '2026-06-04T09:23:00.000Z' },
+    ],
+  }));
+
+  render(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[]} />);
+
+  const mapSummary = (await screen.findByRole('heading', { name: /Kart og logg/i })).closest('section');
+  expect(mapSummary).not.toBeNull();
+  expect(within(mapSummary!).getByText('1 markør')).toBeInTheDocument();
+  expect(within(mapSummary!).getByText('1 tegning')).toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('button', { name: /Lag etteraksjonsrapport Markdown/i }));
+  const afterActionMarkdown = await screen.findByLabelText(/Etteraksjonsrapport Markdown/i) as HTMLTextAreaElement;
+  expect(afterActionMarkdown.value).toContain('Current UI marker');
+  expect(afterActionMarkdown.value).toContain('Current UI sector');
+  expect(afterActionMarkdown.value).not.toContain('Wrong UI');
+
+  await userEvent.click(screen.getByRole('button', { name: /Lag oppdragsmappe/i }));
+  const folderJson = await screen.findByLabelText(/Oppdragsmappe JSON/i) as HTMLTextAreaElement;
+  const folderMarkdown = screen.getByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
+  expect(folderJson.value).toContain('Current UI marker');
+  expect(folderJson.value).toContain('Current UI sector');
+  expect(folderJson.value).not.toContain('Wrong UI');
+  expect(folderMarkdown.value).toContain('Current UI marker');
+  expect(folderMarkdown.value).toContain('Current UI sector');
+  expect(folderMarkdown.value).not.toContain('Wrong UI');
 });
 
 
@@ -607,7 +665,7 @@ it('shows map and field-log summary on the mission dashboard', async () => {
     schemaVersion: 1,
   } as any);
   localStorage.setItem(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({
-    markers: [{ id: 'marker-dashboard', itemType: 'marker', kind: 'il-ko', label: 'KO lokal', point: { x: 22, y: 33 }, createdAt: '2026-06-04T09:15:00.000Z' }],
+    markers: [{ id: 'marker-dashboard', missionId: 'm6-map-summary-dashboard', itemType: 'marker', kind: 'il-ko', label: 'KO lokal', point: { x: 22, y: 33 }, createdAt: '2026-06-04T09:15:00.000Z' }],
     drawings: [],
   }));
 
