@@ -5,6 +5,7 @@ import { MissionContextPanel } from '@/components/mission-context-panel';
 import { archiveMission, clearLocalMissionData, listArchivedMissions, listMissions, saveChecklistRun, saveMission } from '@/lib/mission/local-store';
 import { EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY } from '@/lib/integrations/source-settings';
 import { readLocalAuditLog } from '@/lib/privacy/local-profile';
+import { OPERATIONS_MAP_STORAGE_KEY } from '@/lib/maps/operations-map';
 import type { OperationalChecklist } from '@/lib/content/schemas';
 
 vi.mock('next/navigation', () => ({
@@ -508,6 +509,53 @@ it('shows a situation-first mission dashboard with next action, progress and exp
   expect(text.indexOf('Oppdrag')).toBeLessThan(text.indexOf('Neste anbefalte handling'));
   expect(text.indexOf('Neste anbefalte handling')).toBeLessThan(text.indexOf('Fremdrift'));
   expect(text.indexOf('Fremdrift')).toBeLessThan(text.indexOf('Anbefalte tiltak'));
+});
+
+it('shows map and field-log summary on the mission dashboard', async () => {
+  await saveMission({
+    id: 'm6-map-summary-dashboard',
+    title: 'Kart på oppdragstavle',
+    createdAt: '2026-06-04T09:00:00.000Z',
+    updatedAt: '2026-06-04T09:30:00.000Z',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'generelt',
+    locationText: 'Innsatsområde kart',
+    externalSignals: [],
+    activeChecklistIds: ['fig-under-innsats'],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [],
+    fieldLogEntries: [
+      {
+        id: 'field-log-map-dashboard',
+        timestamp: '2026-06-04T09:25:00.000Z',
+        category: 'observasjon',
+        text: 'Kartkoblet observasjon for tavla',
+        mapReference: {
+          source: 'map-marker',
+          objectId: 'marker-dashboard',
+          label: 'KO lokal',
+          point: { x: 22, y: 33 },
+        },
+        criticalObservation: true,
+        mustBeForwarded: true,
+      },
+    ],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  } as any);
+  localStorage.setItem(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({
+    markers: [{ id: 'marker-dashboard', itemType: 'marker', kind: 'il-ko', label: 'KO lokal', point: { x: 22, y: 33 }, createdAt: '2026-06-04T09:15:00.000Z' }],
+    drawings: [],
+  }));
+
+  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+
+  expect(await screen.findByRole('heading', { name: /Kart og logg/i })).toBeInTheDocument();
+  expect(screen.getAllByText(/kartkoblet logg/i).length).toBeGreaterThan(0);
+  expect(screen.getByRole('link', { name: /Åpne kart/i })).toHaveAttribute('href', '/kart');
 });
 
 it('shows a fallback next action when the matching action card has no steps', async () => {

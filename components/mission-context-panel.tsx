@@ -19,6 +19,8 @@ import { ContextSignalPanel, markStoredContextSignalsStale } from './context-sig
 import { DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS, disabledExternalDataSources, displaySignalsForExternalDataSourceSettings, externalDataSourceSettingsSnapshot, parseExternalDataSourceSettings, subscribeExternalDataSourceSettings } from '@/lib/integrations/source-settings';
 import { MissionCommandHeader, MissionExportShortcuts, MissionProgressSummary } from './mission-command-summary';
 import { TiltakCard } from './tiltak-card';
+import { MissionMapSummary } from './mission-map-summary';
+import { missionMapStateSnapshot, normalizeMissionMapState, subscribeMissionMapState } from '@/lib/maps/operations-map';
 
 function formatUpdatedAt(value: string) {
   return new Intl.DateTimeFormat('nb-NO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
@@ -761,6 +763,18 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
     () => JSON.stringify(DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS),
   );
   const sourceSettings = useMemo(() => parseExternalDataSourceSettings(settingsSnapshot), [settingsSnapshot]);
+  const mapStateSnapshot = useSyncExternalStore(
+    subscribeMissionMapState,
+    missionMapStateSnapshot,
+    () => JSON.stringify({ markers: [], drawings: [] }),
+  );
+  const mapState = useMemo(() => {
+    try {
+      return normalizeMissionMapState(JSON.parse(mapStateSnapshot));
+    } catch {
+      return { markers: [], drawings: [] };
+    }
+  }, [mapStateSnapshot]);
 
   const staleSignals = useMemo(() => {
     const storedSignals = mission.externalSignals.length > 0 ? markStoredContextSignalsStale(mission.externalSignals) : [];
@@ -788,6 +802,8 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
         <MissionProgressSummary mission={mission} checklists={checklists} />
         <MissionExportShortcuts />
       </div>
+
+      <MissionMapSummary mission={mission} mapState={mapState} />
 
       <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950">
         <p className="text-xs font-black uppercase tracking-wide">Operativ grense</p>
