@@ -149,8 +149,8 @@ it('lets users generate local MBK equipment readiness Markdown and JSON exports 
   await userEvent.click(screen.getByRole('button', { name: /Lag MBK Markdown/i }));
   await userEvent.click(screen.getByRole('button', { name: /Lag MBK JSON/i }));
 
-  const markdownPreview = screen.getByLabelText(/MBK materiellstatus Markdown/i) as HTMLTextAreaElement;
-  const jsonPreview = screen.getByLabelText(/MBK materiellstatus JSON/i) as HTMLTextAreaElement;
+  const markdownPreview = await screen.findByLabelText(/MBK materiellstatus Markdown/i) as HTMLTextAreaElement;
+  const jsonPreview = await screen.findByLabelText(/MBK materiellstatus JSON/i) as HTMLTextAreaElement;
   expect(markdownPreview.value).toContain('# Materiellberedskap / MBK');
   expect(markdownPreview.value).toContain('Klar for ny utdeployering: Nei');
   expect(markdownPreview.value).toContain('Trenger service');

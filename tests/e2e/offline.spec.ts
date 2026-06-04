@@ -26,14 +26,14 @@ test('serves shell and generated content offline with stale label', async ({ pag
 
   await context.setOffline(true);
   await page.reload({ waitUntil: 'domcontentloaded' });
-  await expect(page.getByText('Beredskapsboka')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Beredskapsboka' })).toBeVisible();
   await expect(page.getByTestId('content-version')).toHaveText(version ?? '');
-  await expect(page.getByText(/offline|frakoblet|stale/i)).toBeVisible();
+  await expect(page.getByTestId('offline-status')).toContainText(/offline|frakoblet|stale/i);
   await expect(page.getByText(/5-punktsordre/i)).toBeVisible();
 
   await page.locator('a[href="/kort/tilfluktsrom-klargjoring"]').first().click();
   await expect(page.getByRole('heading', { name: /Klargjør offentlig tilfluktsrom/i })).toBeVisible();
-  await page.locator('a[href="/kilder/src-deep-research-tilfluktsrom"]').first().click();
+  await page.locator('a[href="/kilder/src-deep-research-tilfluktsrom#excerpt"]').first().click();
   await expect(page.getByRole('heading', { name: /SRC - Deep Research Tilfluktsrom/i })).toBeVisible();
 
   await page.goto('/kort/tilfluktsrom-klargjoring', { waitUntil: 'domcontentloaded' });
@@ -59,4 +59,41 @@ test('serves shell and generated content offline with stale label', async ({ pag
     }
   });
   expect(apiOk).toBe(false);
+});
+
+test('serves generated-content fallback when cache entry is corrupted or missing offline', async ({ page, context }) => {
+  await page.goto('/hurtigkort');
+  await expect(page.getByRole('heading', { name: 'Hurtigkort' })).toBeVisible();
+  await page.waitForFunction(() => 'serviceWorker' in navigator);
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready;
+  });
+
+  const deleted = await page.evaluate(async () => {
+    const keys = await caches.keys();
+    const matches = await Promise.all(keys.map(async (key) => {
+      const cache = await caches.open(key);
+      return cache.delete('/generated-content/manifest.json');
+    }));
+    return matches.some(Boolean);
+  });
+  expect(deleted).toBe(true);
+
+  await context.setOffline(true);
+
+  const fallback = await page.evaluate(async () => {
+    const response = await fetch('/generated-content/manifest.json');
+    const body = await response.json();
+    return {
+      ok: response.ok,
+      generatedFallback: response.headers.get('x-beredskapsboka-generated-fallback'),
+      cacheVersion: response.headers.get('x-beredskapsboka-cache-version'),
+      body,
+    };
+  });
+
+  expect(fallback.ok).toBe(true);
+  expect(fallback.generatedFallback).toBe('1');
+  expect(fallback.cacheVersion).toBeTruthy();
+  expect(fallback.body).toMatchObject({ contentVersion: 'offline-fallback', fallback: true });
 });

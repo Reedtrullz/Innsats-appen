@@ -12,6 +12,8 @@
     "dev": "next dev",
     "build": "npm run build:content && npm run build:app",
     "build:app": "next build",
+    "perf:budget": "tsx scripts/performance-budget.ts",
+    "perf:lighthouse": "tsx scripts/lighthouse-mobile-budget.ts",
     "start": "mkdir -p .next/standalone/.next && rm -rf .next/standalone/public .next/standalone/.next/static && cp -R public .next/standalone/public && cp -R .next/static .next/standalone/.next/static && cd .next/standalone && node server.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
@@ -27,7 +29,7 @@
     "build:search": "tsx scripts/build-search-index.ts",
     "build:content": "npm run import:obsidian && npm run compile:curated && npm run build:search && npm run sync:workplans && npm run validate:content",
     "check": "npm run check:ci",
-    "check:ci": "npm run build:content && npm run typecheck && npm run lint && npm run test && npm run build:app"
+    "check:ci": "npm run build:content && npm run typecheck && npm run lint && npm run test && npm run build:app && npm run perf:budget && npm run perf:lighthouse"
   },
   "dependencies": {
     "@next/third-parties": "16.2.7",
@@ -50,10 +52,12 @@
     "@types/react": "19.2.16",
     "@types/react-dom": "19.2.3",
     "autoprefixer": "10.5.0",
+    "chrome-launcher": "1.2.1",
     "eslint": "9.39.1",
     "eslint-config-next": "16.2.7",
     "fake-indexeddb": "6.2.5",
     "jsdom": "29.1.1",
+    "lighthouse": "13.3.0",
     "postcss": "8.5.15",
     "tailwindcss": "3.4.19",
     "tsx": "4.22.4",

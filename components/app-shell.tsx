@@ -1,7 +1,7 @@
 import { getContentManifest, getMustReadNotices } from '@/lib/content/load-content';
 import { BottomNav } from './bottom-nav';
 import { DecisionSupportNotice } from './decision-support-notice';
-import { ActiveMissionShortcut, FieldModeRuntime } from './field-mode-panel';
+import { ActiveMissionShortcut, FieldModeRuntime } from './field-mode-runtime';
 import { OfflineStatus } from './offline-status';
 
 function shortVersion(version: string) {

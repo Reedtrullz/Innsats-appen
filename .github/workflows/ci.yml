@@ -64,8 +64,32 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
+      - name: Mobile JavaScript performance budget
+        run: npm run perf:budget
+
+      - name: Lighthouse mobile performance budget
+        run: npm run perf:lighthouse
+
       - name: Playwright production smoke/E2E
         run: PLAYWRIGHT_PROD=1 npx playwright test
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload Playwright traces and screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: playwright-test-results-${{ github.run_id }}
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 14
 
   build-and-push:
     name: Build and push GHCR image

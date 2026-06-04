@@ -21,5 +21,7 @@ export default defineConfig({
     viewport: { width: 390, height: 844 },
     isMobile: true,
     hasTouch: true,
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
 });

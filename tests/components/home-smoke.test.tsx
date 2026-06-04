@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import BoundaryPage from '@/app/(app)/begrensninger/page';
 import DataOnDevicePage from '@/app/(app)/data-pa-enheten/page';
 import KnownLimitationsPage from '@/app/(app)/kjente-begrensninger/page';
@@ -32,7 +32,9 @@ it('renders the in-app boundary, known limitations, and device data pages', () =
 
   render(<DataOnDevicePage />);
   expect(screen.getByRole('heading', { name: /Data lagret på denne enheten/i })).toBeInTheDocument();
-  expect(screen.getByText(/IndexedDB/i)).toBeInTheDocument();
-  expect(screen.getByText(/localStorage/i)).toBeInTheDocument();
-  expect(screen.getByText(/eksporterte filer kan inneholde operasjonelt sensitiv informasjon/i)).toBeInTheDocument();
+  const localStorageSection = screen.getByRole('heading', { name: /Hva lagres lokalt/i }).closest('section');
+  expect(localStorageSection).not.toBeNull();
+  expect(within(localStorageSection as HTMLElement).getByText(/IndexedDB/i)).toBeInTheDocument();
+  expect(within(localStorageSection as HTMLElement).getByText(/localStorage: release-readiness/i)).toBeInTheDocument();
+  expect(screen.getByText(/Eksporterte filer er manuell lokal JSON/i)).toBeInTheDocument();
 });
