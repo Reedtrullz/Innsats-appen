@@ -64,6 +64,22 @@ export const FieldLogCategorySchema = z.enum([
   'beslutning',
 ]);
 
+export const SchematicMapPointSchema = z
+  .object({
+    x: z.number().min(0).max(100),
+    y: z.number().min(0).max(100),
+  })
+  .strict();
+
+export const FieldLogMapReferenceSchema = z
+  .object({
+    source: z.enum(['map-marker', 'map-drawing', 'map-point']),
+    objectId: z.string().min(1).max(120).optional(),
+    label: z.string().min(1).max(120),
+    point: SchematicMapPointSchema,
+  })
+  .strict();
+
 export const FieldLogEntrySchema = z
   .object({
     id: z.string().min(1),
@@ -71,6 +87,7 @@ export const FieldLogEntrySchema = z
     locationText: z.string().optional(),
     category: FieldLogCategorySchema,
     text: z.string().min(1),
+    mapReference: FieldLogMapReferenceSchema.optional(),
     linkedMissionId: z.string().optional(),
     criticalObservation: z.boolean().default(false),
     mustBeForwarded: z.boolean().default(false),
@@ -205,6 +222,8 @@ export type MissionStatusLogItem = z.infer<typeof MissionStatusLogItemSchema>;
 export type ResourceRequestKind = z.infer<typeof ResourceRequestKindSchema>;
 export type MissionResourceRequest = z.infer<typeof MissionResourceRequestSchema>;
 export type FieldLogCategory = z.infer<typeof FieldLogCategorySchema>;
+export type SchematicMapPoint = z.infer<typeof SchematicMapPointSchema>;
+export type FieldLogMapReference = z.infer<typeof FieldLogMapReferenceSchema>;
 export type FieldLogEntry = z.infer<typeof FieldLogEntrySchema>;
 export type RuhCategory = z.infer<typeof RuhCategorySchema>;
 export type RuhRisk = z.infer<typeof RuhRiskSchema>;

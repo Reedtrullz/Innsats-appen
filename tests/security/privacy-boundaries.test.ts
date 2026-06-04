@@ -7,7 +7,7 @@ import { GET as weatherGet } from '@/app/api/context/weather/route';
 import { getActionCards, getChecklists, getGlossaryTerms, getProtectionMeasures, getSourceDocuments, getTrainingPaths } from '@/lib/content/load-content';
 import { containsSensitiveStructuredKey, sensitiveFieldNames } from '@/lib/content/source-policy';
 import { guardAllowedQuery } from '@/lib/integrations/route-guards';
-import { ChecklistRunSchema, MissionContextSchema } from '@/lib/mission/schemas';
+import { ChecklistRunSchema, FieldLogEntrySchema, MissionContextSchema } from '@/lib/mission/schemas';
 
 const sensitiveSchemaFieldNames = sensitiveFieldNames.filter((field) => !['url', 'upstream'].includes(field));
 const forbiddenProxyParams = ['url', 'upstream', 'proxy', 'target', 'href'];
@@ -153,6 +153,24 @@ it('rejects patient-identifying fields in local mission and checklist/log schema
   for (const field of ['patientName', 'patientId', 'fødselsnummer', 'phoneNumber', 'medicalRecordNumber']) {
     expect(ChecklistRunSchema.safeParse({ ...checklistRun, [field]: 'forbudt' }).success, `checklist/log accepted ${field}`).toBe(false);
   }
+});
+
+it('does not accept true map coordinates or external geometry in field-log map references', () => {
+  const baseEntry = {
+    id: 'entry-map-privacy',
+    timestamp: '2026-06-04T10:00:00.000Z',
+    category: 'observasjon',
+    text: 'Lokal observasjon',
+  };
+
+  expect(FieldLogEntrySchema.safeParse({
+    ...baseEntry,
+    mapReference: { source: 'map-marker', objectId: 'marker-1', label: 'OK', point: { x: 50, y: 50 } },
+  }).success).toBe(true);
+  expect(FieldLogEntrySchema.safeParse({
+    ...baseEntry,
+    mapReference: { source: 'map-marker', objectId: 'marker-1', label: 'Lat lon', point: { lat: 63.4305, lon: 10.3951 } },
+  }).success).toBe(false);
 });
 
 it('documents local retention, browser-offline threat model, governance, post-MVP security, DPIA, and source-publication policies', () => {

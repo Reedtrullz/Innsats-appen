@@ -90,6 +90,37 @@ it('adds structured field log schemas with safe defaults for old mission objects
   expect(FieldLogEntrySchema.safeParse({ ...entry, category: 'pasientjournal' }).success).toBe(false);
 });
 
+it('allows sanitized schematic map references on field log entries without true coordinates', () => {
+  const parsed = FieldLogEntrySchema.parse({
+    id: 'map-entry-1',
+    timestamp: '2026-06-04T10:00:00.000Z',
+    locationText: 'Skjematisk punkt 22,33',
+    category: 'observasjon',
+    text: 'Observasjon opprettet fra kartpunkt',
+    mapReference: {
+      source: 'map-marker',
+      objectId: 'marker-1',
+      label: 'KO lokal',
+      point: { x: 22, y: 33 },
+    },
+  });
+
+  expect(parsed.mapReference).toEqual({
+    source: 'map-marker',
+    objectId: 'marker-1',
+    label: 'KO lokal',
+    point: { x: 22, y: 33 },
+  });
+  expect(FieldLogEntrySchema.safeParse({
+    ...parsed,
+    mapReference: { source: 'map-marker', objectId: 'bad', label: 'Ekte', point: { x: 10, y: 101 } },
+  }).success).toBe(false);
+  expect(FieldLogEntrySchema.safeParse({
+    ...parsed,
+    mapReference: { source: 'gps', objectId: 'bad', label: 'Ekte', point: { lat: 63.4, lon: 10.4 } },
+  }).success).toBe(false);
+});
+
 it('exposes the required quick categories with privacy-preserving labels and help text', () => {
   expect(FIELD_LOG_CATEGORIES).toEqual([
     'funn',
