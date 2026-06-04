@@ -71,6 +71,31 @@ it('prefers historical source status over verified sources when verified is list
   });
 });
 
+it('does not promote stale verified, expired, or unresolved source refs as verified search metadata', () => {
+  const docs = buildSearchDocuments({
+    cards: [
+      { slug: 'stale-source-card', title: 'Stale source card', phase: 'under', roles: ['lagforer'], scenarios: ['flom'], priority: 'high', steps: ['Start pumpe'], safety: [], reporting: [], sourceIds: ['src-stale-verified'], competenceRequired: [], equipmentRequired: [] },
+      { slug: 'expired-source-card', title: 'Expired source card', phase: 'under', roles: ['lagforer'], scenarios: ['flom'], priority: 'high', steps: ['Start pumpe'], safety: [], reporting: [], sourceIds: ['src-expired'], competenceRequired: [], equipmentRequired: [] },
+      { slug: 'missing-source-card', title: 'Missing source card', phase: 'under', roles: ['lagforer'], scenarios: ['flom'], priority: 'high', steps: ['Start pumpe'], safety: [], reporting: [], sourceIds: ['src-current', 'src-missing'], competenceRequired: [], equipmentRequired: [] },
+    ] as ActionCard[],
+    sources: [
+      { id: 'src-current', title: 'SRC - Current', sourcePath: 'source-extracts/SRC - Current.md', sourceType: 'source-extract', status: 'verified', verifiedAt: '2026-06-04', reviewAfter: '2099-01-01', owner: 'content-team', reviewer: 'fag', reviewRisk: 'low', body: 'Current source', warnings: [] },
+      { id: 'src-stale-verified', title: 'SRC - Stale verified', sourcePath: 'source-extracts/SRC - Stale verified.md', sourceType: 'source-extract', status: 'verified', verifiedAt: '2024-01-01', reviewAfter: '2024-02-01', owner: 'content-team', reviewer: 'fag', reviewRisk: 'low', body: 'Stale verified source', warnings: [] },
+      { id: 'src-expired', title: 'SRC - Expired', sourcePath: 'source-extracts/SRC - Expired.md', sourceType: 'source-extract', status: 'verified', verifiedAt: '2024-01-01', expiresAt: '2024-02-01', owner: 'content-team', reviewer: 'fag', reviewRisk: 'low', body: 'Expired source', warnings: [] },
+    ] as SourceDocument[],
+    glossary: [] as GlossaryTerm[],
+    training: [] as TrainingPath[],
+    protection: [] as ProtectionMeasure[],
+    faq: [] as FAQEntry[],
+  });
+
+  expect(docs.find((doc) => doc.id === 'kort:stale-source-card')).toMatchObject({ sourceStatus: 'unverified' });
+  expect(docs.find((doc) => doc.id === 'kilde:src-stale-verified')).toMatchObject({ sourceStatus: 'unverified' });
+  expect(docs.find((doc) => doc.id === 'kort:expired-source-card')).toMatchObject({ sourceStatus: 'expired' });
+  expect(docs.find((doc) => doc.id === 'kilde:src-expired')).toMatchObject({ sourceStatus: 'expired' });
+  expect(docs.find((doc) => doc.id === 'kort:missing-source-card')).toMatchObject({ sourceStatus: 'unverified' });
+});
+
 it('uses hurtigkort as default glossary query base path', () => {
   const docs = buildSearchDocuments({
     cards: [] as ActionCard[],

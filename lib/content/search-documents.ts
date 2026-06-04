@@ -1,4 +1,5 @@
 import type { SearchDocument } from './search';
+import { sourceFreshness } from './source-review';
 import type { ActionCard, FAQEntry, GlossaryTerm, ProtectionMeasure, SourceDocument, TrainingPath } from './schemas';
 
 export interface BuildSearchDocumentsInput {
@@ -17,9 +18,20 @@ function joinSearchText(parts: Array<string | string[] | undefined>) {
   return parts.flatMap((part) => (Array.isArray(part) ? part : [part ?? ''])).join(' ');
 }
 
+function sourceSearchStatus(source: SourceDocument): SourceDocument['status'] {
+  const freshness = sourceFreshness(source);
+  if (freshness.state === 'expired') return 'expired';
+  if (freshness.state !== 'current') return PROBLEM_SOURCE_STATUSES.includes(source.status as typeof PROBLEM_SOURCE_STATUSES[number]) ? source.status : 'unverified';
+  return source.status;
+}
+
 function sourceStatusFor(sourceIds: string[] | undefined, sourcesById: Map<string, SourceDocument>) {
-  const statuses = (sourceIds ?? [])
-    .map((sourceId) => sourcesById.get(sourceId)?.status)
+  const ids = sourceIds ?? [];
+  const statuses = ids
+    .map((sourceId) => {
+      const source = sourcesById.get(sourceId);
+      return source ? sourceSearchStatus(source) : 'unverified';
+    })
     .filter((status): status is SourceDocument['status'] => Boolean(status));
 
   return PROBLEM_SOURCE_STATUSES.find((status) => statuses.includes(status)) ?? statuses[0];
@@ -55,7 +67,7 @@ export function buildSearchDocuments({
       body: `${source.body.slice(0, 5000)} ${source.warnings.join(' ')}`,
       type: 'kilde',
       href: `/kilder/${source.id}`,
-      sourceStatus: source.status,
+      sourceStatus: sourceSearchStatus(source),
       sourceIds: [source.id],
     })),
     ...glossary.map<SearchDocument>((term) => ({
