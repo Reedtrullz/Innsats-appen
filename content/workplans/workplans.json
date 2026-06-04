@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T02:54:02.272Z",
+  "generatedAt": "2026-06-04T04:00:27.200Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-04T02:54:02.272Z",
+      "updatedAt": "2026-06-04T04:00:27.200Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -3943,7 +3943,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-302",
           "title": "Design optional local profile model.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 302: Design optional local profile model."
@@ -3951,7 +3951,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-303",
           "title": "Add optional local PIN lock.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 303: Add optional local PIN lock."
@@ -3959,7 +3959,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-304",
           "title": "Evaluate browser/platform biometric unlock support.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 304: Evaluate browser/platform biometric unlock support."
@@ -3967,7 +3967,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-305",
           "title": "Encrypt sensitive local profile data using Web Crypto if profile is implemented.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 305: Encrypt sensitive local profile data using Web Crypto if profile is implemented."
@@ -3975,7 +3975,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-306",
           "title": "Add local role selection separate from account/auth.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 306: Add local role selection separate from account/auth."
@@ -3983,7 +3983,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-307",
           "title": "Add local competence/certification records only after privacy review.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 307: Add local competence/certification records only after privacy review."
@@ -3991,7 +3991,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-308",
           "title": "Add competence expiry reminders stored locally.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 308: Add competence expiry reminders stored locally."
@@ -3999,7 +3999,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-309",
           "title": "Add personal equipment issued/status view only after privacy review.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 309: Add personal equipment issued/status view only after privacy review."
@@ -4007,7 +4007,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-310",
           "title": "Add local availability status only after privacy review.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 310: Add local availability status only after privacy review."
@@ -4015,7 +4015,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-311",
           "title": "Add local calendar integration for exercises/courses only after privacy review.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 311: Add local calendar integration for exercises/courses only after privacy review."
@@ -4023,7 +4023,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-312",
           "title": "Add multiple local profiles only after privacy review.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 312: Add multiple local profiles only after privacy review."
@@ -4031,7 +4031,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-313",
           "title": "Add local profile deletion.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 313: Add local profile deletion."
@@ -4039,7 +4039,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-314",
           "title": "Add local audit log for order creation, status change, export and reset.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 314: Add local audit log for order creation, status change, export and reset."
@@ -4047,7 +4047,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-315",
           "title": "Add audit export.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 315: Add audit export."
@@ -4055,7 +4055,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-316",
           "title": "Add retention settings for local mission/archive/profile data.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 316: Add retention settings for local mission/archive/profile data."
