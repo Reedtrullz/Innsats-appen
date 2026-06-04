@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import {
   OFFLINE_MAP_ATTRIBUTION,
   OFFLINE_MAP_LIMITATION_COPY,
@@ -48,7 +48,10 @@ import {
   type MissionMapState,
 } from '@/lib/maps/operations-map';
 
+import { buildFieldLogEntryFromMapObject } from '@/lib/mission/map-log-link';
+import { getMission, listMissions, saveMission } from '@/lib/mission/local-store';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
+import type { FieldLogCategory, MissionContext } from '@/lib/mission/schemas';
 
 const featureStyles: Record<SchematicMapFeatureKind, { fill: string; stroke: string }> = {
   depot: { fill: '#0f172a', stroke: '#ffffff' },
@@ -156,10 +159,28 @@ export function OfflineMapPanel() {
   const [geoJsonExport, setGeoJsonExport] = useState('');
   const [geoJsonImport, setGeoJsonImport] = useState('');
   const [statusMessage, setStatusMessage] = useState('Lokale kartlag er klare.');
+  const [activeMission, setActiveMission] = useState<MissionContext | null>(null);
+  const [mapLogText, setMapLogText] = useState('');
+  const [mapLogSaving, setMapLogSaving] = useState(false);
+  const mapLogSavingRef = useRef(false);
 
   const selectedPackage = getOfflineMapPackage(selectedPackageId) ?? OFFLINE_MAP_PACKAGES[0];
   const selectedWarning = cacheSizeWarningForPackage(selectedPackage);
   const filteredState = filterMissionMapStateByLayers(mapState, enabledLayers);
+
+  useEffect(() => {
+    let mounted = true;
+    listMissions()
+      .then((missions) => {
+        if (mounted) setActiveMission(missions[0] ?? null);
+      })
+      .catch(() => {
+        if (mounted) setActiveMission(null);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   function persistState(next: MissionMapState, message: string) {
     writeMissionMapState(next);
@@ -190,6 +211,53 @@ export function OfflineMapPanel() {
       persistState({ ...mapState, markers: [...mapState.markers, marker] }, `La til ${MAP_MARKER_LABELS[marker.kind]} lokalt.`);
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Kunne ikke legge til markør.');
+    }
+  }
+
+  async function createLogFromNewestMarker() {
+    const newest = filteredState.markers.at(-1);
+    if (!activeMission || !newest) {
+      setStatusMessage('Opprett aktivt oppdrag og minst én synlig markør før feltlogg fra kart.');
+      return;
+    }
+    if (mapLogSavingRef.current) return;
+    mapLogSavingRef.current = true;
+    setMapLogSaving(true);
+    try {
+      const currentMission = await getMission(activeMission.id);
+      if (!currentMission) {
+        setActiveMission(null);
+        setStatusMessage('Aktivt lokalt oppdrag ble ikke funnet. Åpne oppdraget på nytt før feltlogg fra kart.');
+        return;
+      }
+      const category: FieldLogCategory = newest.kind === 'hazard'
+        ? 'vaer-fare'
+        : newest.kind === 'resource' || newest.kind === 'pump-location'
+          ? 'ressursbehov'
+          : 'observasjon';
+      const entry = buildFieldLogEntryFromMapObject({
+        missionId: currentMission.id,
+        mapObject: newest,
+        category,
+        text: mapLogText,
+        criticalObservation: newest.kind === 'hazard' || newest.kind === 'incident-site',
+        mustBeForwarded: newest.kind === 'hazard' || newest.kind === 'incident-site',
+      });
+      const updated = {
+        ...currentMission,
+        updatedAt: new Date().toISOString(),
+        fieldLogEntries: [...(currentMission.fieldLogEntries ?? []), entry],
+      };
+      await saveMission(updated);
+      setActiveMission(updated);
+      setMapLogText('');
+      appendLocalAuditEntry('status-changed', { missionId: updated.id, statusChangeCount: 0, source: 'map-log' });
+      setStatusMessage(`Feltlogg opprettet lokalt på ${updated.title}.`);
+    } catch (error) {
+      setStatusMessage(error instanceof Error ? error.message : 'Kunne ikke opprette feltlogg fra kart.');
+    } finally {
+      mapLogSavingRef.current = false;
+      setMapLogSaving(false);
     }
   }
 
@@ -309,6 +377,18 @@ export function OfflineMapPanel() {
         <ul className="space-y-1 text-sm font-semibold text-slate-700" data-testid="operations-marker-list">
           {filteredState.markers.length === 0 ? <li>Ingen synlige markører.</li> : filteredState.markers.map((marker) => <li key={marker.id}>{MAP_MARKER_LABELS[marker.kind]} — {marker.label} ({marker.point.x}, {marker.point.y})</li>)}
         </ul>
+      </section>
+
+      <section className="space-y-3 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Logg fra kartpunkt">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Kart → feltlogg</p>
+          <h2 className="text-2xl font-black">Opprett logg fra siste markør</h2>
+          <p className="mt-2 text-sm font-semibold text-amber-900">Lagres bare på aktivt lokalt oppdrag. Bruk skjematiske 0-100 koordinater; ikke legg inn persondata eller skjermede posisjoner.</p>
+        </div>
+        <p className="text-sm font-semibold text-slate-700">Aktivt oppdrag: {activeMission ? activeMission.title : 'Ingen aktivt lokalt oppdrag funnet'}</p>
+        <label className="block text-sm font-black text-slate-800" htmlFor="map-log-text">Loggtekst fra kartpunkt</label>
+        <textarea id="map-log-text" value={mapLogText} onChange={(event) => setMapLogText(event.target.value)} className="min-h-28 w-full rounded-2xl border border-slate-300 p-3 text-base" placeholder="Kort observasjon uten persondata" />
+        <button type="button" onClick={() => void createLogFromNewestMarker()} disabled={mapLogSaving} className="min-h-12 rounded-xl bg-slate-950 px-4 font-bold text-white disabled:cursor-wait disabled:bg-slate-500">Opprett feltlogg fra kartpunkt</button>
       </section>
 
       <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Tegneverktøy og sektorer">

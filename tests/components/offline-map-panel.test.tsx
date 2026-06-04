@@ -2,11 +2,39 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach } from 'vitest';
 import { OfflineMapPanel } from '@/components/offline-map-panel';
+import { clearLocalMissionData, getMission, saveMission } from '@/lib/mission/local-store';
 import { OFFLINE_MAP_CACHE_STORAGE_KEY } from '@/lib/maps/offline-map';
 import { OPERATIONS_MAP_STORAGE_KEY, SCHEMATIC_GEOJSON_COORDINATE_SYSTEM } from '@/lib/maps/operations-map';
 import { readLocalAuditLog } from '@/lib/privacy/local-profile';
+import type { FieldLogEntry, MissionContext } from '@/lib/mission/schemas';
 
-afterEach(() => localStorage.clear());
+afterEach(async () => {
+  localStorage.clear();
+  await clearLocalMissionData();
+});
+
+const activeMission: MissionContext = {
+  id: 'mission-map-log',
+  title: 'Kartlogg test',
+  createdAt: '2026-06-04T09:00:00.000Z',
+  updatedAt: '2026-06-04T09:00:00.000Z',
+  phase: 'under',
+  role: 'lagforer',
+  scenario: 'generelt',
+  locationText: 'Innsatsområde kart',
+  externalSignals: [],
+  externalSignalHistory: [],
+  activeChecklistIds: [],
+  notes: '',
+  tasks: [],
+  statusLog: [],
+  resourceRequests: [],
+  fieldLogEntries: [],
+  ruhReports: [],
+  welfareChecks: [],
+  contentVersion: 'test-v1',
+  schemaVersion: 1,
+};
 
 it('renders a static offline map with attribution and local-only limitations', () => {
   render(<OfflineMapPanel />);
@@ -69,6 +97,110 @@ it('adds local operational markers, toggles layers, and resets local sectors', a
 
   await user.click(screen.getByRole('button', { name: /Nullstill lokale sektorer/i }));
   expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toBeNull();
+});
+
+it('creates a field-log entry on the active mission from the newest map marker', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  render(<OfflineMapPanel />);
+
+  await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'observation');
+  await user.type(screen.getByPlaceholderText(/Sanitert lokal etikett/i), 'Observasjon nord');
+  await user.clear(screen.getByRole('spinbutton', { name: /X 0-100/i }));
+  await user.type(screen.getByRole('spinbutton', { name: /X 0-100/i }), '22');
+  await user.clear(screen.getByRole('spinbutton', { name: /Y 0-100/i }));
+  await user.type(screen.getByRole('spinbutton', { name: /Y 0-100/i }), '33');
+  await user.click(screen.getByRole('button', { name: /Legg til lokal markør/i }));
+
+  await user.type(screen.getByLabelText(/Loggtekst fra kartpunkt/i), 'Røyk observert uten persondata');
+  await user.click(screen.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i }));
+
+  await waitFor(async () => {
+    const mission = await getMission('mission-map-log');
+    expect(mission?.fieldLogEntries).toHaveLength(1);
+    expect(mission?.fieldLogEntries[0]).toMatchObject({
+      category: 'observasjon',
+      text: 'Røyk observert uten persondata',
+      mapReference: { source: 'map-marker', label: 'Observasjon nord', point: { x: 22, y: 33 } },
+    });
+  });
+  expect(screen.getByText(/Feltlogg opprettet lokalt på Kartlogg test/i)).toBeInTheDocument();
+  expect(readLocalAuditLog().some((entry) => entry.details.source === 'map-log')).toBe(true);
+});
+
+it('uses the newest visible marker when the newest stored marker layer is hidden', async () => {
+  const user = userEvent.setup();
+  await saveMission({ ...activeMission, id: 'mission-visible-map-log', title: 'Synlig kartlogg' });
+  render(<OfflineMapPanel />);
+
+  await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'hazard');
+  await user.type(screen.getByPlaceholderText(/Sanitert lokal etikett/i), 'Fare synlig');
+  await user.clear(screen.getByRole('spinbutton', { name: /X 0-100/i }));
+  await user.type(screen.getByRole('spinbutton', { name: /X 0-100/i }), '11');
+  await user.clear(screen.getByRole('spinbutton', { name: /Y 0-100/i }));
+  await user.type(screen.getByRole('spinbutton', { name: /Y 0-100/i }), '22');
+  await user.click(screen.getByRole('button', { name: /Legg til lokal markør/i }));
+
+  await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'observation');
+  await user.clear(screen.getByPlaceholderText(/Sanitert lokal etikett/i));
+  await user.type(screen.getByPlaceholderText(/Sanitert lokal etikett/i), 'Observasjon skjult');
+  await user.clear(screen.getByRole('spinbutton', { name: /X 0-100/i }));
+  await user.type(screen.getByRole('spinbutton', { name: /X 0-100/i }), '44');
+  await user.clear(screen.getByRole('spinbutton', { name: /Y 0-100/i }));
+  await user.type(screen.getByRole('spinbutton', { name: /Y 0-100/i }), '55');
+  await user.click(screen.getByRole('button', { name: /Legg til lokal markør/i }));
+  await user.click(screen.getByLabelText('Observasjon'));
+
+  await user.type(screen.getByLabelText(/Loggtekst fra kartpunkt/i), 'Logg fra synlig markør');
+  await user.click(screen.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i }));
+
+  await waitFor(async () => {
+    const mission = await getMission('mission-visible-map-log');
+    expect(mission?.fieldLogEntries).toHaveLength(1);
+    expect(mission?.fieldLogEntries[0]).toMatchObject({
+      category: 'vaer-fare',
+      text: 'Logg fra synlig markør',
+      mapReference: { source: 'map-marker', label: 'Fare synlig', point: { x: 11, y: 22 } },
+    });
+  });
+});
+
+it('preserves newer local mission updates when saving a field log from the map', async () => {
+  const user = userEvent.setup();
+  const existingEntry: FieldLogEntry = {
+    id: 'field-log-existing-local-update',
+    timestamp: '2026-06-04T09:30:00.000Z',
+    locationText: 'KO lokal',
+    category: 'observasjon',
+    text: 'Eksisterende lokal oppdatering',
+    linkedMissionId: 'mission-stale-map-log',
+    criticalObservation: false,
+    mustBeForwarded: false,
+  };
+  await saveMission({ ...activeMission, id: 'mission-stale-map-log', title: 'Stale kartlogg' });
+  render(<OfflineMapPanel />);
+  expect(await screen.findByText(/Aktivt oppdrag: Stale kartlogg/i)).toBeInTheDocument();
+
+  await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'observation');
+  await user.type(screen.getByPlaceholderText(/Sanitert lokal etikett/i), 'Ny observasjon');
+  await user.click(screen.getByRole('button', { name: /Legg til lokal markør/i }));
+
+  const currentMission = await getMission('mission-stale-map-log');
+  await saveMission({
+    ...currentMission!,
+    notes: 'Oppdatert etter kartpanelet lastet',
+    fieldLogEntries: [existingEntry],
+  });
+
+  await user.type(screen.getByLabelText(/Loggtekst fra kartpunkt/i), 'Ny lokal kartlogg');
+  await user.click(screen.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i }));
+
+  await waitFor(async () => {
+    const mission = await getMission('mission-stale-map-log');
+    expect(mission?.notes).toBe('Oppdatert etter kartpanelet lastet');
+    expect(mission?.fieldLogEntries).toHaveLength(2);
+    expect(mission?.fieldLogEntries.map((entry) => entry.text)).toEqual(['Eksisterende lokal oppdatering', 'Ny lokal kartlogg']);
+  });
 });
 
 it('adds a local sector, measures it, and creates sanitized SVG and GeoJSON exports', async () => {
