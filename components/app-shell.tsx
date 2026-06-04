@@ -19,10 +19,10 @@ export function AppShell({ children, currentPath }: { children: React.ReactNode;
       <FieldModeRuntime />
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-3xl flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Link href="/" className="text-base font-black tracking-tight">Beredskapsboka</Link>
+          <Link href="/" className="inline-flex min-h-11 items-center text-base font-black tracking-tight">Beredskapsboka</Link>
           <div className="flex min-w-0 flex-wrap items-center justify-start gap-2 sm:justify-end">
-            <Link href="/ma-leses" className="rounded-full bg-red-100 px-3 py-1 text-xs font-black text-red-900">Må leses {mustReadCount}</Link>
-            <Link href="/mer" className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800">Mer</Link>
+            <Link href="/ma-leses" className="inline-flex min-h-11 items-center rounded-full bg-red-100 px-4 py-2 text-xs font-black text-red-900">Må leses {mustReadCount}</Link>
+            <Link href="/mer" className="inline-flex min-h-11 items-center rounded-full bg-slate-100 px-4 py-2 text-xs font-black text-slate-800">Mer</Link>
             <OperationalStatusPills compact limit={2} />
           </div>
         </div>

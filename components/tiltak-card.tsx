@@ -53,7 +53,7 @@ export function TiltakCard({ card, ctaLabel = 'Åpne tiltakskort', compact = fal
 
       <div>
         <h2 className={`${compact ? 'text-lg' : 'text-xl'} font-black tracking-tight text-slate-950`}>
-          <Link className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-950" href={href}>
+          <Link className="inline-flex min-h-11 items-center rounded-xl px-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-950" href={href}>
             {card.title}
           </Link>
         </h2>

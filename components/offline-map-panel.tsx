@@ -411,7 +411,7 @@ export function OfflineMapPanel() {
         </form>
         <div className="grid gap-2 md:grid-cols-2" aria-label="Kartlag">
           {[...MAP_MARKER_KINDS, ...MAP_DRAWING_KINDS].map((layer) => (
-            <label key={layer} className="flex items-center gap-2 rounded-xl border border-slate-200 p-2 text-sm font-bold">
+            <label key={layer} className="flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold">
               <input type="checkbox" checked={enabledLayers.includes(layer)} onChange={() => toggleLayer(layer)} />
               {layer in MAP_MARKER_LABELS ? MAP_MARKER_LABELS[layer as MapMarkerKind] : MAP_DRAWING_LABELS[layer as MapDrawingKind]}
             </label>

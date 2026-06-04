@@ -5,6 +5,8 @@ import { clearBrowserLocalState, createLocalMission } from './helpers';
 
 test.use({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
 
+const mobileLayoutRoutes = ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/under', '/etter', '/feltmodus', '/moduler/tilfluktsrom', '/release'];
+
 async function expectNoHorizontalOverflow(page: import('@playwright/test').Page) {
   const overflow = await page.evaluate(() => ({
     documentWidth: document.documentElement.scrollWidth,
@@ -13,6 +15,24 @@ async function expectNoHorizontalOverflow(page: import('@playwright/test').Page)
   }));
   expect(overflow.documentWidth, `document overflow: ${JSON.stringify(overflow)}`).toBeLessThanOrEqual(overflow.viewportWidth + 1);
   expect(overflow.bodyWidth, `body overflow: ${JSON.stringify(overflow)}`).toBeLessThanOrEqual(overflow.viewportWidth + 1);
+}
+
+async function expectVisibleControlsHaveTouchTargets(page: import('@playwright/test').Page, route: string) {
+  const failures = await page.locator('button, a, input, select, textarea').evaluateAll((elements) => elements.flatMap((element, index) => {
+    if (element.closest('[hidden], [aria-hidden="true"]')) return [];
+    if ('disabled' in element && element.disabled) return [];
+    const style = window.getComputedStyle(element);
+    const controlBox = element.getBoundingClientRect();
+    if (style.display === 'none' || style.visibility === 'hidden' || controlBox.width === 0 || controlBox.height === 0) return [];
+    const input = element instanceof HTMLInputElement ? element : null;
+    const label = input && (input.type === 'checkbox' || input.type === 'radio') ? input.closest('label') : null;
+    const box = label?.getBoundingClientRect() ?? controlBox;
+    if (box.width >= 44 && box.height >= 44) return [];
+    const labelText = label?.textContent ?? element.getAttribute('aria-label') ?? element.textContent ?? element.getAttribute('name') ?? element.tagName;
+    const labelSummary = labelText.replace(/\s+/g, ' ').trim().slice(0, 80);
+    return [`${index}: ${element.tagName.toLowerCase()} "${labelSummary}" ${Math.round(box.width)}x${Math.round(box.height)}`];
+  }));
+  expect(failures, `${route} touch-target failures`).toEqual([]);
 }
 
 test.beforeEach(async ({ page }) => {
@@ -30,10 +50,11 @@ test('critical mobile routes have no automated WCAG A/AA accessibility violation
   }
 });
 
-test('mobile layout has no horizontal overflow and nav touch targets are large enough', async ({ page }) => {
-  for (const route of ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/under', '/etter', '/feltmodus', '/moduler/tilfluktsrom']) {
+test('mobile layout has no horizontal overflow and visible controls have large enough touch targets', async ({ page }) => {
+  for (const route of mobileLayoutRoutes) {
     await page.goto(route);
     await expectNoHorizontalOverflow(page);
+    await expectVisibleControlsHaveTouchTargets(page, route);
   }
 
   await page.goto('/hurtigkort');

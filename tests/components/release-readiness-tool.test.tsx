@@ -127,3 +127,14 @@ it('ignores malformed content coverage report gaps instead of crashing', async (
   expect(await screen.findByRole('heading', { name: /Innsats-app pilot/i })).toBeInTheDocument();
   expect(await screen.findByText(/No release-board content coverage gaps reported/i)).toBeInTheDocument();
 });
+
+it('renders release controls with mobile-safe touch targets', () => {
+  render(<ReleaseReadinessTool />);
+
+  expect(screen.getByRole('button', { name: /Idea intake status/i })).toHaveClass('h-11', 'w-11');
+  expect(screen.getByRole('button', { name: 'Reset' })).toHaveClass('min-h-11');
+  expect(screen.getAllByRole('button', { name: 'Remove' })[0]).toHaveClass('min-h-11');
+  for (const select of screen.getAllByRole('combobox')) {
+    expect(select).toHaveClass('min-h-11');
+  }
+});

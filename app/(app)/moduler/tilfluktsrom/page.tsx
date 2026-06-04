@@ -80,7 +80,7 @@ export function TilfluktsromModuleContent({
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-xl font-black">Tiltakskort</h2>
-          <Link className="text-sm font-bold text-sky-800" href="/hurtigkort">Alle hurtigkort</Link>
+          <Link className="inline-flex min-h-11 items-center rounded-full bg-sky-50 px-4 text-sm font-bold text-sky-800" href="/hurtigkort">Alle hurtigkort</Link>
         </div>
         <ActionCardList cards={tilfluktsromCards} showFilters={false} />
       </section>

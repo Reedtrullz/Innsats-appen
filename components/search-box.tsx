@@ -81,8 +81,8 @@ function resetSearchFiltersPath(basePath: string, query: string) {
 
 function chipClass(active: boolean) {
   return active
-    ? 'rounded-full bg-sky-900 px-3 py-2 text-sm font-bold text-white'
-    : 'rounded-full bg-slate-100 px-3 py-2 text-sm font-bold text-slate-800 hover:bg-slate-200';
+    ? 'inline-flex min-h-11 items-center rounded-full bg-sky-900 px-4 py-2 text-sm font-bold text-white'
+    : 'inline-flex min-h-11 items-center rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-200';
 }
 
 function termsLabel(terms: string[] | undefined) {

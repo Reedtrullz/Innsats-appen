@@ -350,12 +350,12 @@ export function ReleaseReadinessTool() {
                         <button
                           type="button"
                           onClick={() => setStageStatus(stage.id, status === 'ready' ? 'in-progress' : status === 'in-progress' ? 'not-started' : 'ready')}
-                          className={`grid h-9 w-9 place-items-center rounded-full border-4 bg-white text-sm font-black ${status === 'ready' ? 'border-blue-600 text-blue-600' : status === 'in-progress' ? 'border-orange-500 text-orange-500' : 'border-slate-400 text-slate-500'}`}
+                          className={`grid h-11 w-11 place-items-center rounded-full border-4 bg-white text-sm font-black ${status === 'ready' ? 'border-blue-600 text-blue-600' : status === 'in-progress' ? 'border-orange-500 text-orange-500' : 'border-slate-400 text-slate-500'}`}
                           aria-label={`${stage.title} status`}
                         >
                           {status === 'ready' ? '✓' : index + 1}
                         </button>
-                        {status === 'in-progress' ? <span className="absolute left-1/2 top-11 -translate-x-1/2 whitespace-nowrap rounded-md border border-orange-300 bg-orange-50 px-3 py-1 text-xs font-black text-orange-600">You are here</span> : null}
+                        {status === 'in-progress' ? <span className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap rounded-md border border-orange-300 bg-orange-50 px-3 py-1 text-xs font-black text-orange-600">You are here</span> : null}
                       </div>
                     );
                   })}
@@ -375,7 +375,7 @@ export function ReleaseReadinessTool() {
             </section>
 
             <section className="mt-10 border-t border-slate-200 pt-4">
-              <div className="grid grid-cols-[minmax(10rem,1fr)_8rem_minmax(11rem,1fr)_7rem_8rem] gap-4 px-3 text-xs font-black uppercase tracking-wide text-slate-500">
+              <div className="hidden grid-cols-[minmax(10rem,1fr)_8rem_minmax(11rem,1fr)_7rem_8rem] gap-4 px-3 text-xs font-black uppercase tracking-wide text-slate-500 md:grid">
                 <span>Workstream</span>
                 <span>Progress</span>
                 <span>Next milestone</span>
@@ -447,7 +447,7 @@ export function ReleaseReadinessTool() {
                         <span className={`rounded-full px-2 py-1 text-xs font-black ${workplan.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : workplan.status === 'blocked' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>{workplan.status}</span>
                       </div>
                       <p className="mt-3 text-sm font-semibold text-slate-600">{workplan.summary}</p>
-                      <p className="mt-3 text-xs font-black text-slate-500">{workplan.sourcePath}</p>
+                      <p className="mt-3 break-all text-xs font-black text-slate-500">{workplan.sourcePath}</p>
                     </article>
                   ))}
                 </div>
@@ -478,7 +478,7 @@ export function ReleaseReadinessTool() {
                     <p className="text-xs font-black uppercase tracking-wide text-blue-700">Open controls</p>
                     <h2 className="text-2xl font-black">Active work</h2>
                   </div>
-                  <button type="button" onClick={resetPlan} className="min-h-10 rounded-xl border border-slate-300 bg-white px-4 text-sm font-black">Reset</button>
+                  <button type="button" onClick={resetPlan} className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm font-black">Reset</button>
                 </div>
                 <div className="mt-4 space-y-3">
                   {activeItems.map((item) => (
@@ -488,11 +488,11 @@ export function ReleaseReadinessTool() {
                           <h3 className="font-black">{item.title}</h3>
                           <p className="text-sm font-semibold text-slate-500">{stageLabels[item.stage]} / {riskLabels[item.risk]} risk</p>
                         </div>
-                        <button type="button" onClick={() => removeItem(item.id)} className="rounded-lg border border-red-200 px-2 py-1 text-xs font-black text-red-700">Remove</button>
+                        <button type="button" onClick={() => removeItem(item.id)} className="min-h-11 rounded-lg border border-red-200 px-3 py-2 text-xs font-black text-red-700">Remove</button>
                       </div>
                       <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                        <label className="text-xs font-black uppercase tracking-wide text-slate-500">Status<select value={item.status} onChange={(event) => setItemStatus(item, event.target.value as WorkStatus)} className="mt-1 min-h-10 w-full rounded-xl border border-slate-300 bg-white px-2 text-sm normal-case tracking-normal text-slate-950">{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-                        <label className="text-xs font-black uppercase tracking-wide text-slate-500">Stage<select value={item.stage} onChange={(event) => setPlan((current) => ({ ...current, items: updateItem(current.items, item.id, { stage: event.target.value as StageId }) }))} className="mt-1 min-h-10 w-full rounded-xl border border-slate-300 bg-white px-2 text-sm normal-case tracking-normal text-slate-950">{stages.map((stage) => <option key={stage.id} value={stage.id}>{stage.title}</option>)}</select></label>
+                        <label className="text-xs font-black uppercase tracking-wide text-slate-500">Status<select value={item.status} onChange={(event) => setItemStatus(item, event.target.value as WorkStatus)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-2 text-sm normal-case tracking-normal text-slate-950">{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+                        <label className="text-xs font-black uppercase tracking-wide text-slate-500">Stage<select value={item.stage} onChange={(event) => setPlan((current) => ({ ...current, items: updateItem(current.items, item.id, { stage: event.target.value as StageId }) }))} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-2 text-sm normal-case tracking-normal text-slate-950">{stages.map((stage) => <option key={stage.id} value={stage.id}>{stage.title}</option>)}</select></label>
                       </div>
                     </article>
                   ))}
@@ -503,7 +503,7 @@ export function ReleaseReadinessTool() {
             <section id="release-export" className="mt-6 rounded-2xl bg-slate-100 p-4">
               <h2 className="text-xl font-black">Local export</h2>
               <p className="mt-1 text-sm font-semibold text-slate-600">Stored only in this browser. Copy this snapshot into a release issue or planning note when needed. Exported snapshots may contain operationally sensitive planning information; handle them according to local routines.</p>
-              <pre className="mt-3 max-h-56 overflow-auto rounded-xl bg-slate-950 p-3 text-xs text-slate-100">{exportText}</pre>
+              <pre className="mt-3 max-h-56 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-xl bg-slate-950 p-3 text-xs text-slate-100">{exportText}</pre>
             </section>
           </main>
 

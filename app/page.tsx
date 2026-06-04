@@ -63,7 +63,7 @@ export default function Home() {
               Direkte til ofte brukte kort og søk når tid er avgjørende.
             </p>
           </div>
-          <Link className="text-sm font-black text-sky-800 underline-offset-4 hover:underline" href="/kilder">
+          <Link className="inline-flex min-h-11 items-center rounded-full bg-sky-50 px-4 text-sm font-black text-sky-800 underline-offset-4 hover:underline" href="/kilder">
             Kilder
           </Link>
         </div>
