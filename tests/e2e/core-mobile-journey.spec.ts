@@ -50,9 +50,9 @@ test('mobile user can search, open source-backed card, create mission, run check
   await page.getByLabel('Scenario').selectOption('tilfluktsrom');
   await page.getByLabel('Sted/lokasjon').fill('Trondheim sentrum');
   await page.getByRole('button', { name: /Lagre oppdrag/i }).click();
-  await expect(page.getByText(missionTitle)).toBeVisible();
+  await expect(page.getByRole('heading', { name: missionTitle, exact: true })).toBeVisible();
 
-  const checklistItem = page.getByLabel(/Kontroller ventilasjon/i);
+  const checklistItem = page.getByRole('checkbox', { name: /Kontroller ventilasjon/i });
   await checklistItem.check();
   await expect(checklistItem).toBeChecked();
   await checklistRunPersisted(page, missionTitle);
@@ -63,7 +63,11 @@ test('mobile user can search, open source-backed card, create mission, run check
   });
 
   await context.setOffline(true);
-  await page.reload({ waitUntil: 'domcontentloaded' });
-  await expect(page.getByText(missionTitle)).toBeVisible();
-  await expect(page.getByLabel(/Kontroller ventilasjon/i)).toBeChecked();
+  try {
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: missionTitle, exact: true })).toBeVisible();
+    await expect(page.getByRole('checkbox', { name: /Kontroller ventilasjon/i })).toBeChecked();
+  } finally {
+    await context.setOffline(false);
+  }
 });

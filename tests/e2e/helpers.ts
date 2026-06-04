@@ -1,22 +1,38 @@
 import { expect, type BrowserContext, type Page } from '@playwright/test';
 
+const LOCAL_DB_NAME = 'beredskapsboka-local';
+
 export async function clearBrowserLocalState(page: Page) {
-  await page.goto('/');
-  await page.evaluate(async () => {
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.evaluate(async (databaseName) => {
     localStorage.clear();
-    await new Promise<void>((resolve) => {
-      const request = indexedDB.deleteDatabase('beredskapsboka-local');
-      request.onsuccess = () => resolve();
-      request.onerror = () => resolve();
-      request.onblocked = () => resolve();
+    sessionStorage.clear();
+
+    const databases = typeof indexedDB.databases === 'function' ? await indexedDB.databases() : [];
+    const exists = databases.some((database) => database.name === databaseName);
+    if (!exists) return;
+
+    const deleteRequest = indexedDB.deleteDatabase(databaseName);
+    await new Promise<void>((resolve, reject) => {
+      deleteRequest.onerror = () => reject(deleteRequest.error ?? new Error(`Failed to delete ${databaseName} IndexedDB.`));
+      deleteRequest.onblocked = () => reject(new Error(`Deleting ${databaseName} IndexedDB was blocked by an open connection.`));
+      deleteRequest.onsuccess = () => resolve();
     });
-  });
+  }, LOCAL_DB_NAME);
+
+  await expect.poll(async () => readLocalDatabaseCounts(page), { timeout: 5_000 }).toEqual({ missions: 0, archivedMissions: 0, checklistRuns: 0 });
 }
 
 export async function waitForServiceWorker(page: Page) {
-  await page.waitForFunction(() => 'serviceWorker' in navigator);
+  await page.waitForFunction(() => 'serviceWorker' in navigator, undefined, { timeout: 5_000 });
   await page.evaluate(async () => {
-    await navigator.serviceWorker.ready;
+    const timeout = new Promise<never>((_, reject) => {
+      window.setTimeout(() => reject(new Error('Timed out waiting for service worker readiness.')), 10_000);
+    });
+    const registration = await Promise.race([navigator.serviceWorker.ready, timeout]);
+    if (!navigator.serviceWorker.controller && !registration.active) {
+      throw new Error('Service worker registered but no active worker/controller is available.');
+    }
   });
 }
 
@@ -34,12 +50,16 @@ export async function createLocalMission(page: Page, options: {
   await page.getByLabel('Scenario').selectOption(options.scenario ?? 'tilfluktsrom');
   await page.getByLabel('Sted/lokasjon').fill(options.location ?? 'Trondheim sentrum');
   await page.getByRole('button', { name: /Lagre oppdrag/i }).click();
-  await expect(page.getByRole('heading', { name: options.title })).toBeVisible();
+  await expect(page.getByRole('heading', { name: options.title, exact: true })).toBeVisible();
 }
 
 export async function readLocalDatabaseCounts(page: Page) {
-  return page.evaluate(async () => {
-    const openRequest = indexedDB.open('beredskapsboka-local');
+  return page.evaluate(async (databaseName) => {
+    const databases = typeof indexedDB.databases === 'function' ? await indexedDB.databases() : [];
+    const exists = databases.some((database) => database.name === databaseName);
+    if (!exists) return { missions: 0, archivedMissions: 0, checklistRuns: 0 };
+
+    const openRequest = indexedDB.open(databaseName);
     const database = await new Promise<IDBDatabase | null>((resolve) => {
       openRequest.onerror = () => resolve(null);
       openRequest.onsuccess = () => resolve(openRequest.result);
@@ -47,10 +67,10 @@ export async function readLocalDatabaseCounts(page: Page) {
     if (!database) return { missions: 0, archivedMissions: 0, checklistRuns: 0 };
     const readStore = async (storeName: string) => {
       if (!database.objectStoreNames.contains(storeName)) return [];
-      return new Promise<unknown[]>((resolve) => {
-        const tx = database.transaction(storeName, 'readonly');
-        const request = tx.objectStore(storeName).getAll();
-        request.onerror = () => resolve([]);
+      return new Promise<unknown[]>((resolve, reject) => {
+        const transaction = database.transaction(storeName, 'readonly');
+        const request = transaction.objectStore(storeName).getAll();
+        request.onerror = () => reject(request.error ?? new Error(`Failed to read ${storeName}.`));
         request.onsuccess = () => resolve(Array.isArray(request.result) ? request.result : []);
       });
     };
@@ -65,13 +85,16 @@ export async function readLocalDatabaseCounts(page: Page) {
     } finally {
       database.close();
     }
-  });
+  }, LOCAL_DB_NAME);
 }
 
 export async function expectOfflineReloadPreservesMission(page: Page, context: BrowserContext, missionTitle: string) {
   await waitForServiceWorker(page);
   await context.setOffline(true);
-  await page.reload({ waitUntil: 'domcontentloaded' });
-  await expect(page.getByRole('heading', { name: missionTitle })).toBeVisible();
-  await context.setOffline(false);
+  try {
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: missionTitle, exact: true })).toBeVisible();
+  } finally {
+    await context.setOffline(false);
+  }
 }

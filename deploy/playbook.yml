@@ -26,6 +26,7 @@
     met_user_agent: "{{ lookup('ansible.builtin.env', 'MET_USER_AGENT') | default('Beredskapsboka/0.1 (+https://innsats.reidar.tech)', true) }}"
     health_url: "http://{{ app_bind_address }}:{{ app_host_port }}/api/health"
     public_health_url: "https://{{ app_domain }}/api/health"
+    caddy_marker_name: Beredskapsboka
 
   pre_tasks:
     - name: Validate deployment variables
@@ -127,7 +128,7 @@
     - name: Manage Caddy reverse proxy block
       ansible.builtin.blockinfile:
         path: /etc/caddy/Caddyfile
-        marker: "# {mark} ANSIBLE MANAGED - Beredskapsboka"
+        marker: "# {mark} ANSIBLE MANAGED - {{ caddy_marker_name }}"
         block: |
           {{ app_domain }} {
             reverse_proxy {{ app_bind_address }}:{{ app_host_port }}

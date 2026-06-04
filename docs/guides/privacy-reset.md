@@ -1,17 +1,21 @@
 # Privacy reset guide
 
-## Når brukes dette
+## Hva kan slettes i appen
 
-Bruk personvern-reset etter øvelse, test, delt enhet eller feilregistrering. Reset fjerner lokal IndexedDB og localStorage for appen på denne nettleseren.
+Beredskapsboka har flere lokale datatyper. Det finnes ikke én knapp som garantert fjerner hele browserprofilen, service-worker cache og alle lokale innstillinger. Bruk riktig reset etter hva du vil fjerne:
 
-## Steg
+1. `/oppdrag` → trykk `Slett lokale data` for å fjerne lokale oppdrag, arkiv og sjekklistekjøringer fra IndexedDB.
+2. `/personvern` → bruk panelene der for å slette lokal profil, auditlogg, kompetansepåminnelser og retention-innstillinger.
+3. Nettleser/PWA-innstillinger → bruk nettleserens “Clear site data” eller avinstaller PWA-en hvis også service-worker cache, cache storage og andre browserlag må fjernes.
+4. `/data-pa-enheten` → brukes til eksport/import og lagringsoversikt, ikke som full reset-knapp.
 
-1. Eksporter eventuell trygg, anonym oppsummering først.
-2. Åpne `/data-pa-enheten`.
-3. Bruk tilbakestill-knappen.
-4. Last siden på nytt og kontroller at lokale oppdrag er borte.
+## Før sletting
 
-Ikke bruk reset som erstatning for korrekt håndtering av persondata; persondata skal ikke inn i appen.
+Eksporter bare hvis du har lov til å lagre lokal JSON for dette test-/demooppdraget. Ikke eksporter persondata, private posisjoner eller reelle skjermede opplysninger.
+
+## Etter sletting
+
+Last siden på nytt og kontroller at lokale oppdrag/profilfelt ikke vises. Hvis enheten skal lånes ut eller brukes i pilot, kontroller også browserens site data.
 
 ## Felles grense
 

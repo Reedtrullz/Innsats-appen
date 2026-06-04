@@ -57,13 +57,21 @@ describe('stale content report', () => {
     expect(JSON.stringify(report)).not.toContain('Offentlig kilde.');
   });
 
-  it('renders a privacy-safe markdown notification body', () => {
+  it('renders a privacy-safe markdown notification body with actionable review dates', () => {
     const markdown = staleContentReportToMarkdown(buildStaleContentReport({ sources, today: '2026-02-01' }));
 
     expect(markdown).toContain('# Stale content report');
     expect(markdown).toContain('src-stale');
+    expect(markdown).toContain('reviewAfter: 2026-01-10');
     expect(markdown).toContain('src-expired');
+    expect(markdown).toContain('expiresAt: 2026-01-01');
     expect(markdown).toContain('Ingen persondata');
     expect(markdown).not.toContain('Offentlig kilde.');
+    expect(markdown).not.toContain('Fagansvarlig');
+    expect(markdown).not.toContain('Redaktør');
+  });
+
+  it('rejects calendar-impossible report dates', () => {
+    expect(() => buildStaleContentReport({ sources, today: '2026-99-99' })).toThrow(/YYYY-MM-DD/);
   });
 });

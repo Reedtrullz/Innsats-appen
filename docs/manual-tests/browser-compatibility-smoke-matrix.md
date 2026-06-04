@@ -1,4 +1,4 @@
-# Task 376: Browser compatibility smoke matrix
+# Browser compatibility smoke matrix
 
 ## Prerequisites / Forutsetninger
 

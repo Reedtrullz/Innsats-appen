@@ -2,11 +2,11 @@
 
 ## Automatisk rapport
 
-Task 412 bruker `npm run report:stale-content` for å skrive stale content rapport til stdout. Rapporten inneholder kilde-ID, tittel, eier, reviewer og dato, men ingen persondata og ingen kilde-body.
+Task 412 bruker `npm run report:stale-content` for å skrive stale content rapport til stdout. Rapporten inneholder kilde-ID, tittel, status, risiko og review-/expiry-datoer. Den skal ha ingen persondata, ingen private posisjoner, ingen eier-/reviewer-navn og ingen kilde-body.
 
 ## Scheduled notification
 
-`.github/workflows/monitoring.yml` kjører rapporten på schedule. Når rapporten har funn, opprettes en GitHub Issue med routing `content-maintenance`. Når rapporten sier `No stale or expired content`, sendes ingen issue.
+`.github/workflows/monitoring.yml` kjører rapporten på schedule. Når rapporten har funn, opprettes eller oppdateres én åpen GitHub Issue med routing `content-maintenance`. Når rapporten sier `No stale or expired content`, sendes ingen issue.
 
 ## Lokal bruk
 

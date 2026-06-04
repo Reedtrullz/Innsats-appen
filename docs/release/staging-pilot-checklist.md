@@ -1,20 +1,30 @@
-# Staging pilot checklist
+# Staging / pre-pilot checklist
 
-## Formål
+## Staging deployment path
 
-Task 390 legger staging deployment før broader pilot / bredere pilot. Staging skal være en verifisert bygg- og innholdsversjon som brukes av testgruppe før flere mannskaper inviteres.
+Task 390 uses `.github/workflows/staging.yml` as the pre-pilot staging deployment path. It deploys an immutable `staging-<sha>` GHCR image to a separate staging container/app directory and verifies the staging `/api/health` endpoint.
 
-## Gate før pilot
+Required GitHub environment/secret configuration before the workflow can run:
 
-1. Bygg med `npm run check:ci` på Node 22.
-2. Kjør produksjons-E2E på staging-URL og arkiver SHA, innholdsversjon og dato.
-3. Kontroller offline installasjon, `/nytt`, `/release`, `/data-pa-enheten`, `/oppdrag`, `/feltmodus` og personvern-reset.
-4. Staging kan bare brukes med trygge testdata.
-5. Rollback: behold forrige godkjente container/image og dokumenter kommando/ansvar før pilot åpnes.
+- `STAGING_SSH_PRIVATE_KEY` secret for the staging deploy user.
+- `STAGING_HOST` variable, defaulting to `198.23.137.16` only if the repo environment does not override it.
+- `STAGING_USER` variable, defaulting to `deploy`.
+- `STAGING_DOMAIN` variable or workflow input, default `staging.innsats.reidar.tech`.
+- `STAGING_PORT` variable or workflow input, default `3007`.
 
-## Go/no-go
+This file does not claim staging has been executed. Before broader pilot, run the staging workflow for the exact SHA and save its completed/successful run URL.
 
-Go krever grønn CI, grønn staging smoke, ingen høy-risiko privacy funn og en navngitt pilotkontakt. No-go ved brudd på offline, reset, source-warning eller release-notater.
+## Gates before broader pilot
+
+- `npm run check:ci` passes locally and in workflow, including production Playwright E2E.
+- Staging health endpoint returns the exact SHA from the staging deploy run.
+- Manual smoke on staging covers `/nytt`, `/release`, `/data-pa-enheten`, `/oppdrag`, `/feltmodus` and privacy reset.
+- Rollback command/owner is documented for the staging and production targets.
+- Real-device evidence for iPhone Safari, Android Chrome, install-to-home-screen, low-connectivity and update-after-offline is attached before final pilot pass.
+
+## Rollback
+
+Rollback is redeploying the previous known-good immutable GHCR SHA through the same staging workflow or production playbook. Do not use `latest` as release evidence.
 
 ## Felles grense
 

@@ -105,12 +105,16 @@ it('includes blocked task count in synced task progress summaries', () => {
         stage: 'verify',
         risk: 'high',
         status: 'blocked',
-        taskCount: 2,
+        taskCount: 6,
         updatedAt: '2026-06-04T12:00:00.000Z',
         evidence: [],
         tasks: [
           { id: 'pilot-workplan-task-1', title: 'Sync Obsidian note', status: 'completed', stage: 'verify', risk: 'medium', evidence: ['sync PASS'] },
-          { id: 'pilot-workplan-task-2', title: 'Verify release page', status: 'blocked', stage: 'release', risk: 'high', evidence: [] },
+          { id: 'pilot-workplan-task-2', title: 'Run iPhone Safari', status: 'blocked', stage: 'release', risk: 'high', evidence: [] },
+          { id: 'pilot-workplan-task-3', title: 'Run Android Chrome', status: 'blocked', stage: 'release', risk: 'high', evidence: [] },
+          { id: 'pilot-workplan-task-4', title: 'Run home-screen install', status: 'blocked', stage: 'release', risk: 'high', evidence: [] },
+          { id: 'pilot-workplan-task-5', title: 'Run low-connectivity', status: 'blocked', stage: 'release', risk: 'high', evidence: [] },
+          { id: 'pilot-workplan-task-6', title: 'Run update-after-offline', status: 'blocked', stage: 'release', risk: 'high', evidence: [] },
         ],
       },
     ],
@@ -119,5 +123,7 @@ it('includes blocked task count in synced task progress summaries', () => {
   const merged = mergeSyncedWorkplansIntoPlan(defaultReleasePlan, blockedSnapshot);
   const item = merged.items.find((candidate) => candidate.id === 'workplan-pilot-workplan');
 
-  expect(item?.notes).toContain('Task progress: 1/2 completed, 1 blocked');
+  expect(item?.notes).toContain('Task progress: 1/6 completed, 5 blocked');
+  expect(item?.notes).toContain('• Run iPhone Safari');
+  expect(item?.notes).toContain('• Run update-after-offline');
 });

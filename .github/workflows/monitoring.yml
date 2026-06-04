@@ -85,10 +85,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          title="Stale content report ${{ steps.stale.outputs.report_date }}"
-          existing="$(gh issue list --state open --search "${title} in:title" --json number --jq 'length')"
-          if [ "${existing}" != "0" ]; then
-            echo "Open stale content issue already exists for ${title}."
+          title="Stale content report"
+          existing="$(gh issue list --state open --search "\"${title}\" in:title" --json number,title --jq ".[] | select(.title == \"${title}\") | .number" | head -n 1)"
+          if [ -n "${existing}" ]; then
+            echo "Open stale content issue #${existing} already exists; adding refreshed report comment."
+            gh issue comment "${existing}" --body-file stale-content-report.md
             exit 0
           fi
           {

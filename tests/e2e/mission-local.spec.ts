@@ -8,10 +8,14 @@ test('creates and reopens a local mission offline', async ({ page, context }) =>
   await page.getByLabel('Scenario').selectOption('tilfluktsrom');
   await page.getByLabel('Sted/lokasjon').fill('Trondheim sentrum');
   await page.getByRole('button', { name: /Lagre oppdrag/i }).click();
-  await expect(page.getByText('Øvelse tilfluktsrom')).toBeVisible();
-  await expect(page.getByText(/Lagres bare lokalt/i)).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Øvelse tilfluktsrom', exact: true })).toBeVisible();
+  await expect(page.getByTestId('privacy-message')).toContainText(/Lagres bare lokalt/i);
   await page.evaluate(async () => { await navigator.serviceWorker.ready; });
   await context.setOffline(true);
-  await page.reload({ waitUntil: 'domcontentloaded' });
-  await expect(page.getByText('Øvelse tilfluktsrom')).toBeVisible();
+  try {
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: 'Øvelse tilfluktsrom', exact: true })).toBeVisible();
+  } finally {
+    await context.setOffline(false);
+  }
 });

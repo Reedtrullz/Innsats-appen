@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T08:20:59.104Z",
+  "generatedAt": "2026-06-04T08:52:37.587Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-04T08:20:59.104Z",
+      "updatedAt": "2026-06-04T08:52:37.587Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -4879,60 +4879,55 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-385",
           "title": "Run real-device testing on iPhone Safari.",
-          "status": "completed",
+          "status": "blocked",
           "stage": "verify",
           "risk": "high",
-          "completedAt": "2026-06-04T09:52:13+02:00",
           "evidence": [
-            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+            "Blocked awaiting physical iPhone Safari or real-device cloud-lab execution. Repo contains task-385 manual script and browser compatibility matrix; Chromium/Playwright evidence is not a pass for this task."
           ],
           "sourceHeading": "Task 385: Run real-device testing on iPhone Safari."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-386",
           "title": "Run real-device testing on Android Chrome.",
-          "status": "completed",
+          "status": "blocked",
           "stage": "verify",
           "risk": "high",
-          "completedAt": "2026-06-04T09:52:13+02:00",
           "evidence": [
-            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+            "Blocked awaiting physical Android Chrome or real-device cloud-lab execution. Repo contains task-386 manual script and browser compatibility matrix; desktop Chromium evidence is not a pass for this task."
           ],
           "sourceHeading": "Task 386: Run real-device testing on Android Chrome."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-387",
           "title": "Run install-to-home-screen testing.",
-          "status": "completed",
+          "status": "blocked",
           "stage": "verify",
           "risk": "high",
-          "completedAt": "2026-06-04T09:52:13+02:00",
           "evidence": [
-            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+            "Blocked awaiting OS-level install-to-home-screen execution on a physical device or real-device lab. Repo contains task-387 manual script and manifest/service-worker tests; automated checks are not a pass for this task."
           ],
           "sourceHeading": "Task 387: Run install-to-home-screen testing."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-388",
           "title": "Run low-connectivity testing.",
-          "status": "completed",
+          "status": "blocked",
           "stage": "verify",
           "risk": "high",
-          "completedAt": "2026-06-04T09:52:13+02:00",
           "evidence": [
-            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+            "Blocked awaiting weak-network/cellular/network-lab execution. Repo contains task-388 manual script and Playwright offline coverage; offline emulation alone is not a pass for this task."
           ],
           "sourceHeading": "Task 388: Run low-connectivity testing."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-389",
           "title": "Run update-after-offline testing.",
-          "status": "completed",
+          "status": "blocked",
           "stage": "verify",
           "risk": "high",
-          "completedAt": "2026-06-04T09:52:13+02:00",
           "evidence": [
-            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+            "Blocked awaiting two-build update-after-offline execution on physical device or staged deployment. Repo contains task-389 manual script and service-worker/update tests; no staged/physical run has been captured."
           ],
           "sourceHeading": "Task 389: Run update-after-offline testing."
         },

@@ -6,7 +6,7 @@ Task 407 ruller ut med ett distrikt / one district først. Målet er å teste ny
 
 ## Go/no-go
 
-Go/no-go holdes etter staging smoke, manual device evidence, supportkanal og personvernkontroll. Go krever at pilotdistrikt har navngitt kontakt og at feil kan rapporteres uten persondata.
+Go/no-go holdes etter staging smoke, manual device evidence, supportkanal og personvernkontroll. Go krever at pilotdistrikt har avtalt team-/kanalalias for kontakt og at feil kan rapporteres uten persondata.
 
 ## Faser
 

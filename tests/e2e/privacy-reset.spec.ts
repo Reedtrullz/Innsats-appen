@@ -8,9 +8,9 @@ test('deletes local mission data with explicit privacy copy', async ({ page }) =
   await page.getByLabel('Scenario').selectOption('tilfluktsrom');
   await page.getByLabel('Sted/lokasjon').fill('Trondheim sentrum');
   await page.getByRole('button', { name: /Lagre oppdrag/i }).click();
-  await expect(page.getByText('Øvelse tilfluktsrom')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Øvelse tilfluktsrom', exact: true })).toBeVisible();
   await page.getByRole('button', { name: /Slett lokale data/i }).click();
   await expect(page.getByTestId('privacy-message')).toHaveText(/Beredskapsboka sender ikke oppdrag/i);
   await page.reload();
-  await expect(page.getByText('Øvelse tilfluktsrom')).not.toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Øvelse tilfluktsrom', exact: true })).not.toBeVisible();
 });

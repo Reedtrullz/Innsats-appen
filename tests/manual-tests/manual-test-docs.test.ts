@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const manualDocs = [
-  ['376', 'docs/manual-tests/task-376-browser-compatibility-matrix.md', /browser compatibility|Chromium|Firefox|WebKit|Safari/i],
   ['377', 'docs/manual-tests/task-377-flom-pumpe.md', /flom|pumpe/i],
   ['378', 'docs/manual-tests/task-378-sar-ettersokning.md', /SAR|ettersøkning|søk/i],
   ['379', 'docs/manual-tests/task-379-cbrne.md', /CBRNE|sone|verneutstyr/i],
@@ -33,10 +32,17 @@ describe('Group 13 manual and real-device test scripts', () => {
     const matrix = read('docs/manual-tests/group-13-coverage-matrix.md');
     for (const [task] of manualDocs) expect(matrix).toMatch(new RegExp(`Task ${task}`));
     expect(matrix).toMatch(/cannot be completed by Chromium emulation/i);
+    expect(matrix).toMatch(/Task 376 is automated import\/export roundtrip coverage/i);
+    expect(matrix).toMatch(/browser-compatibility-smoke-matrix\.md/i);
     expect(matrix).toMatch(/requires physical/i);
+
+    const browserMatrix = read('docs/manual-tests/browser-compatibility-smoke-matrix.md');
+    expect(browserMatrix).toMatch(/browser compatibility|Chromium|Firefox|WebKit|Safari/i);
 
     const template = read('docs/manual-tests/result-log-template.md');
     expect(template).toMatch(/Device model/i);
+    expect(template).toMatch(/Execution environment/i);
+    expect(template).toMatch(/no names, initials, emails or phone numbers/i);
     expect(template).toMatch(/Pass\/Fail/i);
     expect(template).toMatch(/Privacy notes/i);
   });

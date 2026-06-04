@@ -1,10 +1,8 @@
 import { getSourceDocuments } from '../lib/content/load-content';
-import { buildStaleContentReport, staleContentReportToMarkdown } from '../lib/content/stale-content-report';
+import { assertIsoDate, buildStaleContentReport, staleContentReportToMarkdown } from '../lib/content/stale-content-report';
 
 function resolveReportDate() {
-  const date = process.env.REPORT_DATE ?? new Date().toISOString().slice(0, 10);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error('REPORT_DATE must use YYYY-MM-DD');
-  return date;
+  return assertIsoDate(process.env.REPORT_DATE ?? new Date().toISOString().slice(0, 10));
 }
 
 const today = resolveReportDate();

@@ -74,9 +74,13 @@ function statusFromWorkplan(workplan: Workplan): WorkStatus {
 }
 
 function summarizeOpenTasks(workplan: Workplan) {
-  const openTasks = workplan.tasks.filter((task) => task.status !== 'completed').slice(0, 4);
+  const openTasks = workplan.tasks.filter((task) => task.status !== 'completed');
   if (openTasks.length === 0) return 'No open task headings found.';
-  return openTasks.map((task) => `• ${task.title}`).join('\n');
+  const visibleTasks = openTasks.slice(0, 8);
+  const overflow = openTasks.length - visibleTasks.length;
+  const lines = visibleTasks.map((task) => `• ${task.title}`);
+  if (overflow > 0) lines.push(`• …and ${overflow} more open task${overflow === 1 ? '' : 's'}.`);
+  return lines.join('\n');
 }
 
 function taskProgressSummary(workplan: Workplan) {

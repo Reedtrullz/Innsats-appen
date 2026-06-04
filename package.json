@@ -20,8 +20,9 @@
     "audit:ci": "npm audit --audit-level=high",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "npm run build && PLAYWRIGHT_PROD=1 playwright test",
-    "e2e:prod": "npm run build && PLAYWRIGHT_PROD=1 playwright test",
+    "e2e": "npm run build && npm run e2e:prod:no-build",
+    "e2e:prod": "npm run build && npm run e2e:prod:no-build",
+    "e2e:prod:no-build": "PLAYWRIGHT_PROD=1 playwright test",
     "import:obsidian": "tsx scripts/import-obsidian.ts",
     "sync:workplans": "tsx scripts/sync-workplans.ts",
     "compile:curated": "tsx scripts/compile-curated.ts",
@@ -31,7 +32,7 @@
     "build:search": "tsx scripts/build-search-index.ts",
     "build:content": "npm run import:obsidian && npm run compile:curated && npm run build:search && npm run sync:workplans && npm run validate:content",
     "check": "npm run check:ci",
-    "check:ci": "npm run build:content && npm run typecheck && npm run lint && npm run test && npm run build:app && npm run perf:budget && npm run perf:lighthouse"
+    "check:ci": "npm run build:content && npm run typecheck && npm run lint && npm run test && npm run build:app && npm run e2e:prod:no-build && npm run perf:budget && npm run perf:lighthouse"
   },
   "dependencies": {
     "@next/third-parties": "16.2.7",

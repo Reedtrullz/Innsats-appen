@@ -1,0 +1,174 @@
+name: Staging Deploy
+
+on:
+  push:
+    branches:
+      - staging
+  workflow_dispatch:
+    inputs:
+      staging_domain:
+        description: Public staging domain to verify after deploy
+        required: true
+        default: staging.innsats.reidar.tech
+      staging_port:
+        description: Host port bound on the VPS for the staging container
+        required: true
+        default: "3007"
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 22.22.3
+  IMAGE_NAME: ghcr.io/reedtrullz/innsats-appen
+  NEXT_TELEMETRY_DISABLED: "1"
+  ALLOW_PREGENERATED_CONTENT: "1"
+  MET_USER_AGENT: Beredskapsboka/0.1 staging (+https://innsats.reidar.tech)
+
+concurrency:
+  group: innsats-staging-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  staging-checks:
+    name: Staging checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-deps
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run CI-equivalent local gate including production E2E
+        run: npm run check:ci
+
+  build-staging-image:
+    name: Build and push staging image
+    runs-on: ubuntu-latest
+    needs: staging-checks
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+      tag: ${{ steps.image.outputs.tag }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set image tag
+        id: image
+        shell: bash
+        run: |
+          echo "tag=staging-${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push staging image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          build-args: |
+            VERSION=${{ github.sha }}
+          tags: |
+            ${{ steps.image.outputs.image }}:${{ steps.image.outputs.tag }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ github.sha }}
+            tech.reidar.environment=staging
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-staging:
+    name: Deploy staging with Ansible
+    runs-on: ubuntu-latest
+    needs: build-staging-image
+    timeout-minutes: 20
+    environment:
+      name: staging
+      url: https://${{ inputs.staging_domain || vars.STAGING_DOMAIN || 'staging.innsats.reidar.tech' }}
+    env:
+      STAGING_HOST: ${{ vars.STAGING_HOST || '198.23.137.16' }}
+      STAGING_USER: ${{ vars.STAGING_USER || 'deploy' }}
+      STAGING_DOMAIN: ${{ inputs.staging_domain || vars.STAGING_DOMAIN || 'staging.innsats.reidar.tech' }}
+      STAGING_PORT: ${{ inputs.staging_port || vars.STAGING_PORT || '3007' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install Ansible
+        shell: bash
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install ansible
+          ansible-galaxy collection install -r deploy/requirements.yml
+
+      - name: Configure staging SSH key
+        shell: bash
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.STAGING_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_innsats_staging
+          chmod 600 ~/.ssh/id_rsa_innsats_staging
+          ssh-keyscan -H "${STAGING_HOST}" >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_rsa_innsats_staging -o BatchMode=yes -o StrictHostKeyChecking=yes "${STAGING_USER}@${STAGING_HOST}" 'echo "STAGING SSH OK"'
+
+      - name: Write staging inventory
+        shell: bash
+        run: |
+          cat > /tmp/innsats-staging-inventory.yml <<EOF
+          all:
+            children:
+              beredskapsboka:
+                hosts:
+                  staging:
+                    ansible_host: ${STAGING_HOST}
+                    ansible_user: ${STAGING_USER}
+                    ansible_ssh_private_key_file: ~/.ssh/id_rsa_innsats_staging
+                    ansible_python_interpreter: /usr/bin/python3
+                    app_domain: ${STAGING_DOMAIN}
+                    app_host_port: ${STAGING_PORT}
+                    app_bind_address: 127.0.0.1
+          EOF
+
+      - name: Deploy immutable staging image tag
+        shell: bash
+        env:
+          APP_VERSION: ${{ github.sha }}
+          ANSIBLE_CONFIG: deploy/ansible.cfg
+        run: |
+          ansible-playbook \
+            -i /tmp/innsats-staging-inventory.yml \
+            deploy/playbook.yml \
+            -e "docker_image=${{ needs.build-staging-image.outputs.image }}:${{ needs.build-staging-image.outputs.tag }}" \
+            -e "app_name=beredskapsboka-staging" \
+            -e "container_name=beredskapsboka-staging" \
+            -e "app_dir=/opt/apps/beredskapsboka-staging" \
+            -e "app_domain=${STAGING_DOMAIN}" \
+            -e "app_host_port=${STAGING_PORT}" \
+            -e "met_user_agent=${MET_USER_AGENT}" \
+            -e "caddy_marker_name=Beredskapsboka-staging"

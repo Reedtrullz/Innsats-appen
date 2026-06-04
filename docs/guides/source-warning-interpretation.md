@@ -1,14 +1,23 @@
-# Source/warning interpretation guide
+# Source and warning interpretation guide
 
-## Kilde og varsel
+## Hva kildevarsel betyr
 
-Kilde-ID viser hvor offentlig beslutningsstøtte kommer fra. Varsel betyr at innholdet har begrensning, usikkerhet eller må kontrolleres mot offisiell kilde.
+Task 403 forklarer kilde- og varselstatus for mannskaper og ledere. Bruk appens labels slik:
 
-## Tolkning
+- `Kilde fersk` / verified/current: kan brukes som beslutningsstøtte, men lokal ordre og offisielle kilder gjelder.
+- `Ikke verifisert`: les som bakgrunn; ikke bruk som eneste grunnlag for tiltak.
+- `Gjennomgang forfalt`: kilden har passert `reviewAfter`; fagansvarlig må revalidere før pilot/release.
+- `Utløpt kilde`: innholdet er utgått eller passert `expiresAt`; ikke bruk som operativt grunnlag.
+- `Høy kilde-risiko`: krever ekstra kontroll mot original kilde og lokal fagansvarlig.
+- Draft/historical: forklarer kontekst, ikke gjeldende ordre.
 
-- Verified: redaksjonelt kontrollert, men ikke ordre.
-- Unverified/draft/historical/expired: bruk ekstra varsomhet.
-- Kritiske warnings: stopp og verifiser med leder eller primærkilde.
+## Eksterne varsler
+
+MET/NVE/Kartverket/kommune-signaler er kontekst. De blir ikke offisiell ordre i appen, og appen er ikke koblet til Nødvarsel, CIM eller Nødnett.
+
+## Handling
+
+Ved gult/oransje/rødt, utløpt, høy-risiko eller forfalt innhold: åpne kilde, kontroller dato/status, og bruk lokal kommandolinje før beslutning.
 
 ## Felles grense
 

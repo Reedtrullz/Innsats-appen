@@ -1,0 +1,67 @@
+name: Scheduled maintenance reviews
+
+on:
+  schedule:
+    # Quarterly dependency review: first day of Jan/Apr/Jul/Oct.
+    - cron: "23 8 1 JAN,APR,JUL,OCT *"
+    # Annual security/privacy/language support review at start of year.
+    - cron: "41 8 2 JAN *"
+  workflow_dispatch:
+    inputs:
+      review_type:
+        description: dependency, security-privacy, or all
+        required: true
+        default: all
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  create-maintenance-review-issues:
+    name: Create maintenance review issues
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Create or update review issues
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          REQUESTED_REVIEW_TYPE: ${{ inputs.review_type || '' }}
+          EVENT_SCHEDULE: ${{ github.event.schedule || '' }}
+        run: |
+          set -euo pipefail
+          today="$(date -u +%F)"
+          review_type="${REQUESTED_REVIEW_TYPE:-}"
+          if [ -z "${review_type}" ] || [ "${review_type}" = "all" ]; then
+            case "${EVENT_SCHEDULE}" in
+              "23 8 1 JAN,APR,JUL,OCT *") review_type="dependency" ;;
+              "41 8 2 JAN *") review_type="security-privacy" ;;
+              *) review_type="${review_type:-all}" ;;
+            esac
+          fi
+
+          create_or_comment() {
+            local title="$1"
+            local body="$2"
+            local existing
+            existing="$(gh issue list --repo "${GH_REPO}" --state open --search "\"${title}\" in:title" --json number,title --jq ".[] | select(.title == \"${title}\") | .number" | head -n 1)"
+            if [ -n "${existing}" ]; then
+              gh issue comment --repo "${GH_REPO}" "${existing}" --body "Scheduled review reminder ${today}."
+            else
+              gh issue create --repo "${GH_REPO}" --title "${title}" --body "${body}"
+            fi
+          }
+
+          if [ "${review_type}" = "all" ] || [ "${review_type}" = "dependency" ]; then
+            create_or_comment \
+              "Quarterly dependency review" \
+              "Run docs/quarterly-dependency-review.md. Boundary: no secrets/persondata in issue body. Record npm audit status, exact-version drift, CI result, accepted advisory expiry, and owner role."
+          fi
+
+          if [ "${review_type}" = "all" ] || [ "${review_type}" = "security-privacy" ]; then
+            create_or_comment \
+              "Annual security/privacy impact review" \
+              "Run docs/annual-security-review.md and docs/annual-privacy-impact-assessment.md. Boundary: no persondata, no private positions, no source body copied. Also revisit docs/language-support-evaluation.md before public language expansion."
+          fi

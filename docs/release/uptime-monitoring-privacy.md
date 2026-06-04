@@ -1,20 +1,21 @@
 # Uptime monitoring compatible with privacy boundary
 
-## Formål
+## Public synthetic checks only
 
-Task 391 definerer uptime monitoring uten persondata. Monitoren skal bare hente syntetiske offentlige endepunkt og statiske sider: `/`, `/nytt`, `/release`, `/generated-content/manifest.json` og service-worker asset.
+Task 391 bruker `.github/workflows/monitoring.yml` til syntetiske offentlige GET-sjekker. Workflowen sjekker bare disse offentlige URL-ene:
 
-## Tillatt
+- `/api/health` — offentlig helsestatus og versjon, uten brukerdata.
+- `/` — appskall.
+- `/nytt` — release notes fra generert offentlig innhold.
+- `/release` — release board.
+- `/generated-content/manifest.json` — offentlig generert manifest.
+- `/sw.js` — service-worker asset.
 
-- Synthetic GET/HEAD fra ekstern monitor.
-- Statuskode, responstid, TLS-utløp og innholdsversjon.
-- Varsel til pilot support når offentlig side er nede.
+Ingen persondata, ingen cookies, ingen localStorage, ingen IndexedDB, ingen private posisjoner, ingen push-varsling og ingen browserprofildata hentes. Responsbody kastes for uptime-sjekken.
 
-## Ikke tillatt
+## Varsling ved stale innhold
 
-- Ingen persondata, cookies, lokale oppdrag, eksportfiler eller brukeridentifikatorer.
-- Ingen push notification eller klientsporing.
-- Ingen backend-sync eller live incident status.
+Samme workflow kjører `npm run report:stale-content`. Hvis rapporten har funn, opprettes eller oppdateres én åpen GitHub Issue med privacy-safe innhold.
 
 ## Felles grense
 

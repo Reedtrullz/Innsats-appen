@@ -1,4 +1,4 @@
-export const SW_CACHE_VERSION = 'v2';
+export const SW_CACHE_VERSION = 'v3';
 export const SW_CACHE_NAME = `beredskapsboka-${SW_CACHE_VERSION}`;
 export const GENERATED_CONTENT_STALE_MS = 7 * 24 * 60 * 60 * 1000;
 

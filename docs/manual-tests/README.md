@@ -8,7 +8,7 @@ Use safe test data only: no persondata, no patientdata, no names, no phone numbe
 
 ## Required run metadata
 
-Every run records build SHA, visible content version/offline cache version, URL, device model, OS/browser version, network condition, orientation, tester initials/role and date. If a physical device or real-device cloud lab is used, state that explicitly.
+Every run records build SHA, visible content version/offline cache version, URL, device model, OS/browser version, network condition, orientation, execution environment and date. Use role/team alias or device-lab run ID only — no tester names, initials, emails or phone numbers. If a physical device or real-device cloud lab is used, state that explicitly.
 
 ## Evidence and privacy
 

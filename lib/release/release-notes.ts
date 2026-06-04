@@ -25,15 +25,24 @@ export interface ReleaseNotes {
   entries: ReleaseNotesEntry[];
 }
 
+function shortHash(value: string) {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return hash.toString(36).padStart(7, '0').slice(0, 8);
+}
+
 export function contentVersionToReleaseId(contentVersion: string) {
-  const normalized = contentVersion
-    .trim()
+  const trimmed = contentVersion.trim();
+  const normalized = trimmed
     .toLowerCase()
-    .replace(/^(\d{4}-\d{2}-\d{2})[ t](\d{2}):(\d{2}):(\d{2}).*$/, '$1-$2$3$4')
+    .replace(/^(\d{4}-\d{2}-\d{2})[ t](\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?.*$/, (_match, date, hours, minutes, seconds, fraction) => [date, `${hours}${minutes}${seconds}`, fraction].filter(Boolean).join('-'))
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 80);
-  return `content-${normalized || 'unknown'}`;
+    .replace(/^-+|-+$/g, '');
+  const slug = normalized.length > 63 ? `${normalized.slice(0, 63).replace(/-+$/g, '')}-${shortHash(trimmed)}` : normalized;
+  return `content-${slug || 'unknown'}`;
 }
 
 function sortEntries(entries: ContentChangelogEntry[]) {
@@ -56,7 +65,7 @@ export function buildReleaseNotes({ manifest, changelog }: { manifest: ContentMa
     sourceIds: [...entry.sourceIds].sort(),
   }));
   const sourceIds = [...new Set(changelog.flatMap((entry) => entry.sourceIds))].sort();
-  const mustReadCount = entries.filter((entry) => entry.mustRead).length;
+  const mustReadCount = manifest.mustReadCount;
 
   return {
     releaseId: contentVersionToReleaseId(manifest.contentVersion),

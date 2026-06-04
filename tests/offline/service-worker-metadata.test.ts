@@ -15,6 +15,8 @@ describe('service worker metadata helpers', () => {
     expect(sw).toContain(`const SW_CACHE_VERSION = '${SW_CACHE_VERSION}'`);
     expect(sw).toContain('BEREDSKAPSBOKA_GET_SW_STATUS');
     expect(sw).toContain('BEREDSKAPSBOKA_SKIP_WAITING');
+    expect(sw).toContain("'/nytt'");
+    expect(sw).toContain("'/release'");
   });
 
   it('detects stale generated content using the mobile/offline threshold', () => {

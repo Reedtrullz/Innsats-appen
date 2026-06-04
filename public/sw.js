@@ -1,4 +1,4 @@
-const SW_CACHE_VERSION = 'v2';
+const SW_CACHE_VERSION = 'v3';
 const CACHE_NAME = `beredskapsboka-${SW_CACHE_VERSION}`;
 const GENERATED_CONTENT_STALE_MS = 7 * 24 * 60 * 60 * 1000;
 const MESSAGE_TYPES = {
@@ -25,6 +25,8 @@ const STATIC_APP_SHELL = [
   '/kildegjennomgang',
   '/faq',
   '/endringer',
+  '/nytt',
+  '/release',
   '/ma-leses',
   '/oppdrag',
   '/oppdrag/ny',

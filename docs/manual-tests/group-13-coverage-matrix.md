@@ -2,7 +2,6 @@
 
 | Task | Script | Automated overlap | Required manual/physical evidence | Status boundary |
 | --- | --- | --- | --- | --- |
-| Task 376 | `task-376-browser-compatibility-matrix.md` | Chromium Playwright E2E baseline | Firefox/WebKit/Safari/browser-lab rows with explicit pass/fail | Browser matrix required; do not infer from Chromium alone |
 | Task 377 | `task-377-flom-pumpe.md` | Search/card/offline E2E supports cache confidence | Manual flom/pumpe scenario pass/fail with screenshots | Manual scenario required |
 | Task 378 | `task-378-sar-ettersokning.md` | Search/card/map E2E supports navigation confidence | Manual SAR/ettersøkning flow and local-only map notes | Manual scenario required |
 | Task 379 | `task-379-cbrne.md` | Content and offline E2E supports card/module access | Manual CBRNE warning/stop-criteria review | Manual scenario required |
@@ -16,5 +15,7 @@
 | Task 387 | `task-387-install-to-home-screen.md` | Manifest/service-worker tests support PWA readiness | OS-level install and standalone launch evidence | Requires physical device |
 | Task 388 | `task-388-low-connectivity.md` | Playwright offline tests support cache behavior | Weak network/cellular/captive-portal style evidence | Requires physical/network lab |
 | Task 389 | `task-389-update-after-offline.md` | SW update unit/E2E supports update prompt | Two-build offline-then-update run evidence | Requires physical device or staged deployment |
+
+Task 376 is automated import/export roundtrip coverage in `tests/e2e/local-data-import-export-roundtrip.spec.ts`; it is not the browser compatibility matrix. Supplemental browser coverage lives in `browser-compatibility-smoke-matrix.md`.
 
 Physical-device tasks cannot be completed by Chromium emulation alone. Any final pass for tasks 385-389 requires physical device or real-device cloud-lab evidence.

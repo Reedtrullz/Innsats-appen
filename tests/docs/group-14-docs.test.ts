@@ -7,12 +7,12 @@ function read(relativePath: string) {
 }
 
 const requiredDocs: Array<[string, string, RegExp[]]> = [
-  ['390', 'docs/release/staging-pilot-checklist.md', [/staging/i, /broader pilot|bredere pilot/i, /rollback/i]],
+  ['390', 'docs/release/staging-pilot-checklist.md', [/staging/i, /broader pilot|bredere pilot/i, /rollback/i, /STAGING_SSH_PRIVATE_KEY|staging\.yml/i]],
   ['391', 'docs/release/uptime-monitoring-privacy.md', [/uptime/i, /ingen persondata|no personal data/i, /synthetic/i]],
   ['395', 'docs/guides/quick-start-mannskaper.md', [/hurtigstart/i, /mannskaper/i, /offline/i]],
   ['396', 'docs/guides/lagforer-leder.md', [/lagfører|lagforer/i, /5-punktsordre/i, /sambandsplan/i]],
   ['397', 'docs/guides/offline-use.md', [/offline/i, /installer|hjemskjerm/i, /synkroniseres ikke|ingen backend/i]],
-  ['398', 'docs/guides/privacy-reset.md', [/personvern/i, /tilbakestill/i, /lokal/i]],
+  ['398', 'docs/guides/privacy-reset.md', [/personvern/i, /tilbakestill|Slett lokale data/i, /\/oppdrag/i, /\/personvern/i, /lokal/i]],
   ['399', 'docs/guides/expanded-5-punktsordre.md', [/5-punktsordre/i, /situasjon/i, /utførelse/i]],
   ['400', 'docs/guides/expanded-sambandsplan.md', [/sambandsplan/i, /kanal/i, /ikke legg inn reelle nødnettgrupper/i]],
   ['401', 'docs/guides/checklist-runner.md', [/sjekkliste/i, /påkrevd/i, /lokalt/i]],
@@ -20,13 +20,13 @@ const requiredDocs: Array<[string, string, RegExp[]]> = [
   ['403', 'docs/guides/source-warning-interpretation.md', [/kilde/i, /varsel/i, /beslutningsstøtte/i]],
   ['404', 'docs/guides/field-testing.md', [/felt/i, /test/i, /evidence|bevis/i]],
   ['405', 'docs/guides/district-content-contribution.md', [/distriktsleder/i, /godkjent innhold/i, /kilde/i]],
-  ['406', 'docs/guides/interactive-guide-plan.md', [/kort video|interactive guide|interaktiv guide/i, /etter UI stabiliseres|after UI stabilizes/i, /ikke spill inn persondata/i]],
+  ['406', 'docs/guides/interactive-guide.md', [/kort video|interactive guide|interaktiv guide/i, /etter UI stabiliseres|after UI stabilizes/i, /ikke spill inn persondata/i]],
   ['407', 'docs/release/pilot-rollout-plan.md', [/ett distrikt|one district/i, /pilot/i, /go\/no-go|go-no-go/i]],
   ['408', 'docs/release/pilot-support-channel.md', [/support/i, /kontakt/i, /ikke persondata/i, /GitHub Issues/i, /pilot-support/i]],
   ['409', 'docs/roadmap.md', [/roadmap/i, /Group 14/i, /post-MVP/i]],
   ['410', 'docs/technical-debt-register.md', [/technical debt|teknisk gjeld/i, /owner|eier/i, /review/i]],
   ['411', 'docs/content-maintenance-process.md', [/content update|innholdsoppdatering/i, /Beredskapsboka/i, /npm run build:content/i]],
-  ['412', 'docs/stale-content-notifications.md', [/stale content/i, /npm run report:stale-content/i, /ingen persondata/i]],
+  ['412', 'docs/stale-content-notifications.md', [/stale content/i, /npm run report:stale-content/i, /ingen persondata/i, /ingen.*eier.*reviewer/i]],
   ['413', 'docs/quarterly-dependency-review.md', [/quarterly|kvartalsvis/i, /npm audit/i, /eksakte versjoner/i]],
   ['414', 'docs/annual-security-review.md', [/annual|årlig/i, /security|sikkerhet/i, /offline/i]],
   ['415', 'docs/annual-privacy-impact-assessment.md', [/privacy impact|personvernkonsekvens/i, /DPIA/i, /ingen backend/i]],
@@ -54,9 +54,30 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(workflow).toMatch(/schedule:/);
     expect(workflow).toMatch(/https:\/\/innsats\.reidar\.tech\/api\/health/);
     expect(workflow).toMatch(/https:\/\/innsats\.reidar\.tech\/generated-content\/manifest\.json/);
+    expect(workflow).toMatch(/https:\/\/innsats\.reidar\.tech\/sw\.js/);
     expect(workflow).toMatch(/npm run(?: --silent)? report:stale-content/);
     expect(workflow).toMatch(/issues: write/);
+    expect(workflow).toMatch(/title="Stale content report"/);
+    expect(workflow).toMatch(/gh issue comment/);
     expect(workflow).toMatch(/pilot-support|content-maintenance/);
     expect(workflow).not.toMatch(/web-push|PushManager|cookie|localStorage|IndexedDB/);
+  });
+
+  it('adds staging deployment and recurring maintenance review workflows', () => {
+    const staging = read('.github/workflows/staging.yml');
+    expect(staging).toMatch(/name: Staging Deploy/);
+    expect(staging).toMatch(/STAGING_SSH_PRIVATE_KEY/);
+    expect(staging).toMatch(/beredskapsboka-staging/);
+    expect(staging).toMatch(/npm run check:ci/);
+    expect(staging).toMatch(/npx playwright install --with-deps chromium/);
+    expect(staging).toMatch(/packages: write/);
+    expect(staging).toMatch(/caddy_marker_name=Beredskapsboka-staging/);
+
+    const maintenance = read('.github/workflows/maintenance-review.yml');
+    expect(maintenance).toMatch(/Quarterly dependency review/);
+    expect(maintenance).toMatch(/Annual security\/privacy impact review/);
+    expect(maintenance).toMatch(/GH_REPO/);
+    expect(maintenance).toMatch(/EVENT_SCHEDULE/);
+    expect(maintenance).toMatch(/issues: write/);
   });
 });
