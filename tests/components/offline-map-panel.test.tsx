@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach } from 'vitest';
 import { OfflineMapPanel } from '@/components/offline-map-panel';
 import { FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY } from '@/lib/field-mode/field-mode';
+import { saveSelectedActiveMissionId } from '@/lib/mission/active-mission-selection';
 import { clearLocalMissionData, getMission, saveMission } from '@/lib/mission/local-store';
 import { OFFLINE_MAP_CACHE_STORAGE_KEY } from '@/lib/maps/offline-map';
 import { OPERATIONS_MAP_STORAGE_KEY, SCHEMATIC_GEOJSON_COORDINATE_SYSTEM } from '@/lib/maps/operations-map';
@@ -36,6 +37,20 @@ const activeMission: MissionContext = {
   contentVersion: 'test-v1',
   schemaVersion: 1,
 };
+
+function mission(overrides: Partial<MissionContext> = {}): MissionContext {
+  return {
+    ...activeMission,
+    fieldLogEntries: [],
+    ...overrides,
+  };
+}
+
+async function seedMissions(missions: MissionContext[]) {
+  for (const item of missions) {
+    await saveMission(item);
+  }
+}
 
 it('renders a static offline map with attribution and local-only limitations', () => {
   render(<OfflineMapPanel />);
@@ -189,6 +204,34 @@ it('creates a field-log entry on the active mission from the newest map marker',
   });
   expect(screen.getByText(/Feltlogg opprettet lokalt på Kartlogg test/i)).toBeInTheDocument();
   expect(readLocalAuditLog().some((entry) => entry.details.source === 'map-log')).toBe(true);
+});
+
+it('logs map observations to the selected mission, not missions[0]', async () => {
+  const user = userEvent.setup();
+  await seedMissions([
+    mission({ id: 'a', title: 'A', updatedAt: '2026-06-04T10:00:00.000Z' }),
+    mission({ id: 'b', title: 'B', updatedAt: '2026-06-04T09:00:00.000Z' }),
+  ]);
+  saveSelectedActiveMissionId('b');
+
+  render(<OfflineMapPanel />);
+  expect(await screen.findByText(/Feltlogg går til: B/i)).toBeInTheDocument();
+
+  await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'hazard');
+  await user.type(screen.getByPlaceholderText(/Sanitert lokal etikett/i), 'Fare valgt oppdrag');
+  await user.type(screen.getByLabelText(/Loggtekst fra kartpunkt/i), 'Valgt oppdrag får kartlogg');
+  await user.click(screen.getByRole('button', { name: /Legg til lokal markør/i }));
+  await user.click(screen.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i }));
+
+  await waitFor(async () => {
+    expect(await getMission('b')).toMatchObject({
+      fieldLogEntries: expect.arrayContaining([
+        expect.objectContaining({ text: 'Valgt oppdrag får kartlogg' }),
+      ]),
+    });
+    expect(await getMission('a')).toMatchObject({ fieldLogEntries: [] });
+  });
+  expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toContain('"missionId":"b"');
 });
 
 it('uses the newest visible marker when the newest stored marker layer is hidden', async () => {

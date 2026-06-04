@@ -49,6 +49,7 @@ import {
 } from '@/lib/maps/operations-map';
 
 import { buildFieldLogEntryFromMapObject } from '@/lib/mission/map-log-link';
+import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
 import { getMission, listMissions, saveMission } from '@/lib/mission/local-store';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import { DEFAULT_FIELD_MODE_SETTINGS, FIELD_MODE_STORAGE_EVENT, readFieldModeSettings } from '@/lib/field-mode/field-mode';
@@ -198,7 +199,7 @@ export function OfflineMapPanel() {
     let mounted = true;
     listMissions()
       .then((missions) => {
-        if (mounted) setActiveMission(missions[0] ?? null);
+        if (mounted) setActiveMission(selectActiveMission(missions, readSelectedActiveMissionId()));
       })
       .catch(() => {
         if (mounted) setActiveMission(null);
@@ -428,6 +429,7 @@ export function OfflineMapPanel() {
           <p className="mt-2 text-sm font-semibold text-amber-900">Lagres bare på aktivt lokalt oppdrag. Bruk skjematiske 0-100 koordinater; ikke legg inn persondata eller skjermede posisjoner.</p>
         </div>
         <p className="text-sm font-semibold text-slate-700">Aktivt oppdrag: {activeMission ? activeMission.title : 'Ingen aktivt lokalt oppdrag funnet'}</p>
+        <p className="text-sm font-black text-slate-900">Feltlogg går til: {activeMission ? activeMission.title : 'Ingen aktivt lokalt oppdrag funnet'}</p>
         <label className="block text-sm font-black text-slate-800" htmlFor="map-log-text">Loggtekst fra kartpunkt</label>
         <textarea id="map-log-text" value={mapLogText} onChange={(event) => setMapLogText(event.target.value)} className="min-h-28 w-full rounded-2xl border border-slate-300 p-3 text-base" placeholder="Kort observasjon uten persondata" />
         <button type="button" onClick={() => void createLogFromNewestMarker()} disabled={mapLogSaving} className={`${primaryButtonClass} disabled:cursor-wait disabled:bg-slate-500`}>Opprett feltlogg fra kartpunkt</button>
