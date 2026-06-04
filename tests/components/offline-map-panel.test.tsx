@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach } from 'vitest';
 import { OfflineMapPanel } from '@/components/offline-map-panel';
+import { FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY } from '@/lib/field-mode/field-mode';
 import { clearLocalMissionData, getMission, saveMission } from '@/lib/mission/local-store';
 import { OFFLINE_MAP_CACHE_STORAGE_KEY } from '@/lib/maps/offline-map';
 import { OPERATIONS_MAP_STORAGE_KEY, SCHEMATIC_GEOJSON_COORDINATE_SYSTEM } from '@/lib/maps/operations-map';
@@ -46,6 +47,37 @@ it('renders a static offline map with attribution and local-only limitations', (
   expect(screen.getAllByText(/ingen backend sync/i).length).toBeGreaterThan(0);
   expect(screen.getByTestId('map-performance-guard')).toHaveTextContent(/Ytelsesvern/i);
   expect(screen.getByTestId('offline-map-cache-status')).toHaveTextContent(/Ingen kartpakke/i);
+});
+
+it('uses larger map controls when field glove mode is enabled', async () => {
+  localStorage.setItem(FIELD_MODE_STORAGE_KEY, JSON.stringify({ enabled: true, gloveMode: true, theme: 'day', outdoorReadabilityReviewed: true }));
+  render(<OfflineMapPanel />);
+
+  expect(await screen.findByText(/Feltmodus aktiv/i)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Legg til lokal markør/i })).toHaveClass('min-h-16');
+  expect(screen.getByRole('button', { name: /Lagre lokal tegning\/sektor/i })).toHaveClass('min-h-16');
+  expect(screen.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i })).toHaveClass('min-h-16');
+  expect(screen.getByRole('button', { name: /Lag kartbilde/i })).toHaveClass('min-h-16');
+  expect(screen.getByRole('button', { name: /Lag GeoJSON eksport/i })).toHaveClass('min-h-16');
+  expect(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).not.toHaveClass('min-h-16');
+  expect(screen.getByRole('button', { name: /Importer GeoJSON lokalt/i })).not.toHaveClass('min-h-16');
+  expect(screen.getByRole('button', { name: /Tilbakestill kartcache/i })).not.toHaveClass('min-h-16');
+  expect(screen.getByRole('button', { name: /Nullstill lokale sektorer/i })).not.toHaveClass('min-h-16');
+});
+
+
+it('updates map controls when field mode changes while the map is open', async () => {
+  render(<OfflineMapPanel />);
+  expect(screen.queryByText(/Feltmodus aktiv/i)).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Legg til lokal markør/i })).not.toHaveClass('min-h-16');
+
+  act(() => {
+    localStorage.setItem(FIELD_MODE_STORAGE_KEY, JSON.stringify({ enabled: true, gloveMode: true, theme: 'day', outdoorReadabilityReviewed: true }));
+    window.dispatchEvent(new Event(FIELD_MODE_STORAGE_EVENT));
+  });
+
+  expect(await screen.findByText(/Feltmodus aktiv/i)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Legg til lokal markør/i })).toHaveClass('min-h-16');
 });
 
 it('stores selected map package cache metadata in localStorage and can reset it', async () => {

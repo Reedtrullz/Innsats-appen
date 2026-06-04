@@ -51,6 +51,7 @@ import {
 import { buildFieldLogEntryFromMapObject } from '@/lib/mission/map-log-link';
 import { getMission, listMissions, saveMission } from '@/lib/mission/local-store';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
+import { DEFAULT_FIELD_MODE_SETTINGS, FIELD_MODE_STORAGE_EVENT, readFieldModeSettings } from '@/lib/field-mode/field-mode';
 import type { FieldLogCategory, MissionContext } from '@/lib/mission/schemas';
 
 const featureStyles: Record<SchematicMapFeatureKind, { fill: string; stroke: string }> = {
@@ -150,6 +151,9 @@ export function OfflineMapPanel() {
       return { markers: [], drawings: [] };
     }
   }, [mapStateSnapshot]);
+  const [fieldMode, setFieldMode] = useState(DEFAULT_FIELD_MODE_SETTINGS);
+  const fieldGloveMode = fieldMode.enabled && fieldMode.gloveMode;
+  const primaryButtonClass = fieldGloveMode ? 'min-h-16 rounded-xl bg-slate-950 px-5 text-lg font-bold text-white' : 'min-h-12 rounded-xl bg-slate-950 px-4 font-bold text-white';
   const [enabledLayers, setEnabledLayers] = useState<MapLayerKey[]>(DEFAULT_ENABLED_MAP_LAYERS);
   const [markerKind, setMarkerKind] = useState<MapMarkerKind>('incident-site');
   const [drawingKind, setDrawingKind] = useState<MapDrawingKind>('sector');
@@ -167,6 +171,28 @@ export function OfflineMapPanel() {
   const selectedPackage = getOfflineMapPackage(selectedPackageId) ?? OFFLINE_MAP_PACKAGES[0];
   const selectedWarning = cacheSizeWarningForPackage(selectedPackage);
   const filteredState = filterMissionMapStateByLayers(mapState, enabledLayers);
+
+  useEffect(() => {
+    const loadFieldMode = () => {
+      const next = readFieldModeSettings();
+      setFieldMode((current) => (
+        current.enabled === next.enabled
+        && current.gloveMode === next.gloveMode
+        && current.theme === next.theme
+        && current.outdoorReadabilityReviewed === next.outdoorReadabilityReviewed
+          ? current
+          : next
+      ));
+    };
+    loadFieldMode();
+    const onFieldModeChange = () => loadFieldMode();
+    window.addEventListener('storage', onFieldModeChange);
+    window.addEventListener(FIELD_MODE_STORAGE_EVENT, onFieldModeChange);
+    return () => {
+      window.removeEventListener('storage', onFieldModeChange);
+      window.removeEventListener(FIELD_MODE_STORAGE_EVENT, onFieldModeChange);
+    };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -314,6 +340,12 @@ export function OfflineMapPanel() {
         </p>
       </div>
 
+      {fieldMode.enabled ? (
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-black text-emerald-950">
+          Feltmodus aktiv{fieldGloveMode ? ' · hanskemodus gir større kartkontroller' : ''}
+        </div>
+      ) : null}
+
       <SchematicMap packageId={selectedPackage.id} state={filteredState} enabledLayers={enabledLayers} />
 
       <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Lokale kartpakker">
@@ -364,7 +396,7 @@ export function OfflineMapPanel() {
           <label className="text-sm font-bold">X 0-100<input name="markerX" required type="number" min="0" max="100" defaultValue="50" className="mt-1 min-h-11 w-full rounded-xl border px-3" /></label>
           <label className="text-sm font-bold">Y 0-100<input name="markerY" required type="number" min="0" max="100" defaultValue="50" className="mt-1 min-h-11 w-full rounded-xl border px-3" /></label>
           <label className="text-sm font-bold md:col-span-2">Notat uten persondata<textarea name="markerNote" className="mt-1 min-h-20 w-full rounded-xl border p-3" placeholder="Valgfritt, kort og sanitert" /></label>
-          <button type="submit" className="min-h-11 rounded-xl bg-sky-900 px-4 font-black text-white md:col-span-2">Legg til lokal markør</button>
+          <button type="submit" className={`${primaryButtonClass} md:col-span-2`}>Legg til lokal markør</button>
         </form>
         <div className="grid gap-2 md:grid-cols-2" aria-label="Kartlag">
           {[...MAP_MARKER_KINDS, ...MAP_DRAWING_KINDS].map((layer) => (
@@ -388,7 +420,7 @@ export function OfflineMapPanel() {
         <p className="text-sm font-semibold text-slate-700">Aktivt oppdrag: {activeMission ? activeMission.title : 'Ingen aktivt lokalt oppdrag funnet'}</p>
         <label className="block text-sm font-black text-slate-800" htmlFor="map-log-text">Loggtekst fra kartpunkt</label>
         <textarea id="map-log-text" value={mapLogText} onChange={(event) => setMapLogText(event.target.value)} className="min-h-28 w-full rounded-2xl border border-slate-300 p-3 text-base" placeholder="Kort observasjon uten persondata" />
-        <button type="button" onClick={() => void createLogFromNewestMarker()} disabled={mapLogSaving} className="min-h-12 rounded-xl bg-slate-950 px-4 font-bold text-white disabled:cursor-wait disabled:bg-slate-500">Opprett feltlogg fra kartpunkt</button>
+        <button type="button" onClick={() => void createLogFromNewestMarker()} disabled={mapLogSaving} className={`${primaryButtonClass} disabled:cursor-wait disabled:bg-slate-500`}>Opprett feltlogg fra kartpunkt</button>
       </section>
 
       <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Tegneverktøy og sektorer">
@@ -399,7 +431,7 @@ export function OfflineMapPanel() {
           <label className="text-sm font-bold">Etikett<input name="drawingLabel" required defaultValue="Teig alfa" className="mt-1 min-h-11 w-full rounded-xl border px-3" /></label>
           <label className="text-sm font-bold">Koordinater<textarea value={drawingCoordinates} onChange={(event) => setDrawingCoordinates(event.target.value)} className="mt-1 min-h-20 w-full rounded-xl border p-3 font-mono text-xs" aria-label="Tegnekoordinater" /></label>
           <label className="text-sm font-bold">Notat uten persondata<textarea name="drawingNote" className="mt-1 min-h-20 w-full rounded-xl border p-3" /></label>
-          <button type="submit" className="min-h-11 rounded-xl bg-sky-900 px-4 font-black text-white">Lagre lokal tegning/sektor</button>
+          <button type="submit" className={primaryButtonClass}>Lagre lokal tegning/sektor</button>
         </form>
         <p className="rounded-2xl bg-slate-50 p-3 text-sm font-black text-slate-800" data-testid="map-measurement-readout">{operationMeasurement(lastDrawing ?? mapState.drawings.at(-1))}</p>
         <div className="flex flex-wrap gap-3">
@@ -412,8 +444,8 @@ export function OfflineMapPanel() {
         <h2 className="text-2xl font-black">Lokal SVG og GeoJSON</h2>
         <p className="rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">{LOCATION_EXPORT_PRIVACY_WARNING}</p>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <button type="button" onClick={exportSvg} className="min-h-11 w-full rounded-xl bg-slate-900 px-4 font-black text-white sm:w-auto">Lag kartbilde (SVG)</button>
-          <button type="button" onClick={exportGeoJson} className="min-h-11 w-full rounded-xl bg-slate-900 px-4 font-black text-white sm:w-auto">Lag GeoJSON eksport</button>
+          <button type="button" onClick={exportSvg} className={`${primaryButtonClass} w-full sm:w-auto`}>Lag kartbilde (SVG)</button>
+          <button type="button" onClick={exportGeoJson} className={`${primaryButtonClass} w-full sm:w-auto`}>Lag GeoJSON eksport</button>
         </div>
         <label className="block text-sm font-bold">Kartbilde SVG<textarea id="map-image-export" readOnly value={imageExport} className="mt-1 min-h-32 w-full rounded-xl border p-3 font-mono text-xs" /></label>
         <label className="block text-sm font-bold">GeoJSON eksport<textarea id="map-geojson-export" readOnly value={geoJsonExport} className="mt-1 min-h-32 w-full rounded-xl border p-3 font-mono text-xs" /></label>
