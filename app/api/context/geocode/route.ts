@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     const guarded = guardExternalContextSignals(signals);
     if (!guarded.ok) return contextGuardError(guarded);
     return contextJson(guarded.value);
-  } catch (error) {
-    return contextJson({ error: error instanceof Error ? error.message : 'geocode unavailable' }, { status: 502 });
+  } catch {
+    return contextJson({ error: 'geocode unavailable' }, { status: 502 });
   }
 }

@@ -14,15 +14,15 @@ export async function GET(request: Request) {
     const defaultStart = new Date().toISOString().slice(0, 10);
     const defaultEnd = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
     if (start || end) normalizeNveDateRange(start ?? defaultStart, end ?? defaultEnd);
-  } catch (error) {
-    return contextJson({ error: error instanceof Error ? error.message : 'invalid date range' }, { status: 400 });
+  } catch {
+    return contextJson({ error: 'invalid date range' }, { status: 400 });
   }
   try {
     const signals = await fetchNveHazardSignals({ municipality, start, end });
     const guarded = guardExternalContextSignals(signals);
     if (!guarded.ok) return contextGuardError(guarded);
     return contextJson(guarded.value);
-  } catch (error) {
-    return contextJson({ error: error instanceof Error ? error.message : 'hazards unavailable' }, { status: 502 });
+  } catch {
+    return contextJson({ error: 'hazards unavailable' }, { status: 502 });
   }
 }
