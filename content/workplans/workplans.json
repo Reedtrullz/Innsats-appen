@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T07:16:12.416Z",
+  "generatedAt": "2026-06-04T07:53:43.189Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-04T07:16:12.416Z",
+      "updatedAt": "2026-06-04T07:53:43.189Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -4615,217 +4615,325 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-363",
           "title": "Extend Playwright E2E for full Før-Under-Etter journey with real data.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 363: Extend Playwright E2E for full Før-Under-Etter journey with real data."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-364",
           "title": "Add E2E for expanded 5-punktsordre templates.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 364: Add E2E for expanded 5-punktsordre templates."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-365",
           "title": "Add E2E for expanded sambandsplan templates.",
-          "status": "active",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 365: Add E2E for expanded sambandsplan templates."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-366",
           "title": "Add E2E for after-action report export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 366: Add E2E for after-action report export."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-367",
           "title": "Add E2E for structured field log.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 367: Add E2E for structured field log."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-368",
           "title": "Add E2E for RUH form.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 368: Add E2E for RUH form."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-369",
           "title": "Add E2E for privacy reset after archive/log creation.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 369: Add E2E for privacy reset after archive/log creation."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-370",
           "title": "Add accessibility tests with axe or equivalent.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 370: Add accessibility tests with axe or equivalent."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-371",
           "title": "Target WCAG 2.2 AA where practical.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 371: Target WCAG 2.2 AA where practical."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-372",
           "title": "Add keyboard navigation tests.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 372: Add keyboard navigation tests."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-373",
           "title": "Add screen-reader label checks.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 373: Add screen-reader label checks."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-374",
           "title": "Add performance tests for mobile/offline usage.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 374: Add performance tests for mobile/offline usage."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-375",
           "title": "Add storage quota tests.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 375: Add storage quota tests."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-376",
           "title": "Add import/export roundtrip tests.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 376: Add import/export roundtrip tests."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-377",
           "title": "Create manual test script for flom/pumpe.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 377: Create manual test script for flom/pumpe."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-378",
           "title": "Create manual test script for SAR/ettersøkning.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 378: Create manual test script for SAR/ettersøkning."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-379",
           "title": "Create manual test script for CBRNE.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 379: Create manual test script for CBRNE."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-380",
           "title": "Create manual test script for RADIAC/nedfall.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 380: Create manual test script for RADIAC/nedfall."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-381",
           "title": "Create manual test script for alvorlig ulykke/psykologisk førstehjelp.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 381: Create manual test script for alvorlig ulykke/psykologisk førstehjelp."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-382",
           "title": "Create manual test script for Etter innsats/MBK.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 382: Create manual test script for Etter innsats/MBK."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-383",
           "title": "Create manual test script for offline use.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 383: Create manual test script for offline use."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-384",
           "title": "Create manual test script for rain/gloves/darkness/stress.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 384: Create manual test script for rain/gloves/darkness/stress."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-385",
           "title": "Run real-device testing on iPhone Safari.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 385: Run real-device testing on iPhone Safari."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-386",
           "title": "Run real-device testing on Android Chrome.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 386: Run real-device testing on Android Chrome."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-387",
           "title": "Run install-to-home-screen testing.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 387: Run install-to-home-screen testing."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-388",
           "title": "Run low-connectivity testing.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 388: Run low-connectivity testing."
         },
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-389",
           "title": "Run update-after-offline testing.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-04T09:52:13+02:00",
+          "evidence": [
+            "Commit 4dca438 test: add group 13 e2e and manual coverage. Verified npm run check:ci; 17/17 Group 13 Playwright tests; npm audit --audit-level=high exited 0 with only existing moderate Next/PostCSS advisory; spec compliance review approved after task-376 coverage fix; code quality/security review approved."
+          ],
           "sourceHeading": "Task 389: Run update-after-offline testing."
         },
         {
