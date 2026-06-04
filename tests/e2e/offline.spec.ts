@@ -1,25 +1,76 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import { waitForServiceWorker } from './helpers';
 
-test('operational app shell routes load offline after service-worker warmup', async ({ page, context }) => {
+const routeHeadings: Record<string, RegExp> = {
+  '/': /Hva står du i nå/i,
+  '/ma-leses': /Må leses/i,
+  '/mer': /^Mer$/i,
+  '/begrensninger': /Operative grenser/i,
+  '/kjente-begrensninger': /Kjente begrensninger/i,
+  '/data-pa-enheten': /Data lagret på denne enheten/i,
+  '/oppdrag/ny': /Opprett lokalt oppdrag/i,
+  '/sok': /Søk i tiltak, kilder og moduler/i,
+  '/for': /^Før$/i,
+  '/under': /^Under$/i,
+  '/etter': /^Etter$/i,
+  '/kilder': /^Kilder$/i,
+  '/kort/alvorlig-ulykke-dod-eget-personell': /Alvorlig ulykke eller død blant eget personell/i,
+  '/kort/psykologisk-forstehjelp-sekvens': /Psykologisk førstehjelp steg for steg/i,
+  '/kort/sambandsplan-start': /Start sambandsplan/i,
+  '/oppdrag': /Lokale oppdrag/i,
+  '/hurtigkort': /Hurtigkort/i,
+  '/laering': /Opplæring/i,
+  '/kart': /^Kart$/i,
+  '/feltmodus': /Feltmodus/i,
+  '/personvern': /Lokal profil og personvern/i,
+  '/release': /Innsats-app pilot/i,
+  '/kildegjennomgang': /Kildegjennomgang/i,
+  '/datakilder': /Eksterne datakilder/i,
+  '/endringer': /Endringslogg/i,
+};
+
+async function visibleInternalRoutes(locator: Locator) {
+  return locator.evaluateAll((links) => Array.from(new Set(links
+    .map((link) => link.getAttribute('href')?.split('#')[0].split('?')[0] ?? '')
+    .filter((href) => href.startsWith('/')))));
+}
+
+async function expectOfflineRoute(page: Page, route: string) {
+  const heading = routeHeadings[route];
+  expect(heading, `missing offline heading expectation for visible route ${route}`).toBeDefined();
+  await page.goto(route, { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('heading', { name: heading }).first()).toBeVisible();
+  if (route !== '/release') await expect(page.getByRole('navigation', { name: /Hovednavigasjon/i })).toBeVisible();
+}
+
+async function expectVisibleRoutesWorkOffline(page: Page, routes: string[], sourceLabel: string) {
+  const missingExpectations = routes.filter((route) => !routeHeadings[route]);
+  expect(missingExpectations, `${sourceLabel} has visible routes without offline heading expectations`).toEqual([]);
+  for (const route of routes) {
+    await expectOfflineRoute(page, route);
+  }
+}
+
+test('visible app-shell and boundary links load offline after service-worker warmup', async ({ page, context }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Hva står du i nå/i })).toBeVisible();
   await waitForServiceWorker(page);
 
-  const operationalRoutes = [
-    { route: '/', heading: /Hva står du i nå/i },
-    { route: '/sok', heading: /Søk i tiltak, kilder og moduler/i },
-    { route: '/mer', heading: /^Mer$/i },
-  ];
-
   await context.setOffline(true);
   try {
-    for (const { route, heading } of operationalRoutes) {
-      await page.goto(route, { waitUntil: 'domcontentloaded' });
-      await expect(page.getByRole('heading', { name: heading }).first()).toBeVisible();
-      await expect(page.getByRole('navigation', { name: /Hovednavigasjon/i })).toBeVisible();
-    }
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const homeRoutes = await visibleInternalRoutes(page.locator('a[href^="/"]'));
+    await expectVisibleRoutesWorkOffline(page, homeRoutes, 'home page');
+
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const decisionNoticeRoutes = await visibleInternalRoutes(page.locator('section[aria-label="Operativ grense og lokal datalagring"] a[href^="/"]'));
+    expect(decisionNoticeRoutes).toEqual(['/begrensninger', '/kjente-begrensninger', '/data-pa-enheten']);
+    await expectVisibleRoutesWorkOffline(page, decisionNoticeRoutes, 'decision-support notice');
+
+    await page.goto('/mer', { waitUntil: 'domcontentloaded' });
+    const moreRoutes = await visibleInternalRoutes(page.locator('a[href^="/"]'));
+    await expectVisibleRoutesWorkOffline(page, moreRoutes, 'More page');
   } finally {
     await context.setOffline(false);
   }

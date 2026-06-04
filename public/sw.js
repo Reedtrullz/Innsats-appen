@@ -1,4 +1,4 @@
-const SW_CACHE_VERSION = 'v3';
+const SW_CACHE_VERSION = 'v4';
 const CACHE_NAME = `beredskapsboka-${SW_CACHE_VERSION}`;
 const GENERATED_CONTENT_STALE_MS = 7 * 24 * 60 * 60 * 1000;
 const MESSAGE_TYPES = {
@@ -25,6 +25,11 @@ const STATIC_APP_SHELL = [
   '/kilder',
   '/kildegjennomgang',
   '/faq',
+  '/begrensninger',
+  '/kjente-begrensninger',
+  '/data-pa-enheten',
+  '/personvern',
+  '/datakilder',
   '/endringer',
   '/nytt',
   '/ma-leses',
@@ -39,6 +44,7 @@ const STATIC_APP_SHELL = [
   '/moduler/radiac',
   '/moduler/tilfluktsrom',
   '/offline',
+  '/release',
   '/generated-content/manifest.json',
   '/generated-content/action-cards.json',
   '/generated-content/checklists.json',

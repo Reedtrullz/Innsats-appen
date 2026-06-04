@@ -25,10 +25,19 @@ describe('service worker metadata helpers', () => {
     expect(sw).toContain('BEREDSKAPSBOKA_GET_SW_STATUS');
     expect(sw).toContain('BEREDSKAPSBOKA_SKIP_WAITING');
     expect(staticAppShell).toContain('/');
-    expect(staticAppShell).toContain('/nytt');
-    expect(staticAppShell).toContain('/sok');
-    expect(staticAppShell).toContain('/mer');
-    expect(staticAppShell).not.toContain('/release');
+    for (const route of [
+      '/nytt',
+      '/sok',
+      '/mer',
+      '/begrensninger',
+      '/kjente-begrensninger',
+      '/data-pa-enheten',
+      '/personvern',
+      '/datakilder',
+      '/release',
+    ]) {
+      expect(staticAppShell).toContain(route);
+    }
   });
 
   it('detects stale generated content using the mobile/offline threshold', () => {
