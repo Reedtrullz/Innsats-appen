@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T01:10:07.679Z",
+  "generatedAt": "2026-06-04T01:56:49.810Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-04T01:10:07.679Z",
+      "updatedAt": "2026-06-04T01:56:49.810Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -3559,7 +3559,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-254",
           "title": "Verify and document official Kartverket endpoint usage.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 254: Verify and document official Kartverket endpoint usage."
@@ -3567,7 +3567,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-255",
           "title": "Verify and document official MET endpoint usage.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 255: Verify and document official MET endpoint usage."
@@ -3575,7 +3575,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-256",
           "title": "Verify and document official NVE endpoint usage.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 256: Verify and document official NVE endpoint usage."
@@ -3583,7 +3583,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-257",
           "title": "Configure production MET_USER_AGENT with contact-bearing value.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 257: Configure production MET_USER_AGENT with contact-bearing value."
@@ -3591,7 +3591,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-258",
           "title": "Add MET Alerts adapter if not already production-ready.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 258: Add MET Alerts adapter if not already production-ready."
@@ -3599,7 +3599,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-259",
           "title": "Add MET Nowcast adapter if useful for target locations.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 259: Add MET Nowcast adapter if useful for target locations."
@@ -3607,7 +3607,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-260",
           "title": "Add NVE flood warning normalization.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 260: Add NVE flood warning normalization."
@@ -3615,7 +3615,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-261",
           "title": "Add NVE landslide warning normalization.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 261: Add NVE landslide warning normalization."
@@ -3623,7 +3623,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-262",
           "title": "Add NVE avalanche warning normalization.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 262: Add NVE avalanche warning normalization."
@@ -3631,7 +3631,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-263",
           "title": "Add external context signal history per mission.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 263: Add external context signal history per mission."
@@ -3639,7 +3639,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-264",
           "title": "Add fetched-at/stale state to all context signals.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 264: Add fetched-at/stale state to all context signals."
@@ -3647,7 +3647,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-265",
           "title": "Add last-known-good cache for public context.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 265: Add last-known-good cache for public context."
@@ -3655,7 +3655,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-266",
           "title": "Add API failure UI that does not hide stale useful context.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 266: Add API failure UI that does not hide stale useful context."
@@ -3663,7 +3663,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-267",
           "title": "Add rate-limit handling tests.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 267: Add rate-limit handling tests."
@@ -3671,7 +3671,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-268",
           "title": "Add route-guard tests for unsupported query shapes.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 268: Add route-guard tests for unsupported query shapes."
@@ -3679,7 +3679,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-269",
           "title": "Add external-data-sources settings page.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 269: Add external-data-sources settings page."
@@ -3687,7 +3687,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-270",
           "title": "Allow users to disable Kartverket context.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 270: Allow users to disable Kartverket context."
@@ -3695,7 +3695,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-271",
           "title": "Allow users to disable MET context.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 271: Allow users to disable MET context."
@@ -3703,7 +3703,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-272",
           "title": "Allow users to disable NVE context.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 272: Allow users to disable NVE context."
