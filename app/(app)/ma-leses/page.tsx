@@ -18,7 +18,7 @@ export default function MustReadPage() {
       <section className="rounded-3xl bg-white p-5 shadow-sm">
         <p className="text-sm font-bold uppercase tracking-wide text-red-700">Kritiske innholdsendringer</p>
         <h1 className="text-3xl font-black">Må leses</h1>
-        <p className="mt-2 text-sm text-slate-700">Varsler om kritiske innholdsendringer. Dette er beslutningsstøtte og erstatter ikke lokal ordre, samband eller offisielt planverk.</p>
+        <p className="mt-2 text-sm text-slate-700">Dette er kritiske innholdsendringer i Beredskapsboka. Det er ikke Nødvarsel, ikke pushvarsel og ikke offisiell befolkningsvarsling. Dette er beslutningsstøtte og erstatter ikke lokal ordre, samband eller offisielt planverk.</p>
         <Link href="/endringer" className="mt-3 inline-flex min-h-11 items-center rounded-full bg-slate-100 px-4 text-sm font-black text-slate-800">Se full endringslogg</Link>
       </section>
 

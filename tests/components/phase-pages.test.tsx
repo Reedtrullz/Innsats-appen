@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import EtterPage from '@/app/(app)/etter/page';
+import KnownLimitationsPage from '@/app/(app)/kjente-begrensninger/page';
+import MustReadPage from '@/app/(app)/ma-leses/page';
 import UnderPage from '@/app/(app)/under/page';
 import { PhasePageContent } from '@/components/action-card-list';
 import type { ActionCard, ContentChangelogEntry, MustReadNotice, OperationalChecklist } from '@/lib/content/schemas';
@@ -69,4 +71,19 @@ it('links Etter CTAs to the exact dashboard sections', () => {
   expect(screen.getByRole('link', { name: /RUH og velferd/i })).toHaveAttribute('href', '/oppdrag#ruh-velferd');
   expect(screen.getByRole('link', { name: /Oppdragsmappe/i })).toHaveAttribute('href', '/oppdrag#oppdragsmappe');
   expect(screen.getByText(/lokal og ikke offisiell innsending/i)).toBeInTheDocument();
+});
+
+it('states that Må leses is not Nødvarsel or official population warning', () => {
+  const mustRead = render(<MustReadPage />);
+  const mustReadText = mustRead.container.textContent ?? '';
+  expect(mustReadText).toMatch(/ikke Nødvarsel/i);
+  expect(mustReadText).toMatch(/ikke pushvarsel/i);
+  expect(mustReadText).toMatch(/ikke offisiell befolkningsvarsling/i);
+  mustRead.unmount();
+
+  const limitations = render(<KnownLimitationsPage />);
+  const limitationsText = limitations.container.textContent ?? '';
+  expect(limitationsText).toMatch(/ikke Nødvarsel/i);
+  expect(limitationsText).toMatch(/ikke pushvarsel/i);
+  expect(limitationsText).toMatch(/ikke offisiell befolkningsvarsling/i);
 });
