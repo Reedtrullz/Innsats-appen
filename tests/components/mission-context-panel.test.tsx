@@ -7,6 +7,7 @@ import { EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY } from '@/lib/integrations/so
 import { readLocalAuditLog } from '@/lib/privacy/local-profile';
 import { OPERATIONS_MAP_STORAGE_KEY } from '@/lib/maps/operations-map';
 import type { OperationalChecklist } from '@/lib/content/schemas';
+import type { MissionContext } from '@/lib/mission/schemas';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
@@ -37,6 +38,51 @@ const checklists = [
     items: [],
   },
 ] as OperationalChecklist[];
+
+function mission({ id, title, ...overrides }: Omit<Partial<MissionContext>, 'id' | 'title'> & Pick<MissionContext, 'id' | 'title'>): MissionContext {
+  return {
+    id,
+    title,
+    createdAt: '2026-06-04T08:00:00.000Z',
+    updatedAt: '2026-06-04T08:00:00.000Z',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'generelt',
+    locationText: 'Lokalt område',
+    externalSignals: [],
+    externalSignalHistory: [],
+    activeChecklistIds: [],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [],
+    fieldLogEntries: [],
+    ruhReports: [],
+    welfareChecks: [],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+    ...overrides,
+  };
+}
+
+async function seedMissions(missions: MissionContext[]) {
+  for (const item of missions) {
+    await saveMission(item);
+  }
+}
+
+it('can open another local mission as the active dashboard', async () => {
+  await seedMissions([
+    mission({ id: 'mission-a', title: 'A', locationText: 'Lokasjon A', updatedAt: '2026-06-04T10:00:00.000Z' }),
+    mission({ id: 'mission-b', title: 'B', locationText: 'Lokasjon B', updatedAt: '2026-06-04T09:00:00.000Z' }),
+  ]);
+
+  render(<MissionContextPanel mode="list" contentVersion="test" checklists={[]} actionCards={[]} />);
+
+  expect(await screen.findByText(/A · Lokasjon A/i)).toBeInTheDocument();
+  await userEvent.click(await screen.findByRole('button', { name: /Åpne B som aktivt oppdrag/i }));
+  expect(await screen.findByText(/B · Lokasjon B/i)).toBeInTheDocument();
+});
 
 it('stores the checklist that matches the selected mission scenario and phase', async () => {
   render(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} />);

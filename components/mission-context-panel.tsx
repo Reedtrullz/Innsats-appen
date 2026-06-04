@@ -14,6 +14,7 @@ import { buildOrderUpdateSuggestions } from '@/lib/mission/order-update-suggesti
 import { buildMissionFolderExport, exportMissionFolderMarkdown } from '@/lib/mission/mission-folder-export';
 import { exportMissionStatusSummaryMarkdown } from '@/lib/mission/export-markdown';
 import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArchivedMission, listArchivedMissions, listChecklistRuns, listMissions, saveMission } from '@/lib/mission/local-store';
+import { readSelectedActiveMissionId, saveSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import type { MissionContext, ChecklistRun, MissionTaskStatus, QuickStatusMessage, ResourceRequestKind, FieldLogCategory, RuhCategory, RuhRisk, WelfareLoad } from '@/lib/mission/schemas';
 import { ChecklistRunner } from './checklist-runner';
@@ -895,6 +896,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
 export function MissionContextPanel({ mode = 'list', contentVersion, checklists, actionCards = [] }: { mode?: 'list' | 'create'; contentVersion: string; checklists: OperationalChecklist[]; actionCards?: ActionCard[] }) {
   const router = useRouter();
   const [missions, setMissions] = useState<MissionContext[]>([]);
+  const [selectedActiveMissionId, setSelectedActiveMissionId] = useState<string | null>(() => readSelectedActiveMissionId());
   const [archivedMissions, setArchivedMissions] = useState<MissionContext[]>([]);
   const [archiveSearch, setArchiveSearch] = useState('');
   const [privacyMessage, setPrivacyMessage] = useState('Lagres bare lokalt i denne nettleseren');
@@ -958,6 +960,8 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
     await clearLocalMissionData();
     appendLocalAuditEntry('local-reset', { resetScope: 'mission-data' });
     latestMissionsRef.current = [];
+    saveSelectedActiveMissionId(null);
+    setSelectedActiveMissionId(null);
     setMissions([]);
     setArchivedMissions([]);
     setPrivacyMessage('Dette sletter bare data i denne nettleseren. Beredskapsboka sender ikke oppdrag, sjekklister eller notater til en server i MVP.');
@@ -1012,6 +1016,12 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
     setPrivacyMessage('Lokalt arkiv er tømt i denne nettleseren. Aktive lokale oppdrag er beholdt.');
   }
 
+  function openMissionAsActive(mission: MissionContext) {
+    saveSelectedActiveMissionId(mission.id);
+    setSelectedActiveMissionId(mission.id);
+    setPrivacyMessage(`${mission.title} er valgt som aktivt oppdrag i denne nettleseren.`);
+  }
+
   if (mode === 'create') {
     return (
       <form onSubmit={(event) => void onSubmit(event)} className="space-y-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
@@ -1032,7 +1042,8 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
     );
   }
 
-  const activeMission = missions[0];
+  const activeMission = selectActiveMission(missions, selectedActiveMissionId);
+  const otherMissions = activeMission ? missions.filter((mission) => mission.id !== activeMission.id) : [];
   const activeChecklist = activeMission ? matchingChecklist(checklists, activeMission) : undefined;
   const archiveSearchActive = archiveSearch.trim().length > 0;
   return (
@@ -1054,14 +1065,19 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
           <a href="/oppdrag/ny" className="mt-4 inline-flex min-h-12 items-center rounded-xl bg-slate-950 px-5 font-bold text-white">Start oppdragstavle</a>
         </section>
       ) : <MissionCommandDashboard mission={activeMission} cards={actionCards} checklist={activeChecklist} checklists={checklists} onMissionChange={updateMission} onArchive={archiveActiveMission} />}
-      {missions.length > 1 ? (
+      {otherMissions.length > 0 ? (
         <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
           <h2 className="text-lg font-black">Andre lokale oppdrag</h2>
           <div className="mt-3 space-y-2">
-            {missions.slice(1).map((mission) => (
+            {otherMissions.map((mission) => (
               <article key={mission.id} className="rounded-xl border border-slate-200 p-3">
-                <h3 className="font-black">{mission.title}</h3>
-                <p className="text-sm font-semibold text-slate-600">{phaseLabels[mission.phase]} / {roleLabels[mission.role]} / {scenarioLabels[mission.scenario]} / {mission.locationText}</p>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 className="font-black">{mission.title}</h3>
+                    <p className="text-sm font-semibold text-slate-600">{phaseLabels[mission.phase]} / {roleLabels[mission.role]} / {scenarioLabels[mission.scenario]} / {mission.locationText}</p>
+                  </div>
+                  <button type="button" onClick={() => openMissionAsActive(mission)} className="min-h-11 rounded-xl border border-slate-300 px-3 text-sm font-bold text-slate-900">Åpne {mission.title} som aktivt oppdrag</button>
+                </div>
               </article>
             ))}
           </div>
