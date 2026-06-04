@@ -22,16 +22,17 @@ The GitHub Actions version of the flow is:
 push/PR -> automatic checks -> main-only Docker build/push -> main-only Ansible deploy -> exact-SHA public health verification
 ```
 
-## Current verified production deploy
+## Deployment verification status
 
-As of 2026-06-04T09:58:17Z:
+Repo docs cannot hard-code the current live SHA as a permanent fact because every docs-only status commit also creates and deploys a newer immutable image. Verify the current live SHA with:
 
-- SHA: `e259b39692b48601a7069fe3fbefad5fe74989c5`
-- GitHub Actions run: https://github.com/Reedtrullz/Innsats-appen/actions/runs/26943809255
-- Image tag: `ghcr.io/reedtrullz/innsats-appen:e259b39692b4`
-- Public health: `https://innsats.reidar.tech/api/health` returned `status=healthy`, `nodeEnv=production`, and the exact SHA.
+```bash
+git rev-parse origin/main
+curl -fsS https://innsats.reidar.tech/api/health
+gh run list --commit "$(git rev-parse origin/main)" --limit 5 --json databaseId,status,conclusion,headSha,url
+```
 
-See `docs/release/current-deployment-status.md` for the latest verification record and release-board caveats.
+The last audited application-code baseline was SHA `e259b39692b48601a7069fe3fbefad5fe74989c5`, verified by GitHub Actions run `26943809255`; see `docs/release/current-deployment-status.md` for details and release-board caveats.
 
 ## One-time prerequisites
 

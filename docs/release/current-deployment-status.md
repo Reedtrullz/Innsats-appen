@@ -1,37 +1,48 @@
-# Current deployment status
+# Deployment status and verification notes
 
-Updated: 2026-06-04T09:58:17Z
+Updated: 2026-06-04T10:10:00Z
 
-## Production
+## How to verify the current production SHA
 
-- Public URL: https://innsats.reidar.tech
-- Health endpoint: https://innsats.reidar.tech/api/health
-- GitHub repository: https://github.com/Reedtrullz/Innsats-appen
-- Current verified production SHA: `e259b39692b48601a7069fe3fbefad5fe74989c5`
-- GitHub Actions run: https://github.com/Reedtrullz/Innsats-appen/actions/runs/26943809255
-- GHCR image tag: `ghcr.io/reedtrullz/innsats-appen:e259b39692b4`
+Do not treat this markdown file as the source of the current live SHA. Every docs-only status commit also creates a new Git commit, runs CI/CD, and deploys a new immutable image. The source of truth for what is live is the public health endpoint plus the completed GitHub Actions run for that exact SHA.
 
-Live health check at 2026-06-04T09:58:17Z returned:
+Use:
 
-```json
-{"status":"healthy","app":"beredskapsboka","version":"e259b39692b48601a7069fe3fbefad5fe74989c5","nodeEnv":"production","timestamp":"2026-06-04T09:58:17.953Z"}
+```bash
+git rev-parse origin/main
+curl -fsS https://innsats.reidar.tech/api/health
+gh run list --commit "$(git rev-parse origin/main)" --limit 5 \
+  --json databaseId,status,conclusion,headSha,url
 ```
 
-## Verified gates for this SHA
+The health response must return `status=healthy`, `nodeEnv=production`, and `version` equal to the SHA being claimed.
 
-GitHub Actions run `26943809255` completed with conclusion `success` for all deploy-chain jobs:
+## Last audited application-code baseline
+
+The last non-doc audit/remediation baseline was:
+
+- Application-code SHA: `e259b39692b48601a7069fe3fbefad5fe74989c5`
+- GitHub Actions run: https://github.com/Reedtrullz/Innsats-appen/actions/runs/26943809255
+- GHCR image tag: `ghcr.io/reedtrullz/innsats-appen:e259b39692b4`
+- Live health at 2026-06-04T09:58:17Z returned `status=healthy`, `nodeEnv=production`, and `version=e259b39692b48601a7069fe3fbefad5fe74989c5`.
+
+That run completed with conclusion `success` for all deploy-chain jobs:
 
 - `Automatic checks`: high/critical npm audit, content build, TypeScript, ESLint, Vitest, production build, Playwright Chromium install, mobile JavaScript performance budget, Lighthouse mobile budget, and Playwright production smoke/E2E.
 - `Build and push GHCR image`: published immutable SHA image and `latest`.
 - `Deploy to VPS with Ansible`: deployed the immutable image and verified the public health endpoint returned the exact SHA.
 
-Local pre-push gate for the final header-overflow fix also passed:
+A later docs/status commit `fb82f34c6769d116004fc380bea8e4b5cb039646` also completed CI/CD successfully in run `26945029772`. Future docs-only commits may supersede that SHA while leaving the application-code baseline above unchanged.
+
+## Local validation performed for the docs/status update
+
+Before committing the docs/status update, this local gate passed:
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use 22 && npm run check:ci
 ```
 
-The local gate included `build:content`, `typecheck`, `lint`, 64 Vitest files / 352 tests, production Next build, 27 Playwright production E2E tests, route JS budget, and Lighthouse mobile budget.
+The local gate included `build:content`, `typecheck`, `lint`, 64 Vitest files / 353 tests, production Next build, 27 Playwright production E2E tests, route JS budget, and Lighthouse mobile budget.
 
 ## Workplan / release-board truthfulness
 
@@ -49,7 +60,7 @@ Blocked tasks requiring evidence that cannot be produced by local Chromium emula
 - Task 388: Run low-connectivity testing.
 - Task 389: Run update-after-offline testing.
 
-The production app is deployed and healthy, but broader pilot/go decision still requires staging or physical/real-device evidence for the five blocked tasks.
+The production app can be healthy while broader pilot/go decision remains blocked until staging or physical/real-device evidence exists for these five tasks.
 
 ## Boundary reminders
 

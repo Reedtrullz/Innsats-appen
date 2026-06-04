@@ -14,7 +14,7 @@ Required GitHub environment/secret configuration before the workflow can run:
 
 This file does not claim staging has been executed. Before broader pilot, run the staging workflow for the exact SHA and save its completed/successful run URL.
 
-Current production baseline for staging comparison: SHA `e259b39692b48601a7069fe3fbefad5fe74989c5`, verified by GitHub Actions run `26943809255` and `https://innsats.reidar.tech/api/health`. See `docs/release/current-deployment-status.md`.
+Current production comparison point: verify the live SHA with `https://innsats.reidar.tech/api/health` before comparing staging. The last audited application-code baseline is SHA `e259b39692b48601a7069fe3fbefad5fe74989c5`, verified by GitHub Actions run `26943809255`. See `docs/release/current-deployment-status.md`.
 
 ## Gates before broader pilot
 

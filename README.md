@@ -4,7 +4,7 @@ Mobile-first, offline-capable PWA for source-backed Sivilforsvaret decision supp
 
 - Repository: https://github.com/Reedtrullz/Innsats-appen
 - Production domain: https://innsats.reidar.tech
-- Current verified deployment: `e259b39692b48601a7069fe3fbefad5fe74989c5` via GitHub Actions run `26943809255`; see `docs/release/current-deployment-status.md`.
+- Current live SHA source of truth: `curl -fsS https://innsats.reidar.tech/api/health`; the last audited application-code baseline is `e259b39692b48601a7069fe3fbefad5fe74989c5` via GitHub Actions run `26943809255`. See `docs/release/current-deployment-status.md`.
 - GHCR image namespace: `ghcr.io/reedtrullz/innsats-appen`
 
 The app is a local MVP: generated content, mission dashboards, checklist runs, 5-punktsordre exports, sambandsplan exports, and release-readiness board state stay in the browser unless the user manually copies them out.

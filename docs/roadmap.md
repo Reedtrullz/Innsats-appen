@@ -2,12 +2,13 @@
 
 ## Current production posture
 
-Per 2026-06-04 er Beredskapsboka/Innsats-appen deploy-verifisert i produksjon på SHA `e259b39692b48601a7069fe3fbefad5fe74989c5`.
+Per 2026-06-04 er Beredskapsboka/Innsats-appen deploy-verifisert i produksjon. Repo-dokumenter hardkoder ikke permanent "current live SHA" fordi docs-only commits også deployes som nye immutable images.
 
-- Live: https://innsats.reidar.tech
-- Health endpoint verified exact SHA and `nodeEnv=production`.
+- Current live SHA: verifiser med `curl -fsS https://innsats.reidar.tech/api/health` og match mot `git rev-parse origin/main` / GitHub Actions run for samme SHA.
+- Last audited application-code baseline: `e259b39692b48601a7069fe3fbefad5fe74989c5`.
+- Baseline health endpoint verified exact SHA and `nodeEnv=production`.
 - GitHub Actions run `26943809255` completed successfully for automatic checks, GHCR image build/push and Ansible deploy.
-- Full status record: `docs/release/current-deployment-status.md`
+- Full status/verification note: `docs/release/current-deployment-status.md`
 
 Dette betyr at teknisk CI/CD/deploy baseline er grønn. Release board skal likevel vise fem blokkerte real-device/staging evidence-oppgaver.
 

@@ -6,11 +6,12 @@ Task 407 ruller ut med ett distrikt / one district først. Målet er å teste ny
 
 ## Current baseline
 
-Produksjon er deploy-verifisert på SHA `e259b39692b48601a7069fe3fbefad5fe74989c5` via GitHub Actions run `26943809255`.
+Produksjon er deploy-verifisert. Repo-dokumenter hardkoder ikke permanent "current live SHA" fordi hver docs-only statusoppdatering også deployes som ny immutable image.
 
+- Current live SHA: verifiser med `curl -fsS https://innsats.reidar.tech/api/health` og match mot GitHub Actions run for samme SHA.
+- Last audited application-code baseline: `e259b39692b48601a7069fe3fbefad5fe74989c5` via GitHub Actions run `26943809255`.
 - Live: https://innsats.reidar.tech
-- Health: https://innsats.reidar.tech/api/health returned `status=healthy`, `nodeEnv=production`, and exact SHA at 2026-06-04T09:58:17Z.
-- Status record: `docs/release/current-deployment-status.md`
+- Status/verification note: `docs/release/current-deployment-status.md`
 
 Dette er en teknisk deploy-/CI-godkjent baseline, ikke en bredere pilot-go.
 
