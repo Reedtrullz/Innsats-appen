@@ -29,6 +29,7 @@ export async function buildGeneratedSearchIndex(generatedDir = 'content/generate
       body: [...(card.steps ?? []), ...(card.safety ?? []), ...(card.reporting ?? []), card.warning ?? '', ...(card.competenceRequired ?? []), ...(card.equipmentRequired ?? [])].join(' '),
       scenario: card.scenarios.join(' '),
       role: card.roles.join(' '),
+      phase: card.phase,
       type: 'kort',
       href: `/kort/${card.slug}`,
     })),

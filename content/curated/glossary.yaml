@@ -1,24 +1,73 @@
 - term: jod
   definition: Jodtabletter brukes bare etter råd fra myndighetene ved atomberedskap.
   aliases: [kaliumjodid]
-  synonyms: [jodtabletter, atomberedskap]
-  sourceIds: [src-jodtabletter-i-sivilforsvaret]
+  synonyms: [jodtablett, jodtabletter, jod-tablett, atomulykke, atomberedskap, radioaktivt nedfall, nukleær hendelse]
+  sourceIds: [src-jodtabletter-i-sivilforsvaret, src-atomberedskap-i-norge-og-sivilforsvarets-rolle]
 - term: dose
   definition: Stråledose registreres med metode, tid, sted og usikkerhet.
-  synonyms: [dosimeter, dosekontroll, radiac]
+  synonyms: [dosimeter, doserate, dosekontroll, radiac, stråling, oppholdstid]
   sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
 - term: rens
   definition: Grov-/finrens ved CBRN-hendelser skal skille ren og uren side.
-  synonyms: [sanering, CBRN, MRE]
-  sourceIds: [src-veileder-for-sivilforsvarets-renseenheter-cbrn]
+  synonyms: [sanering, dekontaminering, grovrens, finrens, ren side, uren side, MRE, CBRN]
+  sourceIds: [src-veileder-for-sivilforsvarets-renseenheter-cbrn, src-samvirke-pa-forurenset-skadested-cbrne-sps41]
 - term: MFE
   definition: Mobil forsterkningsenhet som kan støtte distrikter ved større hendelser.
-  synonyms: [mobil forsterkningsenhet, støtte]
+  synonyms: [mobil forsterkningsenhet, forsterkningsenhet, nasjonal støtte, støtteanmodning]
   sourceIds: [src-mobile-forsterkningsenheter-mfe]
 - term: RADIAC
   definition: Radiologisk måletjeneste for måling, dosekontroll og rapportering.
-  synonyms: [radiacmåling, stråling, dose]
+  synonyms: [radiacmåling, stråling, dose, dosimeter, doserate]
   sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
+- term: samband
+  definition: Planlagt samband beskriver radiobruk, kallesignal, kanaler/talegrupper og alternative kontaktveier.
+  synonyms: [radio, nødnett, kallesignal, sambandstest, kommunikasjonsplan, sambandsplan]
+  sourceIds: [src-kommunikasjons-og-sambandsdiagram, src-5-punktsordre]
+- term: samleplass
+  definition: Samleplass brukes som felles oppmøte-, mottaks- eller samlepunktsbegrep etter oppdragets plan.
+  aliases: [oppmøtested, frammøtested]
+  synonyms: [depot, staging, mottakspunkt, samlepunkt]
+  sourceIds: [src-kursplan-grunnkurs-fig10, src-5-punktsordre]
+- term: ordre
+  definition: 5-punktsordre strukturerer situasjon, oppdrag, plan/utførelse, administrasjon/forsyning og ledelse/samband.
+  aliases: [5-punktsordre]
+  synonyms: [fempunktsordre, oppdrag, ordrepunkt, situasjon, utførelse, ledelse]
+  sourceIds: [src-5-punktsordre]
+- term: KO
+  definition: Kommandoplass/KO og IL-KO brukes som søkeord for ledelsesplass i innsatsområdet.
+  aliases: [IL-KO, ilko, ko]
+  synonyms: [kommandoplass, innsatsleders KO, innsatsleders IL-KO]
+  sourceIds: [src-5-punktsordre, src-operativt-konsept-for-sivilforsvaret]
+- term: innsatsleder
+  definition: Innsatsleder/IL er et samvirkebegrep som ofte brukes sammen med politi, brann, helse og stab.
+  aliases: [IL]
+  synonyms: [innsatsledelse, politi, brann, helse, stab]
+  sourceIds: [src-5-punktsordre, src-deep-research-leder-og-lagforer]
+- term: beredskapsvakt
+  definition: Beredskapsvakt/vakthavende dekker vaktfunksjon, mottak av varsler og første oppfølging.
+  aliases: [vakt]
+  synonyms: [vakthavende, varselmottak]
+  sourceIds: [src-opplaeringsplan-for-beredskapsvakt, src-tiltakskort-01-vaktbytte]
+- term: pumpe
+  definition: Pumpe og lensepumpe brukes ved flom, vannforsyning, slangeutlegg og vannskade.
+  aliases: [lensepumpe]
+  synonyms: [flom, vannforsyning, slangeutlegg, vannskade]
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-operativt-konsept-for-sivilforsvaret]
+- term: skadde
+  definition: Søketermer for skadde og førstehjelp peker til livreddende tiltak; ikke registrer pasientdata i appen.
+  aliases: [skadet]
+  synonyms: [samleplass, førstehjelp, "113", livreddende førstehjelp, pasient]
+  sourceIds: [src-deep-research-forstehjelp, src-livreddende-tiltak-ved-rn-hendelse]
+- term: psykososial
+  definition: Psykososial oppfølging dekker defuse/defusing, debrief, EFOK, kollegastøtte og psykisk førstehjelp.
+  aliases: [EFOK]
+  synonyms: [defuse, defusing, debrief, kollegastøtte, psykisk førstehjelp]
+  sourceIds: [src-psykososial-oppfolging-og-kollegastotte, src-tiltakskort-psykologisk-forstehjelp]
+- term: MBK
+  definition: Materiellberedskapskontroll/MBK dekker materiellkontroll, etterkontroll, klargjøring og service etter bruk.
+  aliases: [materiellberedskap]
+  synonyms: [materiellkontroll, etterkontroll, klargjøring, karantene, service, vask]
+  sourceIds: [src-mobile-forsterkningsenheter-mfe, src-opplaering-materiellansvarlig-fig]
 - term: tilfluktsrom
   definition: Beskyttelsestiltak der bare offentlig/godkjent informasjon skal brukes i MVP.
   synonyms: [sivile beskyttelsestiltak, offentlig tilfluktsrom]

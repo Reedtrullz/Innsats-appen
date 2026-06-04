@@ -23,7 +23,7 @@ it('renders new and updated procedures from generated changelog', () => {
 it('renders must-read notices linked to cards and changelog', () => {
   render(<MustReadPage />);
 
-  expect(screen.getByRole('heading', { name: /Må leses/i })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { level: 1, name: /Må leses/i })).toBeInTheDocument();
   expect(screen.getByText(/erstatter ikke lokal ordre/i)).toBeInTheDocument();
   expect(screen.getAllByText(/Kilder:/i).length).toBeGreaterThan(0);
 });

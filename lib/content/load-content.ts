@@ -111,3 +111,10 @@ export function getContentManifest(): ContentManifest {
   if (!fs.existsSync(filePath)) throw new Error(`Missing generated manifest: ${filePath}`);
   return ContentManifestSchema.parse(JSON.parse(fs.readFileSync(filePath, 'utf8')));
 }
+
+export function getSearchIndexGeneratedAt(): string | undefined {
+  const filePath = path.join(generatedRoot, 'search-index.json');
+  if (!fs.existsSync(filePath)) return undefined;
+  const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8')) as { generatedAt?: unknown };
+  return typeof parsed.generatedAt === 'string' ? parsed.generatedAt : undefined;
+}
