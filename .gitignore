@@ -15,6 +15,8 @@ content/generated/*.json
 !content/generated/source-documents.json
 public/generated-content/
 public/content-assets/
+!public/content-assets/
+!public/content-assets/*.png
 
 # Raw source drop from the original Beredskapsboka material.
 # The app imports from Obsidian/generated content; do not commit source artifacts from repo root.
