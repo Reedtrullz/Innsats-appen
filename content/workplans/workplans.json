@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-04T01:56:49.810Z",
+  "generatedAt": "2026-06-04T02:54:02.272Z",
   "sourceCount": 5,
   "workplans": [
     {
@@ -858,7 +858,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-04T01:56:49.810Z",
+      "updatedAt": "2026-06-04T02:54:02.272Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -3711,7 +3711,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-273",
           "title": "Write ADR for offline map architecture.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 273: Write ADR for offline map architecture."
@@ -3719,7 +3719,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-274",
           "title": "Choose offline map approach: MBTiles/MapLibre, Leaflet tile packages or static map packages.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 274: Choose offline map approach: MBTiles/MapLibre, Leaflet tile packages or static map packages."
@@ -3727,7 +3727,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-275",
           "title": "Implement basic map page after ADR approval.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 275: Implement basic map page after ADR approval."
@@ -3735,7 +3735,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-276",
           "title": "Add map source attribution.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 276: Add map source attribution."
@@ -3743,7 +3743,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-277",
           "title": "Add optional map package download for selected area/district.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 277: Add optional map package download for selected area/district."
@@ -3751,7 +3751,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-278",
           "title": "Add map cache size warning.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 278: Add map cache size warning."
@@ -3759,7 +3759,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-279",
           "title": "Add map cache reset.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 279: Add map cache reset."
@@ -3767,7 +3767,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-280",
           "title": "Optimize map performance on older phones.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 280: Optimize map performance on older phones."
@@ -3775,7 +3775,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-281",
           "title": "Add offline map E2E test.",
-          "status": "active",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "sourceHeading": "Task 281: Add offline map E2E test."
@@ -3783,7 +3783,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-282",
           "title": "Add map markers for incident site.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 282: Add map markers for incident site."
@@ -3791,7 +3791,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-283",
           "title": "Add map markers for hazards.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 283: Add map markers for hazards."
@@ -3799,7 +3799,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-284",
           "title": "Add map markers for resources.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 284: Add map markers for resources."
@@ -3807,7 +3807,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-285",
           "title": "Add map markers for meeting point.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 285: Add map markers for meeting point."
@@ -3815,7 +3815,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-286",
           "title": "Add map markers for IL-KO.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 286: Add map markers for IL-KO."
@@ -3823,7 +3823,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-287",
           "title": "Add map markers for pump location.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 287: Add map markers for pump location."
@@ -3831,7 +3831,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-288",
           "title": "Add map markers for observations.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 288: Add map markers for observations."
@@ -3839,7 +3839,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-289",
           "title": "Add map layer controls.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 289: Add map layer controls."
@@ -3847,7 +3847,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-290",
           "title": "Add drawing tools for point, line and polygon.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 290: Add drawing tools for point, line and polygon."
@@ -3855,7 +3855,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-291",
           "title": "Add sector/teig drawing tools.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 291: Add sector/teig drawing tools."
@@ -3863,7 +3863,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-292",
           "title": "Add distance measuring tool.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 292: Add distance measuring tool."
@@ -3871,7 +3871,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-293",
           "title": "Add area measuring tool.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 293: Add area measuring tool."
@@ -3879,7 +3879,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-294",
           "title": "Add local save/load of sectors.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 294: Add local save/load of sectors."
@@ -3887,7 +3887,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-295",
           "title": "Add map image export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 295: Add map image export."
@@ -3895,7 +3895,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-296",
           "title": "Add GeoJSON export.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 296: Add GeoJSON export."
@@ -3903,7 +3903,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-297",
           "title": "Add GeoJSON import.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 297: Add GeoJSON import."
@@ -3911,7 +3911,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-298",
           "title": "Add KML import evaluation.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 298: Add KML import evaluation."
@@ -3919,7 +3919,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-299",
           "title": "Add privacy warning for location exports.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 299: Add privacy warning for location exports."
@@ -3927,7 +3927,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-300",
           "title": "Design QR/file-based sector import from leadership without backend sync.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 300: Design QR/file-based sector import from leadership without backend sync."
@@ -3935,7 +3935,7 @@
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-301",
           "title": "Research shared live position/blue-force tracking as post-MVP only.",
-          "status": "active",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "sourceHeading": "Task 301: Research shared live position/blue-force tracking as post-MVP only."
