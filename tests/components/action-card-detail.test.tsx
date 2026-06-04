@@ -50,3 +50,52 @@ it('shows competence rationale when no explicit competence requirement exists', 
   expect(screen.getByText(/Kompetansevurdering/i)).toBeInTheDocument();
   expect(screen.getByText(/Tilfluktsromstøtte styres av ansvarlig myndighet/i)).toBeInTheDocument();
 });
+
+it('summarizes source confidence before the full source list', () => {
+  const card = { slug: 'flom-pumpe-start', title: 'Flom og pumpeutlegg', phase: 'under', roles: ['lagforer'], scenarios: ['flom'], priority: 'high', steps: ['Start pumpe'], safety: [], reporting: [], sourceIds: ['src-flom'], competenceRequired: [] } as ActionCard;
+  const sources = [testSource({ id: 'src-flom', title: 'SRC - Flom', status: 'verified', verifiedAt: '2026-06-04', body: 'Flom' })];
+
+  render(<ActionCardDetail card={card} sources={sources} />);
+
+  expect(screen.getByRole('heading', { name: /Kildestatus/i })).toBeInTheDocument();
+  expect(screen.getByText(/Verifisert kildegrunnlag/i)).toBeInTheDocument();
+  expect(screen.getByText(/Sist verifisert: 2026-06-04/i)).toBeInTheDocument();
+});
+
+it('warns when a card has an expired source', () => {
+  const card = { slug: 'flom-pumpe-start', title: 'Flom og pumpeutlegg', phase: 'under', roles: ['lagforer'], scenarios: ['flom'], priority: 'high', steps: ['Start pumpe'], safety: [], reporting: [], sourceIds: ['src-flom'], competenceRequired: [] } as ActionCard;
+  const sources = [testSource({ id: 'src-flom', title: 'SRC - Flom', status: 'expired', verifiedAt: '2026-06-04', expiresAt: '2000-01-01', body: 'Flom' })];
+
+  render(<ActionCardDetail card={card} sources={sources} />);
+
+  expect(screen.getByText(/Kilde krever kontroll/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/Utløpt kilde/i).length).toBeGreaterThan(0);
+  expect(screen.getByText(/Status: expired/i)).toBeInTheDocument();
+  expect(screen.queryByText(/Verifisert kildegrunnlag/i)).not.toBeInTheDocument();
+});
+
+it('warns and shows a missing source id even when another linked source is verified', () => {
+  const card = { slug: 'flom-pumpe-start', title: 'Flom og pumpeutlegg', phase: 'under', roles: ['lagforer'], scenarios: ['flom'], priority: 'high', steps: ['Start pumpe'], safety: [], reporting: [], sourceIds: ['src-flom', 'missing-source'], competenceRequired: [] } as ActionCard;
+  const sources = [testSource({ id: 'src-flom', title: 'SRC - Flom', status: 'verified', verifiedAt: '2026-06-04', body: 'Flom' })];
+
+  render(<ActionCardDetail card={card} sources={sources} />);
+
+  expect(screen.getByText(/Kilde krever kontroll/i)).toBeInTheDocument();
+  expect(screen.getByText(/Mangler kilde: missing-source/i)).toBeInTheDocument();
+  expect(screen.queryByText(/Verifisert kildegrunnlag/i)).not.toBeInTheDocument();
+});
+
+it('warns when linked sources mix current and draft source states', () => {
+  const card = { slug: 'flom-pumpe-start', title: 'Flom og pumpeutlegg', phase: 'under', roles: ['lagforer'], scenarios: ['flom'], priority: 'high', steps: ['Start pumpe'], safety: [], reporting: [], sourceIds: ['src-current', 'src-draft'], competenceRequired: [] } as ActionCard;
+  const sources = [
+    testSource({ id: 'src-current', title: 'SRC - Current', status: 'verified', verifiedAt: '2026-06-04', body: 'Current' }),
+    testSource({ id: 'src-draft', title: 'SRC - Draft', status: 'draft', verifiedAt: '2026-06-04', reviewAfter: '2099-01-01', body: 'Draft' }),
+  ];
+
+  render(<ActionCardDetail card={card} sources={sources} />);
+
+  expect(screen.getByText(/Kilde krever kontroll/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/Høy kilde-risiko/i).length).toBeGreaterThan(0);
+  expect(screen.getByText(/Status: draft/i)).toBeInTheDocument();
+  expect(screen.queryByText(/Verifisert kildegrunnlag/i)).not.toBeInTheDocument();
+});

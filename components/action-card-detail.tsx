@@ -1,4 +1,5 @@
 import type { ActionCard, SourceDocument } from '@/lib/content/schemas';
+import { sourceFreshness } from '@/lib/content/source-review';
 import { competenceLabels, phaseLabels, roleLabels, scenarioLabels } from '@/lib/content/taxonomy';
 import { SourceBadge } from './source-badge';
 import { WarningBanner } from './warning-banner';
@@ -38,8 +39,65 @@ function CompetenceGuardrail({ card }: { card: ActionCard }) {
   );
 }
 
+function sourceStatusClasses(status: SourceDocument['status']) {
+  if (status === 'verified') return 'border-emerald-200 bg-emerald-50 text-emerald-800';
+  if (status === 'expired') return 'border-red-200 bg-red-50 text-red-800';
+  return 'border-amber-200 bg-amber-50 text-amber-900';
+}
+
+function freshnessClasses(tone: ReturnType<typeof sourceFreshness>['tone']) {
+  if (tone === 'red') return 'border-red-200 bg-red-50 text-red-700';
+  if (tone === 'amber') return 'border-amber-200 bg-amber-50 text-amber-800';
+  if (tone === 'emerald') return 'border-emerald-200 bg-emerald-50 text-emerald-700';
+  return 'border-slate-200 bg-slate-50 text-slate-700';
+}
+
+function SourceConfidencePanel({ linkedSources, missingSourceIds }: { linkedSources: SourceDocument[]; missingSourceIds: string[] }) {
+  const sourceReviews = linkedSources.map((source) => ({ source, freshness: sourceFreshness(source) }));
+  const hasVerifiedSourceBase = missingSourceIds.length === 0 && sourceReviews.length > 0 && sourceReviews.every((item) => item.freshness.state === 'current');
+  const panelClasses = hasVerifiedSourceBase
+    ? 'rounded-3xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-950 shadow-sm'
+    : 'rounded-3xl border border-amber-300 bg-amber-50 p-5 text-amber-950 shadow-sm';
+
+  return (
+    <section className={panelClasses} aria-labelledby="source-confidence-heading">
+      <h2 id="source-confidence-heading" className="text-xl font-black">Kildestatus</h2>
+      <p className="mt-2 text-base font-black">{hasVerifiedSourceBase ? 'Verifisert kildegrunnlag' : 'Kilde krever kontroll'}</p>
+      <p className="mt-2 text-sm font-semibold">
+        Kildeutdragene er støtte, ikke fullstendig originalkilde. Kontroller mot gjeldende ordre og ansvarlig myndighet før operativ bruk.
+      </p>
+      {sourceReviews.length > 0 ? (
+        <ul className="mt-3 space-y-2 text-sm font-semibold">
+          {sourceReviews.map(({ source, freshness }) => (
+            <li key={source.id} className="flex flex-wrap items-center gap-2">
+              <span className="font-black">{source.id}</span>
+              <span className={`rounded-full border px-2 py-0.5 text-xs font-black ${sourceStatusClasses(source.status)}`}>Status: {source.status}</span>
+              <span className={`rounded-full border px-2 py-0.5 text-xs font-black ${freshnessClasses(freshness.tone)}`}>{freshness.label}</span>
+              <span>Sist verifisert: {source.verifiedAt}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-3 text-sm font-semibold">Ingen koblede kilder ble funnet for dette tiltakskortet.</p>
+      )}
+      {missingSourceIds.length > 0 ? (
+        <ul className="mt-3 space-y-2 text-sm font-black text-red-800">
+          {missingSourceIds.map((id) => <li key={id}>Mangler kilde: {id}</li>)}
+        </ul>
+      ) : null}
+    </section>
+  );
+}
+
 export function ActionCardDetail({ card, sources }: { card: ActionCard; sources: SourceDocument[] }) {
-  const linkedSources = card.sourceIds.map((id) => sources.find((source) => source.id === id)).filter(Boolean) as SourceDocument[];
+  const sourceById = new Map(sources.map((source) => [source.id, source]));
+  const linkedSources: SourceDocument[] = [];
+  const missingSourceIds: string[] = [];
+  card.sourceIds.forEach((id) => {
+    const source = sourceById.get(id);
+    if (source) linkedSources.push(source);
+    else missingSourceIds.push(id);
+  });
   return (
     <article className="space-y-4">
       <div className="rounded-3xl bg-white p-5 shadow-sm">
@@ -54,6 +112,7 @@ export function ActionCardDetail({ card, sources }: { card: ActionCard; sources:
       {card.warning ? <WarningBanner>{card.warning}</WarningBanner> : null}
       {linkedSources.flatMap((source) => source.warnings).map((warning) => <WarningBanner key={warning}>{warning}</WarningBanner>)}
       <CompetenceGuardrail card={card} />
+      <SourceConfidencePanel linkedSources={linkedSources} missingSourceIds={missingSourceIds} />
       <section className="rounded-3xl bg-white p-5 shadow-sm">
         <h2 className="text-xl font-black">Tiltak</h2>
         <ol className="mt-3 list-decimal space-y-2 pl-5 text-slate-800">
