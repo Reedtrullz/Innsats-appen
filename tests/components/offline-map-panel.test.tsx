@@ -111,7 +111,9 @@ it('keeps rendered map marker count capped for the large district package', asyn
 
 it('adds local operational markers, toggles layers, and resets local sectors', async () => {
   const user = userEvent.setup();
+  await saveMission(activeMission);
   render(<OfflineMapPanel />);
+  expect(await screen.findByText(/Aktivt oppdrag: Kartlogg test/i)).toBeInTheDocument();
 
   await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'hazard');
   await user.type(screen.getByPlaceholderText(/Sanitert lokal etikett/i), 'Fareområde');
@@ -129,6 +131,35 @@ it('adds local operational markers, toggles layers, and resets local sectors', a
 
   await user.click(screen.getByRole('button', { name: /Nullstill lokale sektorer/i }));
   expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toBeNull();
+});
+
+it('attaches the active mission id to newly saved local markers', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  render(<OfflineMapPanel />);
+  expect(await screen.findByText(/Aktivt oppdrag: Kartlogg test/i)).toBeInTheDocument();
+
+  await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'observation');
+  await user.type(screen.getByPlaceholderText(/Sanitert lokal etikett/i), 'Observasjon med oppdrag');
+  await user.click(screen.getByRole('button', { name: /Legg til lokal markør/i }));
+
+  await waitFor(() => {
+    expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toContain('"missionId":"mission-map-log"');
+  });
+});
+
+it('blocks local marker saves when no active mission exists', async () => {
+  const user = userEvent.setup();
+  render(<OfflineMapPanel />);
+  expect(await screen.findByText(/Aktivt oppdrag: Ingen aktivt lokalt oppdrag funnet/i)).toBeInTheDocument();
+
+  await user.type(screen.getByPlaceholderText(/Sanitert lokal etikett/i), 'Markør uten oppdrag');
+  await user.click(screen.getByRole('button', { name: /Legg til lokal markør/i }));
+
+  await waitFor(() => {
+    expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toBeNull();
+    expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Opprett aktivt oppdrag før du lagrer lokale kartobjekter/i);
+  });
 });
 
 it('creates a field-log entry on the active mission from the newest map marker', async () => {
@@ -237,7 +268,9 @@ it('preserves newer local mission updates when saving a field log from the map',
 
 it('adds a local sector, measures it, and creates sanitized SVG and GeoJSON exports', async () => {
   const user = userEvent.setup();
+  await saveMission(activeMission);
   render(<OfflineMapPanel />);
+  expect(await screen.findByText(/Aktivt oppdrag: Kartlogg test/i)).toBeInTheDocument();
 
   await user.click(screen.getByRole('button', { name: /Lagre lokal tegning\/sektor/i }));
   expect(screen.getByTestId('map-measurement-readout')).toHaveTextContent(/Sektor\/teig: avstand/i);
@@ -251,6 +284,32 @@ it('adds a local sector, measures it, and creates sanitized SVG and GeoJSON expo
   expect((screen.getByLabelText(/GeoJSON eksport/i) as HTMLTextAreaElement).value).toContain('schematic-0-100-local-only');
   expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'map-geojson')).toBe(true);
   expect(screen.getAllByText(/Lokale kartmarkører og sektorer kan røpe/i).length).toBeGreaterThan(0);
+});
+
+it('attaches the active mission id to newly saved local drawings', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  render(<OfflineMapPanel />);
+  expect(await screen.findByText(/Aktivt oppdrag: Kartlogg test/i)).toBeInTheDocument();
+
+  await user.click(screen.getByRole('button', { name: /Lagre lokal tegning\/sektor/i }));
+
+  await waitFor(() => {
+    expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toContain('"missionId":"mission-map-log"');
+  });
+});
+
+it('blocks local drawing saves when no active mission exists', async () => {
+  const user = userEvent.setup();
+  render(<OfflineMapPanel />);
+  expect(await screen.findByText(/Aktivt oppdrag: Ingen aktivt lokalt oppdrag funnet/i)).toBeInTheDocument();
+
+  await user.click(screen.getByRole('button', { name: /Lagre lokal tegning\/sektor/i }));
+
+  await waitFor(() => {
+    expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toBeNull();
+    expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Opprett aktivt oppdrag før du lagrer lokale kartobjekter/i);
+  });
 });
 
 it('imports supported schematic GeoJSON and documents KML and blue-force as post-MVP', async () => {

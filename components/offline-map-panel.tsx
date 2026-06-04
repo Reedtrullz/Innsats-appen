@@ -226,9 +226,14 @@ export function OfflineMapPanel() {
   }
 
   function addMarker(formData: FormData) {
+    if (!activeMission) {
+      setStatusMessage('Opprett aktivt oppdrag før du lagrer lokale kartobjekter.');
+      return;
+    }
     try {
       const marker = createMissionMapMarker({
         kind: markerKind,
+        missionId: activeMission.id,
         label: formData.get('markerLabel'),
         x: formData.get('markerX'),
         y: formData.get('markerY'),
@@ -288,9 +293,14 @@ export function OfflineMapPanel() {
   }
 
   function addDrawing(formData: FormData) {
+    if (!activeMission) {
+      setStatusMessage('Opprett aktivt oppdrag før du lagrer lokale kartobjekter.');
+      return;
+    }
     try {
       const drawing = createMissionMapDrawing({
         kind: drawingKind,
+        missionId: activeMission.id,
         label: formData.get('drawingLabel'),
         coordinates: drawingCoordinates,
         note: formData.get('drawingNote'),
