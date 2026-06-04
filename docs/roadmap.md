@@ -12,6 +12,12 @@ Per 2026-06-04 er Beredskapsboka/Innsats-appen deploy-verifisert i produksjon. R
 
 Dette betyr at teknisk CI/CD/deploy baseline er grønn. Release board skal likevel vise fem blokkerte real-device/staging evidence-oppgaver.
 
+## Operational command surface
+
+Den feltvendte UI-modellen er nå Hjem → Søk → Oppdrag → Kort → Mer. Primærflyten er Situation → Phase → Next action → Checklist → Export → Source: brukeren skal først forstå situasjon/fase, deretter finne neste lokale handling, sjekkliste, eksport og kildegrunnlag. `/release` holdes utenfor operational shell og forblir admin/release-readiness.
+
+Dette er fortsatt MVP uten login, sentral hendelsesdatabase, backend mission sync, patient/persondata, offisiell kommando-systemintegrasjon eller private/skjermede tilfluktsromdata. Se `docs/ui-operational-command-surface.md`.
+
 ## Group 14
 
 Group 14 lukker staging, release notes, guider, pilot og vedlikehold. Post-MVP arbeid holdes bak governance: backend sync, auth, push, CIM/Nødnett-integrasjon og persondata krever egen plan.

@@ -60,8 +60,9 @@ npm run e2e:prod -- tests/e2e/offline.spec.ts
 
 ## Current app surfaces
 
-- `/hurtigkort`, `/for`, `/under`, `/etter`, `/kilder`, and `/moduler/*` expose source-backed cards, phase pages, source views, and specialist modules.
-- `/oppdrag/ny` creates a local mission context; `/oppdrag` shows the active mission dashboard with recommended cards, scenario module link, matching checklist progress, order/comms export tools, and cached/stale public context signals.
+- `/`, `/sok`, `/hurtigkort`, `/for`, `/under`, `/etter`, `/kilder`, and `/moduler/*` expose the operational command entry point, local/offline search, source-backed cards, phase pages, source views, and specialist modules.
+- `/oppdrag/ny` creates a local mission context; `/oppdrag` shows the active mission dashboard with situation, next recommended action, recommended cards, matching checklist progress, order/comms export tools, and cached/stale public context signals.
+- `/mer` keeps secondary support surfaces together: sources, learning/modules, map, field mode, privacy, device-data controls, and admin links.
 - `/release` is a standalone release-readiness board for launch planning, stage gates, active work, synced workplans, risk attention, local JSON export, and launch-material links. It intentionally avoids the operational app shell.
 
 ## Runbook

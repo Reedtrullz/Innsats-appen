@@ -56,6 +56,15 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(doc).toMatch(/ikke et offisielt|not an official|beslutningsstøtte/i);
   });
 
+  it('documents the operational command-surface UI without expanding MVP boundaries', () => {
+    const doc = read('docs/ui-operational-command-surface.md');
+    expect(doc).toContain('Situation → Phase → Next action → Checklist → Export → Source');
+    expect(doc).toContain('/release stays outside the operational shell');
+    expect(doc).toContain('no login');
+    expect(doc).toContain('no central incident database');
+    expect(doc).toContain('no patient/persondata');
+  });
+
   it('adds release/stale notification scripts without adding backend sync or push services', () => {
     const packageJson = JSON.parse(read('package.json')) as { scripts: Record<string, string>; dependencies?: Record<string, string>; devDependencies?: Record<string, string> };
     expect(packageJson.scripts['release:notes']).toBe('tsx scripts/generate-release-notes.ts');
