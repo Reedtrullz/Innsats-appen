@@ -11,18 +11,18 @@ import { MAN_DOWN_POST_MVP_NOTE, MEDIA_ATTACHMENT_SAFETY_NOTES } from '@/lib/mis
 import { RUH_CATEGORY_OPTIONS, RUH_LOCAL_ONLY_WARNING, RUH_PATIENT_DATA_WARNING, RUH_RISK_OPTIONS, WELFARE_LOAD_OPTIONS, WELFARE_NON_MEDICAL_WARNING, exportRuhJson, exportRuhMarkdown, exportWelfareJson, exportWelfareMarkdown, summarizeWelfareCheck } from '@/lib/mission/ruh-welfare';
 import { buildEquipmentReadinessSummary, exportEquipmentReadinessJson, exportEquipmentReadinessMarkdown } from '@/lib/mission/equipment-readiness';
 import { buildOrderUpdateSuggestions } from '@/lib/mission/order-update-suggestions';
-import { buildMissionFolderExport, exportMissionFolderMarkdown } from '@/lib/mission/mission-folder-export';
 import { exportMissionStatusSummaryMarkdown } from '@/lib/mission/export-markdown';
 import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArchivedMission, listArchivedMissions, listChecklistRuns, listMissions, saveMission } from '@/lib/mission/local-store';
 import { readSelectedActiveMissionId, saveSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
-import type { MissionContext, ChecklistRun, MissionTaskStatus, QuickStatusMessage, ResourceRequestKind, FieldLogCategory, RuhCategory, RuhRisk, WelfareLoad } from '@/lib/mission/schemas';
+import type { MissionContext, MissionTaskStatus, QuickStatusMessage, ResourceRequestKind, FieldLogCategory, RuhCategory, RuhRisk, WelfareLoad } from '@/lib/mission/schemas';
 import { ChecklistRunner } from './checklist-runner';
 import { ContextSignalPanel, markStoredContextSignalsStale } from './context-signal-panel';
 import { DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS, disabledExternalDataSources, displaySignalsForExternalDataSourceSettings, externalDataSourceSettingsSnapshot, parseExternalDataSourceSettings, subscribeExternalDataSourceSettings } from '@/lib/integrations/source-settings';
 import { MissionCommandHeader, MissionExportShortcuts, MissionProgressSummary } from './mission-command-summary';
 import { TiltakCard } from './tiltak-card';
 import { MissionMapSummary } from './mission-map-summary';
+import { MissionFolderExportControls } from './mission/mission-folder-export-controls';
 import { missionMapStateSnapshot, normalizeMissionMapState, subscribeMissionMapState, mapStateForMission, type MissionMapState } from '@/lib/maps/operations-map';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
 
@@ -820,42 +820,6 @@ function AfterActionReportControls({ mission, displaySignals, checklists, fallba
   );
 }
 
-
-function MissionFolderExportControls({ mission, checklists, mapState }: { mission: MissionContext; checklists: OperationalChecklist[]; mapState: MissionMapState }) {
-  const [json, setJson] = useState('');
-  const [markdown, setMarkdown] = useState('');
-
-  async function generate() {
-    const checklistRuns: ChecklistRun[] = await listChecklistRuns(mission.id);
-    const bundle = buildMissionFolderExport({ mission, checklists, checklistRuns, mapState });
-    setJson(`${JSON.stringify(bundle, null, 2)}\n`);
-    setMarkdown(exportMissionFolderMarkdown(bundle));
-    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'mission-folder' });
-  }
-
-  return (
-    <section id="oppdragsmappe" className="scroll-mt-24 space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200" aria-label="Oppdragsmappe">
-      <div>
-        <p className="text-xs font-black uppercase tracking-wide text-sky-700">Oppdragsmappe</p>
-        <h3 className="text-xl font-black">Lokal oppdragsmappe</h3>
-        <p className="mt-1 text-sm font-semibold text-amber-900">Lokal eksportpakke. Ikke offisielt arkiv eller sentral lagring. Saniter før deling.</p>
-      </div>
-      <button type="button" onClick={() => void generate()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag oppdragsmappe</button>
-      {json ? (
-        <label htmlFor="mission-folder-json" className="block text-sm font-bold">
-          Oppdragsmappe JSON
-          <textarea id="mission-folder-json" readOnly value={json} className="mt-1 min-h-48 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-        </label>
-      ) : null}
-      {markdown ? (
-        <label htmlFor="mission-folder-markdown" className="block text-sm font-bold">
-          Oppdragsmappe Markdown
-          <textarea id="mission-folder-markdown" readOnly value={markdown} className="mt-1 min-h-48 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-        </label>
-      ) : null}
-    </section>
-  );
-}
 
 function MissionCommandDashboard({ mission, cards, checklist, checklists, onMissionChange, onArchive }: { mission: MissionContext; cards: ActionCard[]; checklist?: OperationalChecklist; checklists: OperationalChecklist[]; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
   const firstActions = missionCards(cards, mission);
