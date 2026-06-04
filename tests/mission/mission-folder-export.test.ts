@@ -59,6 +59,40 @@ it('builds a local mission folder bundle with map artifacts and privacy warnings
   expect(markdown).toContain('Sanitert GeoJSON');
 });
 
+it('rejects mission folder export when included field log contains high-confidence sensitive free text', () => {
+  expect(() => buildMissionFolderExport({
+    mission: {
+      ...mission,
+      fieldLogEntries: [
+        { id: 'field-sensitive-folder', timestamp: '2026-06-04T09:15:00.000Z', category: 'observasjon', text: 'pasient Ola Nordmann', criticalObservation: false, mustBeForwarded: false },
+      ],
+    },
+    checklists: [],
+    checklistRuns: [],
+    generatedAt: '2026-06-04T11:00:00.000Z',
+  })).toThrow(/missionFolder\.mission\.fieldLogEntries\[0\]\.text|fieldLog\.entries\[0\]\.text/i);
+});
+
+it('rejects sensitive map labels in mission-folder artifacts even beyond after-action summary limits', () => {
+  const markers = Array.from({ length: 11 }, (_, index) => ({
+    id: `marker-${index}`,
+    missionId: mission.id,
+    itemType: 'marker' as const,
+    kind: 'observation' as const,
+    label: index === 10 ? 'pasient Ola Nordmann' : `Trygg markør ${index}`,
+    point: { x: 10 + index, y: 20 },
+    createdAt: '2026-06-04T09:00:00.000Z',
+  }));
+
+  expect(() => buildMissionFolderExport({
+    mission,
+    checklists: [],
+    checklistRuns: [],
+    mapState: { markers, drawings: [] },
+    generatedAt: '2026-06-04T11:00:00.000Z',
+  })).toThrow(/missionFolder\.mapState\.markers\[10\]\.label/i);
+});
+
 it('excludes unrelated other missions from the current mission folder map artifacts', () => {
   const bundle = buildMissionFolderExport({
     mission,
@@ -86,6 +120,7 @@ it('excludes unrelated other missions from the current mission folder map artifa
   expect(bundle.artifacts.afterActionMarkdown).toContain('Current');
   expect(bundle.artifacts.afterActionMarkdown).toContain('Current sector');
   expect(bundle.artifacts.afterActionMarkdown).not.toContain('Wrong');
-  expect(bundle.artifacts.mapFeatureCollection.features.map((feature) => feature.properties.label)).toEqual(['Current', 'Current sector']);
+  const featureLabels = (bundle.artifacts.mapFeatureCollection.features as Array<{ properties: { label: string } }>).map((feature) => feature.properties.label);
+  expect(featureLabels).toEqual(['Current', 'Current sector']);
   expect(JSON.stringify(bundle)).not.toMatch(/current note|wrong note|folder-mission|other-mission|missionId/i);
 });

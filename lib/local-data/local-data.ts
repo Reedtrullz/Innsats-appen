@@ -2,6 +2,7 @@ import { FIELD_FEEDBACK_STORAGE_KEY, FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAG
 import { EXTERNAL_DATA_SOURCE_SETTINGS_EVENT, EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY } from '@/lib/integrations/source-settings';
 import { OFFLINE_MAP_CACHE_EVENT, OFFLINE_MAP_CACHE_STORAGE_KEY } from '@/lib/maps/offline-map';
 import { OPERATIONS_MAP_EVENT, OPERATIONS_MAP_STORAGE_KEY } from '@/lib/maps/operations-map';
+import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
 import {
   DB_NAME,
   LOCAL_MISSION_DB_VERSION,
@@ -324,10 +325,12 @@ export function sanitizeLocalStorageSnapshot(input: unknown, options: SanitizeLo
   for (const [key, value] of Object.entries(input)) {
     if (!keyIsAllowed(key) || typeof value !== 'string') continue;
     if (value.length > MAX_LOCAL_STORAGE_VALUE_CHARS) throw new Error(`Local import rejected: localStorage value for ${key} is too large.`);
+    assertNoSensitiveOperationalTextInValue(value, `localStorage.${key}`);
     try {
       const parsedValue = JSON.parse(value);
       if (options.enforceImportLimits) assertLocalImportDepth(parsedValue, MAX_LOCAL_IMPORT_DEPTH, `localStorage.${key}`);
       assertNoDangerousFields(parsedValue, `localStorage.${key}`);
+      assertNoSensitiveOperationalTextInValue(parsedValue, `localStorage.${key}`);
     } catch (error) {
       if (error instanceof SyntaxError) {
         // Some small settings could be plain strings in older exports. Keep the exact value.
@@ -410,6 +413,7 @@ function normalizeExportRecord(input: unknown, options: NormalizeExportRecordOpt
   assertNoDangerousFields(input);
   const exportVersion = validateImportVersions(input);
   if (options.enforceImportLimits) assertLocalImportCounts(input, exportVersion);
+  assertNoSensitiveOperationalTextInValue(input, 'localImport');
 
   const indexedDb = isRecord(input.indexedDb) ? input.indexedDb : {};
   const missions = normalizeMissions(exportVersion === LOCAL_DATA_EXPORT_VERSION ? indexedDb.missions : (input.missions ?? indexedDb.missions));

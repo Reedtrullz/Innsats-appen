@@ -1,3 +1,4 @@
+import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
 import type { FieldLogCategory, FieldLogEntry, MissionContext } from './schemas';
 
 export const FIELD_LOG_CATEGORIES = [
@@ -115,7 +116,12 @@ function mapReferenceText(entry: FieldLogEntry) {
   return ` — Kart: ${label} (${source} ${point.x},${point.y})`;
 }
 
+function assertFieldLogExportSafe(mission: MissionContext, entries: FieldLogEntry[]) {
+  assertNoSensitiveOperationalTextInValue({ mission: missionExportSummary(mission), entries: sortFieldLogEntries(entries).map(exportedEntry) }, 'fieldLog');
+}
+
 export function exportFieldLogMarkdown({ mission, entries }: { mission: MissionContext; entries: FieldLogEntry[] }) {
+  assertFieldLogExportSafe(mission, entries);
   const lines: string[] = [];
   lines.push('# Lokal feltlogg');
   lines.push('');
@@ -149,6 +155,7 @@ export function exportFieldLogMarkdown({ mission, entries }: { mission: MissionC
 }
 
 export function exportFieldLogJson({ mission, entries }: { mission: MissionContext; entries: FieldLogEntry[] }) {
+  assertFieldLogExportSafe(mission, entries);
   return `${JSON.stringify({
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),

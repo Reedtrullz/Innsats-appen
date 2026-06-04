@@ -43,6 +43,33 @@ it('defaults old missions to empty RUH reports and welfare checks', () => {
   expect(baseMission.welfareChecks).toEqual([]);
 });
 
+it('rejects high-confidence sensitive RUH and welfare free text at schema and export time', () => {
+  const sensitiveRuh = {
+    id: 'ruh-sensitive',
+    timestamp: '2026-06-04T10:15:00.000Z',
+    category: 'hms',
+    whatHappened: 'fødselsnummer 01017012345',
+    immediateMeasure: 'Sperret av område',
+    risk: 'lav',
+    followUpNeeded: false,
+  } as const;
+  const sensitiveWelfare = {
+    id: 'welfare-sensitive',
+    timestamp: '2026-06-04T10:30:00.000Z',
+    physicalLoad: 'lav',
+    mentalLoad: 'lav',
+    needsRest: false,
+    needsRelief: false,
+    reminders: { water: false, food: false, warmth: false, rest: false, dryClothing: false },
+    note: 'skjermet tilfluktsrom adresse',
+  } as const;
+
+  expect(RuhReportSchema.safeParse(sensitiveRuh).success).toBe(false);
+  expect(WelfareCheckSchema.safeParse(sensitiveWelfare).success).toBe(false);
+  expect(() => exportRuhMarkdown({ mission: baseMission, reports: [sensitiveRuh] })).toThrow(/ruh\.reports\[0\]\.whatHappened/i);
+  expect(() => exportWelfareJson({ mission: baseMission, checks: [sensitiveWelfare] })).toThrow(/welfare\.checks\[0\]\.note/i);
+});
+
 it('validates simplified RUH fields and exports local non-official RUH without patient/persondata', () => {
   const report = RuhReportSchema.parse({
     id: 'ruh-1',

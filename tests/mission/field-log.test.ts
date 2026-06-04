@@ -121,6 +121,21 @@ it('allows sanitized schematic map references on field log entries without true 
   }).success).toBe(false);
 });
 
+it('rejects high-confidence sensitive field-log free text at schema and export time', () => {
+  const sensitiveEntry = {
+    id: 'sensitive-field-log',
+    timestamp: '2026-06-04T10:00:00.000Z',
+    category: 'observasjon',
+    text: 'pasient Ola Nordmann',
+    criticalObservation: false,
+    mustBeForwarded: false,
+  } as const;
+
+  expect(FieldLogEntrySchema.safeParse(sensitiveEntry).success).toBe(false);
+  expect(() => exportFieldLogMarkdown({ mission: baseMission, entries: [sensitiveEntry] })).toThrow(/fieldLog\.entries\[0\]\.text/i);
+  expect(() => exportFieldLogJson({ mission: baseMission, entries: [sensitiveEntry] })).toThrow(/persondata|pasientdata|skjermet/i);
+});
+
 it('searches and exports field-log map references as schematic local context only', () => {
   const mapEntry: FieldLogEntry = {
     id: 'entry-map-ref',

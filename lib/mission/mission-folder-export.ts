@@ -1,4 +1,5 @@
 import type { OperationalChecklist } from '@/lib/content/schemas';
+import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
 import { buildGeoJsonExport, buildMapImageSvg, geoJsonExportText, mapStateForMission, normalizeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
 import { buildAfterActionReport, exportAfterActionMarkdown } from './after-action-report';
 import { exportFieldLogMarkdown } from './field-log';
@@ -31,6 +32,13 @@ function missionFolderMapState(mapState: MissionMapState | undefined, missionId:
   };
 }
 
+function missionFolderMapText(mapState: MissionMapState) {
+  return {
+    markers: mapState.markers.map((marker) => ({ label: marker.label })),
+    drawings: mapState.drawings.map((drawing) => ({ label: drawing.label })),
+  };
+}
+
 function missionFolderFieldLogEntries(mission: MissionContext) {
   return (mission.fieldLogEntries ?? []).map((entry) => ({
     ...entry,
@@ -47,6 +55,15 @@ export function buildMissionFolderExport(input: {
 }) {
   const generatedAt = input.generatedAt ?? new Date().toISOString();
   const mapState = missionFolderMapState(input.mapState, input.mission.id);
+  assertNoSensitiveOperationalTextInValue({
+    mission: {
+      ...input.mission,
+      externalSignals: undefined,
+      externalSignalHistory: undefined,
+    },
+    checklistRuns: input.checklistRuns.map((run) => ({ notesByItemId: run.notesByItemId })),
+    mapState: missionFolderMapText(mapState),
+  }, 'missionFolder');
   const afterActionReport = buildAfterActionReport({
     mission: input.mission,
     checklists: input.checklists,

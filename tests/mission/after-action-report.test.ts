@@ -161,6 +161,50 @@ it('uses structured mission field-log entries in after-action local log section'
   expect(JSON.stringify(report)).not.toMatch(/lat|lon|geometry|rawRef/i);
 });
 
+it('blocks high-confidence sensitive after-action local order, log, mission and resource notes', () => {
+  expect(() => buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    localOrderText: 'fødselsnummer 01017012345',
+  })).toThrow(/afterAction\.localOrderText/i);
+
+  expect(() => buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    localLogText: 'pasient Ola Nordmann',
+  })).toThrow(/afterAction\.localLogText/i);
+
+  expect(() => buildAfterActionReport({
+    mission: { ...mission, notes: 'skjermet tilfluktsrom adresse' },
+    checklists,
+    checklistRuns: runs,
+  })).toThrow(/afterAction\.mission\.notes/i);
+
+  expect(() => buildAfterActionReport({
+    mission: {
+      ...mission,
+      resourceRequests: [{ ...mission.resourceRequests[0], note: 'privat adresse ved depot' }],
+    },
+    checklists,
+    checklistRuns: runs,
+  })).toThrow(/afterAction\.mission\.resourceRequests\[0\]\.note/i);
+});
+
+it('rejects high-confidence sensitive map labels before building an after-action report', () => {
+  expect(() => buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapState: {
+      markers: [{ id: 'marker-sensitive-label', missionId: mission.id, itemType: 'marker', kind: 'observation', label: 'pasient Ola Nordmann', point: { x: 22, y: 33 }, createdAt: '2026-06-03T09:00:00.000Z' }],
+      drawings: [],
+    },
+  })).toThrow(/afterAction\.mapState\.markers\[0\]\.label/i);
+});
+
 it('includes sanitized schematic map summary in after-action report when provided', () => {
   const report = buildAfterActionReport({
     mission,

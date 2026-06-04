@@ -24,6 +24,11 @@ import { MissionCommandHeader, MissionExportShortcuts, MissionProgressSummary } 
 import { TiltakCard } from './tiltak-card';
 import { MissionMapSummary } from './mission-map-summary';
 import { missionMapStateSnapshot, normalizeMissionMapState, subscribeMissionMapState, mapStateForMission, type MissionMapState } from '@/lib/maps/operations-map';
+import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+
+function operationalPrivacyErrorMessage(context: string) {
+  return `${context}: Lokal tekst ble stoppet fordi den kan inneholde persondata, pasientdata, skjermet informasjon eller private lokasjoner. Bruk ordinære systemer for slike opplysninger.`;
+}
 
 function formatUpdatedAt(value: string) {
   return new Intl.DateTimeFormat('nb-NO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
@@ -82,6 +87,7 @@ function statusSummaryMission(mission: MissionContext, externalSignals: MissionC
 function LocalMissionControls({ mission, displaySignals, onMissionChange }: { mission: MissionContext; displaySignals: MissionContext['externalSignals']; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void> }) {
   const openTasks = mission.tasks.filter((task) => task.status !== 'done');
   const [showStatusSummary, setShowStatusSummary] = useState(false);
+  const [privacyError, setPrivacyError] = useState('');
   const statusSummaryMarkdown = showStatusSummary ? exportMissionStatusSummaryMarkdown({ mission: statusSummaryMission(mission, displaySignals) }) : '';
 
   async function addTask(event: React.FormEvent<HTMLFormElement>) {
@@ -93,6 +99,13 @@ function LocalMissionControls({ mission, displaySignals, onMissionChange }: { mi
     const now = new Date().toISOString();
     const status = String(form.get('taskStatus') ?? 'not-started') as MissionTaskStatus;
     const task = { id: crypto.randomUUID(), title, status, createdAt: now, updatedAt: now };
+    try {
+      assertNoSensitiveOperationalTextInValue({ title: task.title }, 'localStatus.task');
+    } catch {
+      setPrivacyError(operationalPrivacyErrorMessage('Lokal status'));
+      return;
+    }
+    setPrivacyError('');
     await onMissionChange(mission.id, (current) => {
       return {
         ...current,
@@ -128,6 +141,13 @@ function LocalMissionControls({ mission, displaySignals, onMissionChange }: { mi
       quantity: String(form.get('resourceQuantity') ?? '').trim() || undefined,
       note: String(form.get('resourceNote') ?? '').trim() || undefined,
     };
+    try {
+      assertNoSensitiveOperationalTextInValue({ quantity: resourceRequest.quantity, note: resourceRequest.note }, 'localStatus.resourceRequest');
+    } catch {
+      setPrivacyError(operationalPrivacyErrorMessage('Lokal status'));
+      return;
+    }
+    setPrivacyError('');
     await onMissionChange(mission.id, (current) => {
       return {
         ...current,
@@ -181,6 +201,7 @@ function LocalMissionControls({ mission, displaySignals, onMissionChange }: { mi
           <p className="mt-2 text-sm font-semibold text-slate-700">{mission.notes || 'Ingen lokale notater.'}</p>
         </div>
       </div>
+      {privacyError ? <p role="alert" aria-label="lokal status personvern" className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{privacyError}</p> : null}
       <div className="grid gap-3 lg:grid-cols-3">
         <form onSubmit={(event) => void addTask(event)} className="rounded-xl border border-slate-200 p-3">
           <h4 className="font-black">Lokal oppgaveliste</h4>
@@ -216,6 +237,7 @@ function FieldLogControls({ mission, onMissionChange }: { mission: MissionContex
   const [markdown, setMarkdown] = useState('');
   const [json, setJson] = useState('');
   const [pdfReadyHtml, setPdfReadyHtml] = useState('');
+  const [privacyError, setPrivacyError] = useState('');
   const entries = mission.fieldLogEntries ?? [];
   const filteredEntries = filterFieldLogEntries(entries, { query, category: categoryFilter });
   const selectedCategoryHelp = FIELD_LOG_CATEGORY_OPTIONS.find((option) => option.value === selectedCategory)?.helpText;
@@ -239,6 +261,13 @@ function FieldLogControls({ mission, onMissionChange }: { mission: MissionContex
       criticalObservation: form.get('criticalObservation') === 'on',
       mustBeForwarded: form.get('mustBeForwarded') === 'on',
     };
+    try {
+      assertNoSensitiveOperationalTextInValue({ text: entry.text, locationText: entry.locationText }, 'fieldLog');
+    } catch {
+      setPrivacyError(operationalPrivacyErrorMessage('Feltlogg'));
+      return;
+    }
+    setPrivacyError('');
     await onMissionChange(mission.id, (current) => ({
       ...current,
       updatedAt: now,
@@ -292,6 +321,7 @@ function FieldLogControls({ mission, onMissionChange }: { mission: MissionContex
           <textarea name="fieldLogText" required className="mt-1 min-h-24 w-full rounded-xl border border-slate-300 p-3" placeholder="Kort observasjon. Ikke persondata, pasientdata eller skjermet operativ informasjon." />
         </label>
         <p className="rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950 lg:col-span-3">{selectedCategoryHelp}</p>
+        {privacyError ? <p role="alert" aria-label="feltlogg personvern" className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900 lg:col-span-3">{privacyError}</p> : null}
         <label className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm font-bold">
           <input name="criticalObservation" type="checkbox" className="h-5 w-5" />
           Kritisk observasjon
@@ -380,6 +410,8 @@ function RuhWelfareControls({ mission, onMissionChange }: { mission: MissionCont
   const [ruhJson, setRuhJson] = useState('');
   const [welfareMarkdown, setWelfareMarkdown] = useState('');
   const [welfareJson, setWelfareJson] = useState('');
+  const [ruhPrivacyError, setRuhPrivacyError] = useState('');
+  const [welfarePrivacyError, setWelfarePrivacyError] = useState('');
   const ruhReports = mission.ruhReports ?? [];
   const welfareChecks = mission.welfareChecks ?? [];
 
@@ -402,6 +434,13 @@ function RuhWelfareControls({ mission, onMissionChange }: { mission: MissionCont
       followUpNeeded: form.get('ruhFollowUpNeeded') === 'on',
       linkedMissionId: mission.id,
     };
+    try {
+      assertNoSensitiveOperationalTextInValue({ whatHappened: report.whatHappened, immediateMeasure: report.immediateMeasure }, 'ruh');
+    } catch {
+      setRuhPrivacyError(operationalPrivacyErrorMessage('RUH'));
+      return;
+    }
+    setRuhPrivacyError('');
     await onMissionChange(mission.id, (current) => ({
       ...current,
       updatedAt: now,
@@ -435,6 +474,13 @@ function RuhWelfareControls({ mission, onMissionChange }: { mission: MissionCont
       },
       note: String(form.get('welfareNote') ?? '').trim() || undefined,
     };
+    try {
+      assertNoSensitiveOperationalTextInValue({ note: check.note }, 'welfare');
+    } catch {
+      setWelfarePrivacyError(operationalPrivacyErrorMessage('Velferd'));
+      return;
+    }
+    setWelfarePrivacyError('');
     await onMissionChange(mission.id, (current) => ({
       ...current,
       updatedAt: now,
@@ -481,6 +527,7 @@ function RuhWelfareControls({ mission, onMissionChange }: { mission: MissionCont
           <label className="block text-sm font-bold">RUH kategori<select name="ruhCategory" value={ruhCategory} onChange={(event) => setRuhCategory(event.target.value as RuhCategory)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3">{RUH_CATEGORY_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
           <label className="block text-sm font-bold">Hva skjedde<textarea name="ruhWhatHappened" required className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 p-3" placeholder="Kort avvik/nestenulykke uten navn, ID, pasientdata eller persondata" /></label>
           <label className="block text-sm font-bold">Umiddelbart tiltak<textarea name="ruhImmediateMeasure" required className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 p-3" placeholder="Hva ble gjort med en gang" /></label>
+          {ruhPrivacyError ? <p role="alert" aria-label="ruh personvern" className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{ruhPrivacyError}</p> : null}
           <label className="block text-sm font-bold">RUH risiko<select name="ruhRisk" value={ruhRisk} onChange={(event) => setRuhRisk(event.target.value as RuhRisk)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3">{RUH_RISK_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
           <label className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm font-bold"><input name="ruhFollowUpNeeded" type="checkbox" className="h-5 w-5" />RUH trenger videre tiltak</label>
           <button type="submit" className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Legg til RUH</button>
@@ -505,6 +552,7 @@ function RuhWelfareControls({ mission, onMissionChange }: { mission: MissionCont
             </div>
           </fieldset>
           <label className="block text-sm font-bold">Velferdsnotat<textarea name="welfareNote" className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 p-3" placeholder="Kort ikke-medisinsk notat" /></label>
+          {welfarePrivacyError ? <p role="alert" aria-label="velferd personvern" className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{welfarePrivacyError}</p> : null}
           <button type="submit" className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lagre velferdssjekk</button>
         </form>
       </div>
@@ -562,33 +610,44 @@ function StructuredLessonsFeedbackControls({ mission, onMissionChange, onArchive
     communications: mission.feedback?.communications ?? '',
   }));
   const [message, setMessage] = useState('');
+  const [privacyError, setPrivacyError] = useState('');
 
   async function saveStructuredFeedback() {
     const now = new Date().toISOString();
+    const nextLessons = {
+      summary: lessons.summary.trim(),
+      whatWorked: lessons.whatWorked.trim(),
+      improvements: lessons.improvements.trim(),
+      followUp: lessons.followUp.trim(),
+    };
+    const nextFeedback = {
+      leadership: feedback.leadership.trim(),
+      equipment: feedback.equipment.trim(),
+      procedures: feedback.procedures.trim(),
+      training: feedback.training.trim(),
+      safety: feedback.safety.trim(),
+      communications: feedback.communications.trim(),
+    };
+    try {
+      assertNoSensitiveOperationalTextInValue({ lessonsLearned: nextLessons, feedback: nextFeedback }, 'structuredFeedback');
+    } catch {
+      setPrivacyError(operationalPrivacyErrorMessage('Erfaringer'));
+      setMessage('');
+      return false;
+    }
+    setPrivacyError('');
     await onMissionChange(mission.id, (current) => ({
       ...current,
       updatedAt: now,
-      lessonsLearned: {
-        summary: lessons.summary.trim(),
-        whatWorked: lessons.whatWorked.trim(),
-        improvements: lessons.improvements.trim(),
-        followUp: lessons.followUp.trim(),
-      },
-      feedback: {
-        leadership: feedback.leadership.trim(),
-        equipment: feedback.equipment.trim(),
-        procedures: feedback.procedures.trim(),
-        training: feedback.training.trim(),
-        safety: feedback.safety.trim(),
-        communications: feedback.communications.trim(),
-      },
+      lessonsLearned: nextLessons,
+      feedback: nextFeedback,
     }));
     setMessage('Erfaringer og tilbakemelding er lagret lokalt.');
+    return true;
   }
 
   async function saveStructuredFeedbackAndArchive() {
-    await saveStructuredFeedback();
-    await onArchive(mission.id);
+    if (await saveStructuredFeedback()) await onArchive(mission.id);
   }
 
   return (
@@ -616,6 +675,7 @@ function StructuredLessonsFeedbackControls({ mission, onMissionChange, onArchive
         <button type="button" onClick={() => void saveStructuredFeedback()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lagre erfaringer og tilbakemelding</button>
         <button type="button" onClick={() => void saveStructuredFeedbackAndArchive()} className="min-h-11 rounded-xl border border-emerald-700 bg-emerald-50 px-4 font-bold text-emerald-950">Fullfør og arkiver lokalt</button>
       </div>
+      {privacyError ? <p role="alert" aria-label="erfaringer personvern" className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{privacyError}</p> : null}
       {message ? <p className="text-sm font-semibold text-emerald-800">{message}</p> : null}
     </section>
   );
@@ -900,6 +960,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
   const [archivedMissions, setArchivedMissions] = useState<MissionContext[]>([]);
   const [archiveSearch, setArchiveSearch] = useState('');
   const [privacyMessage, setPrivacyMessage] = useState('Lagres bare lokalt i denne nettleseren');
+  const [createPrivacyError, setCreatePrivacyError] = useState('');
   const latestMissionsRef = useRef<MissionContext[]>([]);
   const missionWriteQueueRef = useRef<Promise<void>>(Promise.resolve());
   const archiveSearchRequestRef = useRef(0);
@@ -951,6 +1012,13 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
     };
     const activeChecklist = matchingChecklist(checklists, missionDraft);
     const mission = { ...missionDraft, activeChecklistIds: activeChecklist ? [activeChecklist.slug] : [] };
+    try {
+      assertNoSensitiveOperationalTextInValue({ title: mission.title, locationText: mission.locationText }, 'missionCreate');
+    } catch {
+      setCreatePrivacyError(operationalPrivacyErrorMessage('Oppdrag'));
+      return;
+    }
+    setCreatePrivacyError('');
     await saveMission(mission);
     appendLocalAuditEntry('order-created', { missionId: mission.id, orderType: 'local-mission' });
     router.push('/oppdrag');
@@ -1029,6 +1097,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
           <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Nytt oppdrag</p>
           <h1 className="text-3xl font-black">Opprett lokalt oppdrag</h1>
           <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Lagres bare lokalt i denne nettleseren. Ikke legg inn persondata.</p>
+          {createPrivacyError ? <p role="alert" aria-label="oppdrag personvern" className="mt-2 rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{createPrivacyError}</p> : null}
         </div>
         <label className="block text-sm font-bold">Tittel<input name="title" required className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3" placeholder="Eksempel: Tilfluktsrom sentrum" /></label>
         <div className="grid gap-3 sm:grid-cols-2">

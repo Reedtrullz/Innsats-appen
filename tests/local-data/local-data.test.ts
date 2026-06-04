@@ -149,6 +149,25 @@ it('rejects future versions and dangerous import fields while stripping non-dang
   expect(Object.keys(parsed.localStorage)).toEqual([LOCAL_PROFILE_STORAGE_KEY]);
 });
 
+it('rejects imported local data with high-confidence sensitive mission text before replacing stored data', async () => {
+  const sensitiveExport = buildLocalDataExport({
+    missions: [baseMission],
+    checklistRuns: [baseRun],
+  });
+  sensitiveExport.indexedDb.missions[0] = { ...sensitiveExport.indexedDb.missions[0], notes: 'pasient Ola Nordmann' };
+  const serialized = JSON.stringify(sensitiveExport);
+  const replaceMissionData = vi.fn(async () => ({ missions: 1, checklistRuns: 1 }));
+
+  expect(() => parseLocalDataImport(serialized)).toThrow(/localImport\.indexedDb\.missions\[0\]\.notes/i);
+  await expect(applyLocalDataImport(serialized, {
+    confirmLocalOnly: true,
+    confirmReplaceExistingLocalData: true,
+    storage: new MemoryStorage(),
+    replaceMissionData,
+  })).rejects.toThrow(/persondata|pasientdata|skjermet/i);
+  expect(replaceMissionData).not.toHaveBeenCalled();
+});
+
 it('reads only known localStorage keys for backup', () => {
   const storage = new MemoryStorage();
   storage.setItem(FIELD_MODE_STORAGE_KEY, '{"enabled":true}');

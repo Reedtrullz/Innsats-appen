@@ -1,3 +1,4 @@
+import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
 import type { MissionContext, RuhCategory, RuhReport, RuhRisk, WelfareCheck, WelfareLoad } from './schemas';
 
 export const RUH_LOCAL_ONLY_WARNING = 'Lagres bare lokalt i denne nettleseren. Ikke offisiell HMS/RUH-innsending eller formell avviksbehandling. Følg gjeldende rapportlinjer og ordinære HMS/RUH-systemer ved behov.';
@@ -101,7 +102,16 @@ function exportedWelfareCheck(check: WelfareCheck) {
   };
 }
 
+function assertRuhExportSafe(mission: MissionContext, reports: RuhReport[]) {
+  assertNoSensitiveOperationalTextInValue({ mission: missionExportSummary(mission), reports: sortRuhReports(reports).map(exportedRuhReport) }, 'ruh');
+}
+
+function assertWelfareExportSafe(mission: MissionContext, checks: WelfareCheck[]) {
+  assertNoSensitiveOperationalTextInValue({ mission: missionExportSummary(mission), checks: sortWelfareChecks(checks).map(exportedWelfareCheck) }, 'welfare');
+}
+
 export function exportRuhMarkdown({ mission, reports }: { mission: MissionContext; reports: RuhReport[] }) {
+  assertRuhExportSafe(mission, reports);
   const lines: string[] = [];
   lines.push('# Lokal forenklet RUH');
   lines.push('');
@@ -128,6 +138,7 @@ export function exportRuhMarkdown({ mission, reports }: { mission: MissionContex
 }
 
 export function exportRuhJson({ mission, reports }: { mission: MissionContext; reports: RuhReport[] }) {
+  assertRuhExportSafe(mission, reports);
   return `${JSON.stringify({
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
@@ -138,6 +149,7 @@ export function exportRuhJson({ mission, reports }: { mission: MissionContext; r
 }
 
 export function exportWelfareMarkdown({ mission, checks }: { mission: MissionContext; checks: WelfareCheck[] }) {
+  assertWelfareExportSafe(mission, checks);
   const lines: string[] = [];
   lines.push('# Lokal velferds- og belastningssjekk');
   lines.push('');
@@ -162,6 +174,7 @@ export function exportWelfareMarkdown({ mission, checks }: { mission: MissionCon
 }
 
 export function exportWelfareJson({ mission, checks }: { mission: MissionContext; checks: WelfareCheck[] }) {
+  assertWelfareExportSafe(mission, checks);
   return `${JSON.stringify({
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),

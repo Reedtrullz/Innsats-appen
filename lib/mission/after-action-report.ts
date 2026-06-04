@@ -1,4 +1,5 @@
 import type { OperationalChecklist } from '@/lib/content/schemas';
+import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
 import { EXPORT_SENSITIVITY_WARNING } from './order-export';
 import { FIELD_LOG_CATEGORY_LABELS, sortFieldLogEntries } from './field-log';
 import { MAP_DRAWING_LABELS, MAP_MARKER_LABELS, mapStateForMission, normalizeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
@@ -361,7 +362,40 @@ function buildMbkSummary(checklists: OperationalChecklist[], runs: ChecklistRun[
   };
 }
 
+function assertAfterActionMapStateSafe(mapState: MissionMapState | undefined, missionId: string): void {
+  const scopedMapState = mapStateForMission(normalizeMissionMapState(mapState ?? { markers: [], drawings: [] }), missionId);
+  assertNoSensitiveOperationalTextInValue({
+    markers: scopedMapState.markers.map((marker) => ({ label: marker.label })),
+    drawings: scopedMapState.drawings.map((drawing) => ({ label: drawing.label })),
+  }, 'afterAction.mapState');
+}
+
+function assertAfterActionInputSafe({ mission, checklistRuns, localOrderText, localSambandText, localLogText, mapState }: BuildAfterActionReportInput): void {
+  assertNoSensitiveOperationalTextInValue({
+    localOrderText,
+    localSambandText,
+    localLogText,
+    mission: {
+      title: mission.title,
+      locationText: mission.locationText,
+      municipality: mission.municipality,
+      notes: mission.notes,
+      tasks: mission.tasks,
+      statusLog: mission.statusLog,
+      resourceRequests: mission.resourceRequests,
+      fieldLogEntries: mission.fieldLogEntries,
+      ruhReports: mission.ruhReports,
+      welfareChecks: mission.welfareChecks,
+      lessonsLearned: mission.lessonsLearned,
+      feedback: mission.feedback,
+    },
+    checklistRuns: checklistRuns.map((run) => ({ notesByItemId: run.notesByItemId })),
+  }, 'afterAction');
+  assertAfterActionMapStateSafe(mapState, mission.id);
+}
+
 export function buildAfterActionReport({ mission, checklists, checklistRuns, generatedAt, localOrderText, localSambandText, localLogText, mapState }: BuildAfterActionReportInput): AfterActionReport {
+  assertAfterActionInputSafe({ mission, checklists, checklistRuns, generatedAt, localOrderText, localSambandText, localLogText, mapState });
   const reportChecklists = checklistSummaries(checklists, checklistRuns);
   const resourceEntries = mission.resourceRequests.map(resourceEntry);
   const equipmentDamageLoss = resourceEntries.filter(isEquipmentDamageOrLoss);
@@ -440,6 +474,7 @@ function hasSectionValues(values: Record<string, string>) {
 }
 
 export function exportMbkStatusSummaryMarkdown(report: AfterActionReport) {
+  assertNoSensitiveOperationalTextInValue(report, 'afterActionReport');
   const mbk = report.sections.mbkSummary;
   const lines: string[] = [];
   lines.push('# MBK-status / materiellberedskap');
@@ -461,6 +496,7 @@ export function exportMbkStatusSummaryMarkdown(report: AfterActionReport) {
 }
 
 export function exportAfterActionMarkdown(report: AfterActionReport) {
+  assertNoSensitiveOperationalTextInValue(report, 'afterActionReport');
   const lines: string[] = [];
   lines.push('# Etteraksjonsrapport');
   lines.push('');
@@ -565,6 +601,7 @@ function stripInternalExportFields(value: unknown): unknown {
 }
 
 export function exportAfterActionJson(report: AfterActionReport) {
+  assertNoSensitiveOperationalTextInValue(report, 'afterActionReport');
   return `${JSON.stringify(stripInternalExportFields(report), null, 2)}\n`;
 }
 

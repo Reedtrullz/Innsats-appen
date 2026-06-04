@@ -99,6 +99,50 @@ it('stores the checklist that matches the selected mission scenario and phase', 
   });
 });
 
+it('blocks sensitive mission creation text in the UI before saving locally', async () => {
+  render(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} />);
+
+  await userEvent.type(screen.getByLabelText(/Tittel/i), 'pasient Ola Nordmann');
+  await userEvent.type(screen.getByLabelText(/Sted\/lokasjon/i), 'Trondheim');
+  await userEvent.click(screen.getByRole('button', { name: /Lagre oppdrag/i }));
+
+  const alert = await screen.findByRole('alert', { name: /oppdrag personvern/i });
+  expect(alert).toHaveTextContent(/persondata|pasientdata|skjermet/i);
+  expect(alert).not.toHaveTextContent(/Ola Nordmann/i);
+  await waitFor(async () => {
+    expect(await listMissions()).toEqual([]);
+  });
+});
+
+it('blocks sensitive local task and resource text in the UI before saving locally', async () => {
+  await saveMission(mission({ id: 'status-sensitive-ui', title: 'Sensitive local status UI' }));
+
+  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+
+  await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i });
+  await userEvent.type(screen.getByLabelText(/Ny lokal oppgave/i), 'pasient Ola Nordmann');
+  await userEvent.click(screen.getByRole('button', { name: /Legg til oppgave/i }));
+
+  const taskAlert = await screen.findByRole('alert', { name: /lokal status personvern/i });
+  expect(taskAlert).toHaveTextContent(/persondata|pasientdata|skjermet/i);
+  expect(taskAlert).not.toHaveTextContent(/Ola Nordmann/i);
+  await waitFor(async () => {
+    const [storedMission] = await listMissions();
+    expect(storedMission.tasks).toEqual([]);
+  });
+
+  await userEvent.type(screen.getByLabelText(/Kort merknad/i), 'fødselsnummer 01017012345');
+  await userEvent.click(screen.getByRole('button', { name: /Registrer ressursbehov/i }));
+
+  const resourceAlert = await screen.findByRole('alert', { name: /lokal status personvern/i });
+  expect(resourceAlert).toHaveTextContent(/persondata|pasientdata|skjermet/i);
+  expect(resourceAlert).not.toHaveTextContent(/01017012345/i);
+  await waitFor(async () => {
+    const [storedMission] = await listMissions();
+    expect(storedMission.resourceRequests).toEqual([]);
+  });
+});
+
 it('lets users generate a local task/status/resource markdown export from the mission UI', async () => {
   await saveMission({
     id: 'm2b-export-ui',
@@ -512,6 +556,24 @@ it('lets users add, filter and export a structured local field log with patient-
   expect(pdfPreview.value).toContain('Skriv ut &gt; Lagre som PDF');
 });
 
+it('blocks sensitive field-log text in the UI before saving locally', async () => {
+  await saveMission(mission({ id: 'field-log-sensitive-ui', title: 'Sensitive field log UI' }));
+
+  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+
+  await screen.findByRole('heading', { name: /Lokal feltlogg/i });
+  await userEvent.type(screen.getByLabelText(/Feltlogg tekst/i), 'pasient Ola Nordmann');
+  await userEvent.click(screen.getByRole('button', { name: /Legg til feltlogg/i }));
+
+  const alert = await screen.findByRole('alert', { name: /feltlogg personvern/i });
+  expect(alert).toHaveTextContent(/persondata|pasientdata|skjermet/i);
+  expect(alert).not.toHaveTextContent(/Ola Nordmann/i);
+  await waitFor(async () => {
+    const [storedMission] = await listMissions();
+    expect(storedMission.fieldLogEntries).toEqual([]);
+  });
+});
+
 it('lets users add local RUH reports, welfare checks and see media/man-down safety notes', async () => {
   await saveMission({
     id: 'm6b-ruh-welfare-ui',
@@ -612,6 +674,36 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
   expect(welfareMarkdownPreview.value).toContain('Trenger avløsning');
   expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'welfare-markdown')).toBe(true);
   expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'welfare-json')).toBe(true);
+});
+
+it('blocks sensitive RUH and structured feedback text in the UI before saving locally', async () => {
+  await saveMission(mission({ id: 'ruh-feedback-sensitive-ui', title: 'Sensitive RUH feedback UI' }));
+
+  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+
+  await screen.findByRole('heading', { name: /RUH og velferd/i });
+  await userEvent.type(screen.getByLabelText(/Hva skjedde/i), 'fødselsnummer 01017012345');
+  await userEvent.type(screen.getByLabelText(/Umiddelbart tiltak/i), 'Sperret av område');
+  await userEvent.click(screen.getByRole('button', { name: /Legg til RUH/i }));
+
+  const ruhAlert = await screen.findByRole('alert', { name: /ruh personvern/i });
+  expect(ruhAlert).toHaveTextContent(/persondata|pasientdata|skjermet/i);
+  expect(ruhAlert).not.toHaveTextContent(/01017012345/i);
+  await waitFor(async () => {
+    const [storedMission] = await listMissions();
+    expect(storedMission.ruhReports).toEqual([]);
+  });
+
+  await userEvent.type(screen.getByLabelText(/Erfaringsoppsummering/i), 'skjermet tilfluktsrom adresse');
+  await userEvent.click(screen.getByRole('button', { name: /Lagre erfaringer og tilbakemelding/i }));
+
+  const lessonsAlert = await screen.findByRole('alert', { name: /erfaringer personvern/i });
+  expect(lessonsAlert).toHaveTextContent(/private lokasjoner|skjermet/i);
+  expect(lessonsAlert).not.toHaveTextContent(/tilfluktsrom adresse/i);
+  await waitFor(async () => {
+    const [storedMission] = await listMissions();
+    expect(storedMission.lessonsLearned).toBeUndefined();
+  });
 });
 
 it('shows a situation-first mission dashboard with next action, progress and exports', async () => {

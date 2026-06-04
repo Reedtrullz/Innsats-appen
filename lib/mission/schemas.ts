@@ -1,5 +1,17 @@
 import { z } from 'zod';
 import { PhaseSchema, RoleSchema, ScenarioSchema } from '@/lib/content/schemas';
+import { detectSensitiveOperationalText } from '@/lib/privacy/sensitive-text';
+
+function sensitiveText(context: string) {
+  return z.string().superRefine((value, ctx) => {
+    const match = detectSensitiveOperationalText(value);
+    if (!match) return;
+    ctx.addIssue({
+      code: 'custom',
+      message: `Local operational text rejected at ${context}: possible persondata/pasientdata/skjermet/private-location risk (${match.kind}).`,
+    });
+  });
+}
 
 export const CoordinatesSchema = z.object({
   lat: z.number().min(-90).max(90),
@@ -31,11 +43,11 @@ export const EquipmentStatusSchema = z.enum(['ready', 'missing', 'damaged', 'con
 export const MissionTaskSchema = z
   .object({
     id: z.string().min(1),
-    title: z.string().min(1),
+    title: sensitiveText('mission.tasks.title').min(1),
     status: MissionTaskStatusSchema,
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
-    notes: z.string().optional(),
+    notes: sensitiveText('mission.tasks.notes').optional(),
   })
   .strict();
 
@@ -46,7 +58,7 @@ export const MissionStatusLogItemSchema = z
     id: z.string().min(1),
     message: QuickStatusMessageSchema,
     createdAt: z.string().datetime(),
-    note: z.string().optional(),
+    note: sensitiveText('mission.statusLog.note').optional(),
   })
   .strict();
 
@@ -75,7 +87,7 @@ export const FieldLogMapReferenceSchema = z
   .object({
     source: z.enum(['map-marker', 'map-drawing', 'map-point']),
     objectId: z.string().min(1).max(120).optional(),
-    label: z.string().min(1).max(120),
+    label: sensitiveText('fieldLog.mapReference.label').min(1).max(120),
     point: SchematicMapPointSchema,
   })
   .strict();
@@ -84,9 +96,9 @@ export const FieldLogEntrySchema = z
   .object({
     id: z.string().min(1),
     timestamp: z.string().datetime(),
-    locationText: z.string().optional(),
+    locationText: sensitiveText('fieldLog.locationText').optional(),
     category: FieldLogCategorySchema,
-    text: z.string().min(1),
+    text: sensitiveText('fieldLog.text').min(1),
     mapReference: FieldLogMapReferenceSchema.optional(),
     linkedMissionId: z.string().optional(),
     criticalObservation: z.boolean().default(false),
@@ -102,8 +114,8 @@ export const RuhReportSchema = z
     id: z.string().min(1),
     timestamp: z.string().datetime(),
     category: RuhCategorySchema,
-    whatHappened: z.string().min(1),
-    immediateMeasure: z.string().min(1),
+    whatHappened: sensitiveText('ruh.whatHappened').min(1),
+    immediateMeasure: sensitiveText('ruh.immediateMeasure').min(1),
     risk: RuhRiskSchema,
     followUpNeeded: z.boolean().default(false),
     linkedMissionId: z.string().optional(),
@@ -131,7 +143,7 @@ export const WelfareCheckSchema = z
     needsRest: z.boolean().default(false),
     needsRelief: z.boolean().default(false),
     reminders: WelfareReminderSchema.default({ water: false, food: false, warmth: false, rest: false, dryClothing: false }),
-    note: z.string().optional(),
+    note: sensitiveText('welfare.note').optional(),
   })
   .strict();
 
@@ -141,47 +153,47 @@ export const MissionResourceRequestSchema = z
     kind: ResourceRequestKindSchema,
     status: MissionTaskStatusSchema,
     createdAt: z.string().datetime(),
-    quantity: z.string().optional(),
-    note: z.string().optional(),
+    quantity: sensitiveText('mission.resourceRequests.quantity').optional(),
+    note: sensitiveText('mission.resourceRequests.note').optional(),
   })
   .strict();
 
 export const MissionLessonsLearnedSchema = z
   .object({
-    summary: z.string().default(''),
-    whatWorked: z.string().default(''),
-    improvements: z.string().default(''),
-    followUp: z.string().default(''),
+    summary: sensitiveText('mission.lessonsLearned.summary').default(''),
+    whatWorked: sensitiveText('mission.lessonsLearned.whatWorked').default(''),
+    improvements: sensitiveText('mission.lessonsLearned.improvements').default(''),
+    followUp: sensitiveText('mission.lessonsLearned.followUp').default(''),
   })
   .strict();
 
 export const MissionFeedbackSchema = z
   .object({
-    leadership: z.string().default(''),
-    equipment: z.string().default(''),
-    procedures: z.string().default(''),
-    training: z.string().default(''),
-    safety: z.string().default(''),
-    communications: z.string().default(''),
+    leadership: sensitiveText('mission.feedback.leadership').default(''),
+    equipment: sensitiveText('mission.feedback.equipment').default(''),
+    procedures: sensitiveText('mission.feedback.procedures').default(''),
+    training: sensitiveText('mission.feedback.training').default(''),
+    safety: sensitiveText('mission.feedback.safety').default(''),
+    communications: sensitiveText('mission.feedback.communications').default(''),
   })
   .strict();
 
 export const MissionContextSchema = z
   .object({
     id: z.string().min(1),
-    title: z.string().min(1),
+    title: sensitiveText('mission.title').min(1),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
     phase: PhaseSchema,
     role: RoleSchema,
     scenario: ScenarioSchema,
-    locationText: z.string().min(1),
+    locationText: sensitiveText('mission.locationText').min(1),
     coordinates: CoordinatesSchema.optional(),
-    municipality: z.string().optional(),
+    municipality: sensitiveText('mission.municipality').optional(),
     externalSignals: z.array(ExternalContextSignalSchema).default([]),
     externalSignalHistory: z.array(ExternalContextSignalSchema).default([]),
     activeChecklistIds: z.array(z.string()).default([]),
-    notes: z.string().default(''),
+    notes: sensitiveText('mission.notes').default(''),
     tasks: z.array(MissionTaskSchema).default([]),
     statusLog: z.array(MissionStatusLogItemSchema).default([]),
     resourceRequests: z.array(MissionResourceRequestSchema).default([]),
@@ -203,7 +215,7 @@ export const ChecklistRunSchema = z
     missionId: z.string().min(1),
     templateSlug: z.string().min(1),
     checkedItemIds: z.array(z.string()).default([]),
-    notesByItemId: z.record(z.string(), z.string()).default({}),
+    notesByItemId: z.record(z.string(), sensitiveText('checklistRun.notesByItemId')).default({}),
     equipmentStatusByItemId: z.record(z.string(), EquipmentStatusSchema).default({}),
     updatedAt: z.string().datetime(),
     schemaVersion: z.number().int().positive().default(1),
