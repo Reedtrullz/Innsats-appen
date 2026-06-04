@@ -8,9 +8,9 @@ function EtterReportingEntryPoints() {
       <h2 id="etter-reporting-heading" className="text-2xl font-black">Rapport, RUH/velferd og oppdragsmappe</h2>
       <p className="mt-2 text-sm font-semibold text-slate-200">Alt er lokal og ikke offisiell innsending. Kopier eller eksporter manuelt etter godkjente rutiner.</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        <a href="/oppdrag" className="rounded-2xl bg-white p-4 font-black text-slate-950">Åpne etterrapport</a>
-        <a href="/oppdrag" className="rounded-2xl bg-white p-4 font-black text-slate-950">RUH og velferd</a>
-        <a href="/oppdrag" className="rounded-2xl bg-white p-4 font-black text-slate-950">Oppdragsmappe</a>
+        <a href="/oppdrag#etterrapport" className="rounded-2xl bg-white p-4 font-black text-slate-950">Åpne etterrapport</a>
+        <a href="/oppdrag#ruh-velferd" className="rounded-2xl bg-white p-4 font-black text-slate-950">RUH og velferd</a>
+        <a href="/oppdrag#oppdragsmappe" className="rounded-2xl bg-white p-4 font-black text-slate-950">Oppdragsmappe</a>
       </div>
     </section>
   );

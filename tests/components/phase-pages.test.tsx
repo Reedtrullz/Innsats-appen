@@ -61,12 +61,12 @@ it('shows under-phase operational entry points for map, log and active mission',
   expect(screen.getByText(/Kart og logg er lokal beslutningsstøtte/i)).toBeInTheDocument();
 });
 
-it('shows after-phase reporting entry points for RUH, welfare and mission folder', () => {
+it('links Etter CTAs to the exact dashboard sections', () => {
   render(<EtterPage />);
 
   expect(screen.getByRole('heading', { name: /Etter innsats/i })).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: /Åpne etterrapport/i })).toHaveAttribute('href', '/oppdrag');
-  expect(screen.getByRole('link', { name: /RUH og velferd/i })).toHaveAttribute('href', '/oppdrag');
-  expect(screen.getByRole('link', { name: /Oppdragsmappe/i })).toHaveAttribute('href', '/oppdrag');
+  expect(screen.getByRole('link', { name: /Åpne etterrapport/i })).toHaveAttribute('href', '/oppdrag#etterrapport');
+  expect(screen.getByRole('link', { name: /RUH og velferd/i })).toHaveAttribute('href', '/oppdrag#ruh-velferd');
+  expect(screen.getByRole('link', { name: /Oppdragsmappe/i })).toHaveAttribute('href', '/oppdrag#oppdragsmappe');
   expect(screen.getByText(/lokal og ikke offisiell innsending/i)).toBeInTheDocument();
 });

@@ -67,6 +67,7 @@ const taskStatusOptions: Array<{ value: MissionTaskStatus; label: string }> = [
 ];
 
 const quickStatusMessages: QuickStatusMessage[] = ['på posisjon', 'oppgave fullført', 'trenger assistanse'];
+const missionDashboardHashTargets = new Set(['etterrapport', 'ruh-velferd', 'oppdragsmappe']);
 
 const resourceKindOptions: Array<{ value: ResourceRequestKind; label: string }> = [
   { value: 'water', label: 'Vann' },
@@ -512,7 +513,7 @@ function RuhWelfareControls({ mission, onMissionChange }: { mission: MissionCont
   }
 
   return (
-    <section className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <section id="ruh-velferd" className="scroll-mt-24 space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Forenklet RUH og belastning</p>
         <h3 className="text-xl font-black">RUH og velferd</h3>
@@ -772,7 +773,7 @@ function AfterActionReportControls({ mission, displaySignals, checklists, fallba
   }
 
   return (
-    <section className="space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <section id="etterrapport" className="scroll-mt-24 space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Lokal etterrapport</p>
         <h3 className="text-xl font-black">Etteraksjonsrapport</h3>
@@ -833,7 +834,7 @@ function MissionFolderExportControls({ mission, checklists, mapState }: { missio
   }
 
   return (
-    <section id="oppdragsmappe" className="space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200" aria-label="Oppdragsmappe">
+    <section id="oppdragsmappe" className="scroll-mt-24 space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200" aria-label="Oppdragsmappe">
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Oppdragsmappe</p>
         <h3 className="text-xl font-black">Lokal oppdragsmappe</h3>
@@ -887,6 +888,15 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
     ? firstActions[0].steps.slice(0, 3)
     : ['Åpne sjekklisten og bekreft fase, samband og sikkerhet.'];
   const orderSuggestions = buildOrderUpdateSuggestions(mission.fieldLogEntries ?? []);
+
+  useEffect(() => {
+    const targetId = window.location.hash.slice(1);
+    if (!missionDashboardHashTargets.has(targetId)) return;
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(targetId)?.scrollIntoView({ block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [mission.id]);
 
   return (
     <article className="space-y-4">

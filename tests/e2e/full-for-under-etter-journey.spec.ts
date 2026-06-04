@@ -22,6 +22,9 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await page.goto('/etter');
   await expect(page.getByRole('heading', { name: 'Etter', exact: true })).toBeVisible();
   await expect(page.getByText(/Sjekkliste etter innsats/i).first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /Åpne etterrapport/i })).toHaveAttribute('href', '/oppdrag#etterrapport');
+  await expect(page.getByRole('link', { name: /RUH og velferd/i })).toHaveAttribute('href', '/oppdrag#ruh-velferd');
+  await expect(page.getByRole('link', { name: /Oppdragsmappe/i })).toHaveAttribute('href', '/oppdrag#oppdragsmappe');
 
   await createLocalMission(page, {
     title: missionTitle,
@@ -31,6 +34,27 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
     location: 'Trondheim sentrum testområde',
   });
 
+  await expect(page.getByRole('heading', { name: /Situasjonsoversikt nå/i })).toBeVisible();
+
+  await page.goto('/etter');
+  await page.getByRole('link', { name: /Åpne etterrapport/i }).click();
+  await expect(page).toHaveURL(/\/oppdrag#etterrapport$/);
+  await expect(page.locator('#etterrapport').getByRole('heading', { name: /Etteraksjonsrapport/i })).toBeVisible();
+  await expect(page.locator('#etterrapport')).toBeInViewport();
+
+  await page.goto('/etter');
+  await page.getByRole('link', { name: /RUH og velferd/i }).click();
+  await expect(page).toHaveURL(/\/oppdrag#ruh-velferd$/);
+  await expect(page.locator('#ruh-velferd').getByRole('heading', { name: /RUH og velferd/i })).toBeVisible();
+  await expect(page.locator('#ruh-velferd')).toBeInViewport();
+
+  await page.goto('/etter');
+  await page.getByRole('link', { name: /Oppdragsmappe/i }).click();
+  await expect(page).toHaveURL(/\/oppdrag#oppdragsmappe$/);
+  await expect(page.locator('#oppdragsmappe').getByRole('heading', { name: /Lokal oppdragsmappe/i })).toBeVisible();
+  await expect(page.locator('#oppdragsmappe')).toBeInViewport();
+
+  await page.goto('/oppdrag');
   await expect(page.getByRole('heading', { name: /Situasjonsoversikt nå/i })).toBeVisible();
   await page.getByLabel(/Ny lokal oppgave/i).fill('Kontroller inngang uten persondata');
   await page.getByLabel(/Oppgavestatus/i).selectOption('in-progress');
