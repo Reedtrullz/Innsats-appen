@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-04T08:52:37.587Z",
-  "sourceCount": 5,
+  "generatedAt": "2026-06-04T10:59:30.718Z",
+  "sourceCount": 6,
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -5266,6 +5266,177 @@
             "Commit de03b7c feat: add group 14 rollout and maintenance workflows. Implemented /nytt release notes page, content-version-to-release mapping, release/stale report scripts, scheduled privacy-safe monitoring/stale-content GitHub Actions workflow, staging/pilot/support/maintenance/security/privacy/language docs and tests. Gates: targeted Group 14 tests PASS (37 tests), npm run release:notes PASS, npm run report:stale-content PASS, npm run check:ci PASS (350 Vitest tests, production build including /nytt, perf budget, Lighthouse), spec re-review APPROVED, code quality/security review APPROVED."
           ],
           "sourceHeading": "Task 417: Evaluate English support only if operationally useful."
+        }
+      ]
+    },
+    {
+      "id": "2026-06-04_123416-operational-command-surface-ui-plan",
+      "title": "Operational Command Surface UI Implementation Plan",
+      "sourcePath": ".hermes/plans/2026-06-04_123416-operational-command-surface-ui-plan.md",
+      "sourceType": "hermes-plan",
+      "summary": "Transform Innsats-appen from a document/card portal feel into an operational field-support command surface centered on situation, phase, next action, checklist, export, and source confidence.",
+      "stage": "build",
+      "risk": "high",
+      "status": "active",
+      "owner": "AR",
+      "evidence": [
+        "Plan drafted 2026-06-04T10:34:16Z from user-provided Operational command surface UI direction after inspecting README.md, app/page.tsx, AppShell, BottomNav, mission dashboard, SearchBox, ActionCardList, ActionCardDetail, tests, and workplan sync conventions."
+      ],
+      "taskCount": 17,
+      "updatedAt": "2026-06-04T10:59:30.718Z",
+      "tasks": [
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-1",
+          "title": "Create shared operational status pills",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 1: Create shared operational status pills"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-2",
+          "title": "Replace home smoke expectations with command-surface behavior",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 2: Replace home smoke expectations with command-surface behavior"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-3",
+          "title": "Implement the operational command-surface home page",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 3: Implement the operational command-surface home page"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-4",
+          "title": "Extract shared search document builder",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 4: Extract shared search document builder"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-5",
+          "title": "Refactor Hurtigkort to use shared search builder",
+          "status": "planned",
+          "stage": "build",
+          "risk": "low",
+          "owner": "AR",
+          "sourceHeading": "Task 5: Refactor Hurtigkort to use shared search builder"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-6",
+          "title": "Make search UI operational and add /sok",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 6: Make search UI operational and add /sok"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-7",
+          "title": "Add /mer route for secondary/admin links",
+          "status": "planned",
+          "stage": "build",
+          "risk": "low",
+          "owner": "AR",
+          "sourceHeading": "Task 7: Add /mer route for secondary/admin links"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-8",
+          "title": "Replace bottom nav with five operational tabs",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 8: Replace bottom nav with five operational tabs"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-9",
+          "title": "Refine AppShell header into compact operational chrome",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 9: Refine AppShell header into compact operational chrome"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-10",
+          "title": "Create reusable TiltakCard presentation component",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 10: Create reusable TiltakCard presentation component"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-11",
+          "title": "Wire TiltakCard into card list and phase pages",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 11: Wire TiltakCard into card list and phase pages"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-12",
+          "title": "Add source confidence panel to card detail",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 12: Add source confidence panel to card detail"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-13",
+          "title": "Extract mission dashboard presentation helpers",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 13: Extract mission dashboard presentation helpers"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-14",
+          "title": "Wire mission command summary into /oppdrag [PARENT-DIRECT]",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 14: Wire mission command summary into /oppdrag [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-15",
+          "title": "Add production mobile/accessibility/performance verification for the new shell",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 15: Add production mobile/accessibility/performance verification for the new shell"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-16",
+          "title": "Update README/docs for the operational command surface",
+          "status": "planned",
+          "stage": "release",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 16: Update README/docs for the operational command surface"
+        },
+        {
+          "id": "2026-06-04_123416-operational-command-surface-ui-plan-task-17",
+          "title": "Final implementation audit, sync, and deployment verification",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 17: Final implementation audit, sync, and deployment verification"
         }
       ]
     }
