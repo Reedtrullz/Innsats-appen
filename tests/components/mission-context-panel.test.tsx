@@ -231,6 +231,57 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
   expect(pdfPreview.value).toContain('<!doctype html>');
 });
 
+it('generates a local oppdragsmappe export with map and log artifacts', async () => {
+  await saveMission({
+    id: 'mission-folder-ui',
+    title: 'Oppdragsmappe UI',
+    createdAt: '2026-06-04T09:00:00.000Z',
+    updatedAt: '2026-06-04T09:30:00.000Z',
+    phase: 'etter',
+    role: 'lagforer',
+    scenario: 'generelt',
+    locationText: 'Lokalt område',
+    externalSignals: [],
+    externalSignalHistory: [],
+    activeChecklistIds: [],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [],
+    fieldLogEntries: [
+      { id: 'field-folder-ui', timestamp: '2026-06-04T09:10:00.000Z', category: 'observasjon', text: 'Feltlogg i oppdragsmappe', criticalObservation: false, mustBeForwarded: false, linkedMissionId: 'mission-folder-ui' },
+    ],
+    ruhReports: [],
+    welfareChecks: [],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  } as any);
+  localStorage.setItem(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({
+    markers: [{ id: 'marker-1', itemType: 'marker', kind: 'observation', label: 'Obs', point: { x: 11, y: 22 }, note: 'rawRef lat lon should not export', createdAt: '2026-06-04T09:20:00.000Z' }],
+    drawings: [],
+  }));
+
+  render(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[]} />);
+  await screen.findByRole('heading', { name: /Neste anbefalte handling/i });
+  await userEvent.click(screen.getByRole('button', { name: /Lag oppdragsmappe/i }));
+
+  const json = await screen.findByLabelText(/Oppdragsmappe JSON/i) as HTMLTextAreaElement;
+  const markdown = screen.getByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
+  expect(json.value).toContain('Oppdragsmappe UI');
+  expect(json.value).toContain('schematic-0-100-local-only');
+  expect(json.value).toContain('Feltlogg i oppdragsmappe');
+  expect(markdown.value).toContain('# Oppdragsmappe');
+  expect(markdown.value).toContain('Oppdragsmappe UI');
+  expect(json.value).not.toContain('mission-folder-ui');
+  expect(json.value).not.toContain('marker-1');
+  expect(json.value).not.toContain('rawRef lat lon should not export');
+  expect(json.value).not.toMatch(/indexedDB|objectStore|GPSLatitude|GPSLongitude|"lat"|"lon"|"rawRef"/i);
+
+  const auditLog = readLocalAuditLog();
+  expect(auditLog.some((entry) => entry.type === 'export-created' && entry.details?.exportKind === 'mission-folder')).toBe(true);
+});
+
+
 it('archives pending lessons and feedback typed without clicking the separate save button', async () => {
   await saveMission({
     id: 'm2c-unsaved-lessons-archive',
