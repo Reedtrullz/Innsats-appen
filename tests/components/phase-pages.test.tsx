@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import EtterPage from '@/app/(app)/etter/page';
 import UnderPage from '@/app/(app)/under/page';
 import { PhasePageContent } from '@/components/action-card-list';
 import type { ActionCard, ContentChangelogEntry, MustReadNotice, OperationalChecklist } from '@/lib/content/schemas';
@@ -58,4 +59,14 @@ it('shows under-phase operational entry points for map, log and active mission',
   expect(screen.getByRole('link', { name: /Åpne kart/i })).toHaveAttribute('href', '/kart');
   expect(screen.getByRole('link', { name: /Loggfør observasjon/i })).toHaveAttribute('href', '/oppdrag#feltlogg');
   expect(screen.getByText(/Kart og logg er lokal beslutningsstøtte/i)).toBeInTheDocument();
+});
+
+it('shows after-phase reporting entry points for RUH, welfare and mission folder', () => {
+  render(<EtterPage />);
+
+  expect(screen.getByRole('heading', { name: /Etter innsats/i })).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /Åpne etterrapport/i })).toHaveAttribute('href', '/oppdrag');
+  expect(screen.getByRole('link', { name: /RUH og velferd/i })).toHaveAttribute('href', '/oppdrag');
+  expect(screen.getByRole('link', { name: /Oppdragsmappe/i })).toHaveAttribute('href', '/oppdrag');
+  expect(screen.getByText(/lokal og ikke offisiell innsending/i)).toBeInTheDocument();
 });
