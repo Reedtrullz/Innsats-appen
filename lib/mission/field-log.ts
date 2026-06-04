@@ -53,6 +53,9 @@ export function filterFieldLogEntries(entries: FieldLogEntry[], filters: { query
       FIELD_LOG_CATEGORY_LABELS[entry.category],
       entry.category,
       entry.text,
+      entry.mapReference?.label,
+      entry.mapReference ? `${entry.mapReference.point.x},${entry.mapReference.point.y}` : undefined,
+      entry.mapReference?.source,
       entry.linkedMissionId,
       flags,
     ].filter(Boolean).join(' ').toLowerCase();
@@ -74,12 +77,25 @@ function missionExportSummary(mission: MissionContext) {
 }
 
 function exportedEntry(entry: FieldLogEntry) {
+  const mapReference = entry.mapReference
+    ? {
+        source: entry.mapReference.source,
+        objectId: entry.mapReference.objectId,
+        label: entry.mapReference.label,
+        point: {
+          x: entry.mapReference.point.x,
+          y: entry.mapReference.point.y,
+        },
+      }
+    : undefined;
+
   return {
     timestamp: entry.timestamp,
     locationText: entry.locationText,
     category: entry.category,
     categoryLabel: FIELD_LOG_CATEGORY_LABELS[entry.category],
     text: entry.text,
+    mapReference,
     linkedMissionId: entry.linkedMissionId,
     flags: {
       criticalObservation: entry.criticalObservation,
@@ -93,6 +109,12 @@ function entryFlags(entry: FieldLogEntry) {
   if (entry.criticalObservation) flags.push('Kritisk observasjon');
   if (entry.mustBeForwarded) flags.push('Må videresendes');
   return flags;
+}
+
+function mapReferenceText(entry: FieldLogEntry) {
+  if (!entry.mapReference) return '';
+  const { source, label, point } = entry.mapReference;
+  return ` — Kart: ${label} (${source} ${point.x},${point.y})`;
 }
 
 export function exportFieldLogMarkdown({ mission, entries }: { mission: MissionContext; entries: FieldLogEntry[] }) {
@@ -118,10 +140,11 @@ export function exportFieldLogMarkdown({ mission, entries }: { mission: MissionC
   } else {
     for (const entry of sorted) {
       const location = entry.locationText ? ` — ${entry.locationText}` : '';
+      const mapReference = mapReferenceText(entry);
       const flags = entryFlags(entry);
       const flagSuffix = flags.length > 0 ? ` — ${flags.join(', ')}` : '';
       const linked = entry.linkedMissionId ? ` — Koblet oppdrag: ${entry.linkedMissionId}` : '';
-      lines.push(`- ${entry.timestamp} — ${FIELD_LOG_CATEGORY_LABELS[entry.category]}${location}${flagSuffix}${linked}: ${entry.text}`);
+      lines.push(`- ${entry.timestamp} — ${FIELD_LOG_CATEGORY_LABELS[entry.category]}${location}${mapReference}${flagSuffix}${linked}: ${entry.text}`);
     }
   }
 

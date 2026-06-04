@@ -121,6 +121,39 @@ it('allows sanitized schematic map references on field log entries without true 
   }).success).toBe(false);
 });
 
+it('searches and exports field-log map references as schematic local context only', () => {
+  const mapEntry: FieldLogEntry = {
+    id: 'entry-map-ref',
+    timestamp: '2026-06-04T09:30:00.000Z',
+    locationText: 'Skjematisk 22,33',
+    category: 'observasjon',
+    text: 'Røyk ved KO',
+    criticalObservation: true,
+    mustBeForwarded: true,
+    mapReference: {
+      source: 'map-marker',
+      objectId: 'marker-ko',
+      label: 'KO lokal',
+      point: { x: 22, y: 33 },
+    },
+  };
+
+  expect(filterFieldLogEntries([mapEntry], { query: 'KO lokal' })).toHaveLength(1);
+  expect(filterFieldLogEntries([mapEntry], { query: '22,33' })).toHaveLength(1);
+
+  const markdown = exportFieldLogMarkdown({ mission: baseMission, entries: [mapEntry] });
+  const json = JSON.parse(exportFieldLogJson({ mission: baseMission, entries: [mapEntry] }));
+
+  expect(markdown).toContain('Kart: KO lokal (map-marker 22,33)');
+  expect(json.entries[0].mapReference).toEqual({
+    source: 'map-marker',
+    objectId: 'marker-ko',
+    label: 'KO lokal',
+    point: { x: 22, y: 33 },
+  });
+  expect(JSON.stringify(json)).not.toMatch(/lat|lon|geometry|rawRef/i);
+});
+
 it('exposes the required quick categories with privacy-preserving labels and help text', () => {
   expect(FIELD_LOG_CATEGORIES).toEqual([
     'funn',
