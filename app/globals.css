@@ -6,8 +6,17 @@
   color-scheme: light;
 }
 
+html {
+  max-width: 100%;
+  overflow-x: clip;
+  scroll-padding-top: 6rem;
+  scroll-padding-bottom: 8rem;
+}
+
 body {
   margin: 0;
+  max-width: 100%;
+  overflow-x: clip;
   background: #f8fafc;
   color: #0f172a;
 }

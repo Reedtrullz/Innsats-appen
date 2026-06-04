@@ -5,7 +5,7 @@ const port = process.env.PLAYWRIGHT_PORT ?? '3000';
 if (!/^\d+$/.test(port)) throw new Error('PLAYWRIGHT_PORT must be a numeric TCP port');
 const baseURL = `http://127.0.0.1:${port}`;
 const withOptionalNvm = (command: string) =>
-  `bash -lc 'if [ -s "$HOME/.nvm/nvm.sh" ]; then source "$HOME/.nvm/nvm.sh" && nvm use 22 >/dev/null; fi; PORT=${port} ${command}'`;
+  `bash -lc 'if [ -s "$HOME/.nvm/nvm.sh" ]; then source "$HOME/.nvm/nvm.sh" && nvm use 22 >/dev/null 2>&1 || true; fi; PORT=${port} ${command}'`;
 
 export default defineConfig({
   testDir: './tests/e2e',

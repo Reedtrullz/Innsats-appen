@@ -331,9 +331,9 @@ export function OfflineMapPanel() {
         <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Eksport/import</p>
         <h2 className="text-2xl font-black">Lokal SVG og GeoJSON</h2>
         <p className="rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">{LOCATION_EXPORT_PRIVACY_WARNING}</p>
-        <div className="flex flex-wrap gap-3">
-          <button type="button" onClick={exportSvg} className="min-h-11 rounded-xl bg-slate-900 px-4 font-black text-white">Lag kartbilde (SVG)</button>
-          <button type="button" onClick={exportGeoJson} className="min-h-11 rounded-xl bg-slate-900 px-4 font-black text-white">Lag GeoJSON eksport</button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <button type="button" onClick={exportSvg} className="min-h-11 w-full rounded-xl bg-slate-900 px-4 font-black text-white sm:w-auto">Lag kartbilde (SVG)</button>
+          <button type="button" onClick={exportGeoJson} className="min-h-11 w-full rounded-xl bg-slate-900 px-4 font-black text-white sm:w-auto">Lag GeoJSON eksport</button>
         </div>
         <label className="block text-sm font-bold">Kartbilde SVG<textarea id="map-image-export" readOnly value={imageExport} className="mt-1 min-h-32 w-full rounded-xl border p-3 font-mono text-xs" /></label>
         <label className="block text-sm font-bold">GeoJSON eksport<textarea id="map-geojson-export" readOnly value={geoJsonExport} className="mt-1 min-h-32 w-full rounded-xl border p-3 font-mono text-xs" /></label>
