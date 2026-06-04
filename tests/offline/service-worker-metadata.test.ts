@@ -24,6 +24,7 @@ describe('service worker metadata helpers', () => {
     expect(sw).toContain('BEREDSKAPSBOKA_SKIP_WAITING');
     expect(staticAppShell).toContain('/nytt');
     expect(staticAppShell).toContain('/sok');
+    expect(staticAppShell).toContain('/mer');
     expect(staticAppShell).not.toContain('/release');
   });
 
