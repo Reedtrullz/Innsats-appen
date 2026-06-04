@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState, useSyncExternalStore } from 'react';
+import { useMemo, useState, useSyncExternalStore, type MouseEvent } from 'react';
 import { searchDocuments, searchIndexFreshnessLabel, suggestSearchQueries, type SearchContext, type SearchDocument, type SearchHit } from '@/lib/content/search';
 
 const LOCATION_CHANGE_EVENT = 'beredskapsboka:locationchange';
@@ -74,6 +74,11 @@ function searchPath(basePath: string, query: string) {
   return `${basePath}?q=${encodeURIComponent(query)}`;
 }
 
+function resetSearchFiltersPath(basePath: string, query: string) {
+  const trimmed = query.trim();
+  return trimmed ? searchPath(basePath, trimmed) : basePath;
+}
+
 function chipClass(active: boolean) {
   return active
     ? 'rounded-full bg-sky-900 px-3 py-2 text-sm font-bold text-white'
@@ -121,12 +126,13 @@ export function SearchBox({
     if (!q) return [];
     return searchDocuments(documents, q, rankingContext);
   }, [documents, query, rankingContext]);
-  const results = useMemo(() => rawResults.filter((doc) => {
+  const filteredResults = useMemo(() => rawResults.filter((doc) => {
     if (activePhase && doc.phase !== activePhase) return false;
     if (activeType && doc.type !== activeType) return false;
     if (activeSourceStatus && doc.sourceStatus !== activeSourceStatus) return false;
     return true;
-  }).slice(0, 12), [activePhase, activeSourceStatus, activeType, rawResults]);
+  }), [activePhase, activeSourceStatus, activeType, rawResults]);
+  const results = useMemo(() => filteredResults.slice(0, 12), [filteredResults]);
   const suggestions = useMemo(() => {
     const q = query.trim();
     if (!q || rawResults.length > 0) return [];
@@ -135,6 +141,8 @@ export function SearchBox({
   const typeFilters = useMemo(() => uniqueSorted(documents.map((doc) => doc.type)), [documents]);
   const sourceStatusFilters = useMemo(() => uniqueSorted(documents.map((doc) => doc.sourceStatus)), [documents]);
   const hasActiveFilters = Boolean(activePhase || activeType || activeSourceStatus);
+  const filtersHideResults = Boolean(query.trim() && hasActiveFilters && rawResults.length > 0 && filteredResults.length === 0);
+  const resetFiltersHref = resetSearchFiltersPath(suggestionBasePath, query);
   const freshnessLabel = (showFreshnessIndicator || typeof generatedAt !== 'undefined') ? searchIndexFreshnessLabel(generatedAt, now) : null;
   const grouped = results.reduce<Record<string, SearchHit[]>>((acc, doc) => {
     const key = doc.type ?? 'resultat';
@@ -142,6 +150,17 @@ export function SearchBox({
     acc[key].push(doc);
     return acc;
   }, {});
+  function resetFilters() {
+    setActivePhase(null);
+    setActiveType(null);
+    setActiveSourceStatus(null);
+  }
+
+  function resetFiltersAndPreserveQuery(event: MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+    resetFilters();
+    window.history.pushState(null, '', resetFiltersHref);
+  }
   return (
     <section className="rounded-3xl bg-white p-4 shadow-sm" aria-label="Lokalt søk">
       <label className="text-sm font-bold text-slate-700" htmlFor="stress-search">Søk lokalt i tiltak, kilder og moduler</label>
@@ -205,21 +224,30 @@ export function SearchBox({
             <button
               type="button"
               className="rounded-full border border-slate-300 px-3 py-2 text-sm font-bold text-slate-700"
-              onClick={() => {
-                setActivePhase(null);
-                setActiveType(null);
-                setActiveSourceStatus(null);
-              }}
+              onClick={resetFilters}
             >
-              Nullstill filtre
+              Fjern aktive filtre
             </button>
           ) : null}
         </fieldset>
       ) : null}
       {query && results.length === 0 ? (
         <div className="mt-3 space-y-2 text-sm text-slate-700">
-          <p className="font-semibold">Ingen treff. Prøv et kjent fagord.</p>
-          {suggestions.length > 0 ? (
+          {filtersHideResults ? (
+            <>
+              <p className="font-semibold">{rawResults.length} treff skjult av filtre.</p>
+              <Link
+                className="inline-flex min-h-11 items-center rounded-full bg-sky-900 px-4 text-sm font-black text-white"
+                href={resetFiltersHref}
+                onClick={resetFiltersAndPreserveQuery}
+              >
+                Nullstill filtre
+              </Link>
+            </>
+          ) : (
+            <p className="font-semibold">Ingen treff. Prøv et kjent fagord.</p>
+          )}
+          {!filtersHideResults && suggestions.length > 0 ? (
             <div>
               <p className="text-slate-600">Mente du:</p>
               <ul className="mt-1 flex flex-wrap gap-2">

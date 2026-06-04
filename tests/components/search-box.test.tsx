@@ -123,3 +123,22 @@ it('filters matching results before applying the visible result limit', async ()
   expect(screen.getByRole('link', { name: 'Zz kilde etter limit' })).toBeInTheDocument();
   expect(screen.queryByRole('link', { name: 'Aa pumpe tiltak 00' })).not.toBeInTheDocument();
 });
+
+it('explains when filters hide search results and lets users reset filters', async () => {
+  render(<SearchBox documents={[docs[2]]} enableFilters />);
+
+  await userEvent.type(screen.getByRole('searchbox'), 'pumpe');
+  expect(screen.getByRole('link', { name: 'Pumpe og vannforsyning' })).toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('button', { name: /Fase: Før/i }));
+
+  expect(screen.getByText(/1 treff skjult av filtre/i)).toBeInTheDocument();
+  expect(screen.queryByText(/Ingen treff\. Prøv et kjent fagord/i)).not.toBeInTheDocument();
+  const reset = screen.getByRole('link', { name: /Nullstill filtre/i });
+  expect(reset).toHaveAttribute('href', '/hurtigkort?q=pumpe');
+
+  await userEvent.click(reset);
+
+  expect(screen.getByRole('link', { name: 'Pumpe og vannforsyning' })).toBeInTheDocument();
+  expect(screen.queryByText(/treff skjult av filtre/i)).not.toBeInTheDocument();
+});

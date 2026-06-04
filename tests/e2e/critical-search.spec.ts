@@ -50,3 +50,24 @@ test('search tab opens first-class operational search', async ({ page }) => {
   await expect(page.getByText(/Søkeord:/i).first()).toBeVisible();
   await expect(page.getByText(/Kilde:/i).first()).toBeVisible();
 });
+
+test('search explains when filters hide otherwise matching results', async ({ page }) => {
+  await page.goto('/sok');
+  const search = page.getByRole('searchbox');
+  await search.fill('dekontaminering');
+  await expect(page.getByLabel('Lokalt søk').getByRole('link').first()).toBeVisible();
+
+  await page.getByRole('button', { name: /Fase: Før/i }).click();
+
+  await expect(page.getByText(/treff skjult av filtre/i)).toBeVisible();
+  await expect(page.getByText(/Ingen treff\. Prøv et kjent fagord/i)).toHaveCount(0);
+  const reset = page.getByRole('link', { name: /Nullstill filtre/i });
+  await expect(reset).toHaveAttribute('href', '/sok?q=dekontaminering');
+
+  await reset.click();
+
+  await expect(page).toHaveURL(/\/sok\?q=dekontaminering$/);
+  await expect(search).toHaveValue('dekontaminering');
+  await expect(page.getByLabel('Lokalt søk').getByRole('link').first()).toBeVisible();
+  await expect(page.getByText(/treff skjult av filtre/i)).toHaveCount(0);
+});
