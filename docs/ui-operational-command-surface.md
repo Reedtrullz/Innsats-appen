@@ -10,7 +10,8 @@ Operational navigation:
 
 - Hjem: command entry point with situation prompts, local/offline status, and direct starts for search or local mission.
 - Søk: fast local/offline search across tiltak, kilder, learning modules, glossary, protection measures, and FAQ entries.
-- Oppdrag: current local mission dashboard with situation, next recommended action, checklist progress, local tasks/status/resources, and local exports.
+- Oppdrag: current local mission dashboard with situation, next recommended action, checklist progress, map/log summary, local tasks/status/resources, and local exports.
+- Kart/Feltmodus workflow: local-only Kart → Logg → Oppdrag → Etterrapport → Oppdragsmappe using schematic 0-100 coordinates; see `docs/map-log-fieldmode-workflow.md`.
 - Kort: tiltakskort / hurtigkort for source-backed action cards and phase filters.
 - Mer: sources, modules, field mode, privacy, map, device-data controls, and admin/release links.
 

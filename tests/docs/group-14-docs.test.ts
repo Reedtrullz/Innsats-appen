@@ -120,4 +120,14 @@ describe('Group 14 rollout and maintenance documentation', () => {
       expect(Object.keys(allDependencies)).not.toContain(dependency);
     }
   });
+
+  it('documents the map-log-fieldmode workflow without adding backend or live tracking claims', () => {
+    const doc = read('docs/map-log-fieldmode-workflow.md');
+    expect(doc).toContain('Kart → Logg → Oppdrag → Etterrapport → Oppdragsmappe');
+    expect(doc).toContain('schematic 0-100');
+    expect(doc).toContain('local-only');
+    expect(doc).toContain('No backend sync, no login, no live tracking');
+    expect(doc).toContain('MapLibre/Leaflet/MBTiles requires a separate governed package plan');
+    expect(doc).toContain('Do not enter patient/persondata');
+  });
 });
