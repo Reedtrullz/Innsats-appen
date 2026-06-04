@@ -295,7 +295,7 @@ it('lets users add, filter and export a structured local field log with patient-
   expect(await screen.findByRole('heading', { name: /Lokal feltlogg/i })).toBeInTheDocument();
   expect(screen.getAllByText(/Ikke offisiell logg/i).length).toBeGreaterThan(0);
   expect(screen.getByText(/ikke registrer navn, ID, fødselsdato, fødselsnummer, diagnose, behandling, journal, helseopplysninger eller pasientdata/i)).toBeInTheDocument();
-  expect(screen.getByText(/Trenger ekstra lysmast/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/Trenger ekstra lysmast/i).length).toBeGreaterThan(0);
 
   await userEvent.clear(screen.getByLabelText(/Feltlogg tidspunkt/i));
   await userEvent.type(screen.getByLabelText(/Feltlogg tidspunkt/i), '2026-06-04T09:05');
@@ -323,11 +323,13 @@ it('lets users add, filter and export a structured local field log with patient-
   expect(screen.getAllByText(/Kritisk observasjon/i).length).toBeGreaterThan(0);
   expect(screen.getAllByText(/Må videresendes/i).length).toBeGreaterThan(0);
 
+  const fieldLogTimeline = screen.getByRole('heading', { name: /Feltlogg tidslinje/i }).closest('div')?.parentElement;
+  expect(fieldLogTimeline).not.toBeNull();
   await userEvent.type(screen.getByLabelText(/Søk i feltlogg/i), 'vannstand');
-  expect(screen.getByText(/Vannstand stiger ved bekk/i)).toBeInTheDocument();
-  await waitFor(() => expect(screen.queryByText(/Trenger ekstra lysmast/i)).not.toBeInTheDocument());
+  expect(within(fieldLogTimeline!).getByText(/Vannstand stiger ved bekk/i)).toBeInTheDocument();
+  await waitFor(() => expect(within(fieldLogTimeline!).queryByText(/Trenger ekstra lysmast/i)).not.toBeInTheDocument());
   await userEvent.selectOptions(screen.getByLabelText(/Filtrer feltloggkategori/i), 'observasjon');
-  expect(screen.getByText(/Vannstand stiger ved bekk/i)).toBeInTheDocument();
+  expect(within(fieldLogTimeline!).getByText(/Vannstand stiger ved bekk/i)).toBeInTheDocument();
 
   await userEvent.click(screen.getByRole('button', { name: /Lag feltlogg Markdown/i }));
   await userEvent.click(screen.getByRole('button', { name: /Lag feltlogg JSON/i }));
@@ -556,6 +558,43 @@ it('shows map and field-log summary on the mission dashboard', async () => {
   expect(await screen.findByRole('heading', { name: /Kart og logg/i })).toBeInTheDocument();
   expect(screen.getAllByText(/kartkoblet logg/i).length).toBeGreaterThan(0);
   expect(screen.getByRole('link', { name: /Åpne kart/i })).toHaveAttribute('href', '/kart');
+});
+
+it('shows local manual order-update suggestions from important field-log entries', async () => {
+  await saveMission({
+    id: 'm6-order-suggestions-ui',
+    title: 'Flom ordre forslag',
+    createdAt: '2026-06-04T09:00:00.000Z',
+    updatedAt: '2026-06-04T09:30:00.000Z',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'flom',
+    locationText: 'Innsatsområde nord',
+    externalSignals: [],
+    activeChecklistIds: ['fig-under-innsats'],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [],
+    fieldLogEntries: [
+      {
+        id: 'field-log-order-suggestion',
+        timestamp: '2026-06-04T09:05:00.000Z',
+        category: 'vaer-fare',
+        text: 'Flomvei stengt',
+        criticalObservation: true,
+        mustBeForwarded: true,
+      },
+    ],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  } as any);
+
+  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+
+  const orderSuggestionPanel = await screen.findByRole('region', { name: /Forslag til manuell ordreoppdatering/i });
+  expect(orderSuggestionPanel).toHaveTextContent(/Dette endrer ikke ordre/i);
+  expect(within(orderSuggestionPanel).getByText(/Flomvei stengt/i)).toBeInTheDocument();
 });
 
 it('shows a fallback next action when the matching action card has no steps', async () => {

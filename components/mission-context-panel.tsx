@@ -10,6 +10,7 @@ import { FIELD_LOG_CATEGORY_OPTIONS, FIELD_LOG_CATEGORY_LABELS, FIELD_LOG_LOCAL_
 import { MAN_DOWN_POST_MVP_NOTE, MEDIA_ATTACHMENT_SAFETY_NOTES } from '@/lib/mission/media-safety';
 import { RUH_CATEGORY_OPTIONS, RUH_LOCAL_ONLY_WARNING, RUH_PATIENT_DATA_WARNING, RUH_RISK_OPTIONS, WELFARE_LOAD_OPTIONS, WELFARE_NON_MEDICAL_WARNING, exportRuhJson, exportRuhMarkdown, exportWelfareJson, exportWelfareMarkdown, summarizeWelfareCheck } from '@/lib/mission/ruh-welfare';
 import { buildEquipmentReadinessSummary, exportEquipmentReadinessJson, exportEquipmentReadinessMarkdown } from '@/lib/mission/equipment-readiness';
+import { buildOrderUpdateSuggestions } from '@/lib/mission/order-update-suggestions';
 import { exportMissionStatusSummaryMarkdown } from '@/lib/mission/export-markdown';
 import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArchivedMission, listArchivedMissions, listChecklistRuns, listMissions, saveMission } from '@/lib/mission/local-store';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
@@ -784,6 +785,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
   const nextActionSteps = firstActions[0]?.steps.length
     ? firstActions[0].steps.slice(0, 3)
     : ['Åpne sjekklisten og bekreft fase, samband og sikkerhet.'];
+  const orderSuggestions = buildOrderUpdateSuggestions(mission.fieldLogEntries ?? []);
 
   return (
     <article className="space-y-4">
@@ -809,6 +811,16 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
         <p className="text-xs font-black uppercase tracking-wide">Operativ grense</p>
         <p className="mt-1 text-sm font-semibold">Lokalt arbeidsstøtte. Kontroller alltid mot gjeldende ordre, fagmyndighet og innsatsleders føringer. Ikke legg inn persondata.</p>
       </section>
+
+      {orderSuggestions.length > 0 ? (
+        <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950" aria-label="Forslag til manuell ordreoppdatering">
+          <h3 className="text-lg font-black">Forslag til manuell ordreoppdatering</h3>
+          <p className="mt-1 text-sm font-semibold">Automatisk forslag fra kritiske lokale logginnslag. Dette endrer ikke ordre og er ikke offisiell ordre.</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold">
+            {orderSuggestions.map((suggestion) => <li key={suggestion}>{suggestion}</li>)}
+          </ul>
+        </section>
+      ) : null}
 
       <LocalMissionControls mission={mission} displaySignals={staleSignals} onMissionChange={onMissionChange} />
       <FieldLogControls mission={mission} onMissionChange={onMissionChange} />
