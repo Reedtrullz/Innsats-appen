@@ -28,6 +28,7 @@ it('shows generated content version and expanded content navigation', () => {
   expect(screen.getByTestId('shell-content-version')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /Kildegjennomgang/i })).toHaveAttribute('href', '/kildegjennomgang');
   expect(screen.getByRole('link', { name: /Datakilder/i })).toHaveAttribute('href', '/datakilder');
+  expect(screen.getByRole('link', { name: /Personvern/i })).toHaveAttribute('href', '/personvern');
   expect(screen.getAllByRole('link', { name: /Kart/i }).some((link) => link.getAttribute('href') === '/kart')).toBe(true);
   expect(screen.getByRole('link', { name: /FAQ/i })).toHaveAttribute('href', '/faq');
   expect(screen.getByRole('link', { name: /Endringer/i })).toHaveAttribute('href', '/endringer');

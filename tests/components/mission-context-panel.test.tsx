@@ -4,6 +4,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { MissionContextPanel } from '@/components/mission-context-panel';
 import { archiveMission, clearLocalMissionData, listArchivedMissions, listMissions, saveChecklistRun, saveMission } from '@/lib/mission/local-store';
 import { EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY } from '@/lib/integrations/source-settings';
+import { readLocalAuditLog } from '@/lib/privacy/local-profile';
 import type { OperationalChecklist } from '@/lib/content/schemas';
 
 vi.mock('next/navigation', () => ({
@@ -411,6 +412,8 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
   expect(exportedRuhJson.mission.id).toBeUndefined();
   expect(exportedRuhJson.reports[0].linkedMissionId).toBeUndefined();
   expect(ruhJsonPreview.value).not.toMatch(/indexedDB|objectStore|Exif|GPSLatitude|GPSLongitude/i);
+  expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'ruh-markdown')).toBe(true);
+  expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'ruh-json')).toBe(true);
 
   await userEvent.selectOptions(screen.getByLabelText(/Fysisk belastning/i), 'hoy');
   await userEvent.selectOptions(screen.getByLabelText(/Mental belastning/i), 'moderat');
@@ -437,10 +440,13 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
   expect(screen.getByText(/Lang innsats, planlegg pause/i)).toBeInTheDocument();
 
   await userEvent.click(screen.getByRole('button', { name: /Lag velferd Markdown/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Lag velferd JSON/i }));
   const welfareMarkdownPreview = screen.getByLabelText(/Velferd Markdown/i) as HTMLTextAreaElement;
   expect(welfareMarkdownPreview.value).toContain('# Lokal velferds- og belastningssjekk');
   expect(welfareMarkdownPreview.value).toContain('Ikke medisinsk vurdering');
   expect(welfareMarkdownPreview.value).toContain('Trenger avløsning');
+  expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'welfare-markdown')).toBe(true);
+  expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'welfare-json')).toBe(true);
 });
 
 it('shows current situation and lets users add local tasks, quick status and resource requests', async () => {

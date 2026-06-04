@@ -1,13 +1,18 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
+import { afterEach, vi } from 'vitest';
 import MissionsPage from '@/app/(app)/oppdrag/page';
 import { CommsPlanForm } from '@/components/forms/comms-plan-form';
 import { FivePointOrderForm } from '@/components/forms/five-point-order-form';
+import { readLocalAuditLog } from '@/lib/privacy/local-profile';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
+
+afterEach(() => {
+  localStorage.clear();
+});
 
 it('requires all five order points and renders exported markdown', async () => {
   render(<FivePointOrderForm contentVersion="test-content-ui" />);
@@ -42,6 +47,7 @@ it('requires all five order points and renders exported markdown', async () => {
   expect(jsonButton).toBeEnabled();
   expect(pdfButton).toBeEnabled();
   await userEvent.click(markdownButton);
+  expect(readLocalAuditLog().some((entry) => entry.type === 'export-created' && entry.details.exportKind === 'five-point-order-markdown')).toBe(true);
   expect(screen.getByText(/# 5-punktsordre/i)).toBeInTheDocument();
   expect(screen.getByText(/src-5-punktsordre/i)).toBeInTheDocument();
   expect(screen.getAllByText(/operasjonelt sensitiv informasjon/i).length).toBeGreaterThan(0);

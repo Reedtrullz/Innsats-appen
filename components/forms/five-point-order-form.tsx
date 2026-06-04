@@ -10,6 +10,7 @@ import {
   exportFivePointOrderMarkdown,
   exportFivePointOrderPdfReadyHtml,
 } from '@/lib/mission/order-export';
+import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 
 function value(form: FormData, key: string) {
   return String(form.get(key) ?? '').trim();
@@ -58,6 +59,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
 
     const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
     const format = (submitter?.value as ExportFormat | undefined) ?? 'markdown';
+    appendLocalAuditEntry('export-created', { exportKind: `five-point-order-${format}`, templateId: input.templateId, readbackConfirmed: input.readbackConfirmed });
     if (format === 'json') {
       setPreview({ format, text: exportFivePointOrderJson(input) });
       return;

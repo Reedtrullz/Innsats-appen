@@ -4,6 +4,7 @@ import { afterEach } from 'vitest';
 import { OfflineMapPanel } from '@/components/offline-map-panel';
 import { OFFLINE_MAP_CACHE_STORAGE_KEY } from '@/lib/maps/offline-map';
 import { OPERATIONS_MAP_STORAGE_KEY, SCHEMATIC_GEOJSON_COORDINATE_SYSTEM } from '@/lib/maps/operations-map';
+import { readLocalAuditLog } from '@/lib/privacy/local-profile';
 
 afterEach(() => localStorage.clear());
 
@@ -80,9 +81,11 @@ it('adds a local sector, measures it, and creates sanitized SVG and GeoJSON expo
 
   await user.click(screen.getByRole('button', { name: /Lag kartbilde/i }));
   expect((screen.getByLabelText(/Kartbilde SVG/i) as HTMLTextAreaElement).value).toContain('aria-label="Sanitert lokalt kartbilde"');
+  expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'map-svg')).toBe(true);
 
   await user.click(screen.getByRole('button', { name: /Lag GeoJSON eksport/i }));
   expect((screen.getByLabelText(/GeoJSON eksport/i) as HTMLTextAreaElement).value).toContain('schematic-0-100-local-only');
+  expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'map-geojson')).toBe(true);
   expect(screen.getAllByText(/Lokale kartmarkører og sektorer kan røpe/i).length).toBeGreaterThan(0);
 });
 

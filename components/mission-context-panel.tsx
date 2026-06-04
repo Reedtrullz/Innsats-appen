@@ -13,6 +13,7 @@ import { RUH_CATEGORY_OPTIONS, RUH_LOCAL_ONLY_WARNING, RUH_PATIENT_DATA_WARNING,
 import { buildEquipmentReadinessSummary, exportEquipmentReadinessJson, exportEquipmentReadinessMarkdown } from '@/lib/mission/equipment-readiness';
 import { exportMissionStatusSummaryMarkdown } from '@/lib/mission/export-markdown';
 import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArchivedMission, listArchivedMissions, listChecklistRuns, listMissions, saveMission } from '@/lib/mission/local-store';
+import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import type { MissionContext, MissionTaskStatus, QuickStatusMessage, ResourceRequestKind, FieldLogCategory, RuhCategory, RuhRisk, WelfareLoad } from '@/lib/mission/schemas';
 import { ChecklistRunner } from './checklist-runner';
 import { ContextSignalPanel, markStoredContextSignalsStale } from './context-signal-panel';
@@ -140,6 +141,7 @@ function LocalMissionControls({ mission, displaySignals, onMissionChange }: { mi
 
   function generateStatusSummary() {
     setShowStatusSummary(true);
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'status-summary' });
   }
 
   return (
@@ -251,14 +253,17 @@ function FieldLogControls({ mission, onMissionChange }: { mission: MissionContex
 
   function generateMarkdown() {
     setMarkdown(exportFieldLogMarkdown({ mission, entries: filteredEntries }));
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'field-log-markdown', count: filteredEntries.length });
   }
 
   function generateJson() {
     setJson(exportFieldLogJson({ mission, entries: filteredEntries }));
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'field-log-json', count: filteredEntries.length });
   }
 
   function generatePdfReadyHtml() {
     setPdfReadyHtml(exportFieldLogPdfReadyHtml({ mission, entries: filteredEntries }));
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'field-log-pdf-ready-html', count: filteredEntries.length });
   }
 
   return (
@@ -441,6 +446,26 @@ function RuhWelfareControls({ mission, onMissionChange }: { mission: MissionCont
     setMentalLoad('lav');
   }
 
+  function generateRuhMarkdown() {
+    setRuhMarkdown(exportRuhMarkdown({ mission, reports: ruhReports }));
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'ruh-markdown', count: ruhReports.length });
+  }
+
+  function generateRuhJson() {
+    setRuhJson(exportRuhJson({ mission, reports: ruhReports }));
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'ruh-json', count: ruhReports.length });
+  }
+
+  function generateWelfareMarkdown() {
+    setWelfareMarkdown(exportWelfareMarkdown({ mission, checks: welfareChecks }));
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'welfare-markdown', count: welfareChecks.length });
+  }
+
+  function generateWelfareJson() {
+    setWelfareJson(exportWelfareJson({ mission, checks: welfareChecks }));
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'welfare-json', count: welfareChecks.length });
+  }
+
   return (
     <section className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
@@ -500,10 +525,10 @@ function RuhWelfareControls({ mission, onMissionChange }: { mission: MissionCont
         <h4 className="font-black">RUH/velferd eksport</h4>
         <p className="mt-1 text-sm font-semibold">Eksport er lokal forhåndsvisning. Kontroller innhold og fjern persondata før deling.</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          <button type="button" onClick={() => setRuhMarkdown(exportRuhMarkdown({ mission, reports: ruhReports }))} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag RUH Markdown</button>
-          <button type="button" onClick={() => setRuhJson(exportRuhJson({ mission, reports: ruhReports }))} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag RUH JSON</button>
-          <button type="button" onClick={() => setWelfareMarkdown(exportWelfareMarkdown({ mission, checks: welfareChecks }))} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag velferd Markdown</button>
-          <button type="button" onClick={() => setWelfareJson(exportWelfareJson({ mission, checks: welfareChecks }))} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag velferd JSON</button>
+          <button type="button" onClick={generateRuhMarkdown} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag RUH Markdown</button>
+          <button type="button" onClick={generateRuhJson} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag RUH JSON</button>
+          <button type="button" onClick={generateWelfareMarkdown} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag velferd Markdown</button>
+          <button type="button" onClick={generateWelfareJson} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag velferd JSON</button>
         </div>
       </div>
       {ruhMarkdown ? <label htmlFor="ruh-markdown" className="block text-sm font-bold">RUH Markdown<textarea id="ruh-markdown" readOnly value={ruhMarkdown} className="mt-1 min-h-52 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" /></label> : null}
@@ -615,10 +640,12 @@ function EquipmentReadinessExportControls({ mission, checklists }: { mission: Mi
 
   async function generateMarkdown() {
     setMarkdown(exportEquipmentReadinessMarkdown(await buildSummary()));
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'mbk-markdown' });
   }
 
   async function generateJson() {
     setJson(exportEquipmentReadinessJson(await buildSummary()));
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'mbk-json' });
   }
 
   return (
@@ -671,14 +698,17 @@ function AfterActionReportControls({ mission, displaySignals, checklists, fallba
 
   async function generateMarkdown() {
     setMarkdown(exportAfterActionMarkdown(await buildReport()));
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'after-action-markdown' });
   }
 
   async function generateJson() {
     setJson(exportAfterActionJson(await buildReport()));
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'after-action-json' });
   }
 
   async function generatePdfReadyHtml() {
     setPdfReadyHtml(exportAfterActionPdfReadyHtml(await buildReport()));
+    appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'after-action-pdf-ready-html' });
   }
 
   return (
@@ -888,11 +918,13 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
     const activeChecklist = matchingChecklist(checklists, missionDraft);
     const mission = { ...missionDraft, activeChecklistIds: activeChecklist ? [activeChecklist.slug] : [] };
     await saveMission(mission);
+    appendLocalAuditEntry('order-created', { missionId: mission.id, orderType: 'local-mission' });
     router.push('/oppdrag');
   }
 
   async function reset() {
     await clearLocalMissionData();
+    appendLocalAuditEntry('local-reset', { resetScope: 'mission-data' });
     latestMissionsRef.current = [];
     setMissions([]);
     setArchivedMissions([]);
@@ -904,6 +936,14 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
       const currentMission = latestMissionsRef.current.find((item) => item.id === missionId);
       if (!currentMission) return;
       const saved = await saveMission(update(currentMission));
+      const statusChangeCount = Math.max(0, saved.statusLog.length - currentMission.statusLog.length);
+      const taskStatusChangeCount = saved.tasks.filter((task) => {
+        const previous = currentMission.tasks.find((item) => item.id === task.id);
+        return previous ? previous.status !== task.status : task.status !== 'not-started';
+      }).length;
+      if (statusChangeCount > 0 || taskStatusChangeCount > 0) {
+        appendLocalAuditEntry('status-changed', { missionId: saved.id, statusChangeCount, taskStatusChangeCount });
+      }
       const nextMissions = latestMissionsRef.current.map((item) => (item.id === saved.id ? saved : item)).filter((item) => !item.archivedAt).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
       latestMissionsRef.current = nextMissions;
       setMissions(nextMissions);
@@ -922,17 +962,20 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
   async function archiveActiveMission(missionId: string) {
     await missionWriteQueueRef.current.catch(() => undefined);
     await archiveMission(missionId);
+    appendLocalAuditEntry('status-changed', { missionId, beforeStatus: 'active', afterStatus: 'archived' });
     await refreshMissionLists();
     setPrivacyMessage('Oppdraget er fullført og arkivert bare lokalt i denne nettleseren. Dette er ikke offisielt arkiv eller innsending.');
   }
 
   async function removeArchivedMission(missionId: string) {
     await deleteArchivedMission(missionId);
+    appendLocalAuditEntry('local-reset', { missionId, resetScope: 'archived-mission-delete' });
     await refreshMissionLists();
   }
 
   async function resetArchiveOnly() {
     await clearArchivedMissions();
+    appendLocalAuditEntry('local-reset', { resetScope: 'archive' });
     await refreshMissionLists();
     setPrivacyMessage('Lokalt arkiv er tømt i denne nettleseren. Aktive lokale oppdrag er beholdt.');
   }

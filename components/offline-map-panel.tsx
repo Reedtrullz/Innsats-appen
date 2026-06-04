@@ -48,6 +48,8 @@ import {
   type MissionMapState,
 } from '@/lib/maps/operations-map';
 
+import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
+
 const featureStyles: Record<SchematicMapFeatureKind, { fill: string; stroke: string }> = {
   depot: { fill: '#0f172a', stroke: '#ffffff' },
   'meeting-point': { fill: '#0369a1', stroke: '#ffffff' },
@@ -214,11 +216,13 @@ export function OfflineMapPanel() {
 
   function exportSvg() {
     setImageExport(buildMapImageSvg(mapState));
+    appendLocalAuditEntry('export-created', { exportKind: 'map-svg', markerCount: mapState.markers.length, drawingCount: mapState.drawings.length });
     setStatusMessage('Sanitert SVG kartbilde er generert lokalt.');
   }
 
   function exportGeoJson() {
     setGeoJsonExport(geoJsonExportText(mapState));
+    appendLocalAuditEntry('export-created', { exportKind: 'map-geojson', markerCount: mapState.markers.length, drawingCount: mapState.drawings.length });
     setStatusMessage('Sanitert GeoJSON er generert lokalt.');
   }
 

@@ -21,6 +21,7 @@ export function AppShell({ children, currentPath }: { children: React.ReactNode;
             <a href="/endringer" className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800">Endringer</a>
             <a href="/kildegjennomgang" className="rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-900">Kildegjennomgang</a>
             <a href="/datakilder" className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800">Datakilder</a>
+            <a href="/personvern" className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800">Personvern</a>
             <a href="/kart" className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800">Kart</a>
             <a href="/release" className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-800">Release</a>
             <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">Kildebelagt MVP</span>
