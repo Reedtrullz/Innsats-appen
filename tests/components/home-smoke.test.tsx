@@ -4,17 +4,25 @@ import DataOnDevicePage from '@/app/(app)/data-pa-enheten/page';
 import KnownLimitationsPage from '@/app/(app)/kjente-begrensninger/page';
 import Home from '@/app/page';
 
-it('shows the Beredskapsboka landing page', () => {
+it('shows the operational command-surface landing page', () => {
   render(<Home />);
+
   expect(screen.getByRole('heading', { name: /Beredskapsboka/i })).toBeInTheDocument();
-  expect(screen.getByText(/mobil/i)).toBeInTheDocument();
-  expect(screen.getByText(/beslutningsstøtte/i)).toBeInTheDocument();
-  expect(screen.getByText(/ikke et offisielt kommando/i)).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: /Åpne hurtigkort/i })).toHaveAttribute('href', '/hurtigkort');
+  expect(screen.getByRole('heading', { name: /Hva står du i nå/i })).toBeInTheDocument();
+  expect(screen.getByText(/kildebelagt beslutningsstøtte før, under og etter innsats/i)).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /Start lokalt oppdrag/i })).toHaveAttribute('href', '/oppdrag/ny');
-  expect(screen.getByRole('link', { name: /grenser/i })).toHaveAttribute('href', '/begrensninger');
-  expect(screen.getByRole('link', { name: /kjente begrensninger/i })).toHaveAttribute('href', '/kjente-begrensninger');
-  expect(screen.getByRole('link', { name: /data på enheten/i })).toHaveAttribute('href', '/data-pa-enheten');
+  expect(screen.getByRole('link', { name: /Finn tiltak raskt/i })).toHaveAttribute('href', '/sok');
+  expect(screen.getByRole('link', { name: /^Før innsats$/i })).toHaveAttribute('href', '/for');
+  expect(screen.getByRole('link', { name: /^Under innsats$/i })).toHaveAttribute('href', '/under');
+  expect(screen.getByRole('link', { name: /^Etter innsats$/i })).toHaveAttribute('href', '/etter');
+  expect(screen.getAllByRole('link', { name: /Kilder/i }).some((link) => link.getAttribute('href') === '/kilder')).toBe(true);
+  expect(screen.getByRole('link', { name: /Alvorlig ulykke/i })).toHaveAttribute('href', '/kort/alvorlig-ulykke-dod-eget-personell');
+  expect(screen.getByRole('link', { name: /Psykologisk førstehjelp/i })).toHaveAttribute('href', '/kort/psykologisk-forstehjelp-sekvens');
+  expect(screen.getByRole('link', { name: /Samband \/ ordre/i })).toHaveAttribute('href', '/kort/sambandsplan-start');
+  expect(screen.getByText('Offline-klar')).toBeInTheDocument();
+  expect(screen.getByText('Lagres lokalt')).toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: /Release readiness/i })).not.toBeInTheDocument();
+  expect(screen.getByText(/Ikke offisielt kommandosystem/i)).toBeInTheDocument();
 });
 
 it('renders the in-app boundary, known limitations, and device data pages', () => {
