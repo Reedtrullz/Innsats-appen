@@ -55,7 +55,7 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await page.getByLabel(/Kritisk observasjon/i).check();
   await page.getByLabel(/Må videresendes/i).check();
   await page.getByRole('button', { name: /Legg til feltlogg/i }).click();
-  await expect(page.getByText(/Våt terskel observert/i)).toBeVisible();
+  await expect(page.locator('#feltlogg').getByText(/Våt terskel observert/i).first()).toBeVisible();
   await page.getByLabel(/Søk i feltlogg/i).fill('terskel');
   await expect(page.getByText(/1\/1 treff/i)).toBeVisible();
   await page.getByRole('button', { name: /Lag feltlogg Markdown/i }).click();
@@ -102,5 +102,5 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
 
   await expectOfflineReloadPreservesMission(page, context, missionTitle);
   await expect(page.getByRole('checkbox', { name: /Kontroller ventilasjon/i })).toBeChecked();
-  await expect(page.getByText(/Våt terskel observert/i)).toBeVisible();
+  await expect(page.locator('#feltlogg').getByText(/Våt terskel observert/i).first()).toBeVisible();
 });

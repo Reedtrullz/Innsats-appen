@@ -131,6 +131,9 @@ test('map and field-mode controls expose screen-reader labels', async ({ page })
   await expect(markerRegion.getByRole('spinbutton', { name: /X 0-100/i })).toBeVisible();
   await expect(markerRegion.getByRole('spinbutton', { name: /Y 0-100/i })).toBeVisible();
   await expect(markerRegion.getByRole('textbox', { name: /Notat uten persondata/i })).toBeVisible();
+  const mapLogRegion = page.getByRole('region', { name: /Logg fra kartpunkt/i });
+  await expect(mapLogRegion.getByLabel(/Loggtekst fra kartpunkt/i)).toBeVisible();
+  await expect(mapLogRegion.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i })).toBeVisible();
 
   const drawingRegion = page.getByRole('region', { name: /Tegneverktøy og sektorer/i });
   await expect(drawingRegion.getByRole('combobox', { name: /Tegnetype/i })).toBeVisible();
@@ -167,6 +170,9 @@ test('screen-reader labels remain available on active mission operational contro
     location: 'Label testområde',
   });
 
+  await expect(page.getByRole('heading', { name: /Kart og logg/i })).toBeVisible();
+  await expect(page.getByRole('region', { name: /Oppdragsmappe/i })).toBeVisible();
+
   for (const label of [
     'Ny lokal oppgave',
     'Oppgavestatus',
@@ -179,6 +185,9 @@ test('screen-reader labels remain available on active mission operational contro
     'Feltlogg tekst',
     'Søk i feltlogg',
     'Filtrer feltloggkategori',
+    'Lokal ordretekst',
+    'Lokalt samband',
+    'Lokal logg',
     'RUH tidspunkt',
     'RUH kategori',
     'Hva skjedde',
@@ -187,9 +196,6 @@ test('screen-reader labels remain available on active mission operational contro
     'Fysisk belastning',
     'Mental belastning',
     'Velferdsnotat',
-    'Lokal ordretekst',
-    'Lokalt samband',
-    'Lokal logg',
     'Erfaringsoppsummering',
   ]) {
     await expect(page.getByLabel(new RegExp(label.replaceAll('/', '\\/'), 'i')).first()).toBeVisible();

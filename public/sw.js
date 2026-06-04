@@ -33,6 +33,7 @@ const STATIC_APP_SHELL = [
   '/mer',
   '/laering',
   '/kart',
+  '/feltmodus',
   '/moduler/cbrn',
   '/moduler/mfe',
   '/moduler/radiac',
