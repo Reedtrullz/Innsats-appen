@@ -6,12 +6,15 @@ import {
   LOCAL_DATA_SCHEMA_VERSION,
   LOCAL_DATA_STORE_KEYS,
   LOCAL_DATABASE_DECISION,
+  MAX_LOCAL_IMPORT_CHECKLIST_RUNS,
+  MAX_LOCAL_IMPORT_MISSIONS,
   applyLocalDataImport,
   buildLocalDataExport,
   formatStorageEstimate,
   migrateLocalDataExport,
   parseLocalDataImport,
   readKnownLocalStorage,
+  serializeLocalDataExport,
   storageQuotaStatus,
 } from '@/lib/local-data/local-data';
 import type { ChecklistRun, MissionContext } from '@/lib/mission/schemas';
@@ -161,7 +164,7 @@ it('formats storage quota status with warning and unknown fallbacks', () => {
   expect(storageQuotaStatus(undefined)).toMatchObject({ level: 'unknown' });
 });
 
-it('does not silently truncate missions or checklist runs in local backups/imports', () => {
+it('does not silently truncate exports while import parsing rejects over-cap payloads', () => {
   const manyMissions = Array.from({ length: 105 }, (_, index) => ({
     ...baseMission,
     id: `mission-full-backup-${index}`,
@@ -178,9 +181,27 @@ it('does not silently truncate missions or checklist runs in local backups/impor
   const exportData = buildLocalDataExport({ missions: manyMissions, checklistRuns: manyRuns, now: '2026-06-04T12:30:00.000Z' });
   expect(exportData.indexedDb.missions).toHaveLength(manyMissions.length);
   expect(exportData.indexedDb.checklistRuns).toHaveLength(manyRuns.length);
-  const parsed = parseLocalDataImport(JSON.stringify(exportData));
-  expect(parsed.indexedDb.missions).toHaveLength(manyMissions.length);
-  expect(parsed.indexedDb.checklistRuns).toHaveLength(manyRuns.length);
+  const serializedExport = JSON.parse(serializeLocalDataExport(exportData));
+  expect(serializedExport.indexedDb.missions).toHaveLength(manyMissions.length);
+  expect(serializedExport.indexedDb.checklistRuns).toHaveLength(manyRuns.length);
+
+  expect(() => parseLocalDataImport(JSON.stringify({
+    ...exportData,
+    indexedDb: { missions: manyMissions, checklistRuns: manyRuns.slice(0, MAX_LOCAL_IMPORT_CHECKLIST_RUNS) },
+  }))).toThrow(/too many missions/i);
+  expect(() => parseLocalDataImport(JSON.stringify({
+    ...exportData,
+    indexedDb: { missions: manyMissions.slice(0, MAX_LOCAL_IMPORT_MISSIONS), checklistRuns: manyRuns },
+  }))).toThrow(/too many checklist runs/i);
+
+  const cappedExportData = buildLocalDataExport({
+    missions: manyMissions.slice(0, MAX_LOCAL_IMPORT_MISSIONS),
+    checklistRuns: manyRuns.slice(0, MAX_LOCAL_IMPORT_CHECKLIST_RUNS),
+    now: '2026-06-04T12:30:00.000Z',
+  });
+  const parsed = parseLocalDataImport(JSON.stringify(cappedExportData));
+  expect(parsed.indexedDb.missions).toHaveLength(MAX_LOCAL_IMPORT_MISSIONS);
+  expect(parsed.indexedDb.checklistRuns).toHaveLength(MAX_LOCAL_IMPORT_CHECKLIST_RUNS);
 });
 
 it('rolls back localStorage if import storage writes fail before DB replacement', async () => {

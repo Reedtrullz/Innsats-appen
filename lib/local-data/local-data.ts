@@ -26,6 +26,10 @@ export const LOCAL_DATA_EXPORT_VERSION = 1;
 export const LOCAL_DATA_EXPORT_KIND = 'beredskapsboka-local-data-export';
 export const LOCAL_DATA_LARGE_IMPORT_WARNING_CHARS = 2_000_000;
 export const MAX_LOCAL_STORAGE_VALUE_CHARS = 250_000;
+export const MAX_LOCAL_IMPORT_TEXT_CHARS = 2_000_000;
+export const MAX_LOCAL_IMPORT_DEPTH = 25;
+export const MAX_LOCAL_IMPORT_MISSIONS = 100;
+export const MAX_LOCAL_IMPORT_CHECKLIST_RUNS = 500;
 
 export const RELEASE_READINESS_STORAGE_KEY = 'beredskapsboka-release-readiness-v1';
 
@@ -128,6 +132,14 @@ type ApplyLocalDataImportOptions = {
   replaceMissionData?: (missions: MissionContext[], checklistRuns: ChecklistRun[]) => Promise<{ missions: number; checklistRuns: number }>;
 };
 
+type NormalizeExportRecordOptions = {
+  enforceImportLimits?: boolean;
+};
+
+type SanitizeLocalStorageSnapshotOptions = {
+  enforceImportLimits?: boolean;
+};
+
 const dangerousImportFieldNames = new Set([
   'auth',
   'authentication',
@@ -214,6 +226,24 @@ function assertNoDangerousFields(value: unknown, path = 'import'): void {
   }
 }
 
+function assertImportTextSize(text: string): void {
+  if (text.length > MAX_LOCAL_IMPORT_TEXT_CHARS) {
+    throw new Error('Local import rejected: import text is too large.');
+  }
+}
+
+function assertLocalImportDepth(value: unknown, maxDepth = MAX_LOCAL_IMPORT_DEPTH, path = 'import', depth = 0): void {
+  if (depth > maxDepth) throw new Error(`Local import rejected: import payload is too deep at ${path}.`);
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertLocalImportDepth(item, maxDepth, `${path}[${index}]`, depth + 1));
+    return;
+  }
+  if (!isRecord(value)) return;
+  for (const [key, nested] of Object.entries(value)) {
+    assertLocalImportDepth(nested, maxDepth, `${path}.${key}`, depth + 1);
+  }
+}
+
 function parseVersionNumber(value: unknown, label: string): number {
   if (typeof value !== 'number' || !Number.isInteger(value) || value < 0) throw new Error(`Local import rejected: ${label} is invalid.`);
   return value;
@@ -270,20 +300,34 @@ function validateImportVersions(record: Record<string, unknown>): number {
   return exportVersion;
 }
 
+function assertLocalImportCounts(record: Record<string, unknown>, exportVersion: number): void {
+  const indexedDb = isRecord(record.indexedDb) ? record.indexedDb : {};
+  const rawMissions = exportVersion === LOCAL_DATA_EXPORT_VERSION ? indexedDb.missions : (record.missions ?? indexedDb.missions);
+  const rawChecklistRuns = exportVersion === LOCAL_DATA_EXPORT_VERSION ? indexedDb.checklistRuns : (record.checklistRuns ?? indexedDb.checklistRuns);
+  if (Array.isArray(rawMissions) && rawMissions.length > MAX_LOCAL_IMPORT_MISSIONS) {
+    throw new Error('Local import rejected: too many missions in import.');
+  }
+  if (Array.isArray(rawChecklistRuns) && rawChecklistRuns.length > MAX_LOCAL_IMPORT_CHECKLIST_RUNS) {
+    throw new Error('Local import rejected: too many checklist runs in import.');
+  }
+}
+
 function sortedLocalStorageSnapshot(snapshot: LocalStorageSnapshot): LocalStorageSnapshot {
   return Object.fromEntries(
     LOCAL_DATA_STORE_KEYS.flatMap((key) => (typeof snapshot[key] === 'string' ? [[key, snapshot[key]]] : [])),
   ) as LocalStorageSnapshot;
 }
 
-export function sanitizeLocalStorageSnapshot(input: unknown): LocalStorageSnapshot {
+export function sanitizeLocalStorageSnapshot(input: unknown, options: SanitizeLocalStorageSnapshotOptions = {}): LocalStorageSnapshot {
   if (!isRecord(input)) return {};
   const snapshot: LocalStorageSnapshot = {};
   for (const [key, value] of Object.entries(input)) {
     if (!keyIsAllowed(key) || typeof value !== 'string') continue;
     if (value.length > MAX_LOCAL_STORAGE_VALUE_CHARS) throw new Error(`Local import rejected: localStorage value for ${key} is too large.`);
     try {
-      assertNoDangerousFields(JSON.parse(value), `localStorage.${key}`);
+      const parsedValue = JSON.parse(value);
+      if (options.enforceImportLimits) assertLocalImportDepth(parsedValue, MAX_LOCAL_IMPORT_DEPTH, `localStorage.${key}`);
+      assertNoDangerousFields(parsedValue, `localStorage.${key}`);
     } catch (error) {
       if (error instanceof SyntaxError) {
         // Some small settings could be plain strings in older exports. Keep the exact value.
@@ -360,10 +404,12 @@ function normalizeChecklistRuns(input: unknown): ChecklistRun[] {
   return input.map(migrateStoredChecklistRun);
 }
 
-function normalizeExportRecord(input: unknown): LocalDataExport {
+function normalizeExportRecord(input: unknown, options: NormalizeExportRecordOptions = {}): LocalDataExport {
   if (!isRecord(input)) throw new Error('Local import rejected: JSON root must be an object.');
+  if (options.enforceImportLimits) assertLocalImportDepth(input);
   assertNoDangerousFields(input);
   const exportVersion = validateImportVersions(input);
+  if (options.enforceImportLimits) assertLocalImportCounts(input, exportVersion);
 
   const indexedDb = isRecord(input.indexedDb) ? input.indexedDb : {};
   const missions = normalizeMissions(exportVersion === LOCAL_DATA_EXPORT_VERSION ? indexedDb.missions : (input.missions ?? indexedDb.missions));
@@ -372,14 +418,14 @@ function normalizeExportRecord(input: unknown): LocalDataExport {
 
   return buildLocalDataExport({
     now: exportedAt,
-    localStorage: sanitizeLocalStorageSnapshot(input.localStorage),
+    localStorage: sanitizeLocalStorageSnapshot(input.localStorage, { enforceImportLimits: options.enforceImportLimits }),
     missions,
     checklistRuns,
   });
 }
 
 export function migrateLocalDataExport(input: unknown): LocalDataExport {
-  return normalizeExportRecord(input);
+  return normalizeExportRecord(input, { enforceImportLimits: true });
 }
 
 export function buildLocalDataExport(input: LocalDataExportInput = {}): LocalDataExport {
@@ -416,10 +462,11 @@ export async function buildBrowserLocalDataExport(storage: StorageLike | undefin
 }
 
 export function serializeLocalDataExport(exportData: LocalDataExport): string {
-  return `${JSON.stringify(migrateLocalDataExport(exportData), null, 2)}\n`;
+  return `${JSON.stringify(normalizeExportRecord(exportData), null, 2)}\n`;
 }
 
 export function parseLocalDataImport(text: string): LocalDataExport {
+  assertImportTextSize(text);
   let parsed: unknown;
   try {
     parsed = JSON.parse(text);
