@@ -39,7 +39,7 @@ test('exports local app data and imports it back to restore mission and checklis
 
   await page.goto('/oppdrag');
   await page.getByRole('button', { name: /^Slett lokale data$/i }).click();
-  await expect(page.getByRole('heading', { name: missionTitle })).not.toBeVisible();
+  await expect(page.getByText(missionTitle)).toHaveCount(0);
   expect(await readLocalDatabaseCounts(page)).toEqual({ missions: 0, archivedMissions: 0, checklistRuns: 0 });
 
   await page.goto('/data-pa-enheten');
@@ -54,7 +54,8 @@ test('exports local app data and imports it back to restore mission and checklis
   await expect(page.getByTestId('local-data-backup-message')).toHaveText(/Import fullført lokalt/i);
 
   await page.goto('/oppdrag');
-  await expect(page.getByRole('heading', { name: missionTitle })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
+  await expect(page.getByText(new RegExp(`${missionTitle}\\s*·\\s*Roundtrip testområde`, 'i'))).toBeVisible();
   await expect(page.getByText(/Roundtrip feltlogg/i)).toBeVisible();
   await expect(page.getByRole('checkbox', { name: /Kontroller ventilasjon/i })).toBeChecked();
 });

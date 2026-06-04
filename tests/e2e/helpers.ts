@@ -2,6 +2,10 @@ import { expect, type BrowserContext, type Page } from '@playwright/test';
 
 const LOCAL_DB_NAME = 'beredskapsboka-local';
 
+function escapeRegex(value: string) {
+  return value.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&');
+}
+
 export async function clearBrowserLocalState(page: Page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.evaluate(async (databaseName) => {
@@ -12,12 +16,28 @@ export async function clearBrowserLocalState(page: Page) {
     const exists = databases.some((database) => database.name === databaseName);
     if (!exists) return;
 
-    const deleteRequest = indexedDB.deleteDatabase(databaseName);
-    await new Promise<void>((resolve, reject) => {
-      deleteRequest.onerror = () => reject(deleteRequest.error ?? new Error(`Failed to delete ${databaseName} IndexedDB.`));
-      deleteRequest.onblocked = () => reject(new Error(`Deleting ${databaseName} IndexedDB was blocked by an open connection.`));
-      deleteRequest.onsuccess = () => resolve();
+    const openRequest = indexedDB.open(databaseName);
+    const database = await new Promise<IDBDatabase | null>((resolve, reject) => {
+      openRequest.onerror = () => reject(openRequest.error ?? new Error(`Failed to open ${databaseName} IndexedDB for cleanup.`));
+      openRequest.onsuccess = () => resolve(openRequest.result);
     });
+    if (!database) return;
+
+    try {
+      const storeNames = Array.from(database.objectStoreNames);
+      if (storeNames.length === 0) return;
+      await new Promise<void>((resolve, reject) => {
+        const transaction = database.transaction(storeNames, 'readwrite');
+        transaction.onerror = () => reject(transaction.error ?? new Error(`Failed to clear ${databaseName} IndexedDB.`));
+        transaction.onabort = () => reject(transaction.error ?? new Error(`Clearing ${databaseName} IndexedDB was aborted.`));
+        transaction.oncomplete = () => resolve();
+        for (const storeName of storeNames) {
+          transaction.objectStore(storeName).clear();
+        }
+      });
+    } finally {
+      database.close();
+    }
   }, LOCAL_DB_NAME);
 
   await expect.poll(async () => readLocalDatabaseCounts(page), { timeout: 5_000 }).toEqual({ missions: 0, archivedMissions: 0, checklistRuns: 0 });
@@ -48,9 +68,11 @@ export async function createLocalMission(page: Page, options: {
   await page.getByLabel('Rolle').selectOption(options.role ?? 'beredskapsvakt');
   await page.getByLabel('Fase').selectOption(options.phase ?? 'for');
   await page.getByLabel('Scenario').selectOption(options.scenario ?? 'tilfluktsrom');
-  await page.getByLabel('Sted/lokasjon').fill(options.location ?? 'Trondheim sentrum');
+  const missionLocation = options.location ?? 'Trondheim sentrum';
+  await page.getByLabel('Sted/lokasjon').fill(missionLocation);
   await page.getByRole('button', { name: /Lagre oppdrag/i }).click();
-  await expect(page.getByRole('heading', { name: options.title, exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
+  await expect(page.getByText(new RegExp(`${escapeRegex(options.title)}\\s*·\\s*${escapeRegex(missionLocation)}`, 'i'))).toBeVisible();
 }
 
 export async function readLocalDatabaseCounts(page: Page) {
@@ -93,7 +115,8 @@ export async function expectOfflineReloadPreservesMission(page: Page, context: B
   await context.setOffline(true);
   try {
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: missionTitle, exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
+    await expect(page.getByText(new RegExp(`${escapeRegex(missionTitle)}\\s*·`, 'i'))).toBeVisible();
   } finally {
     await context.setOffline(false);
   }

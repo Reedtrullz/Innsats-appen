@@ -13,8 +13,11 @@ async function expectNoHorizontalOverflow(page: import('@playwright/test').Page)
 }
 
 const coreRoutes: Array<{ route: string; heading: RegExp; maxRequests: number; maxMs: number }> = [
-  { route: '/hurtigkort', heading: /Hurtigkort/i, maxRequests: 90, maxMs: 8_000 },
+  { route: '/', heading: /Hva står du i nå/i, maxRequests: 90, maxMs: 8_000 },
+  { route: '/sok', heading: /Søk i tiltak, kilder og moduler/i, maxRequests: 90, maxMs: 8_000 },
   { route: '/oppdrag', heading: /Lokale oppdrag/i, maxRequests: 90, maxMs: 8_000 },
+  { route: '/hurtigkort', heading: /Hurtigkort/i, maxRequests: 90, maxMs: 8_000 },
+  { route: '/mer', heading: /^Mer$/i, maxRequests: 90, maxMs: 8_000 },
   { route: '/data-pa-enheten', heading: /Data lagret på denne enheten/i, maxRequests: 90, maxMs: 8_000 },
   { route: '/feltmodus', heading: /Feltmodus/i, maxRequests: 90, maxMs: 8_000 },
   { route: '/kart', heading: /Kart/i, maxRequests: 90, maxMs: 8_000 },
@@ -48,6 +51,9 @@ test('offline app shell reload is fast after service-worker warmup', async ({ pa
   await waitForServiceWorker(page);
 
   const offlineRoutes = [
+    { route: '/', heading: /Hva står du i nå/i, hasAppShellStatus: true },
+    { route: '/sok', heading: /Søk i tiltak, kilder og moduler/i, hasAppShellStatus: true },
+    { route: '/mer', heading: /^Mer$/i, hasAppShellStatus: true },
     { route: '/hurtigkort', heading: /Hurtigkort/i, hasAppShellStatus: true },
     { route: '/oppdrag', heading: /Lokale oppdrag/i, hasAppShellStatus: true },
     { route: '/nytt', heading: /Hva er nytt/i, hasAppShellStatus: true },

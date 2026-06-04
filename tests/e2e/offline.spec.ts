@@ -2,15 +2,24 @@ import { expect, test } from '@playwright/test';
 
 import { waitForServiceWorker } from './helpers';
 
-test('home page installs the service worker before app-shell navigation', async ({ page, context }) => {
+test('operational app shell routes load offline after service-worker warmup', async ({ page, context }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Beredskapsboka' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Hva står du i nå/i })).toBeVisible();
   await waitForServiceWorker(page);
+
+  const operationalRoutes = [
+    { route: '/', heading: /Hva står du i nå/i },
+    { route: '/sok', heading: /Søk i tiltak, kilder og moduler/i },
+    { route: '/mer', heading: /^Mer$/i },
+  ];
 
   await context.setOffline(true);
   try {
-    await page.goto('/hurtigkort', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: 'Hurtigkort' })).toBeVisible();
+    for (const { route, heading } of operationalRoutes) {
+      await page.goto(route, { waitUntil: 'domcontentloaded' });
+      await expect(page.getByRole('heading', { name: heading }).first()).toBeVisible();
+      await expect(page.getByRole('navigation', { name: /Hovednavigasjon/i })).toBeVisible();
+    }
   } finally {
     await context.setOffline(false);
   }

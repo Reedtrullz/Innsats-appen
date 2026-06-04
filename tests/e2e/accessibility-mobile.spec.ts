@@ -20,7 +20,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('critical mobile routes have no automated WCAG A/AA accessibility violations', async ({ page }) => {
-  for (const route of ['/hurtigkort', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/oppdrag', '/kart', '/feltmodus']) {
+  for (const route of ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/feltmodus']) {
     await page.goto(route);
     await expect(page.getByRole('navigation', { name: /Hovednavigasjon/i })).toBeVisible();
     const results = await new AxeBuilder({ page })
@@ -31,7 +31,7 @@ test('critical mobile routes have no automated WCAG A/AA accessibility violation
 });
 
 test('mobile layout has no horizontal overflow and nav touch targets are large enough', async ({ page }) => {
-  for (const route of ['/hurtigkort', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/moduler/tilfluktsrom']) {
+  for (const route of ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/moduler/tilfluktsrom']) {
     await page.goto(route);
     await expectNoHorizontalOverflow(page);
   }
@@ -85,7 +85,8 @@ test('keyboard can use persistent bottom navigation and submit a new mission for
   await page.getByLabel('Sted/lokasjon').fill('Keyboard testområde');
   await page.getByRole('button', { name: /Lagre oppdrag/i }).focus();
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('heading', { name: missionTitle })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
+  await expect(page.getByText(new RegExp(`${missionTitle}\\s*·\\s*Keyboard testområde`, 'i'))).toBeVisible();
 });
 
 test('mission and local export form controls have accessible labels', async ({ page }) => {
