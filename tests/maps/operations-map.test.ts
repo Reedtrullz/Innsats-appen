@@ -15,7 +15,9 @@ import {
   geoJsonExportText,
   importGeoJsonText,
   measureDrawingDistance,
+  mapStateForMission,
   measurePolygonArea,
+  normalizeMissionMapState,
   operationItemsForRender,
   readMissionMapState,
   resetMissionMapState,
@@ -39,6 +41,28 @@ it('creates drawings and measures distance and sector area', () => {
   expect(measurePolygonArea(sector.points)).toBe(100);
   expect(measureDrawingDistance(sector.points, true)).toBe(40);
   expect(() => createMissionMapDrawing({ kind: 'polygon', label: 'Feil', coordinates: '1,1 2,2' }, now)).toThrow(/at least 3/);
+});
+
+it('preserves legacy map objects without mission id but marks them unscoped', () => {
+  const state = normalizeMissionMapState({
+    markers: [{ id: 'old', itemType: 'marker', kind: 'hazard', label: 'Old', point: { x: 10, y: 10 }, createdAt: '2026-06-04T10:00:00.000Z' }],
+    drawings: [{ id: 'old-sector', itemType: 'drawing', kind: 'sector', label: 'Old sector', points: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }], createdAt: '2026-06-04T10:00:00.000Z' }],
+  });
+
+  expect(state.markers[0].missionId).toBeUndefined();
+  expect(state.drawings[0].missionId).toBeUndefined();
+  expect(mapStateForMission(state, 'mission-a').markers).toHaveLength(0);
+  expect(mapStateForMission(state, 'mission-a').drawings).toHaveLength(0);
+});
+
+it('keeps mission ids on imported map state', () => {
+  const state = normalizeMissionMapState({
+    markers: [{ id: 'm1', missionId: 'mission-a', itemType: 'marker', kind: 'hazard', label: 'Fare', point: { x: 10, y: 10 }, createdAt: '2026-06-04T10:00:00.000Z' }],
+    drawings: [{ id: 'd1', missionId: 'mission-a', itemType: 'drawing', kind: 'sector', label: 'Teig', points: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }], createdAt: '2026-06-04T10:00:00.000Z' }],
+  });
+
+  expect(mapStateForMission(state, 'mission-a').markers).toHaveLength(1);
+  expect(mapStateForMission(state, 'mission-a').drawings).toHaveLength(1);
 });
 
 it('filters layers and caps rendered local operations', () => {

@@ -6,6 +6,7 @@ export type SchematicPoint = { x: number; y: number };
 
 export type MissionMapMarker = {
   id: string;
+  missionId?: string;
   itemType: 'marker';
   kind: MapMarkerKind;
   label: string;
@@ -16,6 +17,7 @@ export type MissionMapMarker = {
 
 export type MissionMapDrawing = {
   id: string;
+  missionId?: string;
   itemType: 'drawing';
   kind: MapDrawingKind;
   label: string;
@@ -138,14 +140,16 @@ function stableId(prefix: string, now: Date) {
   return `${prefix}-${now.toISOString().replace(/[^0-9]/g, '').slice(0, 14)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-export function createMissionMapMarker(input: { kind: MapMarkerKind; label: unknown; x: unknown; y: unknown; note?: unknown }, now = new Date()): MissionMapMarker {
+export function createMissionMapMarker(input: { kind: MapMarkerKind; missionId?: unknown; label: unknown; x: unknown; y: unknown; note?: unknown }, now = new Date()): MissionMapMarker {
   if (!MAP_MARKER_KINDS.includes(input.kind)) throw new Error('Unsupported marker kind');
   const point = normalizeSchematicPoint({ x: input.x, y: input.y });
   if (!point) throw new Error('Marker coordinates must be schematic values from 0 to 100');
   const label = sanitizeMapText(input.label) || MAP_MARKER_LABELS[input.kind];
+  const missionId = sanitizeMapText(input.missionId, 80);
   const note = sanitizeMapText(input.note, 240);
   return {
     id: stableId(input.kind, now),
+    ...(missionId ? { missionId } : {}),
     itemType: 'marker',
     kind: input.kind,
     label,
@@ -155,15 +159,17 @@ export function createMissionMapMarker(input: { kind: MapMarkerKind; label: unkn
   };
 }
 
-export function createMissionMapDrawing(input: { kind: MapDrawingKind; label: unknown; coordinates: string; note?: unknown }, now = new Date()): MissionMapDrawing {
+export function createMissionMapDrawing(input: { kind: MapDrawingKind; missionId?: unknown; label: unknown; coordinates: string; note?: unknown }, now = new Date()): MissionMapDrawing {
   if (!MAP_DRAWING_KINDS.includes(input.kind)) throw new Error('Unsupported drawing kind');
   const points = parseCoordinateText(input.coordinates).slice(0, MAX_POINTS_PER_DRAWING);
   const minimumPoints = input.kind === 'point' ? 1 : input.kind === 'line' ? 2 : 3;
   if (points.length < minimumPoints) throw new Error(`${MAP_DRAWING_LABELS[input.kind]} needs at least ${minimumPoints} schematic point(s)`);
   const label = sanitizeMapText(input.label) || MAP_DRAWING_LABELS[input.kind];
+  const missionId = sanitizeMapText(input.missionId, 80);
   const note = sanitizeMapText(input.note, 240);
   return {
     id: stableId(input.kind, now),
+    ...(missionId ? { missionId } : {}),
     itemType: 'drawing',
     kind: input.kind,
     label,
@@ -178,9 +184,11 @@ function normalizeMarker(value: unknown): MissionMapMarker | null {
   const point = normalizeSchematicPoint(value.point);
   if (!point) return null;
   const label = sanitizeMapText(value.label) || MAP_MARKER_LABELS[value.kind as MapMarkerKind];
+  const missionId = sanitizeMapText(value.missionId, 80);
   const note = sanitizeMapText(value.note, 240);
   return {
     id: sanitizeMapText(value.id, 80) || stableId('marker', new Date(0)),
+    ...(missionId ? { missionId } : {}),
     itemType: 'marker',
     kind: value.kind as MapMarkerKind,
     label,
@@ -196,9 +204,11 @@ function normalizeDrawing(value: unknown): MissionMapDrawing | null {
   const minimumPoints = value.kind === 'point' ? 1 : value.kind === 'line' ? 2 : 3;
   if (points.length < minimumPoints) return null;
   const label = sanitizeMapText(value.label) || MAP_DRAWING_LABELS[value.kind as MapDrawingKind];
+  const missionId = sanitizeMapText(value.missionId, 80);
   const note = sanitizeMapText(value.note, 240);
   return {
     id: sanitizeMapText(value.id, 80) || stableId('drawing', new Date(0)),
+    ...(missionId ? { missionId } : {}),
     itemType: 'drawing',
     kind: value.kind as MapDrawingKind,
     label,
@@ -213,6 +223,13 @@ export function normalizeMissionMapState(value: unknown): MissionMapState {
   return {
     markers: (Array.isArray(value.markers) ? value.markers.map(normalizeMarker).filter((marker): marker is MissionMapMarker => Boolean(marker)) : []).slice(0, MAX_STORED_MARKERS),
     drawings: (Array.isArray(value.drawings) ? value.drawings.map(normalizeDrawing).filter((drawing): drawing is MissionMapDrawing => Boolean(drawing)) : []).slice(0, MAX_STORED_DRAWINGS),
+  };
+}
+
+export function mapStateForMission(state: MissionMapState, missionId: string): MissionMapState {
+  return {
+    markers: state.markers.filter((marker) => marker.missionId === missionId),
+    drawings: state.drawings.filter((drawing) => drawing.missionId === missionId),
   };
 }
 
