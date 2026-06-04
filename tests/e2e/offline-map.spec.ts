@@ -7,6 +7,7 @@ test('offline map page is local-only, cacheable and tile-free', async ({ page, c
   page.on('request', (request) => requestedUrls.push(request.url()));
   await page.addInitScript(() => {
     localStorage.removeItem('beredskapsboka-offline-map-cache-v1');
+    localStorage.removeItem('beredskapsboka-operations-map-v1');
   });
 
   await page.goto('/');
@@ -23,7 +24,7 @@ test('offline map page is local-only, cacheable and tile-free', async ({ page, c
   await expect(page.getByText(/Schematic local map package, not authoritative navigation/i).first()).toBeVisible();
   await expect(page.getByText(/Ingen eksterne kartfliser/i).first()).toBeVisible();
   await expect(page.getByText(/ingen nettverksnedlasting/i)).toBeVisible();
-  await expect(page.getByText(/ingen backend sync/i)).toBeVisible();
+  await expect(page.getByText(/ingen backend sync/i).first()).toBeVisible();
   await expect(page.getByTestId('offline-map-cache-status')).toContainText(/Ingen kartpakke/i);
 
   await context.setOffline(false);
@@ -41,6 +42,24 @@ test('offline map page is local-only, cacheable and tile-free', async ({ page, c
   await page.getByRole('button', { name: /Tilbakestill kartcache/i }).click();
   await expect(page.getByTestId('offline-map-cache-status')).toContainText(/Ingen kartpakke/i);
   await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-offline-map-cache-v1'))).toBeNull();
+
+  await page.getByRole('combobox', { name: /Markørtype/i }).selectOption('il-ko');
+  await page.getByPlaceholder(/Sanitert lokal etikett/i).fill('KO lokal');
+  await page.getByRole('spinbutton', { name: /X 0-100/i }).fill('23');
+  await page.getByRole('spinbutton', { name: /Y 0-100/i }).fill('34');
+  await page.getByRole('button', { name: /Legg til lokal markør/i }).click();
+  await expect(page.getByTestId('operations-marker-list')).toContainText(/IL-KO — KO lokal/i);
+  await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1'))).toContain('il-ko');
+
+  await page.getByRole('button', { name: /Lagre lokal tegning\/sektor/i }).click();
+  await expect(page.getByTestId('map-measurement-readout')).toContainText(/Sektor\/teig: avstand/i);
+
+  await page.getByRole('button', { name: /Lag GeoJSON eksport/i }).click();
+  await expect(page.getByLabel(/GeoJSON eksport/i)).toContainText(/schematic-0-100-local-only/i);
+  await page.getByRole('button', { name: /Lag kartbilde/i }).click();
+  await expect(page.getByLabel(/Kartbilde SVG/i)).toContainText(/Sanitert lokalt kartbilde/i);
+  await expect(page.getByText(/KML-import er ikke implementert i MVP/i)).toBeVisible();
+  await expect(page.getByText(/Delt live posisjon\/blue-force tracking skal ikke bygges i MVP/i)).toBeVisible();
 
   expect(requestedUrls.filter((url) => mapTileUrlPattern.test(url))).toEqual([]);
 });
