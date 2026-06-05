@@ -35,7 +35,7 @@ export const OFFLINE_MAP_CACHE_WARNING_THRESHOLD_MB = 25;
 export const MAX_RENDERED_MAP_FEATURES = 12;
 
 export const OFFLINE_MAP_APPROACH = {
-  decision: 'Static schematic local map package for MVP, with MBTiles/MapLibre/Leaflet deferred to a governed package plan.',
+  decision: 'Static schematic local map package remains the fallback; governed MapLibre/PMTiles packages may be used only from approved app-local files.',
   adr: 'docs/adr/2026-06-04-offline-map-architecture.md',
   networkPolicy: 'No tile URLs, external map APIs or backend sync are used by the MVP map page.',
 } as const;
