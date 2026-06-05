@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, expect, vi } from 'vitest';
 import { createElement, type AnchorHTMLAttributes, type ReactNode } from 'react';
+import { clearLocalMissionData, DB_NAME } from '@/lib/mission/local-store';
 
 const reactActWarningPattern = /not wrapped in act/i;
 const allowedConsoleMessages: RegExp[] = [];
@@ -46,6 +47,33 @@ export function allowConsoleMessageForTest(pattern: RegExp) {
   allowedConsoleMessages.push(pattern);
 }
 
+async function knownIndexedDbExists(name: string) {
+  if (typeof indexedDB === 'undefined') return false;
+  if (typeof indexedDB.databases !== 'function') return true;
+  const databases = await indexedDB.databases();
+  return databases.some((database) => database.name === name);
+}
+
+async function clearKnownIndexedDbDatabases() {
+  if (await knownIndexedDbExists(DB_NAME)) await clearLocalMissionData();
+}
+
+async function cleanupBrowserState() {
+  localStorage.clear();
+  sessionStorage.clear();
+  await clearKnownIndexedDbDatabases();
+  try {
+    vi.clearAllTimers();
+  } catch {
+    // Vitest can throw when real timers are already active; the cleanup goal is best-effort.
+  }
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+  vi.clearAllMocks();
+  vi.restoreAllMocks();
+}
+
 beforeEach(() => {
   allowedConsoleMessages.length = 0;
   const originalConsoleError = console.error.bind(console);
@@ -62,7 +90,7 @@ beforeEach(() => {
   });
 });
 
-afterEach(() => {
+afterEach(async () => {
   const actWarnings = [
     ...unexpectedActWarnings(consoleErrorSpy.mock.calls),
     ...unexpectedActWarnings(consoleWarnSpy.mock.calls),
@@ -71,5 +99,10 @@ afterEach(() => {
   consoleErrorSpy.mockRestore();
   consoleWarnSpy.mockRestore();
 
-  expect(actWarnings, `Unexpected React act warning(s):\n${actWarnings.join('\n---\n')}`).toEqual([]);
+  try {
+    expect(actWarnings, `Unexpected React act warning(s):\n${actWarnings.join('\n---\n')}`).toEqual([]);
+  } finally {
+    await cleanupBrowserState();
+    allowedConsoleMessages.length = 0;
+  }
 });
