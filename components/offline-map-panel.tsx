@@ -46,8 +46,10 @@ import {
   mapStateForMission,
   normalizeMissionMapState,
   operationItemsForRender,
+  parseCoordinateText,
   resetMissionMapState,
   subscribeMissionMapState,
+  updateMissionMapDrawing,
   updateMissionMapMarker,
   writeMissionMapState,
   type MapDrawingKind,
@@ -102,6 +104,12 @@ type MarkerEditDraft = {
   note: string;
 };
 
+type DrawingEditDraft = {
+  label: string;
+  coordinates: string;
+  note: string;
+};
+
 function mapPackageOptionForId(packageId: string | null | undefined, options: MapPackageOption[]) {
   return options.find((mapPackage) => mapPackage.id === packageId);
 }
@@ -115,6 +123,20 @@ function operationMeasurement(drawing: MissionMapDrawing | undefined) {
 
 function markerActionAriaLabel(action: 'Rediger' | 'Slett', marker: MissionMapMarker) {
   return `${action} ${marker.label} (${marker.kind}, X ${marker.point.x}, Y ${marker.point.y})`;
+}
+
+function drawingActionAriaLabel(action: 'Rediger' | 'Slett', drawing: MissionMapDrawing) {
+  const firstPoint = drawing.points[0];
+  const coordinateSummary = firstPoint ? `første punkt X ${firstPoint.x}, Y ${firstPoint.y}` : 'uten punktsammendrag';
+  return `${action} ${drawing.label} (${MAP_DRAWING_LABELS[drawing.kind]}, ${drawing.points.length} punkt, ${coordinateSummary})`;
+}
+
+function drawingPointsToCoordinateText(drawing: MissionMapDrawing) {
+  return drawing.points.map((point) => `${point.x},${point.y}`).join(' ');
+}
+
+function minimumPointCountForDrawing(kind: MapDrawingKind) {
+  return kind === 'point' ? 1 : kind === 'line' ? 2 : 3;
 }
 
 function parseMarkerEditCoordinate(value: string) {
@@ -203,6 +225,8 @@ export function OfflineMapPanel() {
   const [editingMarkerId, setEditingMarkerId] = useState<string | null>(null);
   const [markerEditDraft, setMarkerEditDraft] = useState<MarkerEditDraft>({ label: '', x: '50', y: '50', note: '' });
   const [drawingKind, setDrawingKind] = useState<MapDrawingKind>('sector');
+  const [editingDrawingId, setEditingDrawingId] = useState<string | null>(null);
+  const [drawingEditDraft, setDrawingEditDraft] = useState<DrawingEditDraft>({ label: '', coordinates: '', note: '' });
   const [drawingCoordinates, setDrawingCoordinates] = useState('12,20 40,22 34,54 16,48');
   const [lastDrawing, setLastDrawing] = useState<MissionMapDrawing | undefined>();
   const [imageExport, setImageExport] = useState('');
@@ -249,6 +273,9 @@ export function OfflineMapPanel() {
   const cachedLocalMapPackage = cachedPackage?.runtimeFormat === 'pmtiles' ? localMapPackageForId(cachedPackage.packageId) : undefined;
   const activeMissionMapState = useMemo(() => activeMission ? mapStateForMission(mapState, activeMission.id) : { markers: [], drawings: [] }, [activeMission, mapState]);
   const filteredState = filterMissionMapStateByLayers(activeMissionMapState, enabledLayers);
+  const measuredDrawing = lastDrawing && activeMissionMapState.drawings.some((drawing) => drawing.id === lastDrawing.id)
+    ? lastDrawing
+    : activeMissionMapState.drawings.at(-1);
 
   useEffect(() => {
     latestSelectedPackageIdRef.current = selectedPackage.id;
@@ -501,6 +528,53 @@ export function OfflineMapPanel() {
     }
   }
 
+  function startDrawingEdit(drawing: MissionMapDrawing) {
+    setEditingDrawingId(drawing.id);
+    setDrawingEditDraft({
+      label: drawing.label,
+      coordinates: drawingPointsToCoordinateText(drawing),
+      note: drawing.note ?? '',
+    });
+  }
+
+  function cancelDrawingEdit() {
+    setEditingDrawingId(null);
+    setDrawingEditDraft({ label: '', coordinates: '', note: '' });
+  }
+
+  function saveDrawingEdit(event: FormEvent<HTMLFormElement>, drawing: MissionMapDrawing) {
+    event.preventDefault();
+    if (!activeMission) {
+      setStatusMessage('Opprett aktivt oppdrag før du endrer lokale kartobjekter.');
+      return;
+    }
+    const points = parseCoordinateText(drawingEditDraft.coordinates);
+    const minimumPoints = minimumPointCountForDrawing(drawing.kind);
+    if (points.length < minimumPoints) {
+      setStatusMessage(`${MAP_DRAWING_LABELS[drawing.kind]} trenger minst ${minimumPoints} skjematiske punkt.`);
+      return;
+    }
+    const nextState = updateMissionMapDrawing(mapState, activeMission.id, drawing.id, {
+      label: drawingEditDraft.label,
+      points,
+      note: drawingEditDraft.note,
+    });
+    const updatedDrawing = nextState.drawings.find((item) => item.id === drawing.id && item.missionId === activeMission.id);
+    if (updatedDrawing) setLastDrawing(updatedDrawing);
+    persistState(nextState, 'Oppdaterte lokal sektor/teig.');
+    cancelDrawingEdit();
+  }
+
+  function deleteDrawing(drawing: MissionMapDrawing) {
+    if (!activeMission) {
+      setStatusMessage('Opprett aktivt oppdrag før du sletter lokale kartobjekter.');
+      return;
+    }
+    persistState(deleteMissionMapObject(mapState, activeMission.id, drawing.id), 'Slettet lokal sektor/teig.');
+    if (editingDrawingId === drawing.id) cancelDrawingEdit();
+    if (lastDrawing?.id === drawing.id) setLastDrawing(undefined);
+  }
+
   function resetOperations() {
     if (!activeMission) {
       setStatusMessage('Opprett aktivt oppdrag før du nullstiller lokale kartobjekter.');
@@ -718,7 +792,41 @@ export function OfflineMapPanel() {
           <label className="text-sm font-bold">Notat uten persondata<textarea name="drawingNote" className="mt-1 min-h-20 w-full rounded-xl border p-3" /></label>
           <button type="submit" className={primaryButtonClass}>Lagre lokal tegning/sektor</button>
         </form>
-        <p className="rounded-2xl bg-slate-50 p-3 text-sm font-black text-slate-800" data-testid="map-measurement-readout">{operationMeasurement(lastDrawing ?? activeMissionMapState.drawings.at(-1))}</p>
+        <p className="rounded-2xl bg-slate-50 p-3 text-sm font-black text-slate-800" data-testid="map-measurement-readout">{operationMeasurement(measuredDrawing)}</p>
+        <ul className="space-y-2 text-sm font-semibold text-slate-700" data-testid="operations-drawing-list">
+          {filteredState.drawings.length === 0 ? <li>Ingen synlige sektorer/tegninger.</li> : filteredState.drawings.map((drawing) => (
+            <li key={drawing.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span>{MAP_DRAWING_LABELS[drawing.kind]} — <span>{drawing.label}</span> ({drawing.points.length} punkt)</span>
+                <span className="flex gap-2">
+                  <button type="button" aria-label={drawingActionAriaLabel('Rediger', drawing)} onClick={() => startDrawingEdit(drawing)} className="min-h-10 rounded-xl border border-slate-300 bg-white px-3 font-black text-slate-950">
+                    Rediger {drawing.label}
+                  </button>
+                  <button type="button" aria-label={drawingActionAriaLabel('Slett', drawing)} onClick={() => deleteDrawing(drawing)} className="min-h-10 rounded-xl border border-red-300 bg-white px-3 font-black text-red-900">
+                    Slett {drawing.label}
+                  </button>
+                </span>
+              </div>
+              {editingDrawingId === drawing.id ? (
+                <form onSubmit={(event) => saveDrawingEdit(event, drawing)} className="mt-3 grid gap-3" aria-label={`Rediger sektor ${drawing.label}`}>
+                  <label className="text-sm font-bold">Rediger sektoretikett
+                    <input value={drawingEditDraft.label} onChange={(event) => setDrawingEditDraft((current) => ({ ...current, label: event.target.value }))} className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+                  </label>
+                  <label className="text-sm font-bold">Rediger sektorkoordinater
+                    <textarea aria-label="Rediger sektorkoordinater" value={drawingEditDraft.coordinates} onChange={(event) => setDrawingEditDraft((current) => ({ ...current, coordinates: event.target.value }))} className="mt-1 min-h-20 w-full rounded-xl border p-3 font-mono text-xs" />
+                  </label>
+                  <label className="text-sm font-bold">Rediger sektornotat
+                    <textarea value={drawingEditDraft.note} onChange={(event) => setDrawingEditDraft((current) => ({ ...current, note: event.target.value }))} className="mt-1 min-h-20 w-full rounded-xl border p-3" />
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="submit" className="min-h-10 rounded-xl bg-slate-950 px-4 font-black text-white">Lagre sektorendring</button>
+                    <button type="button" onClick={cancelDrawingEdit} className="min-h-10 rounded-xl border border-slate-300 bg-white px-4 font-black text-slate-950">Avbryt</button>
+                  </div>
+                </form>
+              ) : null}
+            </li>
+          ))}
+        </ul>
         <div className="flex flex-wrap gap-3">
           <button type="button" onClick={resetOperations} className="min-h-11 rounded-xl border border-red-300 bg-white px-4 font-black text-red-900">Nullstill lokale sektorer/markører</button>
         </div>

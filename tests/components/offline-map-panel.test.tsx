@@ -8,6 +8,7 @@ import { OFFLINE_MAP_CACHE_STORAGE_KEY, offlineMapQuotaCopy } from '@/lib/maps/o
 import {
   OPERATIONS_MAP_STORAGE_KEY,
   SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
+  createMissionMapDrawing,
   createMissionMapMarker,
   readMissionMapState,
   writeMissionMapState,
@@ -697,6 +698,65 @@ it('attaches the active mission id to newly saved local drawings', async () => {
   await waitFor(() => {
     expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toContain('"missionId":"mission-map-log"');
   });
+});
+
+it('edits active-mission sectors and refreshes measurement copy', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  writeMissionMapState({
+    markers: [],
+    drawings: [createMissionMapDrawing({
+      kind: 'sector',
+      missionId: activeMission.id,
+      label: 'Teig alfa',
+      coordinates: '10,10 20,10 20,20 10,20',
+    }, new Date('2026-06-05T10:00:00Z'))],
+  });
+
+  await renderOfflineMapPanel();
+
+  await user.click(screen.getByRole('button', { name: /rediger Teig alfa/i }));
+  await user.clear(screen.getByLabelText('Rediger sektoretikett'));
+  await user.type(screen.getByLabelText('Rediger sektoretikett'), 'Teig bravo');
+  await user.clear(screen.getByLabelText('Rediger sektorkoordinater'));
+  await user.type(screen.getByLabelText('Rediger sektorkoordinater'), '10,10 30,10 30,30 10,30');
+  await user.click(screen.getByRole('button', { name: /lagre sektorendring/i }));
+
+  expect(screen.getByText('Teig bravo')).toBeInTheDocument();
+  expect(screen.getByTestId('map-measurement-readout')).toHaveTextContent(/Sektor\/teig: avstand/i);
+});
+
+it('deletes active-mission sectors without touching other mission drawings', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  await saveMission(otherMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  writeMissionMapState({
+    markers: [],
+    drawings: [
+      createMissionMapDrawing({
+        kind: 'sector',
+        missionId: activeMission.id,
+        label: 'Aktiv teig',
+        coordinates: '10,10 20,10 20,20 10,20',
+      }, new Date('2026-06-05T10:00:00Z')),
+      createMissionMapDrawing({
+        kind: 'sector',
+        missionId: otherMission.id,
+        label: 'Skjult teig',
+        coordinates: '40,40 50,40 50,50 40,50',
+      }, new Date('2026-06-05T10:01:00Z')),
+    ],
+  });
+
+  await renderOfflineMapPanel();
+
+  await user.click(screen.getByRole('button', { name: /slett Aktiv teig/i }));
+
+  expect(screen.getByText('Ingen synlige sektorer/tegninger.')).toBeInTheDocument();
+  expect(screen.queryByText('Skjult teig')).not.toBeInTheDocument();
+  expect(readMissionMapState().drawings.some((drawing) => drawing.label === 'Skjult teig')).toBe(true);
 });
 
 it('blocks local drawing saves when no active mission exists', async () => {
