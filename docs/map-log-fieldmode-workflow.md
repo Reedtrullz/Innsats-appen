@@ -12,7 +12,7 @@ The current MVP uses mission-scoped overlays and schematic 0-100 map coordinates
 
 MapLibre/PMTiles support is optional and browser-only. PMTiles packages are app-local static assets with documented attribution/provenance; no runtime tile URL may point to Kartverket, OpenStreetMap, Statkart, Mapbox or any other external provider. If a PMTiles package is unavailable, not approved, not cached, too heavy for the device, or the browser cannot initialize MapLibre, the app must use fallback til skjematisk kart.
 
-No backend sync, no login, no live tracking, no push notifications and no official command-system write path are part of this iteration. MapLibre/Leaflet/MBTiles requires a separate governed package plan before any new runtime dependency, tile package, external map source or coordinate conversion is added.
+No backend sync, no login, no live tracking, no push notifications and no official command-system write path are part of this iteration. Optional browser-only MapLibre/PMTiles support is limited to approved local assets; any Leaflet runtime, MBTiles browser runtime, external map source, coordinate conversion or broader MapLibre expansion requires a separate governed package plan.
 
 Do not enter patient/persondata, private addresses, skjermede locations, names, IDs, birth dates, health details, radio identifiers, restricted object names or restricted operational information. Export only sanitized exercise/test data unless an approved field procedure says otherwise.
 

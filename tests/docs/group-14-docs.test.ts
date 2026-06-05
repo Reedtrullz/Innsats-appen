@@ -162,7 +162,8 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(doc).toContain('schematic 0-100');
     expect(doc).toContain('local-only');
     expect(doc).toContain('No backend sync, no login, no live tracking');
-    expect(doc).toContain('MapLibre/Leaflet/MBTiles requires a separate governed package plan');
+    expect(doc).toContain('Optional browser-only MapLibre/PMTiles support is limited to approved local assets');
+    expect(doc).toContain('Leaflet runtime, MBTiles browser runtime, external map source, coordinate conversion or broader MapLibre expansion requires a separate governed package plan');
     expect(doc).toContain('Do not enter patient/persondata');
   });
 
