@@ -555,6 +555,22 @@ it('shows a local privacy error when GeoJSON import only contains rejected map t
   expect(screen.getByTestId('operations-map-status')).not.toHaveTextContent(/Ingen støttede skjematiske GeoJSON-objekter/i);
 });
 
+it('keeps unsupported GeoJSON-like input on the generic import status path', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  await renderOfflineMapPanel();
+
+  fireEvent.change(screen.getByRole('textbox', { name: /Importer GeoJSON/i }), { target: { value: JSON.stringify({
+    features: [{ properties: { label: '01017000027' } }],
+  }) } });
+  await user.click(screen.getByRole('button', { name: /Importer GeoJSON lokalt/i }));
+
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Ingen støttede skjematiske GeoJSON-objekter/i);
+  expect(readMissionMapState().markers).toHaveLength(0);
+});
+
 it('keeps marker edit mode open when edited text is stopped by the privacy guard', async () => {
   const user = userEvent.setup();
   await saveMission(activeMission);

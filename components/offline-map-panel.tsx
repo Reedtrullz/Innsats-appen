@@ -33,6 +33,7 @@ import {
   MAP_MARKER_KINDS,
   MAP_MARKER_LABELS,
   QR_SECTOR_IMPORT_DESIGN,
+  SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
   buildMapImageSvg,
   createMissionMapDrawing,
   createMissionMapMarker,
@@ -138,14 +139,20 @@ function isImportMapTextValue(value: unknown): value is string | number | null |
   return value === undefined || value === null || typeof value === 'string' || typeof value === 'number';
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object';
+}
+
 function importFeatureHasBlockedMapText(feature: unknown) {
-  if (!feature || typeof feature !== 'object') return false;
-  const properties = 'properties' in feature ? (feature as { properties?: unknown }).properties : undefined;
-  if (!properties || typeof properties !== 'object') return false;
-  const values = [
-    'label' in properties ? (properties as { label?: unknown }).label : undefined,
-    'note' in properties ? (properties as { note?: unknown }).note : undefined,
-  ];
+  if (!isRecord(feature) || feature.type !== 'Feature' || !isRecord(feature.geometry) || !isRecord(feature.properties)) return false;
+  const { geometry, properties } = feature;
+  const markerFeature = properties.itemType === 'marker'
+    && MAP_MARKER_KINDS.includes(properties.kind as MapMarkerKind)
+    && geometry.type === 'Point';
+  const drawingFeature = properties.itemType === 'drawing'
+    && MAP_DRAWING_KINDS.includes(properties.kind as MapDrawingKind);
+  if (!markerFeature && !drawingFeature) return false;
+  const values = [properties.label, properties.note];
   return values.some((value) => {
     if (!isImportMapTextValue(value)) return true;
     return Boolean(detectSensitiveOperationalText(String(value ?? '')));
@@ -155,8 +162,11 @@ function importFeatureHasBlockedMapText(feature: unknown) {
 function geoJsonImportHasBlockedMapText(text: string) {
   try {
     const parsed = JSON.parse(text) as unknown;
-    if (!parsed || typeof parsed !== 'object' || !('features' in parsed) || !Array.isArray((parsed as { features?: unknown }).features)) return false;
-    return (parsed as { features: unknown[] }).features.some(importFeatureHasBlockedMapText);
+    if (!isRecord(parsed)
+      || parsed.type !== 'FeatureCollection'
+      || parsed.coordinateSystem !== SCHEMATIC_GEOJSON_COORDINATE_SYSTEM
+      || !Array.isArray(parsed.features)) return false;
+    return parsed.features.some(importFeatureHasBlockedMapText);
   } catch {
     return false;
   }
