@@ -240,7 +240,7 @@ it('separates schematic map choices from approved PMTiles packages', async () =>
   mockApprovedLocalMapPackages([]);
   await renderOfflineMapPanel();
 
-  expect(screen.getAllByText(/Skjematisk lokalkart/i).length).toBeGreaterThan(0);
+  expect(screen.getByRole('img', { name: /Skjematisk lokalt kart for/i })).toBeInTheDocument();
   expect(screen.getByText(/Ingen godkjente PMTiles-pakker er tilgjengelige/i)).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).not.toBeInTheDocument();
 });
