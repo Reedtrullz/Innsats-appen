@@ -43,6 +43,8 @@ Future docs-only commits may supersede the deployed snapshot SHA while leaving t
 
 ## Local validation performed for the operational map/log/Feltmodus release closeout
 
+Before pilot approval, run `npm run report:source-governance` and resolve every referenced unverified, draft, historical, or expired source. `npm run report:source-governance:strict` is intentionally expected to fail until pilot-scope sources are verified.
+
 Before pushing the release closeout, this local gate passed under Node 22:
 
 ```bash

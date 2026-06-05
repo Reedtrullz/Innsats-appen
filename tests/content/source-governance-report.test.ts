@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { expect, it } from 'vitest';
 import { buildSourceGovernanceReport } from '@/lib/content/source-governance';
 
@@ -92,4 +93,13 @@ it('does not flag unreferenced draft sources as pilot-blocking operational usage
   expect(
     report.findings.pilotBlockingReferencedSources.map((finding: { sourceId: string }) => finding.sourceId),
   ).not.toContain('src-draft');
+});
+
+it('exposes source governance npm scripts', () => {
+  const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8')) as { scripts: Record<string, string> };
+
+  expect(packageJson.scripts['report:source-governance']).toBe('tsx scripts/report-source-governance.ts');
+  expect(packageJson.scripts['report:source-governance:strict']).toBe(
+    'tsx scripts/report-source-governance.ts --strict',
+  );
 });
