@@ -71,7 +71,7 @@ it('includes sanitized map package provenance in mission-folder exports', () => 
     tileUrl: 'https://tiles.example.invalid/{z}/{x}/{y}.pbf',
     bounds: [10.2, 63.2, 10.6, 63.6],
     center: [10.4, 63.4],
-  } as any;
+  };
 
   const bundle = buildMissionFolderExport({
     mission,
@@ -79,7 +79,7 @@ it('includes sanitized map package provenance in mission-folder exports', () => 
     checklistRuns: [],
     mapPackage: unsafeMapPackage,
     generatedAt: '2026-06-04T11:00:00.000Z',
-  } as any);
+  });
 
   expect(bundle.artifacts.mapPackage).toEqual({
     id: 'trondheim-demo-pmtiles',
@@ -91,6 +91,7 @@ it('includes sanitized map package provenance in mission-folder exports', () => 
 
   const markdown = exportMissionFolderMarkdown(bundle);
   expect(markdown).toContain('## Kartpakke');
+  expect(markdown).toContain('Pakke-ID: trondheim-demo-pmtiles');
   expect(markdown).toContain('Trondheim demo PMTiles');
   expect(markdown).toContain('Demo attribution');
   expect(markdown).toContain('Local training package bundled with app');
@@ -104,6 +105,78 @@ it('includes sanitized map package provenance in mission-folder exports', () => 
     expect(exported).not.toContain('bounds');
     expect(exported).not.toContain('center');
   }
+});
+
+it('omits unsafe map package ids while preserving useful provenance in mission-folder exports', () => {
+  const bundle = buildMissionFolderExport({
+    mission,
+    checklists: [],
+    checklistRuns: [],
+    mapPackage: {
+      id: 'https://tiles.example.invalid/foo.pmtiles',
+      title: '  Sanitert lokal kartpakke  ',
+      attribution: '  Demo attribution  ',
+      version: '  2026.06-a  ',
+      provenance: '  Kontrollert opprinnelse for øving  ',
+      url: '/map-packages/foo.pmtiles',
+      styleUrl: '/map-packages/foo-style.json',
+      tileUrl: 'https://tiles.example.invalid/{z}/{x}/{y}.pbf',
+      bounds: [10.2, 63.2, 10.6, 63.6],
+      center: [10.4, 63.4],
+      objectId: 'marker-secret-object',
+    },
+    generatedAt: '2026-06-04T11:00:00.000Z',
+  });
+
+  expect(bundle.artifacts.mapPackage).toEqual({
+    id: '',
+    title: 'Sanitert lokal kartpakke',
+    attribution: 'Demo attribution',
+    version: '2026.06-a',
+    provenance: 'Kontrollert opprinnelse for øving',
+  });
+
+  const markdown = exportMissionFolderMarkdown(bundle);
+  for (const exported of [JSON.stringify(bundle), markdown]) {
+    expect(exported).toContain('Sanitert lokal kartpakke');
+    expect(exported).toContain('Kontrollert opprinnelse for øving');
+    expect(exported).not.toContain('https://tiles.example.invalid/foo.pmtiles');
+    expect(exported).not.toContain('/map-packages/foo.pmtiles');
+    expect(exported).not.toContain('/map-packages/foo-style.json');
+    expect(exported).not.toContain('marker-secret-object');
+    expect(exported).not.toContain('styleUrl');
+    expect(exported).not.toContain('tileUrl');
+    expect(exported).not.toContain('bounds');
+    expect(exported).not.toContain('center');
+    expect(exported).not.toContain('objectId');
+  }
+});
+
+it('does not create mission-folder map package artifacts from id-only input', () => {
+  const bundle = buildMissionFolderExport({
+    mission,
+    checklists: [],
+    checklistRuns: [],
+    mapPackage: { id: 'trondheim-demo-pmtiles' },
+    generatedAt: '2026-06-04T11:00:00.000Z',
+  });
+
+  expect(bundle.artifacts.mapPackage).toBeUndefined();
+  expect(JSON.stringify(bundle)).not.toContain('mapPackage');
+  expect(exportMissionFolderMarkdown(bundle)).not.toContain('## Kartpakke');
+});
+
+it('does not create mission-folder map package artifacts from attribution-version-only input', () => {
+  const bundle = buildMissionFolderExport({
+    mission,
+    checklists: [],
+    checklistRuns: [],
+    mapPackage: { attribution: 'Demo attribution', version: '2026.06-a' },
+    generatedAt: '2026-06-04T11:00:00.000Z',
+  });
+
+  expect(bundle.artifacts.mapPackage).toBeUndefined();
+  expect(exportMissionFolderMarkdown(bundle)).not.toContain('## Kartpakke');
 });
 
 it('rejects mission folder export when included field log contains high-confidence sensitive free text', () => {

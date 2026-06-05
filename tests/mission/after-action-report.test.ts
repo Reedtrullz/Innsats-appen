@@ -301,7 +301,7 @@ it('includes sanitized map package summary in after-action exports', () => {
     tileUrl: 'https://tiles.example.invalid/{z}/{x}/{y}.pbf',
     bounds: [10.2, 63.2, 10.6, 63.6],
     center: [10.4, 63.4],
-  } as any;
+  };
 
   const report = buildAfterActionReport({
     mission,
@@ -309,7 +309,7 @@ it('includes sanitized map package summary in after-action exports', () => {
     checklistRuns: runs,
     generatedAt: '2026-06-03T11:00:00.000Z',
     mapPackage: unsafeMapPackage,
-  } as any);
+  });
 
   expect(report.sections.mapPackage).toEqual({
     id: 'trondheim-demo-pmtiles',
@@ -323,6 +323,7 @@ it('includes sanitized map package summary in after-action exports', () => {
   const html = exportAfterActionPdfReadyHtml(report);
   const json = exportAfterActionJson(report);
   expect(markdown).toContain('## Kartpakke');
+  expect(markdown).toContain('Pakke-ID: trondheim-demo-pmtiles');
   expect(markdown).toContain('Trondheim demo PMTiles');
   expect(markdown).toContain('Local training package bundled with app');
   expect(html).toContain('Kartpakke');
@@ -340,6 +341,102 @@ it('includes sanitized map package summary in after-action exports', () => {
     expect(exported).not.toContain('bounds');
     expect(exported).not.toContain('center');
   }
+});
+
+it('omits unsafe map package ids while preserving useful provenance in after-action exports', () => {
+  const mapPackage = {
+    id: '/map-packages/foo.pmtiles',
+    title: '  Sanitert lokal kartpakke  ',
+    attribution: '  Demo attribution  ',
+    version: '  2026.06-a  ',
+    provenance: '  Kontrollert opprinnelse for øving  ',
+    url: '/map-packages/foo.pmtiles',
+    styleUrl: '/map-packages/foo-style.json',
+    tileUrl: 'https://tiles.example.invalid/{z}/{x}/{y}.pbf',
+    bounds: [10.2, 63.2, 10.6, 63.6],
+    center: [10.4, 63.4],
+    objectId: 'marker-secret-object',
+  };
+
+  const report = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapPackage,
+  });
+
+  expect(report.sections.mapPackage).toEqual({
+    id: '',
+    title: 'Sanitert lokal kartpakke',
+    attribution: 'Demo attribution',
+    version: '2026.06-a',
+    provenance: 'Kontrollert opprinnelse for øving',
+  });
+
+  const markdown = exportAfterActionMarkdown(report);
+  const html = exportAfterActionPdfReadyHtml(report);
+  const json = exportAfterActionJson(report);
+  for (const exported of [JSON.stringify(report), json, markdown, html]) {
+    expect(exported).toContain('Sanitert lokal kartpakke');
+    expect(exported).toContain('Kontrollert opprinnelse for øving');
+    expect(exported).not.toContain('/map-packages/foo.pmtiles');
+    expect(exported).not.toContain('/map-packages/foo-style.json');
+    expect(exported).not.toContain('https://tiles.example.invalid');
+    expect(exported).not.toContain('marker-secret-object');
+    expect(exported).not.toContain('styleUrl');
+    expect(exported).not.toContain('tileUrl');
+    expect(exported).not.toContain('bounds');
+    expect(exported).not.toContain('center');
+    expect(exported).not.toContain('objectId');
+  }
+});
+
+it.each([
+  { id: 'https://tiles.example.invalid/package.pmtiles', title: 'URL id' },
+  { id: 'Marker Object 1', title: 'Object id-ish uppercase id' },
+  { id: 'marker-secret-object', title: 'Marker object id-ish id' },
+  { id: 'map-packages', title: 'Directory-like package id' },
+  { id: 'foo-map-packages-bar', title: 'Embedded directory-like package id' },
+])('blanks unsafe map package id $id in after-action summaries', ({ id, title }) => {
+  const report = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapPackage: {
+      id,
+      title,
+      provenance: 'Useful local provenance',
+    },
+  });
+
+  expect(report.sections.mapPackage).toMatchObject({ id: '', title, provenance: 'Useful local provenance' });
+  expect(exportAfterActionMarkdown(report)).not.toContain(id);
+  expect(JSON.stringify(report)).not.toContain(id);
+});
+
+it('does not create after-action map package sections from id-only or attribution-version-only input', () => {
+  const idOnlyReport = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapPackage: { id: 'trondheim-demo-pmtiles' },
+  });
+  const attributionVersionOnlyReport = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapPackage: { attribution: 'Demo attribution', version: '2026.06-a' },
+  });
+
+  expect(idOnlyReport.sections.mapPackage).toBeUndefined();
+  expect(attributionVersionOnlyReport.sections.mapPackage).toBeUndefined();
+  expect(exportAfterActionJson(idOnlyReport)).not.toContain('mapPackage');
+  expect(exportAfterActionMarkdown(idOnlyReport)).not.toContain('## Kartpakke');
+  expect(exportAfterActionMarkdown(attributionVersionOnlyReport)).not.toContain('## Kartpakke');
 });
 
 it('includes sanitized schematic map summary in after-action report when provided', () => {

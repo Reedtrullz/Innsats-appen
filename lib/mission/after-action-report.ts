@@ -225,17 +225,30 @@ function stringField(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+const SAFE_LOCAL_MAP_PACKAGE_ID = /^[a-z0-9][a-z0-9-]{1,80}$/;
+const UNSAFE_LOCAL_MAP_PACKAGE_ID_PREFIXES = ['marker-', 'drawing-', 'map-marker-', 'map-drawing-', 'object-', 'feature-'];
+
+function safePackageId(value: unknown) {
+  const id = stringField(value);
+  if (!SAFE_LOCAL_MAP_PACKAGE_ID.test(id)) return '';
+  if (id.includes('map-packages')) return '';
+  if (UNSAFE_LOCAL_MAP_PACKAGE_ID_PREFIXES.some((prefix) => id.startsWith(prefix))) return '';
+  return id;
+}
+
 export function sanitizeLocalMapPackageSummary(mapPackage: unknown): LocalMapPackageExportSummary | undefined {
   if (!mapPackage || typeof mapPackage !== 'object') return undefined;
   const source = mapPackage as Record<string, unknown>;
-  const summary = {
-    id: stringField(source.id),
-    title: stringField(source.title),
+  const title = stringField(source.title);
+  const provenance = stringField(source.provenance);
+  if (!title && !provenance) return undefined;
+  return {
+    id: safePackageId(source.id),
+    title,
     attribution: stringField(source.attribution),
     version: stringField(source.version),
-    provenance: stringField(source.provenance),
+    provenance,
   };
-  return Object.values(summary).some((value) => value.length > 0) ? summary : undefined;
 }
 
 function withNote(note: string | undefined) {
@@ -625,10 +638,10 @@ export function exportAfterActionMarkdown(report: AfterActionReport) {
   if (report.sections.mapPackage) {
     lines.push('## Kartpakke');
     lines.push(`- Tittel: ${report.sections.mapPackage.title}`);
-    lines.push(`- Pakke-ID/proveniens: ${report.sections.mapPackage.id}`);
+    lines.push(`- Pakke-ID: ${report.sections.mapPackage.id}`);
     lines.push(`- Versjon: ${report.sections.mapPackage.version}`);
     lines.push(`- Attribusjon: ${report.sections.mapPackage.attribution}`);
-    lines.push(`- Opprinnelse: ${report.sections.mapPackage.provenance}`);
+    lines.push(`- Opprinnelse/proveniens: ${report.sections.mapPackage.provenance}`);
     lines.push('');
   }
   lines.push('## Vær/farer (saniterte lokale sammendrag)');

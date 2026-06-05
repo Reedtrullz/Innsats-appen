@@ -102,10 +102,10 @@ export function exportMissionFolderMarkdown(bundle: MissionFolderExport) {
   const mapPackageLines = bundle.artifacts.mapPackage ? [
     '## Kartpakke',
     `- Tittel: ${bundle.artifacts.mapPackage.title}`,
-    `- Pakke-ID/proveniens: ${bundle.artifacts.mapPackage.id}`,
+    `- Pakke-ID: ${bundle.artifacts.mapPackage.id}`,
     `- Versjon: ${bundle.artifacts.mapPackage.version}`,
     `- Attribusjon: ${bundle.artifacts.mapPackage.attribution}`,
-    `- Opprinnelse: ${bundle.artifacts.mapPackage.provenance}`,
+    `- Opprinnelse/proveniens: ${bundle.artifacts.mapPackage.provenance}`,
     '',
   ] : [];
   return [
