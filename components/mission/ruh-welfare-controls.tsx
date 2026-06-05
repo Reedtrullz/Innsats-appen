@@ -153,7 +153,7 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
           <h4 className="font-black">Oppfølgingskandidater fra logg, utstyr og velferd</h4>
           <p className="mt-1 text-sm font-semibold">{followUpSummary.warning}</p>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold">
-            {followUpSummary.items.slice(0, 6).map((item) => <li key={item}>{item}</li>)}
+            {followUpSummary.items.slice(0, 6).map((item, index) => <li key={`ruh-follow-up-${index}-${item}`}>{item}</li>)}
           </ul>
         </div>
       ) : null}

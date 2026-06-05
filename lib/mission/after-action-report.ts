@@ -3,7 +3,7 @@ import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive
 import { EXPORT_SENSITIVITY_WARNING } from './order-export';
 import { FIELD_LOG_CATEGORY_LABELS, sortFieldLogEntries } from './field-log';
 import { MAP_DRAWING_LABELS, MAP_MARKER_LABELS, mapStateForMission, normalizeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
-import { RUH_CATEGORY_LABELS, RUH_RISK_LABELS, summarizeWelfareCheck, welfareReminderLabels } from './ruh-welfare';
+import { RUH_CATEGORY_LABELS, RUH_RISK_LABELS, summarizeWelfareCheck } from './ruh-welfare';
 import type { ChecklistRun, MissionContext, MissionFeedback, MissionLessonsLearned, MissionResourceRequest } from './schemas';
 
 export const AFTER_ACTION_LOCAL_WARNING = 'Lagres bare lokalt i denne nettleseren. Ikke offisiell innsending eller offisiell logg alene. Ikke legg inn eller del navn, ID, pasientdetaljer, helsejournal, skjermet operativ informasjon, sensitive private lokasjoner eller annet sensitivt innhold.';
@@ -381,8 +381,7 @@ function hasWelfareFollowUp(check: MissionContext['welfareChecks'][number]) {
   return check.needsRest
     || check.needsRelief
     || check.physicalLoad === 'hoy'
-    || check.mentalLoad === 'hoy'
-    || welfareReminderLabels(check).length > 0;
+    || check.mentalLoad === 'hoy';
 }
 
 export function buildRuhWelfareSummary(mission: MissionContext, equipmentDamageLossEntries?: AfterActionResourceEntry[]): AfterActionRuhWelfareSummary {
@@ -411,10 +410,7 @@ export function buildRuhWelfareSummary(mission: MissionContext, equipmentDamageL
   }
 
   const lessonsLearned = normalizedLessonsLearned(mission.lessonsLearned);
-  const feedback = normalizedFeedback(mission.feedback);
   addRuhWelfareItem(items, lessonsLearned.followUp ? `Erfaring oppfølging: ${lessonsLearned.followUp}` : undefined);
-  addRuhWelfareItem(items, feedback.safety ? `Tilbakemelding sikkerhet: ${feedback.safety}` : undefined);
-  addRuhWelfareItem(items, feedback.equipment ? `Tilbakemelding utstyr: ${feedback.equipment}` : undefined);
 
   return {
     status: items.length > 0 ? 'needs-review' : 'ok',

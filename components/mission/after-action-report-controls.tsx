@@ -75,7 +75,7 @@ export function AfterActionReportControls({ mission, displaySignals, checklists,
         </div>
         {ruhWelfareSummary.items.length > 0 ? (
           <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold">
-            {ruhWelfareSummary.items.slice(0, 4).map((item) => <li key={item}>{item}</li>)}
+            {ruhWelfareSummary.items.slice(0, 4).map((item, index) => <li key={`ruh-follow-up-${index}-${item}`}>{item}</li>)}
           </ul>
         ) : (
           <p className="mt-2 text-sm font-semibold">Ingen lokale RUH/velferd-oppfølgingskandidater registrert før eksport.</p>

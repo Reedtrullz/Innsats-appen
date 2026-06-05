@@ -191,8 +191,58 @@ it('builds a RUH and welfare follow-up summary from critical logs and equipment 
   expect(report.sections.ruhWelfareSummary.items.join('\n')).toContain('Defekt pakning');
   expect(exportAfterActionMarkdown(report)).toContain('## RUH/velferd oppfølging');
   expect(exportAfterActionMarkdown(report)).toContain('Lokal oppfølgingsliste for RUH/velferd');
-  expect(exportAfterActionJson(report)).toContain('Nestenulykke ved pumpe');
+  const json = exportAfterActionJson(report);
+  expect(json).toContain('Nestenulykke ved pumpe');
+  expect(json).toContain('Defekt pakning');
+  expect(json).not.toContain('resource-ruh-summary');
+  expect(json).not.toContain('field-ruh-summary');
+  expect(json).not.toContain('linkedMissionId');
   expect(exportAfterActionPdfReadyHtml(report)).toContain('RUH/velferd oppfølging');
+});
+
+it('keeps RUH and welfare summary ok for routine reminders and positive feedback', () => {
+  const report = buildAfterActionReport({
+    mission: {
+      ...mission,
+      resourceRequests: [],
+      fieldLogEntries: [],
+      ruhReports: [],
+      welfareChecks: [
+        {
+          id: 'welfare-routine-reminders',
+          timestamp: '2026-06-03T10:20:00.000Z',
+          physicalLoad: 'lav',
+          mentalLoad: 'lav',
+          needsRest: false,
+          needsRelief: false,
+          reminders: { water: true, food: true, warmth: true, rest: true, dryClothing: true },
+        },
+      ],
+      lessonsLearned: { summary: '', whatWorked: '', improvements: '', followUp: '' },
+      feedback: {
+        leadership: '',
+        equipment: 'Utstyr fungerte',
+        procedures: '',
+        training: '',
+        safety: 'Sperringer fungerte',
+        communications: '',
+      },
+    },
+    checklists: [],
+    checklistRuns: [],
+    generatedAt: '2026-06-03T11:00:00.000Z',
+  });
+
+  expect(report.sections.ruhWelfareSummary.status).toBe('ok');
+  expect(report.sections.ruhWelfareSummary.items).toEqual([]);
+
+  const markdown = exportAfterActionMarkdown(report);
+  const ruhWelfareSection = markdown.split('## RUH/velferd oppfølging')[1]?.split('## Erfaringer og læring')[0] ?? '';
+  expect(ruhWelfareSection).toContain('Ingen lokale RUH/velferd-oppfølgingskandidater');
+  expect(ruhWelfareSection).not.toContain('Sperringer fungerte');
+  expect(ruhWelfareSection).not.toContain('Utstyr fungerte');
+  expect(markdown).toContain('Sikkerhet: Sperringer fungerte');
+  expect(markdown).toContain('Utstyr: Utstyr fungerte');
 });
 
 it('blocks high-confidence sensitive after-action local order, log, mission and resource notes', () => {
