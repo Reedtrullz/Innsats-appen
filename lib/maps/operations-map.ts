@@ -1,4 +1,4 @@
-import { assertNoSensitiveOperationalText } from '@/lib/privacy/sensitive-text';
+import { assertNoSensitiveOperationalText, detectSensitiveOperationalText } from '@/lib/privacy/sensitive-text';
 
 export type MapMarkerKind = 'incident-site' | 'hazard' | 'resource' | 'meeting-point' | 'il-ko' | 'pump-location' | 'observation';
 export type MapDrawingKind = 'point' | 'line' | 'polygon' | 'sector';
@@ -115,11 +115,9 @@ function safeMapText(value: unknown, context: string, maxLength = 120) {
 }
 
 function trySafeMapText(value: unknown, context: string, maxLength = 120) {
-  try {
-    return safeMapText(value, context, maxLength);
-  } catch {
-    return null;
-  }
+  void context;
+  const sanitized = sanitizeMapText(value, maxLength);
+  return detectSensitiveOperationalText(sanitized) ? null : sanitized;
 }
 
 function strictCoordinate(value: unknown): number | null {
@@ -199,15 +197,17 @@ function normalizeMarker(value: unknown): MissionMapMarker | null {
   if (!isRecord(value) || value.itemType !== 'marker' || !MAP_MARKER_KINDS.includes(value.kind as MapMarkerKind)) return null;
   const point = normalizeSchematicPoint(value.point);
   if (!point) return null;
-  const label = sanitizeMapText(value.label) || MAP_MARKER_LABELS[value.kind as MapMarkerKind];
+  const label = trySafeMapText(value.label, 'operationsMap.normalize.marker.label');
+  if (label === null) return null;
   const missionId = sanitizeMapText(value.missionId, 80);
-  const note = sanitizeMapText(value.note, 240);
+  const note = trySafeMapText(value.note, 'operationsMap.normalize.marker.note', 240);
+  if (note === null) return null;
   return {
     id: sanitizeMapText(value.id, 80) || stableId('marker', new Date(0)),
     ...(missionId ? { missionId } : {}),
     itemType: 'marker',
     kind: value.kind as MapMarkerKind,
-    label,
+    label: label || MAP_MARKER_LABELS[value.kind as MapMarkerKind],
     point,
     ...(note ? { note } : {}),
     createdAt: typeof value.createdAt === 'string' ? value.createdAt : new Date(0).toISOString(),
@@ -219,15 +219,17 @@ function normalizeDrawing(value: unknown): MissionMapDrawing | null {
   const points = (Array.isArray(value.points) ? value.points.map(normalizeSchematicPoint).filter((point): point is SchematicPoint => Boolean(point)) : []).slice(0, MAX_POINTS_PER_DRAWING);
   const minimumPoints = value.kind === 'point' ? 1 : value.kind === 'line' ? 2 : 3;
   if (points.length < minimumPoints) return null;
-  const label = sanitizeMapText(value.label) || MAP_DRAWING_LABELS[value.kind as MapDrawingKind];
+  const label = trySafeMapText(value.label, 'operationsMap.normalize.drawing.label');
+  if (label === null) return null;
   const missionId = sanitizeMapText(value.missionId, 80);
-  const note = sanitizeMapText(value.note, 240);
+  const note = trySafeMapText(value.note, 'operationsMap.normalize.drawing.note', 240);
+  if (note === null) return null;
   return {
     id: sanitizeMapText(value.id, 80) || stableId('drawing', new Date(0)),
     ...(missionId ? { missionId } : {}),
     itemType: 'drawing',
     kind: value.kind as MapDrawingKind,
-    label,
+    label: label || MAP_DRAWING_LABELS[value.kind as MapDrawingKind],
     points,
     ...(note ? { note } : {}),
     createdAt: typeof value.createdAt === 'string' ? value.createdAt : new Date(0).toISOString(),
@@ -371,6 +373,7 @@ function polygonCoordinates(points: SchematicPoint[]) {
 }
 
 export function buildGeoJsonExport(state: MissionMapState) {
+  assertMissionMapStateTextSafe(state, 'operationsMap.export');
   const normalized = normalizeMissionMapState(state);
   return {
     type: 'FeatureCollection' as const,
@@ -454,6 +457,7 @@ function svgEscape(value: string) {
 }
 
 export function buildMapImageSvg(state: MissionMapState) {
+  assertMissionMapStateTextSafe(state, 'operationsMap.svg');
   const normalized = normalizeMissionMapState(state);
   const markerSvg = normalized.markers.map((marker) => {
     const label = safeMapText(marker.label, 'operationsMap.svg.marker.label');
@@ -468,6 +472,17 @@ export function buildMapImageSvg(state: MissionMapState) {
     return `<rect x="${point.x - 2}" y="${point.y - 2}" width="4" height="4" fill="#7c3aed"><title>${svgEscape(label)}</title></rect>`;
   }).join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 112" role="img" aria-label="Sanitert lokalt kartbilde"><rect width="100" height="100" fill="#f8fafc"/><path d="M0 20 H100 M0 40 H100 M0 60 H100 M0 80 H100 M20 0 V100 M40 0 V100 M60 0 V100 M80 0 V100" stroke="#cbd5e1" stroke-width="0.35"/>${drawingSvg}${markerSvg}<text x="2" y="108" font-size="3" fill="#7c2d12">${svgEscape(LOCATION_EXPORT_PRIVACY_WARNING.slice(0, 140))}</text></svg>`;
+}
+
+function assertMissionMapStateTextSafe(state: MissionMapState, context: string) {
+  state.markers.forEach((marker, index) => {
+    assertNoSensitiveOperationalText(marker.label, `${context}.markers[${index}].label`);
+    assertNoSensitiveOperationalText(marker.note, `${context}.markers[${index}].note`);
+  });
+  state.drawings.forEach((drawing, index) => {
+    assertNoSensitiveOperationalText(drawing.label, `${context}.drawings[${index}].label`);
+    assertNoSensitiveOperationalText(drawing.note, `${context}.drawings[${index}].note`);
+  });
 }
 
 export function mergeMissionMapState(a: MissionMapState, b: MissionMapState): MissionMapState {

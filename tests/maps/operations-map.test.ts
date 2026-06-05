@@ -17,6 +17,7 @@ import {
   measureDrawingDistance,
   mapStateForMission,
   measurePolygonArea,
+  mergeMissionMapState,
   normalizeMissionMapState,
   operationItemsForRender,
   readMissionMapState,
@@ -175,6 +176,61 @@ it('rejects sensitive text in local map markers and drawings before storage', ()
   expect(() => createMissionMapMarker({ kind: 'observation', label: '01017000027', x: 10, y: 20 }, now)).toThrow(/persondata|identifikator|pasientdata|private/i);
   expect(() => createMissionMapMarker({ kind: 'observation', label: 'Obs', x: 10, y: 20, note: 'kontakt ola.nordmann@example.com' }, now)).toThrow(/persondata|kontakt|private/i);
   expect(() => createMissionMapDrawing({ kind: 'sector', label: 'pasient Ola Nordmann', coordinates: '0,0 10,0 10,10' }, now)).toThrow(/persondata|pasientdata/i);
+});
+
+it('rejects sensitive text in map object update patches', () => {
+  const state: MissionMapState = {
+    markers: [createMissionMapMarker({ kind: 'observation', missionId: 'mission-a', label: 'Obs', x: 10, y: 20 }, now)],
+    drawings: [createMissionMapDrawing({ kind: 'sector', missionId: 'mission-a', label: 'Teig', coordinates: '0,0 10,0 10,10' }, now)],
+  };
+  expect(() => updateMissionMapMarker(state, 'mission-a', state.markers[0].id, { note: 'kontakt ola.nordmann@example.com' })).toThrow(/persondata|kontakt|private/i);
+  expect(() => updateMissionMapDrawing(state, 'mission-a', state.drawings[0].id, { label: '01017000027' })).toThrow(/persondata|identifikator|private/i);
+});
+
+it('skips only unsafe GeoJSON features and continues importing safe local features', () => {
+  const imported = importGeoJsonText(JSON.stringify({
+    type: 'FeatureCollection',
+    coordinateSystem: SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
+    features: [
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [22, 33] }, properties: { itemType: 'marker', kind: 'il-ko', label: '01017000027' } },
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [44, 55] }, properties: { itemType: 'marker', kind: 'observation', label: 'Trygg observasjon', note: 'kontakt ola.nordmann@example.com' } },
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [66, 77] }, properties: { itemType: 'marker', kind: 'observation', label: 'Trygg observasjon' } },
+    ],
+  }), now, 'mission-a');
+
+  expect(imported.markers).toHaveLength(1);
+  expect(imported.markers[0]).toMatchObject({ missionId: 'mission-a', kind: 'observation', label: 'Trygg observasjon', point: { x: 66, y: 77 } });
+});
+
+it('drops unsafe legacy local map objects during normalization, storage and merge', () => {
+  const safeMarker = createMissionMapMarker({ kind: 'observation', missionId: 'mission-a', label: 'Trygg observasjon', x: 10, y: 20 }, now);
+  const unsafeMarker = { ...safeMarker, id: 'unsafe-marker', label: '01017000027' };
+  const unsafeDrawing = { ...createMissionMapDrawing({ kind: 'sector', missionId: 'mission-a', label: 'Trygg teig', coordinates: '0,0 10,0 10,10' }, now), id: 'unsafe-drawing', note: 'kontakt ola.nordmann@example.com' };
+
+  expect(normalizeMissionMapState({ markers: [safeMarker, unsafeMarker], drawings: [unsafeDrawing] })).toEqual({ markers: [safeMarker], drawings: [] });
+
+  const storage = new Map<string, string>();
+  const storageLike = {
+    getItem: (key: string) => storage.get(key) ?? null,
+    setItem: (key: string, value: string) => storage.set(key, value),
+    removeItem: (key: string) => storage.delete(key),
+  };
+  storage.set(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({ markers: [unsafeMarker, safeMarker], drawings: [unsafeDrawing] }));
+  expect(readMissionMapState(storageLike)).toEqual({ markers: [safeMarker], drawings: [] });
+
+  writeMissionMapState({ markers: [unsafeMarker, safeMarker], drawings: [unsafeDrawing] }, storageLike);
+  expect(JSON.parse(storage.get(OPERATIONS_MAP_STORAGE_KEY) ?? '{}')).toMatchObject({ markers: [expect.objectContaining({ id: safeMarker.id })], drawings: [] });
+
+  expect(mergeMissionMapState({ markers: [unsafeMarker], drawings: [] }, { markers: [safeMarker], drawings: [unsafeDrawing] })).toEqual({ markers: [safeMarker], drawings: [] });
+});
+
+it('rejects sensitive notes in caller-provided map export state', () => {
+  const unsafeNoteState: MissionMapState = {
+    markers: [{ id: 'unsafe-note', itemType: 'marker', kind: 'observation', label: 'Obs', note: 'kontakt ola.nordmann@example.com', point: { x: 10, y: 20 }, createdAt: now.toISOString() }],
+    drawings: [],
+  };
+  expect(() => buildMapImageSvg(unsafeNoteState)).toThrow(/persondata|kontakt|private/i);
+  expect(() => buildGeoJsonExport(unsafeNoteState)).toThrow(/persondata|kontakt|private/i);
 });
 
 it('rejects sensitive text during GeoJSON import and export', () => {
