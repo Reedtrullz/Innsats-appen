@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FieldModePanel } from '@/components/field-mode-panel';
 import { FIELD_MODE_STORAGE_KEY, readFieldFeedbackEntries, serializeFieldModeSettings } from '@/lib/field-mode/field-mode';
+import { saveSelectedActiveMissionId } from '@/lib/mission/active-mission-selection';
 import { clearLocalMissionData, saveMission } from '@/lib/mission/local-store';
 import { buildMission } from '../helpers/mission-fixtures';
 import { flushAsyncEffects } from '../helpers/react-effects';
@@ -84,6 +85,29 @@ describe('FieldModePanel', () => {
     await renderFieldModePanel();
     expect(await screen.findByText(/Feltøvelse natt/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Gå til aktivt oppdrag/i })).toHaveAttribute('href', '/oppdrag');
+  });
+
+  it('shows the selected active mission instead of the first saved mission', async () => {
+    await saveMission(buildMission({
+      id: 'field-newest-mission',
+      title: 'Nyeste ikke valgt',
+      createdAt: '2026-06-04T10:00:00.000Z',
+      updatedAt: '2026-06-04T10:00:00.000Z',
+      locationText: 'Nyere område',
+    }));
+    await saveMission(buildMission({
+      id: 'field-selected-mission',
+      title: 'Valgt aktivt feltoppdrag',
+      createdAt: '2026-06-04T09:00:00.000Z',
+      updatedAt: '2026-06-04T09:00:00.000Z',
+      locationText: 'Valgt område',
+    }));
+    saveSelectedActiveMissionId('field-selected-mission');
+
+    await renderFieldModePanel();
+
+    expect(await screen.findByText(/Valgt aktivt feltoppdrag/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Nyeste ikke valgt/i)).not.toBeInTheDocument();
   });
 
   it('warns that voice input is optional, browser-dependent and fallback-only', async () => {

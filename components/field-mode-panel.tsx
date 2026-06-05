@@ -22,6 +22,7 @@ import {
   type FieldModeSettings,
   type FieldModeTheme,
 } from '@/lib/field-mode/field-mode';
+import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
 import { listMissions } from '@/lib/mission/local-store';
 import type { MissionContext } from '@/lib/mission/schemas';
 
@@ -137,7 +138,7 @@ function ActiveMissionPanel() {
     let active = true;
     listMissions()
       .then((missions) => {
-        if (active) setMission(missions[0] ?? null);
+        if (active) setMission(selectActiveMission(missions, readSelectedActiveMissionId()));
       })
       .catch(() => {
         if (active) setMission(null);

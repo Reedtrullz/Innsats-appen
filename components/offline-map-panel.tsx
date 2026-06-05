@@ -759,13 +759,13 @@ export function OfflineMapPanel() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span>{MAP_MARKER_LABELS[marker.kind]} — <span>{marker.label}</span> ({marker.point.x}, {marker.point.y})</span>
                 <span className="flex gap-2">
-                  <button type="button" aria-label={markerActionAriaLabel('Logg herfra', marker)} onClick={() => void createLogFromMapObject(marker)} disabled={mapLogSaving} className="min-h-10 rounded-xl bg-slate-950 px-3 font-black text-white disabled:cursor-wait disabled:bg-slate-500">
+                  <button type="button" aria-label={markerActionAriaLabel('Logg herfra', marker)} onClick={() => void createLogFromMapObject(marker)} disabled={mapLogSaving} className="min-h-11 rounded-xl bg-slate-950 px-3 font-black text-white disabled:cursor-wait disabled:bg-slate-500">
                     Logg herfra {marker.label}
                   </button>
-                  <button type="button" aria-label={markerActionAriaLabel('Rediger', marker)} onClick={() => startMarkerEdit(marker)} className="min-h-10 rounded-xl border border-slate-300 bg-white px-3 font-black text-slate-950">
+                  <button type="button" aria-label={markerActionAriaLabel('Rediger', marker)} onClick={() => startMarkerEdit(marker)} className="min-h-11 rounded-xl border border-slate-300 bg-white px-3 font-black text-slate-950">
                     Rediger {marker.label}
                   </button>
-                  <button type="button" aria-label={markerActionAriaLabel('Slett', marker)} onClick={() => deleteMarker(marker)} className="min-h-10 rounded-xl border border-red-300 bg-white px-3 font-black text-red-900">
+                  <button type="button" aria-label={markerActionAriaLabel('Slett', marker)} onClick={() => deleteMarker(marker)} className="min-h-11 rounded-xl border border-red-300 bg-white px-3 font-black text-red-900">
                     Slett {marker.label}
                   </button>
                 </span>
@@ -785,8 +785,8 @@ export function OfflineMapPanel() {
                     <textarea value={markerEditDraft.note} onChange={(event) => setMarkerEditDraft((current) => ({ ...current, note: event.target.value }))} className="mt-1 min-h-20 w-full rounded-xl border p-3" />
                   </label>
                   <div className="flex flex-wrap gap-2 md:col-span-2">
-                    <button type="submit" className="min-h-10 rounded-xl bg-slate-950 px-4 font-black text-white">Lagre markørendring</button>
-                    <button type="button" onClick={cancelMarkerEdit} className="min-h-10 rounded-xl border border-slate-300 bg-white px-4 font-black text-slate-950">Avbryt</button>
+                    <button type="submit" className="min-h-11 rounded-xl bg-slate-950 px-4 font-black text-white">Lagre markørendring</button>
+                    <button type="button" onClick={cancelMarkerEdit} className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 font-black text-slate-950">Avbryt</button>
                   </div>
                 </form>
               ) : null}
@@ -825,13 +825,13 @@ export function OfflineMapPanel() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span>{MAP_DRAWING_LABELS[drawing.kind]} — <span>{drawing.label}</span> ({drawing.points.length} punkt)</span>
                 <span className="flex gap-2">
-                  <button type="button" aria-label={drawingActionAriaLabel('Logg herfra', drawing)} onClick={() => void createLogFromMapObject(drawing)} disabled={mapLogSaving} className="min-h-10 rounded-xl bg-slate-950 px-3 font-black text-white disabled:cursor-wait disabled:bg-slate-500">
+                  <button type="button" aria-label={drawingActionAriaLabel('Logg herfra', drawing)} onClick={() => void createLogFromMapObject(drawing)} disabled={mapLogSaving} className="min-h-11 rounded-xl bg-slate-950 px-3 font-black text-white disabled:cursor-wait disabled:bg-slate-500">
                     Logg herfra {drawing.label}
                   </button>
-                  <button type="button" aria-label={drawingActionAriaLabel('Rediger', drawing)} onClick={() => startDrawingEdit(drawing)} className="min-h-10 rounded-xl border border-slate-300 bg-white px-3 font-black text-slate-950">
+                  <button type="button" aria-label={drawingActionAriaLabel('Rediger', drawing)} onClick={() => startDrawingEdit(drawing)} className="min-h-11 rounded-xl border border-slate-300 bg-white px-3 font-black text-slate-950">
                     Rediger {drawing.label}
                   </button>
-                  <button type="button" aria-label={drawingActionAriaLabel('Slett', drawing)} onClick={() => deleteDrawing(drawing)} className="min-h-10 rounded-xl border border-red-300 bg-white px-3 font-black text-red-900">
+                  <button type="button" aria-label={drawingActionAriaLabel('Slett', drawing)} onClick={() => deleteDrawing(drawing)} className="min-h-11 rounded-xl border border-red-300 bg-white px-3 font-black text-red-900">
                     Slett {drawing.label}
                   </button>
                 </span>
@@ -848,8 +848,8 @@ export function OfflineMapPanel() {
                     <textarea value={drawingEditDraft.note} onChange={(event) => setDrawingEditDraft((current) => ({ ...current, note: event.target.value }))} className="mt-1 min-h-20 w-full rounded-xl border p-3" />
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    <button type="submit" className="min-h-10 rounded-xl bg-slate-950 px-4 font-black text-white">Lagre sektorendring</button>
-                    <button type="button" onClick={cancelDrawingEdit} className="min-h-10 rounded-xl border border-slate-300 bg-white px-4 font-black text-slate-950">Avbryt</button>
+                    <button type="submit" className="min-h-11 rounded-xl bg-slate-950 px-4 font-black text-white">Lagre sektorendring</button>
+                    <button type="button" onClick={cancelDrawingEdit} className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 font-black text-slate-950">Avbryt</button>
                   </div>
                 </form>
               ) : null}

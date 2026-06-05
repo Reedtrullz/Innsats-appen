@@ -169,6 +169,38 @@ it('uses larger map controls when field glove mode is enabled', async () => {
   expect(screen.getByRole('button', { name: /Nullstill lokale sektorer/i })).not.toHaveClass('min-h-16');
 });
 
+it('keeps marker and drawing row actions at or above 44px touch targets', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  writeMissionMapState({
+    markers: [createMissionMapMarker({ kind: 'hazard', missionId: activeMission.id, label: 'Kort', x: 20, y: 30 }, new Date('2026-06-05T10:00:00Z'))],
+    drawings: [createMissionMapDrawing({ kind: 'sector', missionId: activeMission.id, label: 'Teig kort', coordinates: '10,10 20,10 15,20' }, new Date('2026-06-05T10:01:00Z'))],
+  });
+
+  await renderOfflineMapPanel();
+
+  for (const button of [
+    screen.getByRole('button', { name: /Logg herfra Kort/i }),
+    screen.getByRole('button', { name: /Rediger Kort/i }),
+    screen.getByRole('button', { name: /Slett Kort/i }),
+    screen.getByRole('button', { name: /Logg herfra Teig kort/i }),
+    screen.getByRole('button', { name: /Rediger Teig kort/i }),
+    screen.getByRole('button', { name: /Slett Teig kort/i }),
+  ]) {
+    expect(button).toHaveClass('min-h-11');
+  }
+
+  await user.click(screen.getByRole('button', { name: /Rediger Kort/i }));
+  expect(screen.getByRole('button', { name: /Lagre markørendring/i })).toHaveClass('min-h-11');
+  expect(screen.getByRole('button', { name: /Avbryt/i })).toHaveClass('min-h-11');
+
+  await user.click(screen.getByRole('button', { name: /Avbryt/i }));
+  await user.click(screen.getByRole('button', { name: /Rediger Teig kort/i }));
+  expect(screen.getByRole('button', { name: /Lagre sektorendring/i })).toHaveClass('min-h-11');
+  expect(screen.getByRole('button', { name: /Avbryt/i })).toHaveClass('min-h-11');
+});
+
 
 it('updates map controls when field mode changes while the map is open', async () => {
   await renderOfflineMapPanel();
