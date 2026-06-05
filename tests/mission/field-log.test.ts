@@ -136,6 +136,38 @@ it('rejects high-confidence sensitive field-log free text at schema and export t
   expect(() => exportFieldLogJson({ mission: baseMission, entries: [sensitiveEntry] })).toThrow(/persondata|pasientdata|skjermet/i);
 });
 
+it('scopes direct field-log exports to the current mission', () => {
+  const currentEntry: FieldLogEntry = {
+    id: 'field-current-direct',
+    timestamp: '2026-06-04T09:10:00.000Z',
+    category: 'observasjon',
+    text: 'Current direct export retained',
+    linkedMissionId: baseMission.id,
+    criticalObservation: false,
+    mustBeForwarded: false,
+  };
+  const otherEntry: FieldLogEntry = {
+    id: 'field-other-direct',
+    timestamp: '2026-06-04T09:15:00.000Z',
+    category: 'hms-avvik',
+    text: 'Other direct export must not leak',
+    linkedMissionId: 'other-mission-direct',
+    criticalObservation: true,
+    mustBeForwarded: true,
+  };
+
+  for (const exported of [
+    exportFieldLogMarkdown({ mission: baseMission, entries: [currentEntry, otherEntry] }),
+    exportFieldLogJson({ mission: baseMission, entries: [currentEntry, otherEntry] }),
+    exportFieldLogPdfReadyHtml({ mission: baseMission, entries: [currentEntry, otherEntry] }),
+  ]) {
+    expect(exported).toContain('Current direct export retained');
+    expect(exported).not.toContain('Other direct export must not leak');
+    expect(exported).not.toContain('other-mission-direct');
+    expect(exported).not.toContain('field-other-direct');
+  }
+});
+
 it('searches and exports field-log map references as schematic local context only', () => {
   const mapEntry: FieldLogEntry = {
     id: 'entry-map-ref',

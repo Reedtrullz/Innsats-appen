@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from 'react';
-import { OfflineMapLibreView } from '@/components/maps/offline-maplibre-view';
+import dynamic from 'next/dynamic';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react';
 import {
   OFFLINE_MAP_ATTRIBUTION,
   OFFLINE_MAP_LIMITATION_COPY,
@@ -20,6 +20,7 @@ import {
 import {
   approvedLocalMapPackages,
   localMapPackageForId,
+  type LocalMapPackageManifest,
 } from '@/lib/maps/offline-map-package-manifest';
 import { cacheLocalMapPackageAssets } from '@/lib/maps/map-package-cache';
 import {
@@ -66,6 +67,11 @@ import { getMission, listMissions, saveMission } from '@/lib/mission/local-store
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import { DEFAULT_FIELD_MODE_SETTINGS, FIELD_MODE_STORAGE_EVENT, readFieldModeSettings } from '@/lib/field-mode/field-mode';
 import type { FieldLogCategory, MissionContext } from '@/lib/mission/schemas';
+
+const OfflineMapLibreView = dynamic<{ packageManifest?: LocalMapPackageManifest; fallback?: ReactNode }>(
+  () => import('@/components/maps/offline-maplibre-view').then((module) => module.OfflineMapLibreView),
+  { ssr: false },
+);
 
 const featureStyles: Record<SchematicMapFeatureKind, { fill: string; stroke: string }> = {
   depot: { fill: '#0f172a', stroke: '#ffffff' },

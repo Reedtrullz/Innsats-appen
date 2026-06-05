@@ -116,12 +116,17 @@ function mapReferenceText(entry: FieldLogEntry) {
   return ` — Kart: ${label} (${source} ${point.x},${point.y})`;
 }
 
+function fieldLogEntriesForMission(mission: MissionContext, entries: FieldLogEntry[]) {
+  return entries.filter((entry) => !entry.linkedMissionId || entry.linkedMissionId === mission.id);
+}
+
 function assertFieldLogExportSafe(mission: MissionContext, entries: FieldLogEntry[]) {
   assertNoSensitiveOperationalTextInValue({ mission: missionExportSummary(mission), entries: sortFieldLogEntries(entries).map(exportedEntry) }, 'fieldLog');
 }
 
 export function exportFieldLogMarkdown({ mission, entries }: { mission: MissionContext; entries: FieldLogEntry[] }) {
-  assertFieldLogExportSafe(mission, entries);
+  const scopedEntries = fieldLogEntriesForMission(mission, entries);
+  assertFieldLogExportSafe(mission, scopedEntries);
   const lines: string[] = [];
   lines.push('# Lokal feltlogg');
   lines.push('');
@@ -138,7 +143,7 @@ export function exportFieldLogMarkdown({ mission, entries }: { mission: MissionC
   lines.push('');
   lines.push('## Tidslinje');
 
-  const sorted = sortFieldLogEntries(entries);
+  const sorted = sortFieldLogEntries(scopedEntries);
   if (sorted.length === 0) {
     lines.push('- Ingen feltlogg registrert lokalt.');
   } else {
@@ -155,13 +160,14 @@ export function exportFieldLogMarkdown({ mission, entries }: { mission: MissionC
 }
 
 export function exportFieldLogJson({ mission, entries }: { mission: MissionContext; entries: FieldLogEntry[] }) {
-  assertFieldLogExportSafe(mission, entries);
+  const scopedEntries = fieldLogEntriesForMission(mission, entries);
+  assertFieldLogExportSafe(mission, scopedEntries);
   return `${JSON.stringify({
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
     warnings: [FIELD_LOG_LOCAL_ONLY_WARNING, FIELD_LOG_PATIENT_DATA_WARNING],
     mission: missionExportSummary(mission),
-    entries: sortFieldLogEntries(entries).map(exportedEntry),
+    entries: sortFieldLogEntries(scopedEntries).map(exportedEntry),
   }, null, 2)}\n`;
 }
 

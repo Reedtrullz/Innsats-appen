@@ -70,7 +70,7 @@ describe('performance budget script', () => {
   });
 
   it('fails optional lazy map runtime chunks when they exceed their separate budget', () => {
-    const mapRuntimeChunk = Array.from({ length: 160 }, (_value, index) => `pmtiles runtime marker ${index}`).join('\n');
+    const mapRuntimeChunk = Array.from({ length: 160 }, (_value, index) => `PMTiles Protocol runtime marker ${index}`).join('\n');
     const root = makeBuild(
       {
         'static/chunks/app.js': 'console.log("small route")',
@@ -86,6 +86,32 @@ describe('performance budget script', () => {
 
     expect(result.ok).toBe(false);
     expect(result.findings.some((finding) => finding.label.includes('static/chunks/map-runtime.js'))).toBe(true);
+  });
+
+  it('fails when App Router route-bundle-stats includes MapLibre or PMTiles in first-load chunks', () => {
+    const root = makeBuild(
+      {
+        'static/chunks/app.js': 'console.log("small route")',
+        'static/chunks/map-runtime.js': 'maplibre-gl pmtiles app-router first-load runtime',
+      },
+      { '/_app': ['static/chunks/app.js'] },
+    );
+    fs.mkdirSync(path.join(root, '.next', 'diagnostics'), { recursive: true });
+    fs.writeFileSync(path.join(root, '.next', 'diagnostics', 'route-bundle-stats.json'), JSON.stringify([
+      {
+        route: '/kart',
+        firstLoadUncompressedJsBytes: 1234,
+        firstLoadChunkPaths: ['.next/static/chunks/app.js', '.next/static/chunks/map-runtime.js'],
+      },
+    ], null, 2));
+    const result = checkPerformanceBudget(root, {
+      maxRouteJsGzipBytes: 1024,
+      maxChunkGzipBytes: 1024,
+      maxOptionalMapRuntimeChunkGzipBytes: 1024,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.findings.some((finding) => /MapLibre\/PMTiles runtime included in initial route \/kart/i.test(finding.label))).toBe(true);
   });
 
   it('fails when MapLibre or PMTiles runtime is included in an initial route chunk even under byte budgets', () => {

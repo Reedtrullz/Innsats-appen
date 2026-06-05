@@ -43,7 +43,7 @@ function gzipSize(filePath: string) {
 }
 
 function normalizeAssetPath(asset: string) {
-  return asset.replace(/^\/_next\//, '').replace(/^_next\//, '');
+  return asset.replace(/^\/_next\//, '').replace(/^_next\//, '').replace(/^\.next\//, '');
 }
 
 function assetFile(rootDir: string, asset: string) {
@@ -61,9 +61,21 @@ function routeEntries(manifest: ManifestLike | null) {
   return pageEntries;
 }
 
+function routeBundleStatsEntries(rootDir: string) {
+  const filePath = path.join(rootDir, '.next', 'diagnostics', 'route-bundle-stats.json');
+  if (!fs.existsSync(filePath)) return [];
+  const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8')) as Array<{ route?: unknown; firstLoadChunkPaths?: unknown }>;
+  if (!Array.isArray(parsed)) return [];
+  return parsed.flatMap((entry) => {
+    if (typeof entry.route !== 'string' || !Array.isArray(entry.firstLoadChunkPaths)) return [];
+    const assets = entry.firstLoadChunkPaths.filter((asset): asset is string => typeof asset === 'string' && asset.endsWith('.js'));
+    return assets.length > 0 ? [{ route: entry.route, assets }] : [];
+  });
+}
+
 function isOptionalMapRuntimeChunk(filePath: string) {
   const contents = fs.readFileSync(filePath, 'utf8');
-  return /\b(?:maplibre-gl|pmtiles|MapLibre|PMTiles)\b/.test(contents);
+  return /\b(?:maplibre-gl|Protocol|addProtocol)\b/.test(contents);
 }
 
 export function checkPerformanceBudget(rootDir = process.cwd(), budget = defaultBudget) {
@@ -86,8 +98,12 @@ export function checkPerformanceBudget(rootDir = process.cwd(), budget = default
   const summaries: BudgetFinding[] = [];
   const routeAssetFiles = new Set<string>();
 
-  for (const manifest of manifests) {
-    for (const entry of routeEntries(manifest)) {
+  const routeEntryList = [
+    ...manifests.flatMap((manifest) => routeEntries(manifest)),
+    ...routeBundleStatsEntries(rootDir),
+  ];
+
+  for (const entry of routeEntryList) {
       const files = [...new Set(entry.assets.map((asset) => assetFile(rootDir, asset)).filter((file) => fs.existsSync(file)))];
       for (const file of files) routeAssetFiles.add(file);
       for (const file of files) {
@@ -103,7 +119,6 @@ export function checkPerformanceBudget(rootDir = process.cwd(), budget = default
       const summary = { label: `route ${entry.route}`, gzipBytes, budgetBytes: budget.maxRouteJsGzipBytes };
       summaries.push(summary);
       if (gzipBytes > budget.maxRouteJsGzipBytes) findings.push(summary);
-    }
   }
 
   for (const file of chunkFiles) {

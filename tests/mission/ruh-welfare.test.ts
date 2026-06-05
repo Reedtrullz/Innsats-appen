@@ -103,6 +103,39 @@ it('validates simplified RUH fields and exports local non-official RUH without p
   expect(JSON.stringify(exportedJson)).not.toMatch(/indexedDB|objectStore|Exif|GPSLatitude|GPSLongitude/i);
 });
 
+it('scopes direct RUH exports to the current mission', () => {
+  const currentReport = RuhReportSchema.parse({
+    id: 'ruh-current-direct',
+    timestamp: '2026-06-04T10:15:00.000Z',
+    category: 'hms',
+    whatHappened: 'Current RUH retained',
+    immediateMeasure: 'Fulgt opp lokalt',
+    risk: 'middels',
+    followUpNeeded: true,
+    linkedMissionId: baseMission.id,
+  });
+  const otherReport = RuhReportSchema.parse({
+    id: 'ruh-other-direct',
+    timestamp: '2026-06-04T10:20:00.000Z',
+    category: 'hms',
+    whatHappened: 'Other RUH must not leak',
+    immediateMeasure: 'Håndtert i annet oppdrag',
+    risk: 'hoy',
+    followUpNeeded: true,
+    linkedMissionId: 'other-ruh-mission',
+  });
+
+  for (const exported of [
+    exportRuhMarkdown({ mission: baseMission, reports: [currentReport, otherReport] }),
+    exportRuhJson({ mission: baseMission, reports: [currentReport, otherReport] }),
+  ]) {
+    expect(exported).toContain('Current RUH retained');
+    expect(exported).not.toContain('Other RUH must not leak');
+    expect(exported).not.toContain('other-ruh-mission');
+    expect(exported).not.toContain('ruh-other-direct');
+  }
+});
+
 it('records non-medical welfare/load checks with rest relief flags and reminder summary/export', () => {
   const check = WelfareCheckSchema.parse({
     id: 'welfare-1',

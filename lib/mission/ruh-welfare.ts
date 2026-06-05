@@ -102,6 +102,10 @@ function exportedWelfareCheck(check: WelfareCheck) {
   };
 }
 
+function ruhReportsForMission(mission: MissionContext, reports: RuhReport[]) {
+  return reports.filter((report) => !report.linkedMissionId || report.linkedMissionId === mission.id);
+}
+
 function assertRuhExportSafe(mission: MissionContext, reports: RuhReport[]) {
   assertNoSensitiveOperationalTextInValue({ mission: missionExportSummary(mission), reports: sortRuhReports(reports).map(exportedRuhReport) }, 'ruh');
 }
@@ -111,7 +115,8 @@ function assertWelfareExportSafe(mission: MissionContext, checks: WelfareCheck[]
 }
 
 export function exportRuhMarkdown({ mission, reports }: { mission: MissionContext; reports: RuhReport[] }) {
-  assertRuhExportSafe(mission, reports);
+  const scopedReports = ruhReportsForMission(mission, reports);
+  assertRuhExportSafe(mission, scopedReports);
   const lines: string[] = [];
   lines.push('# Lokal forenklet RUH');
   lines.push('');
@@ -124,7 +129,7 @@ export function exportRuhMarkdown({ mission, reports }: { mission: MissionContex
   lines.push(`- Oppdatert: ${mission.updatedAt}`);
   lines.push('');
   lines.push('## RUH-rapporter');
-  const sorted = sortRuhReports(reports);
+  const sorted = sortRuhReports(scopedReports);
   if (sorted.length === 0) {
     lines.push('- Ingen lokale RUH-rapporter registrert.');
   } else {
@@ -138,13 +143,14 @@ export function exportRuhMarkdown({ mission, reports }: { mission: MissionContex
 }
 
 export function exportRuhJson({ mission, reports }: { mission: MissionContext; reports: RuhReport[] }) {
-  assertRuhExportSafe(mission, reports);
+  const scopedReports = ruhReportsForMission(mission, reports);
+  assertRuhExportSafe(mission, scopedReports);
   return `${JSON.stringify({
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
     warnings: [RUH_LOCAL_ONLY_WARNING, RUH_PATIENT_DATA_WARNING],
     mission: missionExportSummary(mission),
-    reports: sortRuhReports(reports).map(exportedRuhReport),
+    reports: sortRuhReports(scopedReports).map(exportedRuhReport),
   }, null, 2)}\n`;
 }
 
