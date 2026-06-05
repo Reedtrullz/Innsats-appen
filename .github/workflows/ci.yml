@@ -166,12 +166,36 @@ jobs:
 
       - name: Configure SSH key
         shell: bash
+        env:
+          VPS_SSH_HOST_KEY: ${{ vars.VPS_SSH_HOST_KEY || secrets.VPS_SSH_HOST_KEY }}
         run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           printf '%s\n' "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_racknerd
           chmod 600 ~/.ssh/id_rsa_racknerd
-          ssh-keyscan -H 198.23.137.16 >> ~/.ssh/known_hosts
+
+          normalize_host_keys() {
+            sed -e 's/\r$//' -e '/^[[:space:]]*$/d' -e '/^[[:space:]]*#/d' | sort -u
+          }
+
+          expected_host_key="$(printf '%s\n' "${VPS_SSH_HOST_KEY:-}" | normalize_host_keys)"
+          if [[ -z "$expected_host_key" ]]; then
+            echo "VPS_SSH_HOST_KEY repository variable or secret must be set before production deploy." >&2
+            exit 1
+          fi
+
+          scanned_host_key="$(ssh-keyscan -T 10 -t ed25519 198.23.137.16 2>/dev/null | normalize_host_keys)"
+          if [[ -z "$scanned_host_key" ]]; then
+            echo "Unable to scan VPS SSH host key." >&2
+            exit 1
+          fi
+
+          if [[ "$scanned_host_key" != "$expected_host_key" ]]; then
+            echo "VPS SSH host key mismatch; refusing to update known_hosts." >&2
+            exit 1
+          fi
+
+          printf '%s\n' "$expected_host_key" > ~/.ssh/known_hosts
           ssh -i ~/.ssh/id_rsa_racknerd -o BatchMode=yes -o StrictHostKeyChecking=yes deploy@198.23.137.16 'echo "SSH OK"'
 
       - name: Deploy immutable image tag

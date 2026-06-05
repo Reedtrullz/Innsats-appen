@@ -1,0 +1,33 @@
+import { readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+
+function readCiWorkflow() {
+  return readFileSync('.github/workflows/ci.yml', 'utf8');
+}
+
+function configureSshStep(workflow: string) {
+  const start = workflow.indexOf('- name: Configure SSH key');
+  const end = workflow.indexOf('- name: Deploy immutable image tag');
+
+  expect(start).toBeGreaterThan(-1);
+  expect(end).toBeGreaterThan(start);
+  return workflow.slice(start, end);
+}
+
+describe('CI deploy SSH security', () => {
+  it('compares scanned host key with a pinned expected host key before writing known_hosts', () => {
+    const step = configureSshStep(readCiWorkflow());
+    const mismatchCheckIndex = step.indexOf('VPS SSH host key mismatch');
+    const writeKnownHostsIndex = step.indexOf('> ~/.ssh/known_hosts');
+
+    expect(step).toMatch(/VPS_SSH_HOST_KEY/);
+    expect(step).toMatch(/ssh-keyscan/);
+    expect(step).toMatch(/scanned_host_key/);
+    expect(step).toMatch(/expected_host_key/);
+    expect(step).toMatch(/normalize_host_keys\(\)/);
+    expect(step).toMatch(/\/\^\[\[:space:\]\]\*#\/d/);
+    expect(mismatchCheckIndex).toBeGreaterThan(-1);
+    expect(writeKnownHostsIndex).toBeGreaterThan(mismatchCheckIndex);
+    expect(step).not.toMatch(/ssh-keyscan\s+-H\s+198\.23\.137\.16\s+>>\s+~\/\.ssh\/known_hosts/);
+  });
+});

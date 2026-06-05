@@ -36,15 +36,22 @@ The last audited application-code baseline was SHA `e259b39692b48601a7069fe3fbef
 
 ## One-time prerequisites
 
-### GitHub Actions secret
+### GitHub Actions secret and host key pin
 
-The automatic deploy job requires this repository secret:
+The automatic deploy job requires this repository secret and public host-key pin:
 
 ```text
 VPS_SSH_PRIVATE_KEY = private SSH key for deploy@198.23.137.16
+VPS_SSH_HOST_KEY = exact public host key line for 198.23.137.16 (repository variable preferred; secret also supported)
 ```
 
-The workflow writes it to `~/.ssh/id_rsa_racknerd` on the runner, matching `deploy/inventory/hosts.yml`. Do not commit the key or copy it into inventory.
+Set `VPS_SSH_HOST_KEY` from a trusted local network/path, review it once, then store the exact line in GitHub Actions variables:
+
+```bash
+ssh-keyscan -T 10 -t ed25519 198.23.137.16
+```
+
+The workflow compares fresh `ssh-keyscan` output to `VPS_SSH_HOST_KEY` before writing `~/.ssh/known_hosts`; it fails the deploy on mismatch instead of trusting whatever key appears during that CI run. The workflow writes the private key to `~/.ssh/id_rsa_racknerd` on the runner, matching `deploy/inventory/hosts.yml`. Do not commit the key or copy it into inventory.
 
 ### Local/VPS prerequisites
 
