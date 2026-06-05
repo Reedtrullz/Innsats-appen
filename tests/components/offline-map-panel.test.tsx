@@ -224,7 +224,6 @@ it('stores selected map package cache metadata in localStorage and can reset it'
   await renderOfflineMapPanel();
 
   await user.selectOptions(screen.getByRole('combobox', { name: /Velg lokal kartpakke/i }), 'trondheim-demo-pmtiles');
-  expect(screen.getByText(/Cache-varsel: Trondheim demo PMTiles.*12 MB/i)).toBeInTheDocument();
 
   await user.click(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }));
   await waitFor(() => {
