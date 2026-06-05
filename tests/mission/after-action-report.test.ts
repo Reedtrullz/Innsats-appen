@@ -161,6 +161,40 @@ it('uses structured mission field-log entries in after-action local log section'
   expect(JSON.stringify(report)).not.toMatch(/lat|lon|geometry|rawRef/i);
 });
 
+it('builds a RUH and welfare follow-up summary from critical logs and equipment issues', () => {
+  const report = buildAfterActionReport({
+    mission: {
+      ...mission,
+      id: 'mission-ruh-summary',
+      resourceRequests: [
+        { id: 'resource-ruh-summary', kind: 'equipment', status: 'blocked', createdAt: '2026-06-03T10:15:00.000Z', quantity: '1 stk', note: 'Defekt pakning' },
+      ],
+      fieldLogEntries: [
+        {
+          id: 'field-ruh-summary',
+          timestamp: '2026-06-03T10:10:00.000Z',
+          category: 'hms-avvik',
+          text: 'Nestenulykke ved pumpe',
+          criticalObservation: true,
+          mustBeForwarded: true,
+        },
+      ],
+    },
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+  });
+
+  expect(report.sections.ruhWelfareSummary.status).toBe('needs-review');
+  expect(report.sections.ruhWelfareSummary.warning).toContain('Ikke offisiell HMS/RUH-innsending');
+  expect(report.sections.ruhWelfareSummary.items.join('\n')).toContain('Nestenulykke ved pumpe');
+  expect(report.sections.ruhWelfareSummary.items.join('\n')).toContain('Defekt pakning');
+  expect(exportAfterActionMarkdown(report)).toContain('## RUH/velferd oppfølging');
+  expect(exportAfterActionMarkdown(report)).toContain('Lokal oppfølgingsliste for RUH/velferd');
+  expect(exportAfterActionJson(report)).toContain('Nestenulykke ved pumpe');
+  expect(exportAfterActionPdfReadyHtml(report)).toContain('RUH/velferd oppfølging');
+});
+
 it('blocks high-confidence sensitive after-action local order, log, mission and resource notes', () => {
   expect(() => buildAfterActionReport({
     mission,
@@ -477,6 +511,8 @@ it('exports after-action Markdown, JSON and PDF-ready HTML with local-only warni
   expect(markdown).toContain('Eksporterte filer kan inneholde operasjonelt sensitiv informasjon');
   expect(markdown).toContain('## Ressursbruk');
   expect(markdown).toContain('## Skade/tap på utstyr');
+  expect(markdown).toContain('## RUH/velferd oppfølging');
+  expect(markdown).toContain('Lokal oppfølgingsliste for RUH/velferd');
   expect(markdown).toContain('## MBK-status / materiellberedskap');
   expect(markdown).toContain('## Erfaringer og læring');
   expect(markdown).toContain('Tidligere sambandskontroll');

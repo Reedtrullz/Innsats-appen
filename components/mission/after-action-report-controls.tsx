@@ -4,7 +4,7 @@ import { useState } from 'react';
 import type { OperationalChecklist } from '@/lib/content/schemas';
 import type { MissionContext } from '@/lib/mission/schemas';
 import type { MissionMapState } from '@/lib/maps/operations-map';
-import { buildAfterActionReport, exportAfterActionJson, exportAfterActionMarkdown, exportAfterActionPdfReadyHtml } from '@/lib/mission/after-action-report';
+import { buildAfterActionReport, buildRuhWelfareSummary, exportAfterActionJson, exportAfterActionMarkdown, exportAfterActionPdfReadyHtml } from '@/lib/mission/after-action-report';
 import { listChecklistRuns } from '@/lib/mission/local-store';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 
@@ -26,6 +26,7 @@ export function AfterActionReportControls({ mission, displaySignals, checklists,
   const [markdown, setMarkdown] = useState('');
   const [json, setJson] = useState('');
   const [pdfReadyHtml, setPdfReadyHtml] = useState('');
+  const ruhWelfareSummary = buildRuhWelfareSummary(statusSummaryMission(mission, displaySignals));
 
   async function buildReport() {
     const runs = await listChecklistRuns(mission.id);
@@ -62,6 +63,23 @@ export function AfterActionReportControls({ mission, displaySignals, checklists,
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Lokal etterrapport</p>
         <h3 className="text-xl font-black">Etteraksjonsrapport</h3>
         <p className="mt-1 text-sm font-semibold text-amber-900">PDF-klar utskrift er HTML for nettleserens Skriv ut &gt; Lagre som PDF. Ikke offisiell innsending. Lagres bare lokalt; ikke legg inn persondata, pasientdata, sensitive private lokasjoner eller skjermet operativ informasjon.</p>
+      </div>
+      <div role="region" aria-label="RUH/velferd lokal gjennomgang før eksport" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-950">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h4 className="font-black">RUH/velferd gjennomgang</h4>
+            <p className="mt-1 text-sm font-semibold">{ruhWelfareSummary.warning}</p>
+            <p className="mt-1 text-sm font-bold">Status: {ruhWelfareSummary.status === 'needs-review' ? 'Trenger gjennomgang' : 'OK'}</p>
+          </div>
+          <a href="#ruh-velferd" className="rounded-xl bg-white px-3 py-2 text-sm font-black text-amber-950 ring-1 ring-amber-200">Åpne RUH/velferd</a>
+        </div>
+        {ruhWelfareSummary.items.length > 0 ? (
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold">
+            {ruhWelfareSummary.items.slice(0, 4).map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        ) : (
+          <p className="mt-2 text-sm font-semibold">Ingen lokale RUH/velferd-oppfølgingskandidater registrert før eksport.</p>
+        )}
       </div>
       <div className="grid gap-3 lg:grid-cols-3">
         <label className="block text-sm font-bold">

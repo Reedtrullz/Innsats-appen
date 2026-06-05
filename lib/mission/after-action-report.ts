@@ -3,9 +3,11 @@ import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive
 import { EXPORT_SENSITIVITY_WARNING } from './order-export';
 import { FIELD_LOG_CATEGORY_LABELS, sortFieldLogEntries } from './field-log';
 import { MAP_DRAWING_LABELS, MAP_MARKER_LABELS, mapStateForMission, normalizeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
+import { RUH_CATEGORY_LABELS, RUH_RISK_LABELS, summarizeWelfareCheck, welfareReminderLabels } from './ruh-welfare';
 import type { ChecklistRun, MissionContext, MissionFeedback, MissionLessonsLearned, MissionResourceRequest } from './schemas';
 
 export const AFTER_ACTION_LOCAL_WARNING = 'Lagres bare lokalt i denne nettleseren. Ikke offisiell innsending eller offisiell logg alene. Ikke legg inn eller del navn, ID, pasientdetaljer, helsejournal, skjermet operativ informasjon, sensitive private lokasjoner eller annet sensitivt innhold.';
+export const AFTER_ACTION_RUH_WELFARE_LOCAL_WARNING = 'Lokal oppfølgingsliste for RUH/velferd. Ikke offisiell HMS/RUH-innsending, helsejournal eller personalsystem.';
 export const AFTER_ACTION_SCHEMA_VERSION = 2;
 
 const NOT_REGISTERED = 'Ikke registrert i lokal oppdragstavle';
@@ -101,6 +103,12 @@ export type AfterActionMbkSummary = {
   }>;
 };
 
+export type AfterActionRuhWelfareSummary = {
+  status: 'ok' | 'needs-review';
+  items: string[];
+  warning: string;
+};
+
 export type AfterActionReport = {
   schemaVersion: number;
   generatedAt: string;
@@ -148,6 +156,7 @@ export type AfterActionReport = {
     checklists: AfterActionChecklistSummary[];
     resourceConsumption: { entries: AfterActionResourceEntry[]; placeholder?: string };
     equipmentDamageLoss: { entries: AfterActionResourceEntry[]; placeholder?: string };
+    ruhWelfareSummary: AfterActionRuhWelfareSummary;
     lessonsLearned: MissionLessonsLearned;
     feedback: MissionFeedback;
     mbkSummary: AfterActionMbkSummary;
@@ -362,6 +371,58 @@ function buildMbkSummary(checklists: OperationalChecklist[], runs: ChecklistRun[
   };
 }
 
+function addRuhWelfareItem(items: string[], value: string | undefined) {
+  const trimmed = value?.trim();
+  if (!trimmed || items.includes(trimmed)) return;
+  items.push(trimmed);
+}
+
+function hasWelfareFollowUp(check: MissionContext['welfareChecks'][number]) {
+  return check.needsRest
+    || check.needsRelief
+    || check.physicalLoad === 'hoy'
+    || check.mentalLoad === 'hoy'
+    || welfareReminderLabels(check).length > 0;
+}
+
+export function buildRuhWelfareSummary(mission: MissionContext, equipmentDamageLossEntries?: AfterActionResourceEntry[]): AfterActionRuhWelfareSummary {
+  const items: string[] = [];
+  const equipmentEntries = equipmentDamageLossEntries ?? mission.resourceRequests.map(resourceEntry).filter(isEquipmentDamageOrLoss);
+
+  for (const entry of sortFieldLogEntries(mission.fieldLogEntries ?? [])) {
+    if (!entry.criticalObservation && !entry.mustBeForwarded) continue;
+    const flags = [entry.criticalObservation ? 'kritisk observasjon' : '', entry.mustBeForwarded ? 'må videresendes' : ''].filter(Boolean).join(', ');
+    addRuhWelfareItem(items, `Feltlogg (${flags}): ${entry.text}`);
+  }
+
+  for (const entry of equipmentEntries) {
+    const details = [entry.status, entry.quantity, entry.note].filter((part): part is string => Boolean(part));
+    addRuhWelfareItem(items, `Skade/tap utstyr (${entry.kindLabel}): ${details.join(' — ') || 'Oppfølging registrert'}`);
+  }
+
+  for (const report of [...(mission.ruhReports ?? [])].sort((a, b) => a.timestamp.localeCompare(b.timestamp))) {
+    if (!report.followUpNeeded && report.risk !== 'hoy') continue;
+    addRuhWelfareItem(items, `Lokal RUH (${RUH_CATEGORY_LABELS[report.category]}, risiko ${RUH_RISK_LABELS[report.risk]}): ${report.whatHappened}`);
+  }
+
+  for (const check of [...(mission.welfareChecks ?? [])].sort((a, b) => a.timestamp.localeCompare(b.timestamp))) {
+    if (!hasWelfareFollowUp(check)) continue;
+    addRuhWelfareItem(items, `Velferdssjekk: ${summarizeWelfareCheck(check)}${check.note ? ` — ${check.note}` : ''}`);
+  }
+
+  const lessonsLearned = normalizedLessonsLearned(mission.lessonsLearned);
+  const feedback = normalizedFeedback(mission.feedback);
+  addRuhWelfareItem(items, lessonsLearned.followUp ? `Erfaring oppfølging: ${lessonsLearned.followUp}` : undefined);
+  addRuhWelfareItem(items, feedback.safety ? `Tilbakemelding sikkerhet: ${feedback.safety}` : undefined);
+  addRuhWelfareItem(items, feedback.equipment ? `Tilbakemelding utstyr: ${feedback.equipment}` : undefined);
+
+  return {
+    status: items.length > 0 ? 'needs-review' : 'ok',
+    items,
+    warning: AFTER_ACTION_RUH_WELFARE_LOCAL_WARNING,
+  };
+}
+
 function assertAfterActionMapStateSafe(mapState: MissionMapState | undefined, missionId: string): void {
   const scopedMapState = mapStateForMission(normalizeMissionMapState(mapState ?? { markers: [], drawings: [] }), missionId);
   assertNoSensitiveOperationalTextInValue({
@@ -449,6 +510,7 @@ export function buildAfterActionReport({ mission, checklists, checklistRuns, gen
         entries: equipmentDamageLoss,
         placeholder: equipmentDamageLoss.length === 0 ? 'Ingen skade eller tap på utstyr registrert lokalt ennå.' : undefined,
       },
+      ruhWelfareSummary: buildRuhWelfareSummary(mission, equipmentDamageLoss),
       lessonsLearned: normalizedLessonsLearned(mission.lessonsLearned),
       feedback: normalizedFeedback(mission.feedback),
       mbkSummary: buildMbkSummary(checklists, checklistRuns, equipmentDamageLoss, resourceEntries),
@@ -561,6 +623,11 @@ export function exportAfterActionMarkdown(report: AfterActionReport) {
   lines.push('');
   lines.push('## Skade/tap på utstyr');
   bulletOrPlaceholder(lines, report.sections.equipmentDamageLoss.entries.map(resourceLine), report.sections.equipmentDamageLoss.placeholder ?? 'Ingen skade eller tap på utstyr registrert');
+  lines.push('');
+  lines.push('## RUH/velferd oppfølging');
+  lines.push(`- Status: ${report.sections.ruhWelfareSummary.status}`);
+  lines.push(`- Advarsel: ${report.sections.ruhWelfareSummary.warning}`);
+  bulletOrPlaceholder(lines, report.sections.ruhWelfareSummary.items, 'Ingen lokale RUH/velferd-oppfølgingskandidater registrert.');
   lines.push('');
   lines.push('## Erfaringer og læring');
   if (hasSectionValues(report.sections.lessonsLearned)) {

@@ -311,11 +311,66 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
   expect(markdownPreview.value).toContain('MBK-status / materiellberedskap');
   expect(markdownPreview.value).toContain('KO etterrapport');
   expect(jsonPreview.value).toContain('"schemaVersion"');
-  expect(jsonPreview.value).not.toContain('Skadet arbeidslys');
+  expect(jsonPreview.value).toContain('Skadet arbeidslys');
+  expect(jsonPreview.value).toContain('"ruhWelfareSummary"');
   expect(jsonPreview.value).toContain('Sektor etterrapport');
   expect(jsonPreview.value).not.toMatch(/lat|lon|geometry|rawRef|marker-aar-ui|sector-aar-ui/i);
   expect(pdfPreview.value).toContain('PDF-klar utskrift / bruk nettleserens Skriv ut &gt; Lagre som PDF');
   expect(pdfPreview.value).toContain('<!doctype html>');
+});
+
+it('shows RUH/welfare follow-up summary from critical log and equipment issue in Etter UI', async () => {
+  await saveMission(mission({
+    id: 'm17-ruh-summary-ui',
+    title: 'RUH oppfølging UI',
+    createdAt: '2026-06-04T09:00:00.000Z',
+    updatedAt: '2026-06-04T09:30:00.000Z',
+    phase: 'etter',
+    role: 'lagforer',
+    scenario: 'generelt',
+    locationText: 'Innsatsområde RUH oppfølging',
+    externalSignals: [],
+    activeChecklistIds: [],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [
+      { id: 'resource-ruh-summary-ui', kind: 'equipment', status: 'blocked', createdAt: '2026-06-04T09:20:00.000Z', quantity: '1 stk', note: 'Defekt pakning' },
+    ],
+    fieldLogEntries: [
+      {
+        id: 'field-ruh-summary-ui',
+        timestamp: '2026-06-04T09:10:00.000Z',
+        category: 'hms-avvik',
+        text: 'Nestenulykke ved pumpe',
+        criticalObservation: true,
+        mustBeForwarded: true,
+      },
+    ],
+    ruhReports: [],
+    welfareChecks: [],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  }));
+
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} />);
+
+  const ruhSection = await waitFor(() => {
+    const section = document.querySelector('#ruh-velferd');
+    expect(section).not.toBeNull();
+    return section as HTMLElement;
+  });
+  const ruhFollowUp = within(ruhSection).getByRole('region', { name: /RUH\/velferd kandidater/i });
+  expect(ruhFollowUp).toHaveTextContent(/Nestenulykke ved pumpe/i);
+  expect(ruhFollowUp).toHaveTextContent(/Defekt pakning/i);
+  expect(ruhFollowUp).toHaveTextContent(/Ikke offisiell HMS\/RUH-innsending/i);
+
+  const afterActionSection = document.querySelector('#etterrapport') as HTMLElement | null;
+  expect(afterActionSection).not.toBeNull();
+  const afterActionFollowUp = within(afterActionSection!).getByRole('region', { name: /RUH\/velferd lokal gjennomgang før eksport/i });
+  expect(afterActionFollowUp).toHaveTextContent(/Nestenulykke ved pumpe/i);
+  expect(afterActionFollowUp).toHaveTextContent(/Defekt pakning/i);
+  expect(within(afterActionFollowUp).getByRole('link', { name: /Åpne RUH\/velferd/i })).toHaveAttribute('href', '#ruh-velferd');
 });
 
 it('generates a local oppdragsmappe export with map and log artifacts', async () => {
@@ -600,7 +655,7 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   expect(await screen.findByRole('heading', { name: /RUH og velferd/i })).toBeInTheDocument();
-  expect(screen.getByText(/ikke offisiell HMS\/RUH-innsending/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/ikke offisiell HMS\/RUH-innsending/i).length).toBeGreaterThan(0);
   expect(screen.getAllByText(/ikke legg inn navn, ID, pasientdata eller persondata/i).length).toBeGreaterThan(0);
   expect(screen.getByText(/Foto\/video-vedlegg er utsatt i MVP/i)).toBeInTheDocument();
   expect(screen.getByText(/EXIF\/GPS-metadata/i)).toBeInTheDocument();
@@ -625,7 +680,7 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
       followUpNeeded: true,
     });
   });
-  expect(screen.getByText(/Nesten fall ved glatt dekke/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/Nesten fall ved glatt dekke/i).length).toBeGreaterThan(0);
 
   await userEvent.click(screen.getByRole('button', { name: /Lag RUH Markdown/i }));
   await userEvent.click(screen.getByRole('button', { name: /Lag RUH JSON/i }));
@@ -663,8 +718,8 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
       needsRelief: true,
     });
   });
-  expect(screen.getByText(/Fysisk: Høy/i)).toBeInTheDocument();
-  expect(screen.getByText(/Lang innsats, planlegg pause/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/Fysisk: Høy/i).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/Lang innsats, planlegg pause/i).length).toBeGreaterThan(0);
 
   await userEvent.click(screen.getByRole('button', { name: /Lag velferd Markdown/i }));
   await userEvent.click(screen.getByRole('button', { name: /Lag velferd JSON/i }));

@@ -6,6 +6,7 @@ import { RUH_CATEGORY_OPTIONS, RUH_LOCAL_ONLY_WARNING, RUH_PATIENT_DATA_WARNING,
 import type { MissionContext, RuhCategory, RuhRisk, WelfareLoad } from '@/lib/mission/schemas';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+import { buildRuhWelfareSummary } from '@/lib/mission/after-action-report';
 
 type MissionUpdate = (mission: MissionContext) => MissionContext;
 
@@ -40,6 +41,7 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
   const [welfarePrivacyError, setWelfarePrivacyError] = useState('');
   const ruhReports = mission.ruhReports ?? [];
   const welfareChecks = mission.welfareChecks ?? [];
+  const followUpSummary = buildRuhWelfareSummary(mission);
 
   async function addRuhReport(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -145,6 +147,16 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
         <p className="mt-1 text-sm font-semibold text-amber-900">{RUH_LOCAL_ONLY_WARNING} {RUH_PATIENT_DATA_WARNING}</p>
         <p className="mt-1 text-sm font-semibold text-amber-900">{WELFARE_NON_MEDICAL_WARNING}</p>
       </div>
+
+      {followUpSummary.items.length > 0 ? (
+        <div role="region" aria-label="RUH/velferd kandidater" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-950">
+          <h4 className="font-black">Oppfølgingskandidater fra logg, utstyr og velferd</h4>
+          <p className="mt-1 text-sm font-semibold">{followUpSummary.warning}</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold">
+            {followUpSummary.items.slice(0, 6).map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        </div>
+      ) : null}
 
       <div className="grid gap-3 lg:grid-cols-2">
         <form onSubmit={(event) => void addRuhReport(event)} className="grid gap-3 rounded-xl border border-slate-200 p-3">
