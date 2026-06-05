@@ -1,24 +1,48 @@
 import { act, fireEvent, render, screen, waitFor, type RenderResult } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach } from 'vitest';
-import { OfflineMapPanel } from '@/components/offline-map-panel';
+import { afterEach, vi } from 'vitest';
 import { FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY } from '@/lib/field-mode/field-mode';
 import { saveSelectedActiveMissionId } from '@/lib/mission/active-mission-selection';
 import { clearLocalMissionData, getMission, saveMission } from '@/lib/mission/local-store';
 import { OFFLINE_MAP_CACHE_STORAGE_KEY } from '@/lib/maps/offline-map';
-import {
-  resetApprovedLocalMapPackagesForTest,
-  seedApprovedLocalMapPackageForTest,
-} from '@/lib/maps/offline-map-package-manifest';
 import { OPERATIONS_MAP_STORAGE_KEY, SCHEMATIC_GEOJSON_COORDINATE_SYSTEM } from '@/lib/maps/operations-map';
 import { readLocalAuditLog } from '@/lib/privacy/local-profile';
 import type { FieldLogEntry, MissionContext } from '@/lib/mission/schemas';
 import { buildMission } from '../helpers/mission-fixtures';
 import { flushAsyncEffects } from '../helpers/react-effects';
 
+const approvedPmtilesPackage = Object.freeze({
+  id: 'trondheim-demo-pmtiles',
+  title: 'Trondheim demo PMTiles',
+  provider: 'training-demo',
+  runtimeFormat: 'pmtiles',
+  sourceFormat: 'pmtiles',
+  url: '/map-packages/trondheim-demo.pmtiles',
+  styleUrl: '/map-packages/trondheim-demo-style.json',
+  attribution: 'Beredskapsboka test fixture attribution',
+  version: '2026.06-a',
+  updatedAt: '2026-06-05',
+  estimatedSizeMb: 12,
+  bounds: [10.2, 63.2, 10.6, 63.6] as [number, number, number, number],
+  center: [10.4, 63.4] as [number, number],
+  minZoom: 8,
+  maxZoom: 14,
+  approvedForOfflineUse: true,
+  provenance: 'Test-only approved PMTiles package fixture for offline map selection coverage.',
+} as const);
+
+function mockApprovedLocalMapPackages(packages = [approvedPmtilesPackage]) {
+  vi.resetModules();
+  vi.doMock('@/lib/maps/offline-map-package-manifest', () => ({
+    approvedLocalMapPackages: Object.freeze(packages),
+    localMapPackageForId: (id: string | null | undefined) => packages.find((mapPackage) => mapPackage.id === id),
+  }));
+}
+
 afterEach(async () => {
   localStorage.clear();
-  resetApprovedLocalMapPackagesForTest();
+  vi.doUnmock('@/lib/maps/offline-map-package-manifest');
+  vi.resetModules();
   await clearLocalMissionData();
 });
 
@@ -55,6 +79,7 @@ function mission(overrides: Partial<MissionContext> = {}): MissionContext {
 
 
 async function renderOfflineMapPanel(): Promise<RenderResult> {
+  const { OfflineMapPanel } = await import('@/components/offline-map-panel');
   const result = render(<OfflineMapPanel />);
   await flushAsyncEffects();
   return result;
@@ -131,12 +156,7 @@ it('stores selected map package cache metadata in localStorage and can reset it'
 
 it('lets an approved PMTiles package be selected, cached and activated', async () => {
   const user = userEvent.setup();
-  seedApprovedLocalMapPackageForTest({
-    id: 'trondheim-demo-pmtiles',
-    title: 'Trondheim demo PMTiles',
-    url: '/map-packages/trondheim-demo.pmtiles',
-    styleUrl: '/map-packages/trondheim-demo-style.json',
-  });
+  mockApprovedLocalMapPackages();
 
   await renderOfflineMapPanel();
 

@@ -170,10 +170,12 @@ export function readCachedOfflineMapPackage(storage?: Pick<Storage, 'getItem'>):
   }
 }
 
-export function writeCachedOfflineMapPackage(packageId: string, storage?: Pick<Storage, 'setItem'>, now = new Date()): CachedOfflineMapPackage {
+export function writeCachedOfflineMapPackage(packageId: string, storage?: Pick<Storage, 'setItem'>, now = new Date()): CachedOfflineMapPackage | null {
   const schematicMapPackage = getOfflineMapPackage(packageId);
   const localMapPackage = schematicMapPackage ? undefined : localMapPackageForId(packageId);
-  const mapPackage = schematicMapPackage ?? localMapPackage ?? OFFLINE_MAP_PACKAGES[0];
+  const mapPackage = schematicMapPackage ?? localMapPackage;
+  if (!mapPackage) return null;
+
   const cached: CachedOfflineMapPackage = {
     packageId: mapPackage.id,
     title: mapPackage.title,

@@ -6,21 +6,45 @@ import {
   capMapFeatures,
   getOfflineMapPackage,
   getRenderableMapFeatures,
-  normalizeCachedOfflineMapPackage,
   parseCachedOfflineMapPackage,
   readCachedOfflineMapPackage,
   resetCachedOfflineMapPackage,
   writeCachedOfflineMapPackage,
   type SchematicMapFeature,
 } from '@/lib/maps/offline-map';
-import {
-  resetApprovedLocalMapPackagesForTest,
-  seedApprovedLocalMapPackageForTest,
-} from '@/lib/maps/offline-map-package-manifest';
-import { afterEach } from 'vitest';
+import { afterEach, vi } from 'vitest';
+
+const approvedPmtilesPackage = Object.freeze({
+  id: 'trondheim-demo-pmtiles',
+  title: 'Trondheim demo PMTiles',
+  provider: 'training-demo',
+  runtimeFormat: 'pmtiles',
+  sourceFormat: 'pmtiles',
+  url: '/map-packages/trondheim-demo.pmtiles',
+  styleUrl: '/map-packages/trondheim-demo-style.json',
+  attribution: 'Beredskapsboka test fixture attribution',
+  version: '2026.06-a',
+  updatedAt: '2026-06-05',
+  estimatedSizeMb: 12,
+  bounds: [10.2, 63.2, 10.6, 63.6] as [number, number, number, number],
+  center: [10.4, 63.4] as [number, number],
+  minZoom: 8,
+  maxZoom: 14,
+  approvedForOfflineUse: true,
+  provenance: 'Test-only approved PMTiles package fixture for offline map selection coverage.',
+} as const);
+
+function mockApprovedLocalMapPackages(packages = [approvedPmtilesPackage]) {
+  vi.resetModules();
+  vi.doMock('@/lib/maps/offline-map-package-manifest', () => ({
+    approvedLocalMapPackages: Object.freeze(packages),
+    localMapPackageForId: (id: string | null | undefined) => packages.find((mapPackage) => mapPackage.id === id),
+  }));
+}
 
 afterEach(() => {
-  resetApprovedLocalMapPackagesForTest();
+  vi.doUnmock('@/lib/maps/offline-map-package-manifest');
+  vi.resetModules();
 });
 
 it('documents a static schematic MVP approach without tile-provider network policy', () => {
@@ -41,13 +65,9 @@ it('normalizes cached package records and ignores unknown package ids', () => {
   expect(parseCachedOfflineMapPackage('not json')).toBeNull();
 });
 
-it('accepts approved PMTiles package ids in the offline map cache record', () => {
-  seedApprovedLocalMapPackageForTest({
-    id: 'trondheim-demo-pmtiles',
-    title: 'Trondheim demo PMTiles',
-    url: '/map-packages/trondheim-demo.pmtiles',
-    styleUrl: '/map-packages/trondheim-demo-style.json',
-  });
+it('accepts approved PMTiles package ids in the offline map cache record', async () => {
+  mockApprovedLocalMapPackages();
+  const { normalizeCachedOfflineMapPackage } = await import('@/lib/maps/offline-map');
 
   expect(normalizeCachedOfflineMapPackage({
     packageId: 'trondheim-demo-pmtiles',
@@ -75,6 +95,18 @@ it('writes and resets simulated map package cache in browser storage only', () =
 
   resetCachedOfflineMapPackage(localStorageLike);
   expect(readCachedOfflineMapPackage(localStorageLike)).toBeNull();
+});
+
+it('does not write a fallback cache record for unknown package ids', () => {
+  const storage = new Map<string, string>();
+  const localStorageLike = {
+    getItem: (key: string) => storage.get(key) ?? null,
+    setItem: (key: string, value: string) => storage.set(key, value),
+    removeItem: (key: string) => storage.delete(key),
+  };
+
+  expect(writeCachedOfflineMapPackage('unknown-pmtiles-id', localStorageLike, new Date('2026-06-05T10:00:00.000Z'))).toBeNull();
+  expect(storage.get(OFFLINE_MAP_CACHE_STORAGE_KEY)).toBeUndefined();
 });
 
 it('shows cache size warnings for larger packages', () => {
