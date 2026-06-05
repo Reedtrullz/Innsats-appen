@@ -36,7 +36,7 @@ describe('performance budget script', () => {
 
   it('passes small mobile route bundles', () => {
     const root = makeBuild({ 'static/chunks/app.js': 'console.log("small")' }, { '/hurtigkort': ['static/chunks/app.js'] });
-    const result = checkPerformanceBudget(root, { maxRouteJsGzipBytes: 1024, maxChunkGzipBytes: 1024 });
+    const result = checkPerformanceBudget(root, { maxRouteJsGzipBytes: 1024, maxChunkGzipBytes: 1024, maxOptionalMapRuntimeChunkGzipBytes: 1024 });
 
     expect(result.ok).toBe(true);
     expect(formatBudgetResult(result)).toContain('Mobile performance budget');
@@ -44,10 +44,47 @@ describe('performance budget script', () => {
 
   it('fails oversized route and chunk JavaScript', () => {
     const root = makeBuild({ 'static/chunks/app.js': 'x'.repeat(10_000) }, { '/': ['static/chunks/app.js'] });
-    const result = checkPerformanceBudget(root, { maxRouteJsGzipBytes: 20, maxChunkGzipBytes: 20 });
+    const result = checkPerformanceBudget(root, { maxRouteJsGzipBytes: 20, maxChunkGzipBytes: 20, maxOptionalMapRuntimeChunkGzipBytes: 20 });
 
     expect(result.ok).toBe(false);
     expect(result.findings.some((finding) => finding.label === 'route /')).toBe(true);
     expect(result.findings.some((finding) => finding.label.includes('static/chunks/app.js'))).toBe(true);
+  });
+
+  it('allows optional lazy MapLibre or PMTiles runtime chunks under a separate budget', () => {
+    const mapRuntimeChunk = Array.from({ length: 160 }, (_value, index) => `maplibre-gl runtime marker ${index}`).join('\n');
+    const root = makeBuild(
+      {
+        'static/chunks/app.js': 'console.log("small route")',
+        'static/chunks/map-runtime.js': mapRuntimeChunk,
+      },
+      { '/kart': ['static/chunks/app.js'] },
+    );
+    const result = checkPerformanceBudget(root, {
+      maxRouteJsGzipBytes: 1024,
+      maxChunkGzipBytes: 80,
+      maxOptionalMapRuntimeChunkGzipBytes: 1024,
+    });
+
+    expect(result.ok).toBe(true);
+  });
+
+  it('fails optional lazy map runtime chunks when they exceed their separate budget', () => {
+    const mapRuntimeChunk = Array.from({ length: 160 }, (_value, index) => `pmtiles runtime marker ${index}`).join('\n');
+    const root = makeBuild(
+      {
+        'static/chunks/app.js': 'console.log("small route")',
+        'static/chunks/map-runtime.js': mapRuntimeChunk,
+      },
+      { '/kart': ['static/chunks/app.js'] },
+    );
+    const result = checkPerformanceBudget(root, {
+      maxRouteJsGzipBytes: 1024,
+      maxChunkGzipBytes: 80,
+      maxOptionalMapRuntimeChunkGzipBytes: 20,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.findings.some((finding) => finding.label.includes('static/chunks/map-runtime.js'))).toBe(true);
   });
 });

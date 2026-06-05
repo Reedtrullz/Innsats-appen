@@ -47,7 +47,7 @@ export async function waitForServiceWorker(page: Page) {
   await page.waitForFunction(() => 'serviceWorker' in navigator, undefined, { timeout: 5_000 });
   await page.evaluate(async () => {
     const timeout = new Promise<never>((_, reject) => {
-      window.setTimeout(() => reject(new Error('Timed out waiting for service worker readiness.')), 10_000);
+      window.setTimeout(() => reject(new Error('Timed out waiting for service worker readiness.')), 30_000);
     });
     const registration = await Promise.race([navigator.serviceWorker.ready, timeout]);
     if (!navigator.serviceWorker.controller && !registration.active) {

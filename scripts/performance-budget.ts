@@ -14,6 +14,7 @@ type ManifestLike = {
 export type PerformanceBudget = {
   maxRouteJsGzipBytes: number;
   maxChunkGzipBytes: number;
+  maxOptionalMapRuntimeChunkGzipBytes: number;
 };
 
 export type BudgetFinding = {
@@ -27,6 +28,9 @@ const defaultBudget: PerformanceBudget = {
   maxRouteJsGzipBytes: 350 * 1024,
   // Guard one unexpectedly heavy client chunk. This keeps PWA/offline UX changes small.
   maxChunkGzipBytes: 180 * 1024,
+  // MapLibre/PMTiles is deliberately lazy-loaded only after an approved local package is active.
+  // Keep a separate cap so it never hides in the generic initial-route budget.
+  maxOptionalMapRuntimeChunkGzipBytes: 320 * 1024,
 };
 
 function readJson(filePath: string): ManifestLike | null {
@@ -57,6 +61,11 @@ function routeEntries(manifest: ManifestLike | null) {
   return pageEntries;
 }
 
+function isOptionalMapRuntimeChunk(filePath: string) {
+  const contents = fs.readFileSync(filePath, 'utf8');
+  return /\b(?:maplibre-gl|pmtiles|MapLibre|PMTiles)\b/.test(contents);
+}
+
 export function checkPerformanceBudget(rootDir = process.cwd(), budget = defaultBudget) {
   const manifests = [
     readJson(path.join(rootDir, '.next', 'build-manifest.json')),
@@ -75,10 +84,12 @@ export function checkPerformanceBudget(rootDir = process.cwd(), budget = default
 
   const findings: BudgetFinding[] = [];
   const summaries: BudgetFinding[] = [];
+  const routeAssetFiles = new Set<string>();
 
   for (const manifest of manifests) {
     for (const entry of routeEntries(manifest)) {
       const files = [...new Set(entry.assets.map((asset) => assetFile(rootDir, asset)).filter((file) => fs.existsSync(file)))];
+      for (const file of files) routeAssetFiles.add(file);
       const gzipBytes = files.reduce((sum, file) => sum + gzipSize(file), 0);
       const summary = { label: `route ${entry.route}`, gzipBytes, budgetBytes: budget.maxRouteJsGzipBytes };
       summaries.push(summary);
@@ -88,8 +99,10 @@ export function checkPerformanceBudget(rootDir = process.cwd(), budget = default
 
   for (const file of chunkFiles) {
     const gzipBytes = gzipSize(file);
-    if (gzipBytes > budget.maxChunkGzipBytes) {
-      findings.push({ label: path.relative(rootDir, file), gzipBytes, budgetBytes: budget.maxChunkGzipBytes });
+    const optionalMapRuntime = !routeAssetFiles.has(file) && isOptionalMapRuntimeChunk(file);
+    const budgetBytes = optionalMapRuntime ? budget.maxOptionalMapRuntimeChunkGzipBytes : budget.maxChunkGzipBytes;
+    if (gzipBytes > budgetBytes) {
+      findings.push({ label: path.relative(rootDir, file), gzipBytes, budgetBytes });
     }
   }
 
@@ -107,7 +120,7 @@ function formatBytes(bytes: number) {
 
 export function formatBudgetResult(result: ReturnType<typeof checkPerformanceBudget>) {
   const lines = [
-    `Mobile performance budget: route JS <= ${formatBytes(result.budget.maxRouteJsGzipBytes)} gzip, individual chunk <= ${formatBytes(result.budget.maxChunkGzipBytes)} gzip`,
+    `Mobile performance budget: route JS <= ${formatBytes(result.budget.maxRouteJsGzipBytes)} gzip, individual chunk <= ${formatBytes(result.budget.maxChunkGzipBytes)} gzip, optional map runtime chunk <= ${formatBytes(result.budget.maxOptionalMapRuntimeChunkGzipBytes)} gzip`,
     'Largest route JS entries:',
     ...result.summaries.map((summary) => `- ${summary.label}: ${formatBytes(summary.gzipBytes)} gzip`),
   ];
