@@ -147,6 +147,9 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(architecture).toContain('Governed local tile-package iteration');
     expect(architecture).toContain('PMTiles is the browser runtime package format');
     expect(architecture).toContain('No runtime tile URL may point to Kartverket, OpenStreetMap or any external provider');
+    expect(architecture).toContain('optional browser-only MapLibre/PMTiles is allowed for approved app-local packages');
+    expect(architecture).not.toContain('The current app has no map dependencies');
+    expect(architecture).not.toContain('No MapLibre, Leaflet, MBTiles or Kartverket tile runtime is added');
     expect(overlays).toContain('mission-scoped overlays remain the source of operational annotations');
     expect(Object.keys(allDependencies)).toContain('maplibre-gl');
     expect(Object.keys(allDependencies)).toContain('pmtiles');

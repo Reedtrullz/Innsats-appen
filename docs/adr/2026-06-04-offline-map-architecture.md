@@ -8,7 +8,7 @@ Tasks: 273-281
 
 Beredskapsboka must remain mobile-first, local-only and useful offline after initial installation. The Group 9A map work needs a basic `/kart` surface, source/limitation attribution, optional local map package controls, cache warning/reset and E2E coverage.
 
-The current app has no map dependencies. Adding MBTiles readers, MapLibre, Leaflet or bundled raster/vector tile packages now would increase bundle size, service-worker/cache pressure and operational governance scope before the product has a reviewed map data supply chain. The MVP must also avoid backend sync, auth, persondata, private/skjermede locations, official command-system claims and exposure of raw upstream geometry from external context signals.
+At the foundation decision time, the app intentionally avoided map runtime dependencies. Adding MBTiles readers, MapLibre, Leaflet or bundled raster/vector tile packages at that stage would have increased bundle size, service-worker/cache pressure and operational governance scope before the product had a reviewed map data supply chain. The MVP must also avoid backend sync, auth, persondata, private/skjermede locations, official command-system claims and exposure of raw upstream geometry from external context signals.
 
 ## Decision
 
@@ -67,7 +67,7 @@ Chosen for MVP foundation.
 - “Download” means local selection/cache bookkeeping only; there is no network download in this group.
 - Cache warnings are based on estimated metadata size, not measured browser quota usage.
 - Reset clears only the map package cache record.
-- Future MBTiles/MapLibre/Leaflet work must come through a separate governed ADR/package plan covering licenses, update cadence, package signing/integrity, storage quotas, user consent and performance budgets.
+- Future Leaflet work, MBTiles browser runtime, external map-source use, coordinate conversion, broader MapLibre expansion, or additional local tile package classes must come through a separate governed ADR/package plan covering licenses, update cadence, package signing/integrity, storage quotas, user consent and performance budgets.
 
 ## Acceptance notes
 
@@ -80,11 +80,11 @@ The implementation must include:
 - Performance guard for capped rendered features.
 - Unit/component tests and an E2E test asserting the page does not request tile/map-provider URLs.
 
-## Next iteration boundary
+## Foundation boundary and accepted local package iteration
 
-The operational map/logging/Feltmodus integration iteration continues to use the accepted schematic local map architecture. No MapLibre, Leaflet, MBTiles or Kartverket tile runtime is added by the operational-integration iteration.
+The original operational map/logging/Feltmodus integration boundary continued to use the schematic local map architecture while package governance was unresolved. That historical boundary is now superseded by the governed local tile-package iteration below: optional browser-only MapLibre/PMTiles is allowed for approved app-local packages, while Leaflet, MBTiles browser runtime, Kartverket/external tile runtime, coordinate conversion and broader MapLibre expansion remain out of scope unless a separate governed package plan approves them.
 
-If real offline tiles are needed later, create a separate governed package plan before coding. That plan must cover license/attribution, tile source approval, package generation, package signing or integrity, update cadence, offline storage quota, user consent, cache eviction, bundle/performance budgets, and production verification that no external tile network calls occur during offline use.
+If additional real offline tiles are needed later, create a separate governed package plan before coding. That plan must cover license/attribution, tile source approval, package generation, package signing or integrity, update cadence, offline storage quota, user consent, cache eviction, bundle/performance budgets, and production verification that no external tile network calls occur during offline use.
 
 ## Governed local tile-package iteration
 
