@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-05T17:39:50.658Z",
-  "sourceCount": 8,
-  "planSourceCount": 8,
-  "planSourceHash": "sha256:3f15581aed6375e4b6e4f53279522c8939aae5811c27065fcb05cb44c7a178b8",
+  "generatedAt": "2026-06-05T18:56:41.740Z",
+  "sourceCount": 9,
+  "planSourceCount": 9,
+  "planSourceHash": "sha256:60f3ebb125902a06113a826e1c3eb030e5d55ef9c4dbdf286a954f722f6b5be5",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6025,6 +6025,249 @@
             "Release closeout started; pre-ledger committed-tree npm run check:ci PASS on local HEAD. GitHub Actions/deploy/live evidence follows after push."
           ],
           "sourceHeading": "Task 23: Close out workplan ledger, CI, deploy and live verification"
+        }
+      ]
+    },
+    {
+      "id": "2026-06-05_184316-pilot-readiness-remediation-plan",
+      "title": "Pilot Readiness Remediation Implementation Plan",
+      "sourcePath": ".hermes/plans/2026-06-05_184316-pilot-readiness-remediation-plan.md",
+      "sourceType": "hermes-plan",
+      "summary": "Move Beredskapsboka/Innsats-appen from a technically healthy deployed MVP to pilot-ready by fixing privacy gaps, adding source-governance gates, hardening staging/CI/monitoring, clarifying PMTiles scope, and collecting real-device release evidence.",
+      "stage": "build",
+      "risk": "high",
+      "status": "active",
+      "owner": "AR",
+      "evidence": [
+        "Written from the 2026-06-05 comprehensive project review. Current verified baseline was HEAD b85f4ad1e241419a097bdd290d61cb8944abb235, live health matched HEAD, npm run check:ci passed after clearing stale .next, and remaining blockers were pilot evidence, source governance, privacy hardening, staging/GitHub governance, context API backpressure, map-package scope, and release closeout."
+      ],
+      "taskCount": 25,
+      "updatedAt": "2026-06-05T18:56:41.740Z",
+      "tasks": [
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-1",
+          "title": "Add RED tests for high-confidence persondata detection",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 1: Add RED tests for high-confidence persondata detection"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-2",
+          "title": "Implement high-confidence privacy detectors",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 2: Implement high-confidence privacy detectors"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-3",
+          "title": "Add RED tests for map label/note privacy leaks",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 3: Add RED tests for map label/note privacy leaks"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-4",
+          "title": "Enforce privacy guards in map create/import/export helpers",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 4: Enforce privacy guards in map create/import/export helpers"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-5",
+          "title": "Surface map privacy errors in the UI",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 5: Surface map privacy errors in the UI"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-6",
+          "title": "Add source-governance report helper tests",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 6: Add source-governance report helper tests"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-7",
+          "title": "Implement source-governance report helper",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 7: Implement source-governance report helper"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-8",
+          "title": "Add source-governance CLI and npm scripts",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 8: Add source-governance CLI and npm scripts"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-9",
+          "title": "Add pilot source-review ledger fields and docs",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 9: Add pilot source-review ledger fields and docs"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-10",
+          "title": "Review and classify pilot-scope source documents [PARENT-DIRECT]",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 10: Review and classify pilot-scope source documents [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-11",
+          "title": "Add production CI validation for map packages",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 11: Add production CI validation for map packages"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-12",
+          "title": "Add staging workflow exact-SHA and host-key tests",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 12: Add staging workflow exact-SHA and host-key tests"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-13",
+          "title": "Harden staging workflow verification",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 13: Harden staging workflow verification"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-14",
+          "title": "Configure and verify GitHub deployment governance [PARENT-DIRECT]",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 14: Configure and verify GitHub deployment governance [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-15",
+          "title": "Add monitoring health JSON assertions",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 15: Add monitoring health JSON assertions"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-16",
+          "title": "Add context API backpressure tests",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 16: Add context API backpressure tests"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-17",
+          "title": "Implement context API rate limiter and wire routes",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 17: Implement context API rate limiter and wire routes"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-18",
+          "title": "Add PMTiles/schematic map UI scope tests",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 18: Add PMTiles/schematic map UI scope tests"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-19",
+          "title": "Implement PMTiles/schematic map UI separation",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 19: Implement PMTiles/schematic map UI separation"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-20",
+          "title": "Align manifest start URL with pilot install expectations",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 20: Align manifest start URL with pilot install expectations"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-21",
+          "title": "Add real-device evidence capture checklist updates",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 21: Add real-device evidence capture checklist updates"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-22",
+          "title": "Execute staging run and smoke staging [PARENT-DIRECT]",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 22: Execute staging run and smoke staging [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-23",
+          "title": "Execute real-device tasks 385-389 and update ledger [PARENT-DIRECT]",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 23: Execute real-device tasks 385-389 and update ledger [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-24",
+          "title": "Run post-implementation audit and focused re-reviews",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 24: Run post-implementation audit and focused re-reviews"
+        },
+        {
+          "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-25",
+          "title": "Close this workplan ledger, push, wait for exact CI/deploy, and verify live",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 25: Close this workplan ledger, push, wait for exact CI/deploy, and verify live"
         }
       ]
     }
