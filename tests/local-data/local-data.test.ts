@@ -19,8 +19,9 @@ import {
 } from '@/lib/local-data/local-data';
 import type { ChecklistRun, MissionContext } from '@/lib/mission/schemas';
 import { LOCAL_PROFILE_STORAGE_KEY } from '@/lib/privacy/local-profile';
+import { buildMission } from '../helpers/mission-fixtures';
 
-const baseMission: MissionContext = {
+const baseMission = buildMission({
   id: 'mission-local-data-1',
   title: 'Lokal øvelse',
   createdAt: '2026-06-04T10:00:00.000Z',
@@ -41,7 +42,7 @@ const baseMission: MissionContext = {
   welfareChecks: [],
   contentVersion: 'test-v1',
   schemaVersion: 1,
-};
+});
 
 const baseRun: ChecklistRun = {
   id: 'run-local-data-1',

@@ -1,13 +1,15 @@
 import { exportMissionMarkdown, exportMissionStatusSummaryMarkdown, exportMissingEquipmentBeforeDepartureMarkdown } from '@/lib/mission/export-markdown';
+import type { OperationalChecklist } from '@/lib/content/schemas';
+import { buildMission } from '../helpers/mission-fixtures';
 import fs from 'node:fs';
 import yaml from 'js-yaml';
 
-const readYaml = (path: string) => yaml.load(fs.readFileSync(path, 'utf8')) as any[];
+const readYaml = (path: string) => yaml.load(fs.readFileSync(path, 'utf8')) as OperationalChecklist[];
 
 it('exports mission and checklist state without browser metadata', () => {
   const markdown = exportMissionMarkdown({
-    mission: { id: 'm1', title: 'Øvelse tilfluktsrom', createdAt: '2026-06-02T20:00:00.000Z', updatedAt: '2026-06-02T20:00:00.000Z', phase: 'for', role: 'beredskapsvakt', scenario: 'tilfluktsrom', locationText: 'Trondheim', externalSignals: [], activeChecklistIds: [], notes: 'lokal note', contentVersion: 'v1' } as any,
-    checklists: [{ slug: 'tilfluktsrom-teknisk-status', title: 'Tilfluktsrom teknisk status', phase: 'for', roles: ['beredskapsvakt'], scenarios: ['tilfluktsrom'], items: [{ id: 'ventilasjon', label: 'Kontroller ventilasjon', required: true, sourceIds: ['src-deep-research-tilfluktsrom'] }], sourceIds: ['src-deep-research-tilfluktsrom'] } as any],
+    mission: buildMission({ id: 'm1', title: 'Øvelse tilfluktsrom', createdAt: '2026-06-02T20:00:00.000Z', updatedAt: '2026-06-02T20:00:00.000Z', phase: 'for', role: 'beredskapsvakt', scenario: 'tilfluktsrom', locationText: 'Trondheim', externalSignals: [], activeChecklistIds: [], notes: 'lokal note', contentVersion: 'v1' }),
+    checklists: [{ slug: 'tilfluktsrom-teknisk-status', title: 'Tilfluktsrom teknisk status', phase: 'for', roles: ['beredskapsvakt'], scenarios: ['tilfluktsrom'], items: [{ id: 'ventilasjon', label: 'Kontroller ventilasjon', required: true, sourceIds: ['src-deep-research-tilfluktsrom'] }], sourceIds: ['src-deep-research-tilfluktsrom'] }],
     runs: [{ id: 'r1', missionId: 'm1', templateSlug: 'tilfluktsrom-teknisk-status', checkedItemIds: ['ventilasjon'], notesByItemId: {}, equipmentStatusByItemId: {}, updatedAt: '2026-06-02T20:10:00.000Z', schemaVersion: 1 }],
   });
   expect(markdown).toContain('Øvelse tilfluktsrom');
@@ -25,7 +27,7 @@ it('exports missing equipment before departure from local checklist state withou
   const equipmentChecklists = curatedChecklists.filter((checklist) => ['personlig-utstyr-for-utrykning', 'lagsutstyr-for-utrykning'].includes(checklist.slug));
 
   const markdown = exportMissingEquipmentBeforeDepartureMarkdown({
-    mission: { id: 'm1', title: 'FIG utrykning', createdAt: '2026-06-02T20:00:00.000Z', updatedAt: '2026-06-02T20:00:00.000Z', phase: 'for', role: 'lagforer', scenario: 'generelt', locationText: 'Depot', externalSignals: [], activeChecklistIds: [], notes: '', contentVersion: 'v1' } as any,
+    mission: buildMission({ id: 'm1', title: 'FIG utrykning', createdAt: '2026-06-02T20:00:00.000Z', updatedAt: '2026-06-02T20:00:00.000Z', phase: 'for', role: 'lagforer', scenario: 'generelt', locationText: 'Depot', externalSignals: [], activeChecklistIds: [], notes: '', contentVersion: 'v1' }),
     checklists: equipmentChecklists,
     runs: [
       { id: 'r1', missionId: 'm1', templateSlug: 'personlig-utstyr-for-utrykning', checkedItemIds: ['hjelm-og-verneutstyr'], notesByItemId: { bekledning: 'Mangler regnjakker i rett størrelse', 'personlig-samband-og-lys': 'Skal ikke eksporteres', 'mangler-notert-lokalt': 'Prosesspunkt skal ikke eksporteres' }, equipmentStatusByItemId: {}, updatedAt: '2026-06-02T20:10:00.000Z', schemaVersion: 1 },
@@ -51,7 +53,7 @@ it('exports missing equipment before departure from local checklist state withou
 
 it('exports local task, quick status and resource summary without raw external payloads', () => {
   const markdown = exportMissionStatusSummaryMarkdown({
-    mission: {
+    mission: buildMission({
       id: 'm1',
       title: 'FIG under innsats',
       createdAt: '2026-06-03T10:00:00.000Z',
@@ -80,7 +82,7 @@ it('exports local task, quick status and resource summary without raw external p
       ],
       contentVersion: 'v1',
       schemaVersion: 1,
-    } as any,
+    }),
   });
 
   expect(markdown).toContain('# Lokal oppdragsstatus');

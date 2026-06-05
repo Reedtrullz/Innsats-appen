@@ -1,9 +1,18 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within, type RenderResult } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FieldModePanel } from '@/components/field-mode-panel';
 import { FIELD_MODE_STORAGE_KEY, readFieldFeedbackEntries, serializeFieldModeSettings } from '@/lib/field-mode/field-mode';
 import { clearLocalMissionData, saveMission } from '@/lib/mission/local-store';
+import { buildMission } from '../helpers/mission-fixtures';
+import { flushAsyncEffects } from '../helpers/react-effects';
+
+
+async function renderFieldModePanel(): Promise<RenderResult> {
+  const result = render(<FieldModePanel />);
+  await flushAsyncEffects();
+  return result;
+}
 
 afterEach(async () => {
   localStorage.clear();
@@ -14,7 +23,7 @@ afterEach(async () => {
 
 describe('FieldModePanel', () => {
   it('renders feltmodus toggles, quick actions and persistent offline status copy', async () => {
-    render(<FieldModePanel />);
+    await renderFieldModePanel();
 
     expect(screen.getByRole('heading', { name: /Feltmodus for hansker/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/Slå på feltmodus/i)).not.toBeChecked();
@@ -39,7 +48,7 @@ describe('FieldModePanel', () => {
   it('loads persisted field settings after mount without making first render depend on localStorage', async () => {
     localStorage.setItem(FIELD_MODE_STORAGE_KEY, serializeFieldModeSettings({ enabled: true, gloveMode: true, theme: 'reduced-blue', outdoorReadabilityReviewed: true }));
 
-    render(<FieldModePanel />);
+    await renderFieldModePanel();
 
     await waitFor(() => expect(screen.getByLabelText(/Slå på feltmodus/i)).toBeChecked());
     expect(screen.getByLabelText(/Hanskemodus/i)).toBeChecked();
@@ -48,12 +57,12 @@ describe('FieldModePanel', () => {
   });
 
   it('shows a stress-friendly empty state and then an active mission shortcut', async () => {
-    const { unmount } = render(<FieldModePanel />);
+    const { unmount } = await renderFieldModePanel();
     expect(await screen.findByText(/Ingen aktiv lokal oppdragstavle/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Opprett lokalt oppdrag/i })).toHaveAttribute('href', '/oppdrag/ny');
     unmount();
 
-    await saveMission({
+    await saveMission(buildMission({
       id: 'field-active-mission',
       title: 'Feltøvelse natt',
       createdAt: '2026-06-04T09:00:00.000Z',
@@ -70,15 +79,15 @@ describe('FieldModePanel', () => {
       resourceRequests: [],
       contentVersion: 'test-v1',
       schemaVersion: 1,
-    } as any);
+    }));
 
-    render(<FieldModePanel />);
+    await renderFieldModePanel();
     expect(await screen.findByText(/Feltøvelse natt/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Gå til aktivt oppdrag/i })).toHaveAttribute('href', '/oppdrag');
   });
 
   it('warns that voice input is optional, browser-dependent and fallback-only', async () => {
-    render(<FieldModePanel />);
+    await renderFieldModePanel();
     await screen.findByText(/Ingen aktiv lokal oppdragstavle/i);
 
     expect(screen.getByRole('heading', { name: /Web Speech API vurdering/i })).toBeInTheDocument();
@@ -105,7 +114,7 @@ describe('FieldModePanel', () => {
     (window as unknown as { SpeechRecognition?: unknown }).SpeechRecognition = ThrowingSpeechRecognition;
     const user = userEvent.setup();
 
-    render(<FieldModePanel />);
+    await renderFieldModePanel();
 
     await waitFor(() => expect(screen.getByTestId('speech-support-status')).toHaveTextContent(/mulig/i));
     await user.click(screen.getByLabelText(/Jeg forstår at diktering er valgfritt/i));
@@ -117,7 +126,7 @@ describe('FieldModePanel', () => {
   });
 
   it('captures field testing feedback locally with sanitization and no backend claim', async () => {
-    render(<FieldModePanel />);
+    await renderFieldModePanel();
 
     expect(screen.getAllByText(/ingen backend/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/Ingen lokale feltfeedback-notater ennå/i)).toBeInTheDocument();

@@ -1,7 +1,15 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within, type RenderResult } from '@testing-library/react';
 import { afterEach } from 'vitest';
 import { AppShell } from '@/components/app-shell';
 import { FIELD_MODE_STORAGE_KEY, serializeFieldModeSettings } from '@/lib/field-mode/field-mode';
+import { flushAsyncEffects } from '../helpers/react-effects';
+
+
+async function renderAndFlush(ui: React.ReactElement): Promise<RenderResult> {
+  const result = render(ui);
+  await flushAsyncEffects();
+  return result;
+}
 
 afterEach(() => {
   localStorage.clear();
@@ -10,8 +18,8 @@ afterEach(() => {
   delete document.documentElement.dataset.fieldTheme;
 });
 
-it('shows five mobile navigation tabs with current route', () => {
-  render(<AppShell currentPath="/sok"><p>Innhold</p></AppShell>);
+it('shows five mobile navigation tabs with current route', async () => {
+  await renderAndFlush(<AppShell currentPath="/sok"><p>Innhold</p></AppShell>);
   const navigation = within(screen.getByRole('navigation', { name: /Hovednavigasjon/i }));
   for (const label of ['Hjem', 'Søk', 'Oppdrag', 'Kort', 'Mer']) {
     expect(navigation.getByRole('link', { name: label })).toBeInTheDocument();
@@ -21,18 +29,19 @@ it('shows five mobile navigation tabs with current route', () => {
   expect(navigation.queryByRole('link', { name: 'Release' })).not.toBeInTheDocument();
 });
 
-it('suppresses the mobile bottom navigation on release routes', () => {
-  const { rerender } = render(<AppShell currentPath="/release"><p>Release</p></AppShell>);
+it('suppresses the mobile bottom navigation on release routes', async () => {
+  const { rerender } = await renderAndFlush(<AppShell currentPath="/release"><p>Release</p></AppShell>);
 
   expect(screen.queryByRole('navigation', { name: /Hovednavigasjon/i })).not.toBeInTheDocument();
 
   rerender(<AppShell currentPath="/release/foo"><p>Release details</p></AppShell>);
+  await flushAsyncEffects();
 
   expect(screen.queryByRole('navigation', { name: /Hovednavigasjon/i })).not.toBeInTheDocument();
 });
 
-it('keeps a visible decision-support and local-only disclaimer in the persistent shell', () => {
-  render(<AppShell currentPath="/oppdrag"><p>Operativ flate</p></AppShell>);
+it('keeps a visible decision-support and local-only disclaimer in the persistent shell', async () => {
+  await renderAndFlush(<AppShell currentPath="/oppdrag"><p>Operativ flate</p></AppShell>);
 
   expect(screen.getByText(/beslutningsstøtte/i)).toBeInTheDocument();
   expect(screen.getByText(/ikke et offisielt kommando/i)).toBeInTheDocument();
@@ -46,7 +55,7 @@ it('keeps a visible decision-support and local-only disclaimer in the persistent
 it('applies field mode runtime CSS for night mode and 48x48 touch targets', async () => {
   localStorage.setItem(FIELD_MODE_STORAGE_KEY, serializeFieldModeSettings({ enabled: true, gloveMode: false, theme: 'night', outdoorReadabilityReviewed: true }));
 
-  render(<AppShell currentPath="/feltmodus"><button type="button">Kritisk valg</button></AppShell>);
+  await renderAndFlush(<AppShell currentPath="/feltmodus"><button type="button">Kritisk valg</button></AppShell>);
 
   await waitFor(() => expect(document.documentElement.dataset.fieldMode).toBe('on'));
   await waitFor(() => expect(document.documentElement.dataset.fieldTheme).toBe('night'));
@@ -57,8 +66,8 @@ it('applies field mode runtime CSS for night mode and 48x48 touch targets', asyn
   expect(runtimeCss).toContain('background: #020617');
 });
 
-it('shows compact operational chrome and keeps release/admin under Mer', () => {
-  render(<AppShell currentPath="/hurtigkort"><p>Innhold</p></AppShell>);
+it('shows compact operational chrome and keeps release/admin under Mer', async () => {
+  await renderAndFlush(<AppShell currentPath="/hurtigkort"><p>Innhold</p></AppShell>);
   const header = within(screen.getByRole('banner'));
 
   expect(screen.getByTestId('shell-content-version')).toBeInTheDocument();

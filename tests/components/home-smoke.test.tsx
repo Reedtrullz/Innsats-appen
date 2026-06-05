@@ -1,11 +1,13 @@
 import { render, screen, within } from '@testing-library/react';
+import { flushAsyncEffects } from '../helpers/react-effects';
 import BoundaryPage from '@/app/(app)/begrensninger/page';
 import DataOnDevicePage from '@/app/(app)/data-pa-enheten/page';
 import KnownLimitationsPage from '@/app/(app)/kjente-begrensninger/page';
 import Home from '@/app/page';
 
-it('shows the operational command-surface landing page', () => {
+it('shows the operational command-surface landing page', async () => {
   render(<Home />);
+  await flushAsyncEffects();
 
   expect(screen.getByRole('heading', { name: /Beredskapsboka/i })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /Hva står du i nå/i })).toBeInTheDocument();
@@ -25,7 +27,7 @@ it('shows the operational command-surface landing page', () => {
   expect(screen.getByText(/Ikke offisielt kommandosystem/i)).toBeInTheDocument();
 });
 
-it('renders the in-app boundary, known limitations, and device data pages', () => {
+it('renders the in-app boundary, known limitations, and device data pages', async () => {
   const { unmount } = render(<BoundaryPage />);
   expect(screen.getByRole('heading', { name: /Operative grenser/i })).toBeInTheDocument();
   expect(screen.getByText(/ikke et offisielt kommando/i)).toBeInTheDocument();
@@ -39,6 +41,7 @@ it('renders the in-app boundary, known limitations, and device data pages', () =
   known.unmount();
 
   render(<DataOnDevicePage />);
+  await flushAsyncEffects();
   expect(screen.getByRole('heading', { name: /Data lagret på denne enheten/i })).toBeInTheDocument();
   const localStorageSection = screen.getByRole('heading', { name: /Hva lagres lokalt/i }).closest('section');
   expect(localStorageSection).not.toBeNull();

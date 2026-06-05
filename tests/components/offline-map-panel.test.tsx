@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, type RenderResult } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach } from 'vitest';
 import { OfflineMapPanel } from '@/components/offline-map-panel';
@@ -9,13 +9,15 @@ import { OFFLINE_MAP_CACHE_STORAGE_KEY } from '@/lib/maps/offline-map';
 import { OPERATIONS_MAP_STORAGE_KEY, SCHEMATIC_GEOJSON_COORDINATE_SYSTEM } from '@/lib/maps/operations-map';
 import { readLocalAuditLog } from '@/lib/privacy/local-profile';
 import type { FieldLogEntry, MissionContext } from '@/lib/mission/schemas';
+import { buildMission } from '../helpers/mission-fixtures';
+import { flushAsyncEffects } from '../helpers/react-effects';
 
 afterEach(async () => {
   localStorage.clear();
   await clearLocalMissionData();
 });
 
-const activeMission: MissionContext = {
+const activeMission: MissionContext = buildMission({
   id: 'mission-map-log',
   title: 'Kartlogg test',
   createdAt: '2026-06-04T09:00:00.000Z',
@@ -36,7 +38,7 @@ const activeMission: MissionContext = {
   welfareChecks: [],
   contentVersion: 'test-v1',
   schemaVersion: 1,
-};
+});
 
 function mission(overrides: Partial<MissionContext> = {}): MissionContext {
   return {
@@ -46,14 +48,21 @@ function mission(overrides: Partial<MissionContext> = {}): MissionContext {
   };
 }
 
+
+async function renderOfflineMapPanel(): Promise<RenderResult> {
+  const result = render(<OfflineMapPanel />);
+  await flushAsyncEffects();
+  return result;
+}
+
 async function seedMissions(missions: MissionContext[]) {
   for (const item of missions) {
     await saveMission(item);
   }
 }
 
-it('renders a static offline map with attribution and local-only limitations', () => {
-  render(<OfflineMapPanel />);
+it('renders a static offline map with attribution and local-only limitations', async () => {
+  await renderOfflineMapPanel();
 
   expect(screen.getByRole('heading', { name: 'Kart' })).toBeInTheDocument();
   expect(screen.getAllByText(/Schematic local map package, not authoritative navigation/i).length).toBeGreaterThan(0);
@@ -66,7 +75,7 @@ it('renders a static offline map with attribution and local-only limitations', (
 
 it('uses larger map controls when field glove mode is enabled', async () => {
   localStorage.setItem(FIELD_MODE_STORAGE_KEY, JSON.stringify({ enabled: true, gloveMode: true, theme: 'day', outdoorReadabilityReviewed: true }));
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
 
   expect(await screen.findByText(/Feltmodus aktiv/i)).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /Legg til lokal markør/i })).toHaveClass('min-h-16');
@@ -82,7 +91,7 @@ it('uses larger map controls when field glove mode is enabled', async () => {
 
 
 it('updates map controls when field mode changes while the map is open', async () => {
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
   expect(screen.queryByText(/Feltmodus aktiv/i)).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: /Legg til lokal markør/i })).not.toHaveClass('min-h-16');
 
@@ -97,7 +106,7 @@ it('updates map controls when field mode changes while the map is open', async (
 
 it('stores selected map package cache metadata in localStorage and can reset it', async () => {
   const user = userEvent.setup();
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
 
   await user.selectOptions(screen.getByRole('combobox', { name: /Velg lokal kartpakke/i }), 'trondelag-oversikt');
   expect(screen.getByText(/Cache-varsel: Trøndelag oversiktspakke.*42 MB/i)).toBeInTheDocument();
@@ -117,7 +126,7 @@ it('stores selected map package cache metadata in localStorage and can reset it'
 
 it('keeps rendered map marker count capped for the large district package', async () => {
   const user = userEvent.setup();
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
 
   await user.selectOptions(screen.getByRole('combobox', { name: /Velg lokal kartpakke/i }), 'trondelag-oversikt');
   expect(screen.getByTestId('map-performance-guard')).toHaveTextContent(/viser maks 12/i);
@@ -127,7 +136,7 @@ it('keeps rendered map marker count capped for the large district package', asyn
 it('adds local operational markers, toggles layers, and resets local sectors', async () => {
   const user = userEvent.setup();
   await saveMission(activeMission);
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
   expect(await screen.findByText(/Aktivt oppdrag: Kartlogg test/i)).toBeInTheDocument();
 
   await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'hazard');
@@ -151,7 +160,7 @@ it('adds local operational markers, toggles layers, and resets local sectors', a
 it('attaches the active mission id to newly saved local markers', async () => {
   const user = userEvent.setup();
   await saveMission(activeMission);
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
   expect(await screen.findByText(/Aktivt oppdrag: Kartlogg test/i)).toBeInTheDocument();
 
   await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'observation');
@@ -165,7 +174,7 @@ it('attaches the active mission id to newly saved local markers', async () => {
 
 it('blocks local marker saves when no active mission exists', async () => {
   const user = userEvent.setup();
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
   expect(await screen.findByText(/Aktivt oppdrag: Ingen aktivt lokalt oppdrag funnet/i)).toBeInTheDocument();
 
   await user.type(screen.getByPlaceholderText(/Sanitert lokal etikett/i), 'Markør uten oppdrag');
@@ -180,7 +189,7 @@ it('blocks local marker saves when no active mission exists', async () => {
 it('creates a field-log entry on the active mission from the newest map marker', async () => {
   const user = userEvent.setup();
   await saveMission(activeMission);
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
 
   await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'observation');
   await user.type(screen.getByPlaceholderText(/Sanitert lokal etikett/i), 'Observasjon nord');
@@ -214,7 +223,7 @@ it('logs map observations to the selected mission, not missions[0]', async () =>
   ]);
   saveSelectedActiveMissionId('b');
 
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
   expect(await screen.findByText(/Feltlogg går til: B/i)).toBeInTheDocument();
 
   await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'hazard');
@@ -237,7 +246,7 @@ it('logs map observations to the selected mission, not missions[0]', async () =>
 it('uses the newest visible marker when the newest stored marker layer is hidden', async () => {
   const user = userEvent.setup();
   await saveMission({ ...activeMission, id: 'mission-visible-map-log', title: 'Synlig kartlogg' });
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
 
   await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'hazard');
   await user.type(screen.getByPlaceholderText(/Sanitert lokal etikett/i), 'Fare synlig');
@@ -284,7 +293,7 @@ it('preserves newer local mission updates when saving a field log from the map',
     mustBeForwarded: false,
   };
   await saveMission({ ...activeMission, id: 'mission-stale-map-log', title: 'Stale kartlogg' });
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
   expect(await screen.findByText(/Aktivt oppdrag: Stale kartlogg/i)).toBeInTheDocument();
 
   await user.selectOptions(screen.getByRole('combobox', { name: /Markørtype/i }), 'observation');
@@ -312,7 +321,7 @@ it('preserves newer local mission updates when saving a field log from the map',
 it('adds a local sector, measures it, and creates sanitized SVG and GeoJSON exports', async () => {
   const user = userEvent.setup();
   await saveMission(activeMission);
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
   expect(await screen.findByText(/Aktivt oppdrag: Kartlogg test/i)).toBeInTheDocument();
 
   await user.click(screen.getByRole('button', { name: /Lagre lokal tegning\/sektor/i }));
@@ -332,7 +341,7 @@ it('adds a local sector, measures it, and creates sanitized SVG and GeoJSON expo
 it('attaches the active mission id to newly saved local drawings', async () => {
   const user = userEvent.setup();
   await saveMission(activeMission);
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
   expect(await screen.findByText(/Aktivt oppdrag: Kartlogg test/i)).toBeInTheDocument();
 
   await user.click(screen.getByRole('button', { name: /Lagre lokal tegning\/sektor/i }));
@@ -344,7 +353,7 @@ it('attaches the active mission id to newly saved local drawings', async () => {
 
 it('blocks local drawing saves when no active mission exists', async () => {
   const user = userEvent.setup();
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
   expect(await screen.findByText(/Aktivt oppdrag: Ingen aktivt lokalt oppdrag funnet/i)).toBeInTheDocument();
 
   await user.click(screen.getByRole('button', { name: /Lagre lokal tegning\/sektor/i }));
@@ -357,7 +366,7 @@ it('blocks local drawing saves when no active mission exists', async () => {
 
 it('imports supported schematic GeoJSON and documents KML and blue-force as post-MVP', async () => {
   const user = userEvent.setup();
-  render(<OfflineMapPanel />);
+  await renderOfflineMapPanel();
 
   fireEvent.change(screen.getByRole('textbox', { name: /Importer GeoJSON/i }), { target: { value: JSON.stringify({
     type: 'FeatureCollection',

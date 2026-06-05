@@ -1,13 +1,16 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within, type RenderResult } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it, vi } from 'vitest';
+import type { ReactElement } from 'react';
 import { MissionContextPanel } from '@/components/mission-context-panel';
 import { archiveMission, clearLocalMissionData, listArchivedMissions, listMissions, saveChecklistRun, saveMission } from '@/lib/mission/local-store';
 import { EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY } from '@/lib/integrations/source-settings';
 import { readLocalAuditLog } from '@/lib/privacy/local-profile';
 import { OPERATIONS_MAP_STORAGE_KEY } from '@/lib/maps/operations-map';
-import type { OperationalChecklist } from '@/lib/content/schemas';
+import type { ActionCard, OperationalChecklist } from '@/lib/content/schemas';
 import type { MissionContext } from '@/lib/mission/schemas';
+import { buildMission } from '../helpers/mission-fixtures';
+import { flushAsyncEffects } from '../helpers/react-effects';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
@@ -39,30 +42,15 @@ const checklists = [
   },
 ] as OperationalChecklist[];
 
-function mission({ id, title, ...overrides }: Omit<Partial<MissionContext>, 'id' | 'title'> & Pick<MissionContext, 'id' | 'title'>): MissionContext {
-  return {
-    id,
-    title,
-    createdAt: '2026-06-04T08:00:00.000Z',
-    updatedAt: '2026-06-04T08:00:00.000Z',
-    phase: 'under',
-    role: 'lagforer',
-    scenario: 'generelt',
-    locationText: 'Lokalt område',
-    externalSignals: [],
-    externalSignalHistory: [],
-    activeChecklistIds: [],
-    notes: '',
-    tasks: [],
-    statusLog: [],
-    resourceRequests: [],
-    fieldLogEntries: [],
-    ruhReports: [],
-    welfareChecks: [],
-    contentVersion: 'test-v1',
-    schemaVersion: 1,
-    ...overrides,
-  };
+const mission = buildMission;
+
+async function renderMissionPanel(ui: ReactElement): Promise<RenderResult> {
+  const result = render(ui);
+  await flushAsyncEffects();
+  await waitFor(() => {
+    expect(screen.queryAllByText(/Laster lokal sjekklistestatus før redigering/i)).toHaveLength(0);
+  });
+  return result;
 }
 
 async function seedMissions(missions: MissionContext[]) {
@@ -77,7 +65,7 @@ it('can open another local mission as the active dashboard', async () => {
     mission({ id: 'mission-b', title: 'B', locationText: 'Lokasjon B', updatedAt: '2026-06-04T09:00:00.000Z' }),
   ]);
 
-  render(<MissionContextPanel mode="list" contentVersion="test" checklists={[]} actionCards={[]} />);
+  await renderMissionPanel(<MissionContextPanel mode="list" contentVersion="test" checklists={[]} actionCards={[]} />);
 
   expect(await screen.findByText(/A · Lokasjon A/i)).toBeInTheDocument();
   await userEvent.click(await screen.findByRole('button', { name: /Åpne B som aktivt oppdrag/i }));
@@ -85,7 +73,7 @@ it('can open another local mission as the active dashboard', async () => {
 });
 
 it('stores the checklist that matches the selected mission scenario and phase', async () => {
-  render(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} />);
 
   await userEvent.type(screen.getByLabelText(/Tittel/i), 'MFE etterkontroll øvelse');
   await userEvent.selectOptions(screen.getByLabelText(/Fase/i), 'etter');
@@ -100,7 +88,7 @@ it('stores the checklist that matches the selected mission scenario and phase', 
 });
 
 it('blocks sensitive mission creation text in the UI before saving locally', async () => {
-  render(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} />);
 
   await userEvent.type(screen.getByLabelText(/Tittel/i), 'pasient Ola Nordmann');
   await userEvent.type(screen.getByLabelText(/Sted\/lokasjon/i), 'Trondheim');
@@ -117,7 +105,7 @@ it('blocks sensitive mission creation text in the UI before saving locally', asy
 it('blocks sensitive local task and resource text in the UI before saving locally', async () => {
   await saveMission(mission({ id: 'status-sensitive-ui', title: 'Sensitive local status UI' }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i });
   await userEvent.type(screen.getByLabelText(/Ny lokal oppgave/i), 'pasient Ola Nordmann');
@@ -144,7 +132,7 @@ it('blocks sensitive local task and resource text in the UI before saving locall
 });
 
 it('lets users generate a local task/status/resource markdown export from the mission UI', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm2b-export-ui',
     title: 'FIG status eksport',
     createdAt: '2026-06-03T09:00:00.000Z',
@@ -161,9 +149,9 @@ it('lets users generate a local task/status/resource markdown export from the mi
     resourceRequests: [{ id: 'resource-export', kind: 'fuel', status: 'not-started', createdAt: '2026-06-03T09:20:00.000Z', quantity: '10 liter', note: 'Til kjøretøy' }],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   const exportButton = await screen.findByRole('button', { name: /Lag lokal statusrapport/i });
   expect(screen.getByText(/Kun lokal eksport i denne nettleseren\. Ikke offisiell logg\./i)).toBeInTheDocument();
@@ -204,7 +192,7 @@ it('lets users generate local MBK equipment readiness Markdown and JSON exports 
       ],
     },
   ] as OperationalChecklist[];
-  await saveMission({
+  await saveMission(mission({
     id: 'm5c-mbk-ui',
     title: 'MBK UI eksport',
     createdAt: '2026-06-04T08:00:00.000Z',
@@ -221,7 +209,7 @@ it('lets users generate local MBK equipment readiness Markdown and JSON exports 
     resourceRequests: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
   await saveChecklistRun({
     id: 'run-mbk-ui',
     missionId: 'm5c-mbk-ui',
@@ -233,7 +221,7 @@ it('lets users generate local MBK equipment readiness Markdown and JSON exports 
     schemaVersion: 1,
   });
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={mbkChecklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={mbkChecklists} />);
 
   expect(await screen.findByRole('heading', { name: /Materiellberedskap \/ MBK/i })).toBeInTheDocument();
   expect(screen.getByText(/ikke offisiell inventarliste/i)).toBeInTheDocument();
@@ -266,7 +254,7 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
       ],
     },
   ] as OperationalChecklist[];
-  await saveMission({
+  await saveMission(mission({
     id: 'm2c2-after-action-ui',
     title: 'FIG etteraksjon UI',
     createdAt: '2026-06-03T09:00:00.000Z',
@@ -283,14 +271,14 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
     resourceRequests: [{ id: 'resource-aar', kind: 'equipment', status: 'blocked', createdAt: '2026-06-03T09:20:00.000Z', quantity: '1 stk', note: 'Skadet arbeidslys' }],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
   await saveChecklistRun({ id: 'run-aar-ui', missionId: 'm2c2-after-action-ui', templateSlug: 'fig-under-innsats', checkedItemIds: ['materiell-sjekket'], notesByItemId: { 'ressursbruk-notert': 'Fylles etter retur' }, updatedAt: '2026-06-03T09:25:00.000Z', schemaVersion: 1 });
   localStorage.setItem(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({
     markers: [{ id: 'marker-aar-ui', missionId: 'm2c2-after-action-ui', itemType: 'marker', kind: 'il-ko', label: 'KO etterrapport', point: { x: 22, y: 33 }, createdAt: '2026-06-03T09:15:00.000Z' }],
     drawings: [{ id: 'sector-aar-ui', missionId: 'm2c2-after-action-ui', itemType: 'drawing', kind: 'sector', label: 'Sektor etterrapport', points: [{ x: 10, y: 10 }, { x: 30, y: 10 }, { x: 20, y: 30 }], createdAt: '2026-06-03T09:16:00.000Z' }],
   }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={afterActionChecklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={afterActionChecklists} />);
 
   await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i });
   expect(screen.getByRole('heading', { name: /Etteraksjonsrapport/i })).toBeInTheDocument();
@@ -322,7 +310,7 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
 });
 
 it('generates a local oppdragsmappe export with map and log artifacts', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'mission-folder-ui',
     title: 'Oppdragsmappe UI',
     createdAt: '2026-06-04T09:00:00.000Z',
@@ -345,13 +333,13 @@ it('generates a local oppdragsmappe export with map and log artifacts', async ()
     welfareChecks: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
   localStorage.setItem(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({
     markers: [{ id: 'marker-1', missionId: 'mission-folder-ui', itemType: 'marker', kind: 'observation', label: 'Obs', point: { x: 11, y: 22 }, note: 'rawRef lat lon should not export', createdAt: '2026-06-04T09:20:00.000Z' }],
     drawings: [],
   }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[]} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[]} />);
   await screen.findByRole('heading', { name: /Neste anbefalte handling/i });
   await userEvent.click(screen.getByRole('button', { name: /Lag oppdragsmappe/i }));
 
@@ -372,7 +360,7 @@ it('generates a local oppdragsmappe export with map and log artifacts', async ()
 });
 
 it('scopes current mission dashboard, after-action and folder map outputs away from unrelated missions', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'mission-scope-ui',
     title: 'Mission scoped map UI',
     createdAt: '2026-06-04T09:00:00.000Z',
@@ -393,7 +381,7 @@ it('scopes current mission dashboard, after-action and folder map outputs away f
     welfareChecks: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
   localStorage.setItem(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({
     markers: [
       { id: 'marker-scope-current', missionId: 'mission-scope-ui', itemType: 'marker', kind: 'observation', label: 'Current UI marker', point: { x: 11, y: 22 }, createdAt: '2026-06-04T09:20:00.000Z' },
@@ -405,7 +393,7 @@ it('scopes current mission dashboard, after-action and folder map outputs away f
     ],
   }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[]} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[]} />);
 
   const mapSummary = (await screen.findByRole('heading', { name: /Kart og logg/i })).closest('section');
   expect(mapSummary).not.toBeNull();
@@ -431,7 +419,7 @@ it('scopes current mission dashboard, after-action and folder map outputs away f
 
 
 it('archives pending lessons and feedback typed without clicking the separate save button', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm2c-unsaved-lessons-archive',
     title: 'FIG direkte arkiv med læring',
     createdAt: '2026-06-03T09:00:00.000Z',
@@ -448,15 +436,18 @@ it('archives pending lessons and feedback typed without clicking the separate sa
     resourceRequests: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   await screen.findByRole('heading', { name: /Erfaringer og strukturert tilbakemelding/i });
   await userEvent.type(screen.getByLabelText(/Erfaringsoppsummering/i), 'Direkte arkivert erfaring');
   await userEvent.type(screen.getByLabelText(/Tilbakemelding utstyr/i), 'Direkte arkivert utstyrsfeedback');
   await userEvent.click(screen.getByRole('button', { name: /Fullfør og arkiver lokalt/i }));
 
+  await waitFor(() => {
+    expect(screen.getByTestId('privacy-message')).toHaveTextContent(/Oppdraget er fullført og arkivert bare lokalt/i);
+  });
   await waitFor(async () => {
     const archived = await listArchivedMissions();
     expect(archived).toHaveLength(1);
@@ -466,7 +457,7 @@ it('archives pending lessons and feedback typed without clicking the separate sa
 });
 
 it('lets users add, filter and export a structured local field log with patient-data safeguards', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm6a-field-log-ui',
     title: 'FIG feltlogg UI',
     createdAt: '2026-06-04T08:00:00.000Z',
@@ -494,9 +485,9 @@ it('lets users add, filter and export a structured local field log with patient-
     ],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   expect(await screen.findByRole('heading', { name: /Lokal feltlogg/i })).toBeInTheDocument();
   expect(screen.getAllByText(/Ikke offisiell logg/i).length).toBeGreaterThan(0);
@@ -559,7 +550,7 @@ it('lets users add, filter and export a structured local field log with patient-
 it('blocks sensitive field-log text in the UI before saving locally', async () => {
   await saveMission(mission({ id: 'field-log-sensitive-ui', title: 'Sensitive field log UI' }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   await screen.findByRole('heading', { name: /Lokal feltlogg/i });
   await userEvent.type(screen.getByLabelText(/Feltlogg tekst/i), 'pasient Ola Nordmann');
@@ -575,7 +566,7 @@ it('blocks sensitive field-log text in the UI before saving locally', async () =
 });
 
 it('lets users add local RUH reports, welfare checks and see media/man-down safety notes', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm6b-ruh-welfare-ui',
     title: 'FIG RUH velferd UI',
     createdAt: '2026-06-04T08:00:00.000Z',
@@ -595,9 +586,9 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
     welfareChecks: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   expect(await screen.findByRole('heading', { name: /RUH og velferd/i })).toBeInTheDocument();
   expect(screen.getByText(/ikke offisiell HMS\/RUH-innsending/i)).toBeInTheDocument();
@@ -679,7 +670,7 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
 it('blocks sensitive RUH and structured feedback text in the UI before saving locally', async () => {
   await saveMission(mission({ id: 'ruh-feedback-sensitive-ui', title: 'Sensitive RUH feedback UI' }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   await screen.findByRole('heading', { name: /RUH og velferd/i });
   await userEvent.type(screen.getByLabelText(/Hva skjedde/i), 'fødselsnummer 01017012345');
@@ -707,7 +698,7 @@ it('blocks sensitive RUH and structured feedback text in the UI before saving lo
 });
 
 it('shows a situation-first mission dashboard with next action, progress and exports', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm-command-surface',
     title: 'Flom Jaren',
     createdAt: '2026-06-04T12:00:00.000Z',
@@ -724,7 +715,7 @@ it('shows a situation-first mission dashboard with next action, progress and exp
     resourceRequests: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
 
   const flomCards = [{
     slug: 'flom-pumpe-start',
@@ -738,9 +729,9 @@ it('shows a situation-first mission dashboard with next action, progress and exp
     reporting: [],
     sourceIds: ['src-flom'],
     competenceRequired: [],
-  }] as any;
+  }] satisfies ActionCard[];
 
-  render(<MissionContextPanel
+  await renderMissionPanel(<MissionContextPanel
     contentVersion="test-v1"
     checklists={[{
       ...checklists[0],
@@ -748,7 +739,7 @@ it('shows a situation-first mission dashboard with next action, progress and exp
       phase: 'under',
       scenarios: ['flom'],
       items: [{ id: 'sikkerhet', label: 'Etabler sikkerhet', required: true, sourceIds: ['src-flom'] }],
-    } as any]}
+    }]}
     actionCards={flomCards}
   />);
 
@@ -768,7 +759,7 @@ it('shows a situation-first mission dashboard with next action, progress and exp
 });
 
 it('shows map and field-log summary on the mission dashboard', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm6-map-summary-dashboard',
     title: 'Kart på oppdragstavle',
     createdAt: '2026-06-04T09:00:00.000Z',
@@ -801,13 +792,13 @@ it('shows map and field-log summary on the mission dashboard', async () => {
     ],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
   localStorage.setItem(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({
     markers: [{ id: 'marker-dashboard', missionId: 'm6-map-summary-dashboard', itemType: 'marker', kind: 'il-ko', label: 'KO lokal', point: { x: 22, y: 33 }, createdAt: '2026-06-04T09:15:00.000Z' }],
     drawings: [],
   }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   expect(await screen.findByRole('heading', { name: /Kart og logg/i })).toBeInTheDocument();
   expect(screen.getAllByText(/kartkoblet logg/i).length).toBeGreaterThan(0);
@@ -815,7 +806,7 @@ it('shows map and field-log summary on the mission dashboard', async () => {
 });
 
 it('shows local manual order-update suggestions from important field-log entries', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm6-order-suggestions-ui',
     title: 'Flom ordre forslag',
     createdAt: '2026-06-04T09:00:00.000Z',
@@ -842,9 +833,9 @@ it('shows local manual order-update suggestions from important field-log entries
     ],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   const orderSuggestionPanel = await screen.findByRole('region', { name: /Forslag til manuell ordreoppdatering/i });
   expect(orderSuggestionPanel).toHaveTextContent(/Dette endrer ikke ordre/i);
@@ -852,7 +843,7 @@ it('shows local manual order-update suggestions from important field-log entries
 });
 
 it('shows a fallback next action when the matching action card has no steps', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm-command-surface-empty-step',
     title: 'Flom uten steg',
     createdAt: '2026-06-04T12:00:00.000Z',
@@ -869,9 +860,9 @@ it('shows a fallback next action when the matching action card has no steps', as
     resourceRequests: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
 
-  render(<MissionContextPanel
+  await renderMissionPanel(<MissionContextPanel
     contentVersion="test-v1"
     checklists={[{
       ...checklists[0],
@@ -879,7 +870,7 @@ it('shows a fallback next action when the matching action card has no steps', as
       phase: 'under',
       scenarios: ['flom'],
       items: [{ id: 'sikkerhet', label: 'Etabler sikkerhet', required: true, sourceIds: ['src-flom'] }],
-    } as any]}
+    }]}
     actionCards={[{
       slug: 'flom-uten-steg',
       title: 'Flom uten steg',
@@ -892,7 +883,7 @@ it('shows a fallback next action when the matching action card has no steps', as
       reporting: [],
       sourceIds: ['src-flom'],
       competenceRequired: [],
-    } as any]}
+    }]}
   />);
 
   const nextActionSection = (await screen.findByRole('heading', { name: /Neste anbefalte handling/i })).closest('section');
@@ -901,7 +892,7 @@ it('shows a fallback next action when the matching action card has no steps', as
 });
 
 it('shows current situation and lets users add local tasks, quick status and resource requests', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm2b-ui',
     title: 'FIG under innsats',
     createdAt: '2026-06-03T10:00:00.000Z',
@@ -920,9 +911,9 @@ it('shows current situation and lets users add local tasks, quick status and res
     resourceRequests: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   expect(await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i })).toBeInTheDocument();
   expect(screen.getByText(/Kraftig regn: Lokalt sammendrag/i)).toBeInTheDocument();
@@ -950,7 +941,7 @@ it('shows current situation and lets users add local tasks, quick status and res
 });
 
 it('preserves rapid local task, quick status and resource additions in IndexedDB', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm2b-race',
     title: 'FIG raske lokale endringer',
     createdAt: '2026-06-03T11:00:00.000Z',
@@ -967,9 +958,9 @@ it('preserves rapid local task, quick status and resource additions in IndexedDB
     resourceRequests: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
   await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i });
 
   await userEvent.type(screen.getByLabelText(/Ny lokal oppgave/i), 'Sett opp sperring');
@@ -988,7 +979,7 @@ it('preserves rapid local task, quick status and resource additions in IndexedDB
 });
 
 it('shows and exports stored context signals with the same stale normalization as the context panel', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm2b-stale-signal',
     title: 'FIG stale signal',
     createdAt: '2026-06-03T08:00:00.000Z',
@@ -1008,9 +999,9 @@ it('shows and exports stored context signals with the same stale normalization a
     resourceRequests: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   await screen.findByText(/Viser sist vellykkede lokale kontekstsignal som stale/i);
   expect(screen.getByText(/Gammelt regnvarsel: Lagret sammendrag \(stale\)/i)).toBeInTheDocument();
@@ -1025,7 +1016,7 @@ it('shows and exports stored context signals with the same stale normalization a
 
 it('keeps disabled-source last-known-good mission context visibly stale, not active fresh', async () => {
   localStorage.setItem(EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY, JSON.stringify({ kartverket: true, met: false, nve: true }));
-  await saveMission({
+  await saveMission(mission({
     id: 'm2b-disabled-met-stale',
     title: 'FIG disabled MET signal',
     createdAt: '2026-06-03T08:00:00.000Z',
@@ -1044,9 +1035,9 @@ it('keeps disabled-source last-known-good mission context visibly stale, not act
     resourceRequests: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   expect(await screen.findByText(/met utilgjengelig eller avslått lokalt/i)).toBeInTheDocument();
   expect(screen.getByText(/Lagret MET-varsel: Sist vellykket \(stale\)/i)).toBeInTheDocument();
@@ -1061,7 +1052,7 @@ it('shows disabled context sources even when no signals exist', async () => {
     externalSignals: [],
   }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   const panel = await screen.findByRole('region', { name: /offentlig kontekst/i });
   expect(panel).toHaveTextContent(/ingen ferske offentlige kontekstsignaler/i);
@@ -1071,7 +1062,7 @@ it('shows disabled context sources even when no signals exist', async () => {
 });
 
 it('lets users save structured lessons and feedback before locally completing and archiving a mission', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm2c3-active-archive-ui',
     title: 'FIG arkiverbar innsats',
     createdAt: '2026-06-03T12:00:00.000Z',
@@ -1088,9 +1079,9 @@ it('lets users save structured lessons and feedback before locally completing an
     resourceRequests: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i });
   expect(screen.getByText(/Lokalt fullførte oppdrag/i)).toBeInTheDocument();
@@ -1129,7 +1120,7 @@ it('lets users save structured lessons and feedback before locally completing an
 });
 
 it('supports local archive search, deleting one archived mission and clearing the archive without deleting active missions', async () => {
-  await saveMission({
+  await saveMission(mission({
     id: 'm2c3-active-kept-ui',
     title: 'Aktiv beholdes',
     createdAt: '2026-06-03T12:00:00.000Z',
@@ -1146,8 +1137,8 @@ it('supports local archive search, deleting one archived mission and clearing th
     resourceRequests: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
-  await saveMission({
+  }));
+  await saveMission(mission({
     id: 'm2c3-archive-search-ui',
     title: 'Arkiv sambandstreff',
     createdAt: '2026-06-03T11:00:00.000Z',
@@ -1165,8 +1156,8 @@ it('supports local archive search, deleting one archived mission and clearing th
     lessonsLearned: { summary: 'Radio fungerte', whatWorked: '', improvements: '', followUp: '' },
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
-  await saveMission({
+  }));
+  await saveMission(mission({
     id: 'm2c3-archive-miss-ui',
     title: 'Arkiv materiell',
     createdAt: '2026-06-03T10:00:00.000Z',
@@ -1183,11 +1174,11 @@ it('supports local archive search, deleting one archived mission and clearing th
     resourceRequests: [],
     contentVersion: 'test-v1',
     schemaVersion: 1,
-  } as any);
+  }));
   await archiveMission('m2c3-archive-search-ui', { archivedAt: '2026-06-03T11:30:00.000Z' });
   await archiveMission('m2c3-archive-miss-ui', { archivedAt: '2026-06-03T10:30:00.000Z' });
 
-  render(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
   await screen.findByText(/Arkiv sambandstreff/);
   expect(screen.getByText(/Arkiv materiell/)).toBeInTheDocument();
@@ -1198,11 +1189,13 @@ it('supports local archive search, deleting one archived mission and clearing th
   expect(screen.getByRole('button', { name: /Tøm lokalt arkiv/i })).toBeDisabled();
 
   await userEvent.click(screen.getByRole('button', { name: /Slett arkivert oppdrag Arkiv sambandstreff/i }));
+  await waitFor(() => expect(screen.queryByText(/Arkiv sambandstreff/)).not.toBeInTheDocument());
   await waitFor(async () => expect((await listArchivedMissions()).map((item) => item.id)).toEqual(['m2c3-archive-miss-ui']));
 
   await userEvent.clear(screen.getByLabelText(/Søk i lokalt arkiv/i));
   await screen.findByText(/Arkiv materiell/);
   await userEvent.click(screen.getByRole('button', { name: /Tøm lokalt arkiv/i }));
+  await waitFor(() => expect(screen.getByTestId('privacy-message')).toHaveTextContent(/Lokalt arkiv er tømt/i));
   await waitFor(async () => expect(await listArchivedMissions()).toEqual([]));
   expect((await listMissions()).map((mission) => mission.id)).toContain('m2c3-active-kept-ui');
 });
