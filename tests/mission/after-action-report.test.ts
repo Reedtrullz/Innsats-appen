@@ -296,6 +296,8 @@ it('includes sanitized map package summary in after-action exports', () => {
     attribution: 'Demo attribution',
     version: '2026.06-a',
     provenance: 'Local training package bundled with app',
+    runtimeFormat: 'pmtiles',
+    approvedForOfflineUse: true,
     url: '/map-packages/trondheim-demo.pmtiles',
     styleUrl: '/map-packages/trondheim-demo-style.json',
     tileUrl: 'https://tiles.example.invalid/{z}/{x}/{y}.pbf',
@@ -396,6 +398,13 @@ it.each([
   { id: 'https://tiles.example.invalid/package.pmtiles', title: 'URL id' },
   { id: 'Marker Object 1', title: 'Object id-ish uppercase id' },
   { id: 'marker-secret-object', title: 'Marker object id-ish id' },
+  { id: 'aar-mission-1', title: 'Mission object id-ish id' },
+  { id: 'folder-mission', title: 'Mission fixture id-ish id' },
+  { id: 'task-1', title: 'Task id-ish id' },
+  { id: 'status-1', title: 'Status id-ish id' },
+  { id: 'sector-a', title: 'Sector id-ish id' },
+  { id: 'field-folder', title: 'Field log id-ish id' },
+  { id: 'trd-depot', title: 'Map feature id-ish id' },
   { id: 'map-packages', title: 'Directory-like package id' },
   { id: 'foo-map-packages-bar', title: 'Embedded directory-like package id' },
 ])('blanks unsafe map package id $id in after-action summaries', ({ id, title }) => {
@@ -413,7 +422,40 @@ it.each([
 
   expect(report.sections.mapPackage).toMatchObject({ id: '', title, provenance: 'Useful local provenance' });
   expect(exportAfterActionMarkdown(report)).not.toContain(id);
-  expect(JSON.stringify(report)).not.toContain(id);
+  expect(exportAfterActionJson(report)).not.toContain(id);
+  expect(JSON.stringify(report.sections.mapPackage)).not.toContain(id);
+});
+
+it('strips URL and path-like content from after-action map package text fields', () => {
+  const report = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapPackage: {
+      id: 'trondheim-demo-pmtiles',
+      title: 'https://tiles.example.invalid/foo',
+      attribution: '/map-packages/foo-style.json',
+      version: 'https://tiles.example.invalid/pkg.pmtiles',
+      provenance: 'Kontrollert lokal øvingsproveniens',
+      runtimeFormat: 'pmtiles',
+      approvedForOfflineUse: true,
+    },
+  });
+
+  expect(report.sections.mapPackage).toEqual({
+    id: 'trondheim-demo-pmtiles',
+    title: '',
+    attribution: '',
+    version: '',
+    provenance: 'Kontrollert lokal øvingsproveniens',
+  });
+  for (const exported of [JSON.stringify(report), exportAfterActionMarkdown(report), exportAfterActionPdfReadyHtml(report), exportAfterActionJson(report)]) {
+    expect(exported).not.toContain('https://');
+    expect(exported).not.toContain('/map-packages/foo-style.json');
+    expect(exported).not.toContain('pkg.pmtiles');
+    expect(exported).toContain('Kontrollert lokal øvingsproveniens');
+  }
 });
 
 it('does not create after-action map package sections from id-only or attribution-version-only input', () => {

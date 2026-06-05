@@ -3,6 +3,7 @@ import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive
 import { EXPORT_SENSITIVITY_WARNING } from './order-export';
 import { FIELD_LOG_CATEGORY_LABELS, sortFieldLogEntries } from './field-log';
 import { MAP_DRAWING_LABELS, MAP_MARKER_LABELS, mapStateForMission, normalizeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
+import { OFFLINE_MAP_PACKAGES } from '@/lib/maps/offline-map';
 import { RUH_CATEGORY_LABELS, RUH_RISK_LABELS, summarizeWelfareCheck } from './ruh-welfare';
 import type { ChecklistRun, MissionContext, MissionFeedback, MissionLessonsLearned, MissionResourceRequest } from './schemas';
 
@@ -225,28 +226,69 @@ function stringField(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+const KNOWN_LOCAL_MAP_PACKAGE_IDS = new Set(OFFLINE_MAP_PACKAGES.map((mapPackage) => mapPackage.id));
 const SAFE_LOCAL_MAP_PACKAGE_ID = /^[a-z0-9][a-z0-9-]{1,80}$/;
-const UNSAFE_LOCAL_MAP_PACKAGE_ID_PREFIXES = ['marker-', 'drawing-', 'map-marker-', 'map-drawing-', 'object-', 'feature-'];
+const UNSAFE_LOCAL_MAP_PACKAGE_ID_PREFIXES = [
+  'aar-',
+  'drawing-',
+  'field-',
+  'folder-',
+  'feature-',
+  'map-drawing-',
+  'map-marker-',
+  'marker-',
+  'mission-',
+  'object-',
+  'sector-',
+  'status-',
+  'task-',
+  'trd-',
+  'trl-',
+  'ov-',
+];
+const UNSAFE_LOCAL_MAP_PACKAGE_TEXT = [
+  /https?:\/\//i,
+  /:\/\//,
+  /\/map-packages\//i,
+  /^\/\S+/,
+  /\.pmtiles\b/i,
+  /\.json\b/i,
+];
 
-function safePackageId(value: unknown) {
+function safeMapPackageText(value: unknown) {
+  const text = stringField(value);
+  if (!text) return '';
+  if (UNSAFE_LOCAL_MAP_PACKAGE_TEXT.some((pattern) => pattern.test(text))) return '';
+  return text;
+}
+
+function hasControlledPackageIdentity(id: string, source: Record<string, unknown>, title: string) {
+  if (KNOWN_LOCAL_MAP_PACKAGE_IDS.has(id as (typeof OFFLINE_MAP_PACKAGES)[number]['id'])) return true;
+  const runtimeFormat = stringField(source.runtimeFormat);
+  const sourceFormat = stringField(source.sourceFormat);
+  if (source.approvedForOfflineUse === true && (runtimeFormat === 'pmtiles' || sourceFormat === 'pmtiles')) return true;
+  return id.endsWith('-pmtiles') && /pmtiles/i.test(title);
+}
+
+function safePackageId(value: unknown, source: Record<string, unknown>, title: string) {
   const id = stringField(value);
   if (!SAFE_LOCAL_MAP_PACKAGE_ID.test(id)) return '';
   if (id.includes('map-packages')) return '';
   if (UNSAFE_LOCAL_MAP_PACKAGE_ID_PREFIXES.some((prefix) => id.startsWith(prefix))) return '';
-  return id;
+  return hasControlledPackageIdentity(id, source, title) ? id : '';
 }
 
 export function sanitizeLocalMapPackageSummary(mapPackage: unknown): LocalMapPackageExportSummary | undefined {
-  if (!mapPackage || typeof mapPackage !== 'object') return undefined;
+  if (!mapPackage || typeof mapPackage !== 'object' || Array.isArray(mapPackage)) return undefined;
   const source = mapPackage as Record<string, unknown>;
-  const title = stringField(source.title);
-  const provenance = stringField(source.provenance);
+  const title = safeMapPackageText(source.title);
+  const provenance = safeMapPackageText(source.provenance);
   if (!title && !provenance) return undefined;
   return {
-    id: safePackageId(source.id),
+    id: safePackageId(source.id, source, title),
     title,
-    attribution: stringField(source.attribution),
-    version: stringField(source.version),
+    attribution: safeMapPackageText(source.attribution),
+    version: safeMapPackageText(source.version),
     provenance,
   };
 }

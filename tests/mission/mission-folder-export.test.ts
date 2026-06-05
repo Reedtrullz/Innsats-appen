@@ -66,6 +66,8 @@ it('includes sanitized map package provenance in mission-folder exports', () => 
     attribution: 'Demo attribution',
     version: '2026.06-a',
     provenance: 'Local training package bundled with app',
+    runtimeFormat: 'pmtiles',
+    approvedForOfflineUse: true,
     url: '/map-packages/trondheim-demo.pmtiles',
     styleUrl: '/map-packages/trondheim-demo-style.json',
     tileUrl: 'https://tiles.example.invalid/{z}/{x}/{y}.pbf',
@@ -149,6 +151,38 @@ it('omits unsafe map package ids while preserving useful provenance in mission-f
     expect(exported).not.toContain('bounds');
     expect(exported).not.toContain('center');
     expect(exported).not.toContain('objectId');
+  }
+});
+
+it('strips URL and path-like content from mission-folder map package text fields', () => {
+  const bundle = buildMissionFolderExport({
+    mission,
+    checklists: [],
+    checklistRuns: [],
+    mapPackage: {
+      id: 'trondheim-demo-pmtiles',
+      title: 'https://tiles.example.invalid/foo',
+      attribution: '/map-packages/foo-style.json',
+      version: 'https://tiles.example.invalid/pkg.pmtiles',
+      provenance: 'Kontrollert lokal øvingsproveniens',
+      runtimeFormat: 'pmtiles',
+      approvedForOfflineUse: true,
+    },
+    generatedAt: '2026-06-04T11:00:00.000Z',
+  });
+
+  expect(bundle.artifacts.mapPackage).toEqual({
+    id: 'trondheim-demo-pmtiles',
+    title: '',
+    attribution: '',
+    version: '',
+    provenance: 'Kontrollert lokal øvingsproveniens',
+  });
+  for (const exported of [JSON.stringify(bundle), exportMissionFolderMarkdown(bundle)]) {
+    expect(exported).not.toContain('https://');
+    expect(exported).not.toContain('/map-packages/foo-style.json');
+    expect(exported).not.toContain('pkg.pmtiles');
+    expect(exported).toContain('Kontrollert lokal øvingsproveniens');
   }
 });
 
