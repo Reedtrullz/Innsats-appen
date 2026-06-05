@@ -5,7 +5,13 @@ import { FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY } from '@/lib/field-mo
 import { saveSelectedActiveMissionId } from '@/lib/mission/active-mission-selection';
 import { clearLocalMissionData, getMission, saveMission } from '@/lib/mission/local-store';
 import { OFFLINE_MAP_CACHE_STORAGE_KEY, offlineMapQuotaCopy } from '@/lib/maps/offline-map';
-import { OPERATIONS_MAP_STORAGE_KEY, SCHEMATIC_GEOJSON_COORDINATE_SYSTEM } from '@/lib/maps/operations-map';
+import {
+  OPERATIONS_MAP_STORAGE_KEY,
+  SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
+  createMissionMapMarker,
+  readMissionMapState,
+  writeMissionMapState,
+} from '@/lib/maps/operations-map';
 import { readLocalAuditLog } from '@/lib/privacy/local-profile';
 import type { FieldLogEntry, MissionContext } from '@/lib/mission/schemas';
 import { buildMission } from '../helpers/mission-fixtures';
@@ -75,6 +81,29 @@ const activeMission: MissionContext = buildMission({
   role: 'lagforer',
   scenario: 'generelt',
   locationText: 'Innsatsområde kart',
+  externalSignals: [],
+  externalSignalHistory: [],
+  activeChecklistIds: [],
+  notes: '',
+  tasks: [],
+  statusLog: [],
+  resourceRequests: [],
+  fieldLogEntries: [],
+  ruhReports: [],
+  welfareChecks: [],
+  contentVersion: 'test-v1',
+  schemaVersion: 1,
+});
+
+const otherMission: MissionContext = buildMission({
+  id: 'mission-other-map-log',
+  title: 'Annet kartoppdrag',
+  createdAt: '2026-06-04T08:00:00.000Z',
+  updatedAt: '2026-06-04T08:00:00.000Z',
+  phase: 'under',
+  role: 'lagforer',
+  scenario: 'generelt',
+  locationText: 'Annet innsatsområde',
   externalSignals: [],
   externalSignalHistory: [],
   activeChecklistIds: [],
@@ -378,6 +407,34 @@ it('attaches the active mission id to newly saved local markers', async () => {
   await waitFor(() => {
     expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toContain('"missionId":"mission-map-log"');
   });
+});
+
+it('edits and deletes only active-mission markers from the map panel', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  await saveMission(otherMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  writeMissionMapState({
+    markers: [
+      createMissionMapMarker({ kind: 'hazard', missionId: activeMission.id, label: 'Old hazard', x: 20, y: 30 }, new Date('2026-06-05T10:00:00Z')),
+      createMissionMapMarker({ kind: 'resource', missionId: otherMission.id, label: 'Other mission resource', x: 80, y: 30 }, new Date('2026-06-05T10:01:00Z')),
+    ],
+    drawings: [],
+  });
+
+  await renderOfflineMapPanel();
+
+  await user.click(screen.getByRole('button', { name: /rediger Old hazard/i }));
+  await user.clear(screen.getByLabelText('Rediger markøretikett'));
+  await user.type(screen.getByLabelText('Rediger markøretikett'), 'Updated hazard');
+  await user.click(screen.getByRole('button', { name: /lagre markørendring/i }));
+
+  expect(screen.getByText('Updated hazard')).toBeInTheDocument();
+  expect(screen.queryByText('Other mission resource')).not.toBeInTheDocument();
+
+  await user.click(screen.getByRole('button', { name: /slett Updated hazard/i }));
+  expect(screen.getByText('Ingen synlige markører.')).toBeInTheDocument();
+  expect(readMissionMapState().markers.some((marker) => marker.label === 'Other mission resource')).toBe(true);
 });
 
 it('blocks local marker saves when no active mission exists', async () => {

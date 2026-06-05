@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from 'react';
 import { OfflineMapLibreView } from '@/components/maps/offline-maplibre-view';
 import {
   OFFLINE_MAP_ATTRIBUTION,
@@ -35,6 +35,7 @@ import {
   buildMapImageSvg,
   createMissionMapDrawing,
   createMissionMapMarker,
+  deleteMissionMapObject,
   filterMissionMapStateByLayers,
   geoJsonExportText,
   importGeoJsonText,
@@ -47,11 +48,13 @@ import {
   operationItemsForRender,
   resetMissionMapState,
   subscribeMissionMapState,
+  updateMissionMapMarker,
   writeMissionMapState,
   type MapDrawingKind,
   type MapLayerKey,
   type MapMarkerKind,
   type MissionMapDrawing,
+  type MissionMapMarker,
   type MissionMapState,
 } from '@/lib/maps/operations-map';
 
@@ -90,6 +93,13 @@ type MapPackageOption = {
   description?: string;
   url?: string;
   styleUrl?: string;
+};
+
+type MarkerEditDraft = {
+  label: string;
+  x: string;
+  y: string;
+  note: string;
 };
 
 function mapPackageOptionForId(packageId: string | null | undefined, options: MapPackageOption[]) {
@@ -138,7 +148,7 @@ function SchematicMap({ packageId, state, enabledLayers }: { packageId: string; 
         {renderedOperations.map((item) => item.itemType === 'marker' ? (
           <g key={item.id} data-testid={`map-marker-${item.kind}`}>
             <circle cx={item.point.x} cy={item.point.y} r="3.2" fill={markerColors[item.kind]} stroke="#ffffff" strokeWidth="1" />
-            <text x={Math.min(item.point.x + 4, 82)} y={Math.max(item.point.y - 4, 7)} fill="#ffffff" fontSize="3.1" fontWeight="800">{item.label}</text>
+            <text x={Math.min(item.point.x + 4, 82)} y={Math.max(item.point.y - 4, 7)} fill="#ffffff" fontSize="3.1" fontWeight="800">{MAP_MARKER_LABELS[item.kind]}: {item.label}</text>
           </g>
         ) : (
           <g key={item.id} data-testid={`map-drawing-${item.kind}`}>
@@ -180,6 +190,8 @@ export function OfflineMapPanel() {
   const primaryButtonClass = fieldGloveMode ? 'min-h-16 rounded-xl bg-slate-950 px-5 text-lg font-bold text-white' : 'min-h-12 rounded-xl bg-slate-950 px-4 font-bold text-white';
   const [enabledLayers, setEnabledLayers] = useState<MapLayerKey[]>(DEFAULT_ENABLED_MAP_LAYERS);
   const [markerKind, setMarkerKind] = useState<MapMarkerKind>('incident-site');
+  const [editingMarkerId, setEditingMarkerId] = useState<string | null>(null);
+  const [markerEditDraft, setMarkerEditDraft] = useState<MarkerEditDraft>({ label: '', x: '50', y: '50', note: '' });
   const [drawingKind, setDrawingKind] = useState<MapDrawingKind>('sector');
   const [drawingCoordinates, setDrawingCoordinates] = useState('12,20 40,22 34,54 16,48');
   const [lastDrawing, setLastDrawing] = useState<MissionMapDrawing | undefined>();
@@ -366,6 +378,50 @@ export function OfflineMapPanel() {
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : 'Kunne ikke legge til markør.');
     }
+  }
+
+  function startMarkerEdit(marker: MissionMapMarker) {
+    setEditingMarkerId(marker.id);
+    setMarkerEditDraft({
+      label: marker.label,
+      x: String(marker.point.x),
+      y: String(marker.point.y),
+      note: marker.note ?? '',
+    });
+  }
+
+  function cancelMarkerEdit() {
+    setEditingMarkerId(null);
+    setMarkerEditDraft({ label: '', x: '50', y: '50', note: '' });
+  }
+
+  function saveMarkerEdit(event: FormEvent<HTMLFormElement>, marker: MissionMapMarker) {
+    event.preventDefault();
+    if (!activeMission) {
+      setStatusMessage('Opprett aktivt oppdrag før du endrer lokale kartobjekter.');
+      return;
+    }
+    const x = Number(markerEditDraft.x);
+    const y = Number(markerEditDraft.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x > 100 || y < 0 || y > 100) {
+      setStatusMessage('Markørkoordinater må være skjematiske verdier fra 0 til 100.');
+      return;
+    }
+    persistState(updateMissionMapMarker(mapState, activeMission.id, marker.id, {
+      label: markerEditDraft.label,
+      point: { x, y },
+      note: markerEditDraft.note,
+    }), 'Oppdaterte lokal markør.');
+    cancelMarkerEdit();
+  }
+
+  function deleteMarker(marker: MissionMapMarker) {
+    if (!activeMission) {
+      setStatusMessage('Opprett aktivt oppdrag før du sletter lokale kartobjekter.');
+      return;
+    }
+    persistState(deleteMissionMapObject(mapState, activeMission.id, marker.id), 'Slettet lokal markør.');
+    if (editingMarkerId === marker.id) cancelMarkerEdit();
   }
 
   async function createLogFromNewestMarker() {
@@ -590,8 +646,42 @@ export function OfflineMapPanel() {
             </label>
           ))}
         </div>
-        <ul className="space-y-1 text-sm font-semibold text-slate-700" data-testid="operations-marker-list">
-          {filteredState.markers.length === 0 ? <li>Ingen synlige markører.</li> : filteredState.markers.map((marker) => <li key={marker.id}>{MAP_MARKER_LABELS[marker.kind]} — {marker.label} ({marker.point.x}, {marker.point.y})</li>)}
+        <ul className="space-y-2 text-sm font-semibold text-slate-700" data-testid="operations-marker-list">
+          {filteredState.markers.length === 0 ? <li>Ingen synlige markører.</li> : filteredState.markers.map((marker) => (
+            <li key={marker.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span>{MAP_MARKER_LABELS[marker.kind]} — <span>{marker.label}</span> ({marker.point.x}, {marker.point.y})</span>
+                <span className="flex gap-2">
+                  <button type="button" onClick={() => startMarkerEdit(marker)} className="min-h-10 rounded-xl border border-slate-300 bg-white px-3 font-black text-slate-950">
+                    Rediger {marker.label}
+                  </button>
+                  <button type="button" onClick={() => deleteMarker(marker)} className="min-h-10 rounded-xl border border-red-300 bg-white px-3 font-black text-red-900">
+                    Slett {marker.label}
+                  </button>
+                </span>
+              </div>
+              {editingMarkerId === marker.id ? (
+                <form onSubmit={(event) => saveMarkerEdit(event, marker)} className="mt-3 grid gap-3 md:grid-cols-2" aria-label={`Rediger markør ${marker.label}`}>
+                  <label className="text-sm font-bold md:col-span-2">Rediger markøretikett
+                    <input value={markerEditDraft.label} onChange={(event) => setMarkerEditDraft((current) => ({ ...current, label: event.target.value }))} className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+                  </label>
+                  <label className="text-sm font-bold">X 0-100
+                    <input aria-label="Rediger markør X 0-100" type="number" min="0" max="100" value={markerEditDraft.x} onChange={(event) => setMarkerEditDraft((current) => ({ ...current, x: event.target.value }))} className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+                  </label>
+                  <label className="text-sm font-bold">Y 0-100
+                    <input aria-label="Rediger markør Y 0-100" type="number" min="0" max="100" value={markerEditDraft.y} onChange={(event) => setMarkerEditDraft((current) => ({ ...current, y: event.target.value }))} className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+                  </label>
+                  <label className="text-sm font-bold md:col-span-2">Rediger markørnotat
+                    <textarea value={markerEditDraft.note} onChange={(event) => setMarkerEditDraft((current) => ({ ...current, note: event.target.value }))} className="mt-1 min-h-20 w-full rounded-xl border p-3" />
+                  </label>
+                  <div className="flex flex-wrap gap-2 md:col-span-2">
+                    <button type="submit" className="min-h-10 rounded-xl bg-slate-950 px-4 font-black text-white">Lagre markørendring</button>
+                    <button type="button" onClick={cancelMarkerEdit} className="min-h-10 rounded-xl border border-slate-300 bg-white px-4 font-black text-slate-950">Avbryt</button>
+                  </div>
+                </form>
+              ) : null}
+            </li>
+          ))}
         </ul>
       </section>
 
