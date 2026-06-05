@@ -236,6 +236,15 @@ it('stores selected map package cache metadata in localStorage and can reset it'
   });
 });
 
+it('separates schematic map choices from approved PMTiles packages', async () => {
+  mockApprovedLocalMapPackages([]);
+  await renderOfflineMapPanel();
+
+  expect(screen.getAllByText(/Skjematisk lokalkart/i).length).toBeGreaterThan(0);
+  expect(screen.getByText(/Ingen godkjente PMTiles-pakker er tilgjengelige/i)).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).not.toBeInTheDocument();
+});
+
 it('shows quota-aware cache copy before saving a large offline map package', async () => {
   const user = userEvent.setup();
   Object.defineProperty(navigator, 'storage', {
