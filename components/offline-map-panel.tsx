@@ -46,6 +46,7 @@ import {
   mergeMissionMapState,
   missionMapStateSnapshot,
   mapStateForMission,
+  normalizeSchematicPoint,
   normalizeMissionMapState,
   operationItemsForRender,
   parseCoordinateText,
@@ -143,14 +144,45 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object';
 }
 
+function importPointFromCoordinates(coordinates: unknown) {
+  return Array.isArray(coordinates) ? normalizeSchematicPoint({ x: coordinates[0], y: coordinates[1] }) : null;
+}
+
+function supportedImportDrawingPointCount(kind: MapDrawingKind, geometry: Record<string, unknown>) {
+  if (kind === 'point') {
+    return geometry.type === 'Point' && importPointFromCoordinates(geometry.coordinates) ? 1 : 0;
+  }
+  if (kind === 'line') {
+    if (geometry.type !== 'LineString' || !Array.isArray(geometry.coordinates)) return 0;
+    return geometry.coordinates.filter((coords) => importPointFromCoordinates(coords)).length;
+  }
+  if (geometry.type !== 'Polygon' || !Array.isArray(geometry.coordinates) || !Array.isArray(geometry.coordinates[0])) return 0;
+  const points = geometry.coordinates[0]
+    .map((coords) => importPointFromCoordinates(coords))
+    .filter((point): point is NonNullable<ReturnType<typeof importPointFromCoordinates>> => Boolean(point));
+  const withoutClosingDuplicate = points.length > 1
+    && points[0]?.x === points.at(-1)?.x
+    && points[0]?.y === points.at(-1)?.y
+    ? points.slice(0, -1)
+    : points;
+  return withoutClosingDuplicate.length;
+}
+
+function isSupportedImportDrawingFeature(kind: MapDrawingKind, geometry: Record<string, unknown>) {
+  const minimumPoints = kind === 'point' ? 1 : kind === 'line' ? 2 : 3;
+  return supportedImportDrawingPointCount(kind, geometry) >= minimumPoints;
+}
+
 function importFeatureHasBlockedMapText(feature: unknown) {
   if (!isRecord(feature) || feature.type !== 'Feature' || !isRecord(feature.geometry) || !isRecord(feature.properties)) return false;
   const { geometry, properties } = feature;
   const markerFeature = properties.itemType === 'marker'
     && MAP_MARKER_KINDS.includes(properties.kind as MapMarkerKind)
-    && geometry.type === 'Point';
+    && geometry.type === 'Point'
+    && Boolean(importPointFromCoordinates(geometry.coordinates));
   const drawingFeature = properties.itemType === 'drawing'
-    && MAP_DRAWING_KINDS.includes(properties.kind as MapDrawingKind);
+    && MAP_DRAWING_KINDS.includes(properties.kind as MapDrawingKind)
+    && isSupportedImportDrawingFeature(properties.kind as MapDrawingKind, geometry);
   if (!markerFeature && !drawingFeature) return false;
   const values = [properties.label, properties.note];
   return values.some((value) => {

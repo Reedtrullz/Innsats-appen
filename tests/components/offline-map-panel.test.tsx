@@ -571,6 +571,28 @@ it('keeps unsupported GeoJSON-like input on the generic import status path', asy
   expect(readMissionMapState().markers).toHaveLength(0);
 });
 
+it('keeps unsupported local GeoJSON feature geometry on the generic import status path', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  await renderOfflineMapPanel();
+
+  fireEvent.change(screen.getByRole('textbox', { name: /Importer GeoJSON/i }), { target: { value: JSON.stringify({
+    type: 'FeatureCollection',
+    coordinateSystem: SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
+    features: [
+      { type: 'Feature', geometry: { type: 'Point' }, properties: { itemType: 'marker', kind: 'observation', label: '01017000027' } },
+      { type: 'Feature', geometry: { type: 'LineString', coordinates: [] }, properties: { itemType: 'drawing', kind: 'line', label: 'kontakt ola.nordmann@example.com' } },
+    ],
+  }) } });
+  await user.click(screen.getByRole('button', { name: /Importer GeoJSON lokalt/i }));
+
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Ingen støttede skjematiske GeoJSON-objekter/i);
+  expect(readMissionMapState().markers).toHaveLength(0);
+  expect(readMissionMapState().drawings).toHaveLength(0);
+});
+
 it('keeps marker edit mode open when edited text is stopped by the privacy guard', async () => {
   const user = userEvent.setup();
   await saveMission(activeMission);
