@@ -9,6 +9,38 @@ async function tempRoot() {
 }
 
 describe('validate map package files', () => {
+  it('rejects missing referenced package files', async () => {
+    const root = await tempRoot();
+    await fs.mkdir(path.join(root, 'public/map-packages'), { recursive: true });
+    await fs.writeFile(path.join(root, 'public/map-packages/trondheim-demo-style.json'), JSON.stringify({
+      version: 8,
+      sources: { base: { type: 'vector', url: 'pmtiles:///map-packages/missing.pmtiles' } },
+      layers: [],
+    }));
+
+    await expect(validateMapPackageFiles({ rootDir: root, packages: [{
+      id: 'trondheim-demo-pmtiles',
+      url: '/map-packages/missing.pmtiles',
+      styleUrl: '/map-packages/trondheim-demo-style.json',
+    }] })).rejects.toThrow(/missing file.*missing\.pmtiles/i);
+  });
+
+  it('rejects map package paths that escape the local package directory', async () => {
+    const root = await tempRoot();
+    await fs.mkdir(path.join(root, 'public/map-packages'), { recursive: true });
+    await fs.writeFile(path.join(root, 'public/map-packages/trondheim-demo-style.json'), JSON.stringify({
+      version: 8,
+      sources: { base: { type: 'vector', url: 'pmtiles:///map-packages/trondheim-demo.pmtiles' } },
+      layers: [],
+    }));
+
+    await expect(validateMapPackageFiles({ rootDir: root, packages: [{
+      id: 'trondheim-demo-pmtiles',
+      url: '/map-packages/../secret.pmtiles',
+      styleUrl: '/map-packages/trondheim-demo-style.json',
+    }] })).rejects.toThrow(/dot-segment|outside|map package asset/i);
+  });
+
   it('rejects styles that reference external tile URLs', async () => {
     const root = await tempRoot();
     await fs.mkdir(path.join(root, 'public/map-packages'), { recursive: true });
