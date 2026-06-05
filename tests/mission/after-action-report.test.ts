@@ -291,8 +291,8 @@ it('rejects high-confidence sensitive map labels before building an after-action
 
 it('includes sanitized map package summary in after-action exports', () => {
   const unsafeMapPackage = {
-    id: 'trondheim-demo-pmtiles',
-    title: 'Trondheim demo PMTiles',
+    id: 'trondheim-lokal',
+    title: 'Trondheim lokalpakke',
     attribution: 'Demo attribution',
     version: '2026.06-a',
     provenance: 'Local training package bundled with app',
@@ -314,8 +314,8 @@ it('includes sanitized map package summary in after-action exports', () => {
   });
 
   expect(report.sections.mapPackage).toEqual({
-    id: 'trondheim-demo-pmtiles',
-    title: 'Trondheim demo PMTiles',
+    id: 'trondheim-lokal',
+    title: 'Trondheim lokalpakke',
     attribution: 'Demo attribution',
     version: '2026.06-a',
     provenance: 'Local training package bundled with app',
@@ -325,13 +325,13 @@ it('includes sanitized map package summary in after-action exports', () => {
   const html = exportAfterActionPdfReadyHtml(report);
   const json = exportAfterActionJson(report);
   expect(markdown).toContain('## Kartpakke');
-  expect(markdown).toContain('Pakke-ID: trondheim-demo-pmtiles');
-  expect(markdown).toContain('Trondheim demo PMTiles');
+  expect(markdown).toContain('Pakke-ID: trondheim-lokal');
+  expect(markdown).toContain('Trondheim lokalpakke');
   expect(markdown).toContain('Local training package bundled with app');
   expect(html).toContain('Kartpakke');
-  expect(html).toContain('Trondheim demo PMTiles');
+  expect(html).toContain('Trondheim lokalpakke');
   expect(html).toContain('Local training package bundled with app');
-  expect(json).toContain('Trondheim demo PMTiles');
+  expect(json).toContain('Trondheim lokalpakke');
   expect(json).toContain('Local training package bundled with app');
 
   for (const exported of [json, markdown, html]) {
@@ -405,6 +405,8 @@ it.each([
   { id: 'sector-a', title: 'Sector id-ish id' },
   { id: 'field-folder', title: 'Field log id-ish id' },
   { id: 'trd-depot', title: 'Map feature id-ish id' },
+  { id: 'resource-incident-pmtiles', title: 'Forged PMTiles resource id' },
+  { id: 'custom-incident-pmtiles', title: 'Forged PMTiles custom id' },
   { id: 'map-packages', title: 'Directory-like package id' },
   { id: 'foo-map-packages-bar', title: 'Embedded directory-like package id' },
 ])('blanks unsafe map package id $id in after-action summaries', ({ id, title }) => {
@@ -433,7 +435,7 @@ it('strips URL and path-like content from after-action map package text fields',
     checklistRuns: runs,
     generatedAt: '2026-06-03T11:00:00.000Z',
     mapPackage: {
-      id: 'trondheim-demo-pmtiles',
+      id: 'trondheim-lokal',
       title: 'https://tiles.example.invalid/foo',
       attribution: '/map-packages/foo-style.json',
       version: 'https://tiles.example.invalid/pkg.pmtiles',
@@ -444,7 +446,7 @@ it('strips URL and path-like content from after-action map package text fields',
   });
 
   expect(report.sections.mapPackage).toEqual({
-    id: 'trondheim-demo-pmtiles',
+    id: 'trondheim-lokal',
     title: '',
     attribution: '',
     version: '',
@@ -458,13 +460,42 @@ it('strips URL and path-like content from after-action map package text fields',
   }
 });
 
+it('strips relative and local filesystem paths from after-action map package text fields', () => {
+  const report = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapPackage: {
+      id: 'trondheim-lokal',
+      title: 'Kontrollert lokal kartpakke',
+      attribution: 'assets/private/map.mbtiles',
+      version: '2026.06-a',
+      provenance: 'Built from /Users/reidar/secret/source.mbtiles',
+    },
+  });
+
+  expect(report.sections.mapPackage).toEqual({
+    id: 'trondheim-lokal',
+    title: 'Kontrollert lokal kartpakke',
+    attribution: '',
+    version: '2026.06-a',
+    provenance: '',
+  });
+  for (const exported of [JSON.stringify(report.sections.mapPackage), exportAfterActionMarkdown(report), exportAfterActionJson(report)]) {
+    expect(exported).toContain('Kontrollert lokal kartpakke');
+    expect(exported).not.toContain('assets/private/map.mbtiles');
+    expect(exported).not.toContain('/Users/reidar/secret/source.mbtiles');
+  }
+});
+
 it('does not create after-action map package sections from id-only or attribution-version-only input', () => {
   const idOnlyReport = buildAfterActionReport({
     mission,
     checklists,
     checklistRuns: runs,
     generatedAt: '2026-06-03T11:00:00.000Z',
-    mapPackage: { id: 'trondheim-demo-pmtiles' },
+    mapPackage: { id: 'trondheim-lokal' },
   });
   const attributionVersionOnlyReport = buildAfterActionReport({
     mission,

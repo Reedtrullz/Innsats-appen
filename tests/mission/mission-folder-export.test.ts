@@ -61,8 +61,8 @@ it('builds a local mission folder bundle with map artifacts and privacy warnings
 
 it('includes sanitized map package provenance in mission-folder exports', () => {
   const unsafeMapPackage = {
-    id: 'trondheim-demo-pmtiles',
-    title: 'Trondheim demo PMTiles',
+    id: 'trondheim-lokal',
+    title: 'Trondheim lokalpakke',
     attribution: 'Demo attribution',
     version: '2026.06-a',
     provenance: 'Local training package bundled with app',
@@ -84,8 +84,8 @@ it('includes sanitized map package provenance in mission-folder exports', () => 
   });
 
   expect(bundle.artifacts.mapPackage).toEqual({
-    id: 'trondheim-demo-pmtiles',
-    title: 'Trondheim demo PMTiles',
+    id: 'trondheim-lokal',
+    title: 'Trondheim lokalpakke',
     attribution: 'Demo attribution',
     version: '2026.06-a',
     provenance: 'Local training package bundled with app',
@@ -93,8 +93,8 @@ it('includes sanitized map package provenance in mission-folder exports', () => 
 
   const markdown = exportMissionFolderMarkdown(bundle);
   expect(markdown).toContain('## Kartpakke');
-  expect(markdown).toContain('Pakke-ID: trondheim-demo-pmtiles');
-  expect(markdown).toContain('Trondheim demo PMTiles');
+  expect(markdown).toContain('Pakke-ID: trondheim-lokal');
+  expect(markdown).toContain('Trondheim lokalpakke');
   expect(markdown).toContain('Demo attribution');
   expect(markdown).toContain('Local training package bundled with app');
 
@@ -160,7 +160,7 @@ it('strips URL and path-like content from mission-folder map package text fields
     checklists: [],
     checklistRuns: [],
     mapPackage: {
-      id: 'trondheim-demo-pmtiles',
+      id: 'trondheim-lokal',
       title: 'https://tiles.example.invalid/foo',
       attribution: '/map-packages/foo-style.json',
       version: 'https://tiles.example.invalid/pkg.pmtiles',
@@ -172,7 +172,7 @@ it('strips URL and path-like content from mission-folder map package text fields
   });
 
   expect(bundle.artifacts.mapPackage).toEqual({
-    id: 'trondheim-demo-pmtiles',
+    id: 'trondheim-lokal',
     title: '',
     attribution: '',
     version: '',
@@ -191,7 +191,7 @@ it('does not create mission-folder map package artifacts from id-only input', ()
     mission,
     checklists: [],
     checklistRuns: [],
-    mapPackage: { id: 'trondheim-demo-pmtiles' },
+    mapPackage: { id: 'trondheim-lokal' },
     generatedAt: '2026-06-04T11:00:00.000Z',
   });
 
