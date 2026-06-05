@@ -18,19 +18,35 @@ function configureSshStep(workflow: string) {
   return workflow.slice(start, end);
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function workflowStep(workflow: string, startName: string, nextName?: string) {
-  const start = workflow.indexOf(`- name: ${startName}`);
+  const startPattern = new RegExp(`^([ \\t]*)- name: ${escapeRegExp(startName)}\\s*$`, 'm');
+  const startMatch = startPattern.exec(workflow);
+  const start = startMatch?.index ?? -1;
   expect(start).toBeGreaterThan(-1);
 
-  const end = nextName
-    ? workflow.indexOf(`- name: ${nextName}`, start + startName.length)
-    : workflow.length;
+  if (!startMatch) {
+    return '';
+  }
+
+  const sameIndent = escapeRegExp(startMatch[1]);
+  const afterStartOffset = start + startMatch[0].length;
+  const remainder = workflow.slice(afterStartOffset);
+  const endPattern = nextName
+    ? new RegExp(`^${sameIndent}- name: ${escapeRegExp(nextName)}\\s*$`, 'm')
+    : new RegExp(`^${sameIndent}- name: `, 'm');
+  const endMatch = endPattern.exec(remainder);
+  const end = endMatch ? afterStartOffset + endMatch.index : workflow.length;
 
   if (nextName) {
+    expect(endMatch).not.toBeNull();
     expect(end).toBeGreaterThan(start);
   }
 
-  return workflow.slice(start, end > -1 ? end : workflow.length);
+  return workflow.slice(start, end);
 }
 
 describe('CI workflow checks', () => {
@@ -67,8 +83,8 @@ describe('staging deploy verification', () => {
     const step = workflowStep(workflow, 'Configure staging SSH key', 'Write staging inventory');
 
     expect(step).toMatch(/STAGING_SSH_HOST_KEY/);
-    expect(step).toMatch(/known_hosts/);
-    expect(step).toMatch(/ssh-keygen -F/);
+    expect(step).toMatch(/printf\s+'%s\\n'\s+"\$\{STAGING_SSH_HOST_KEY\}"\s*>\s*~\/\.ssh\/known_hosts/);
+    expect(step).toMatch(/ssh-keygen\s+-F\s+"\$\{STAGING_HOST\}"\s+-f\s+~\/\.ssh\/known_hosts/);
     expect(step).not.toMatch(/ssh-keyscan\b/);
   });
 
