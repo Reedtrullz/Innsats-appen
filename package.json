@@ -1,6 +1,7 @@
 {
   "name": "beredskapsboka",
   "version": "0.1.0",
+  "description": "Offline-first Norwegian Civil Defence field-support PWA with local missions, checklists, map/log workflow and privacy-safe exports.",
   "private": true,
   "type": "module",
   "repository": {

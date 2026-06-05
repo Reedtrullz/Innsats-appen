@@ -32,7 +32,7 @@ curl -fsS https://innsats.reidar.tech/api/health
 gh run list --commit "$(git rev-parse origin/main)" --limit 5 --json databaseId,status,conclusion,headSha,url
 ```
 
-The last audited application-code baseline was SHA `e259b39692b48601a7069fe3fbefad5fe74989c5`, verified by GitHub Actions run `26943809255`; see `docs/release/current-deployment-status.md` for details and release-board caveats.
+The last audited application-code baseline was SHA `1a26acbfc6f72152e14906d3ecc04d424275aee4`; the last documented deployed snapshot before this docs refresh was SHA `1750a377362c44734dd802be8095ad317957f1c9`, verified by GitHub Actions run `27030600338`. See `docs/release/current-deployment-status.md` for details and release-board caveats.
 
 ## One-time prerequisites
 

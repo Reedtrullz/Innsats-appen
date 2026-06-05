@@ -37,17 +37,17 @@ const requiredDocs: Array<[string, string, RegExp[]]> = [
 describe('Group 14 rollout and maintenance documentation', () => {
   it('documents the current verified production deployment and remaining evidence blockers', () => {
     const status = read('docs/release/current-deployment-status.md');
-    expect(status).toMatch(/e259b39692b48601a7069fe3fbefad5fe74989c5/);
-    expect(status).toMatch(/26943809255/);
+    expect(status).toMatch(/1a26acbfc6f72152e14906d3ecc04d424275aee4/);
+    expect(status).toMatch(/1750a377362c44734dd802be8095ad317957f1c9/);
+    expect(status).toMatch(/27030600338/);
     expect(status).toMatch(/status=healthy|\"status\":\"healthy\"/);
     expect(status).toMatch(/Automatic checks/);
     expect(status).toMatch(/Build and push GHCR image/);
     expect(status).toMatch(/Deploy to VPS with Ansible/);
-    expect(status).toMatch(/Completed: 412/);
-    expect(status).toMatch(/Blocked: 5/);
-    expect(status).toMatch(/Task 385/);
-    expect(status).toMatch(/Task 389/);
-    expect(status).toMatch(/not all green|ikke all green|intentionally not all green/i);
+    expect(status).toMatch(/Completed tasks: 23\/23/);
+    expect(status).toMatch(/iPhone Safari real-device/);
+    expect(status).toMatch(/Android Chrome real-device/);
+    expect(status).toMatch(/A healthy deployed app is not the same as field pilot approval/i);
   });
 
   it.each(requiredDocs)('covers task %s in %s', (_task, relativePath, matchers) => {

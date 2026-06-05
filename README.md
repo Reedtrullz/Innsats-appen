@@ -1,13 +1,44 @@
 # Beredskapsboka / Innsats-appen
 
-Mobile-first, offline-capable PWA for source-backed Sivilforsvaret decision support.
+Offline-first, mobile field-support PWA for source-backed Norwegian Civil Defence (Sivilforsvaret) decision support before, during and after incidents.
 
 - Repository: https://github.com/Reedtrullz/Innsats-appen
 - Production domain: https://innsats.reidar.tech
-- Current live SHA source of truth: `curl -fsS https://innsats.reidar.tech/api/health`; the last audited application-code baseline is `e259b39692b48601a7069fe3fbefad5fe74989c5` via GitHub Actions run `26943809255`. See `docs/release/current-deployment-status.md`.
 - GHCR image namespace: `ghcr.io/reedtrullz/innsats-appen`
+- Current live SHA source of truth: `curl -fsS https://innsats.reidar.tech/api/health` and the completed GitHub Actions run for that exact SHA. Do not treat a markdown file as the permanent live version; docs-only commits also deploy immutable images. See `docs/release/current-deployment-status.md`.
 
-The app is a local MVP: generated content, mission dashboards, checklist runs, 5-punktsordre exports, sambandsplan exports, and release-readiness board state stay in the browser unless the user manually copies them out.
+## What this is
+
+Beredskapsboka/Innsats-appen turns a curated Obsidian knowledge bank into a local/offline operational support app for Sivilforsvaret-style field work. It is designed for quick mobile use under imperfect connectivity, with source-backed action cards, local mission context, checklists, map/log notes, after-action exports and privacy-safe local reset.
+
+The app is decision support only. It is not an official command, order, journal, tracking, alerting or archive system. Local browser data stays on the device unless the user manually exports or copies it.
+
+## Current app capabilities
+
+- Source-backed quick cards, search, phase pages and specialist modules for før/under/etter innsats.
+- Local mission dashboard with active phase, role/scenario context, next recommended actions, checklist progress, order/comms export tools, public context signals and release-safe local reset.
+- Kart → Logg → Oppdrag → Etterrapport → Oppdragsmappe workflow:
+  - optional app-local MapLibre/PMTiles packages with schematic fallback,
+  - mission-scoped markers, sectors/teiger and GeoJSON/SVG export,
+  - explicit `Logg herfra` actions and active-mission field-log summaries,
+  - sanitized after-action report and mission-folder export metadata.
+- Feltmodus/glove-mode quick actions for map, log, active mission, checklist, 5-punktsordre, sambandsplan, status export and search.
+- Offline-first PWA shell with service-worker/cache verification and strict client CSP/no external runtime tile-provider fetches.
+- Generated workplan/release metadata for the `/release` board, sourced from local `.hermes/plans` and mirrored into safe generated JSON.
+
+## GitHub repository metadata
+
+Recommended GitHub About description:
+
+```text
+Offline-first Norwegian Civil Defence field-support PWA with local missions, checklists, map/log workflow and privacy-safe exports.
+```
+
+Recommended topics/tags:
+
+```text
+pwa, offline-first, emergency-preparedness, civil-defense, sivilforsvaret, incident-response, field-operations, nextjs, typescript, service-worker, pmtiles, maplibre, privacy-first, norwegian, preparedness, checklists, field-logging
+```
 
 ## Requirements
 
@@ -36,17 +67,17 @@ Workplans live in `.hermes/plans/*.md` when developing locally. `npm run sync:wo
 ```bash
 source ~/.nvm/nvm.sh && nvm use 22
 npm install
-npm run dev              # local Next dev server
-npm run build:content    # import Obsidian, compile curated YAML, build search index, generate workplan artifacts, validate graph/artifacts
-npm run sync:workplans    # generate safe .hermes/plans metadata into Obsidian + generated local workplan artifacts for /release
-npm run typecheck        # TypeScript gate
-npm run test             # Vitest unit/component/integration/security/content tests
-npm run build            # content build + production Next build
-npm run e2e              # build + production-mode Playwright E2E (service worker/offline checks)
-npm run e2e:prod         # same build + production-mode E2E alias; set PLAYWRIGHT_PORT=3007 if local port 3000 is busy
+npm run dev                # local Next dev server
+npm run build:content      # import Obsidian, compile curated YAML, build search index, generate workplan artifacts, validate graph/artifacts
+npm run sync:workplans     # generate safe .hermes/plans metadata into Obsidian + generated local workplan artifacts for /release
+npm run typecheck          # TypeScript gate
+npm run test               # Vitest unit/component/integration/security/content tests
+npm run build              # content build + production Next build
+npm run e2e                # build + production-mode Playwright E2E (service worker/offline checks)
+npm run e2e:prod           # same build + production-mode E2E alias; set PLAYWRIGHT_PORT=3007 if local port 3000 is busy
 npm run e2e:prod:no-build  # production-mode Playwright E2E against an existing production build
-npm run check            # alias for check:ci
-npm run check:ci         # build content + typecheck + lint + Vitest + production build + production E2E + perf budgets
+npm run check              # alias for check:ci
+npm run check:ci           # build content + typecheck + lint + Vitest + production build + production E2E + perf budgets
 ```
 
 Useful targeted gates:
@@ -54,8 +85,10 @@ Useful targeted gates:
 ```bash
 npm run test -- tests/content/coverage.test.ts
 npm run test -- tests/security/privacy-boundaries.test.ts
+npm run test -- tests/maps/maplibre-runtime.test.ts
 npm run e2e:prod -- tests/e2e/core-mobile-journey.spec.ts
 npm run e2e:prod -- tests/e2e/offline.spec.ts
+npm run e2e:prod -- tests/e2e/map-log-mission-flow.spec.ts tests/e2e/offline-map.spec.ts
 ```
 
 ## Current app surfaces
@@ -73,7 +106,7 @@ npm run e2e:prod -- tests/e2e/offline.spec.ts
 3. Run `npm run test` and `npm run typecheck` before committing.
 4. Run `npm run build` before production/mobile/offline verification.
 5. Run `npm run e2e:prod` to prove the production shell, service worker, offline flow, local mission storage, privacy reset, and mobile journey.
-6. Before claiming pilot-ready, run `npm run check:ci`, verify the GitHub Actions run for the exact SHA is `completed/success`, verify production `/api/health` returns the same SHA, and keep Tasks 385–389 blocked until real-device/staging evidence exists.
+6. Before claiming pilot-ready, run `npm run check:ci`, verify the GitHub Actions run for the exact SHA is `completed/success`, verify production `/api/health` returns the same SHA, and keep real-device/staging evidence blockers explicit until they are actually tested.
 
 ## Deployment
 
@@ -81,11 +114,11 @@ An Ansible/GHCR deploy setup for `https://innsats.reidar.tech` lives in `deploy/
 
 Automatic CI/CD is configured in `.github/workflows/ci.yml`:
 
-1. Pull requests and pushes to `main` run automatic checks: high/critical npm audit, TypeScript, ESLint, Vitest, production build, and Playwright production E2E.
+1. Pull requests and pushes to `main` run automatic checks: high/critical npm audit, workplan freshness, content build, TypeScript, ESLint, Vitest, production build, mobile JS budget, Lighthouse mobile budget, and Playwright production E2E.
 2. Only after those checks pass on `main`, GitHub Actions builds and pushes `ghcr.io/reedtrullz/innsats-appen:<12-char-sha>` plus `:latest`.
 3. The deploy job then runs `deploy/playbook.yml` over SSH and verifies `https://innsats.reidar.tech/api/health` returns the exact pushed commit SHA.
 
-The deploy workflow requires the repository secret `VPS_SSH_PRIVATE_KEY` containing the private key for the `deploy@198.23.137.16` user.
+The deploy workflow requires the repository secret `VPS_SSH_PRIVATE_KEY` containing the private key for the `deploy@198.23.137.16` user and the configured VPS host-key pin described in `deploy/README.md`.
 
 Manual local deploy is still available:
 
@@ -97,7 +130,7 @@ See `deploy/README.md` for prerequisites, GHCR login notes, and VPS verification
 
 ## MVP boundaries
 
-See `docs/mvp-boundaries.md` for the full boundary policy. In short: no login, no live tracking, no push, no patient/persondata, no central incident database, no official command-system integration, and no private/skjermede tilfluktsrom data in the MVP.
+See `docs/mvp-boundaries.md` for the full boundary policy. In short: no login, no backend mission sync, no live tracking, no push notifications, no patient/persondata, no central incident database, no official command-system integration, no real Nødnett/samband identifiers, and no private/skjermede tilfluktsrom data in the MVP.
 
 ## Content editing
 
