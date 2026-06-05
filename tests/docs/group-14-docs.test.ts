@@ -104,6 +104,10 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(workflow).toMatch(/title="Stale content report"/);
     expect(workflow).toMatch(/gh issue comment/);
     expect(workflow).toMatch(/pilot-support|content-maintenance/);
+    expect(workflow).toMatch(/Verify health JSON/i);
+    expect(workflow).toMatch(/nodeEnv/);
+    expect(workflow).toMatch(/production/);
+    expect(workflow).toMatch(/status.*healthy|healthy.*status/s);
     expect(workflow).not.toMatch(/web-push|PushManager|cookie|localStorage|IndexedDB/);
   });
 
