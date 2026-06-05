@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import manifest from '@/app/manifest';
+import { GENERATED_CONTENT_ROUTES, STATIC_APP_SHELL_ROUTES } from '@/lib/offline/static-app-shell';
 import {
   GENERATED_CONTENT_STALE_MS,
   SW_CACHE_VERSION,
@@ -17,27 +18,17 @@ function extractStaticAppShell(sw: string) {
 }
 
 describe('service worker metadata helpers', () => {
-  it('keeps the public service-worker cache version aligned with the typed metadata', () => {
+  it('keeps the public service-worker cache version and static shell aligned with typed metadata', () => {
     const sw = fs.readFileSync(path.join(process.cwd(), 'public', 'sw.js'), 'utf8');
     const staticAppShell = extractStaticAppShell(sw);
     expect(manifest().start_url).toBe('/');
     expect(sw).toContain(`const SW_CACHE_VERSION = '${SW_CACHE_VERSION}'`);
     expect(sw).toContain('BEREDSKAPSBOKA_GET_SW_STATUS');
     expect(sw).toContain('BEREDSKAPSBOKA_SKIP_WAITING');
-    expect(staticAppShell).toContain('/');
-    for (const route of [
-      '/nytt',
-      '/sok',
-      '/mer',
-      '/begrensninger',
-      '/kjente-begrensninger',
-      '/data-pa-enheten',
-      '/personvern',
-      '/datakilder',
-      '/release',
-    ]) {
-      expect(staticAppShell).toContain(route);
-    }
+    expect(staticAppShell).toEqual([...STATIC_APP_SHELL_ROUTES]);
+    expect(GENERATED_CONTENT_ROUTES.every((route) => route.startsWith('/generated-content/'))).toBe(true);
+    expect(staticAppShell.some((route) => /^\/api\//.test(route))).toBe(false);
+    expect(staticAppShell.some((route) => /^\/content\//.test(route))).toBe(false);
   });
 
   it('detects stale generated content using the mobile/offline threshold', () => {
