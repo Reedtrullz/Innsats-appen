@@ -2,13 +2,16 @@ export const MAPLIBRE_RUNTIME_BROWSER_ONLY = true;
 
 let pmtilesProtocolRegistered = false;
 
-type ProtocolLike = { tile: unknown };
-type MapLibreLike = {
-  addProtocol: (scheme: string, handler: unknown) => void;
+type ProtocolLike<TProtocolHandler> = { tile: TProtocolHandler };
+type MapLibreLike<TProtocolHandler> = {
+  addProtocol: (scheme: string, handler: TProtocolHandler) => void;
   removeProtocol?: (scheme: string) => void;
 };
 
-export function registerPmtilesProtocolOnce(maplibre: MapLibreLike, protocol: ProtocolLike) {
+export function registerPmtilesProtocolOnce<TProtocolHandler>(
+  maplibre: MapLibreLike<TProtocolHandler>,
+  protocol: ProtocolLike<TProtocolHandler>,
+) {
   if (pmtilesProtocolRegistered) return false;
   maplibre.addProtocol('pmtiles', protocol.tile);
   pmtilesProtocolRegistered = true;

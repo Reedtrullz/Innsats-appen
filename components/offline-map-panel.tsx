@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { OfflineMapLibreView } from '@/components/maps/offline-maplibre-view';
 import {
   OFFLINE_MAP_ATTRIBUTION,
   OFFLINE_MAP_LIMITATION_COPY,
@@ -91,30 +92,6 @@ type MapPackageOption = {
 
 function mapPackageOptionForId(packageId: string | null | undefined, options: MapPackageOption[]) {
   return options.find((mapPackage) => mapPackage.id === packageId);
-}
-
-function OfflineMapLibrePlaceholder({ mapPackage }: { mapPackage: MapPackageOption }) {
-  return (
-    <figure
-      data-testid="offline-maplibre-container"
-      className="overflow-hidden rounded-3xl border border-emerald-200 bg-emerald-950 text-white shadow-sm"
-      aria-label="Lokal PMTiles kartpakke"
-    >
-      <div className="flex h-72 flex-col justify-center gap-3 p-6">
-        <p className="text-sm font-black uppercase tracking-wide text-emerald-200">PMTiles lokalpakke</p>
-        <h2 className="text-2xl font-black">{mapPackage.title}</h2>
-        <p className="text-sm font-semibold text-emerald-50">
-          Pre-Task-6 placeholder for godkjent app-lokal PMTiles/MapLibre-visning. Ingen eksterne fliser, backend sync eller nettverksnedlasting utføres her.
-        </p>
-        <p className="text-xs font-semibold text-emerald-100">
-          Lokal PMTiles: {mapPackage.url}. Stil: {mapPackage.styleUrl}. Skjematisk kart beholdes som fallback for andre pakker.
-        </p>
-      </div>
-      <figcaption className="border-t border-emerald-800 bg-emerald-900 p-4 text-xs font-semibold text-emerald-50">
-        Lokal PMTiles er bare aktiv for godkjente app-lokale pakker; full MapLibre-komponent kommer senere.
-      </figcaption>
-    </figure>
-  );
 }
 
 function operationMeasurement(drawing: MissionMapDrawing | undefined) {
@@ -236,7 +213,7 @@ export function OfflineMapPanel() {
   const selectedPackage = mapPackageOptionForId(selectedPackageId, mapPackageOptions) ?? mapPackageOptions[0];
   const selectedWarning = cacheSizeWarningForPackage(selectedPackage);
   const selectedSchematicPackage = getOfflineMapPackage(selectedPackage.id) ?? OFFLINE_MAP_PACKAGES[0];
-  const selectedLocalMapPackage = selectedPackage.runtimeFormat === 'pmtiles' ? localMapPackageForId(selectedPackage.id) : undefined;
+  const cachedLocalMapPackage = cachedPackage?.runtimeFormat === 'pmtiles' ? localMapPackageForId(cachedPackage.packageId) : undefined;
   const activeMissionMapState = useMemo(() => activeMission ? mapStateForMission(mapState, activeMission.id) : { markers: [], drawings: [] }, [activeMission, mapState]);
   const filteredState = filterMissionMapStateByLayers(activeMissionMapState, enabledLayers);
 
@@ -448,8 +425,8 @@ export function OfflineMapPanel() {
         </div>
       ) : null}
 
-      {selectedPackage.runtimeFormat === 'pmtiles' ? (
-        <OfflineMapLibrePlaceholder mapPackage={{ ...selectedPackage, url: selectedLocalMapPackage?.url ?? selectedPackage.url, styleUrl: selectedLocalMapPackage?.styleUrl ?? selectedPackage.styleUrl }} />
+      {cachedLocalMapPackage ? (
+        <OfflineMapLibreView packageManifest={cachedLocalMapPackage} />
       ) : (
         <SchematicMap packageId={selectedSchematicPackage.id} state={filteredState} enabledLayers={enabledLayers} />
       )}
