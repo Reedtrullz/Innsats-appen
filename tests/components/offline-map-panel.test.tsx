@@ -160,7 +160,7 @@ it('uses larger map controls when field glove mode is enabled', async () => {
   expect(await screen.findByText(/Feltmodus aktiv/i)).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /Legg til lokal markør/i })).toHaveClass('min-h-16');
   expect(screen.getByRole('button', { name: /Lagre lokal tegning\/sektor/i })).toHaveClass('min-h-16');
-  expect(screen.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i })).toHaveClass('min-h-16');
+  expect(screen.getByRole('button', { name: /Logg fra nyeste synlige markør/i })).toHaveClass('min-h-16');
   expect(screen.getByRole('button', { name: /Lag kartbilde/i })).toHaveClass('min-h-16');
   expect(screen.getByRole('button', { name: /Lag GeoJSON eksport/i })).toHaveClass('min-h-16');
   expect(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).not.toHaveClass('min-h-16');
@@ -488,7 +488,7 @@ it('blocks local marker saves when no active mission exists', async () => {
   });
 });
 
-it('creates a field-log entry on the active mission from the newest map marker', async () => {
+it('creates a field-log entry on the active mission from a selected map marker', async () => {
   const user = userEvent.setup();
   await saveMission(activeMission);
   await renderOfflineMapPanel();
@@ -502,7 +502,7 @@ it('creates a field-log entry on the active mission from the newest map marker',
   await user.click(screen.getByRole('button', { name: /Legg til lokal markør/i }));
 
   await user.type(screen.getByLabelText(/Loggtekst fra kartpunkt/i), 'Røyk observert uten persondata');
-  await user.click(screen.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i }));
+  await user.click(screen.getByRole('button', { name: /Logg herfra Observasjon nord/i }));
 
   await waitFor(async () => {
     const mission = await getMission('mission-map-log');
@@ -515,6 +515,60 @@ it('creates a field-log entry on the active mission from the newest map marker',
   });
   expect(screen.getByText(/Feltlogg opprettet lokalt på Kartlogg test/i)).toBeInTheDocument();
   expect(readLocalAuditLog().some((entry) => entry.details.source === 'map-log')).toBe(true);
+});
+
+it('creates a field log from the selected visible marker, not only the newest marker', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  writeMissionMapState({
+    markers: [
+      createMissionMapMarker({ kind: 'hazard', missionId: activeMission.id, label: 'Older hazard', x: 10, y: 20 }, new Date('2026-06-05T10:00:00Z')),
+      createMissionMapMarker({ kind: 'resource', missionId: activeMission.id, label: 'Newest resource', x: 80, y: 20 }, new Date('2026-06-05T10:01:00Z')),
+    ],
+    drawings: [],
+  });
+
+  await renderOfflineMapPanel();
+
+  await user.type(screen.getByLabelText('Loggtekst fra kartpunkt'), 'Kontroller eldre farepunkt');
+  await user.click(screen.getByRole('button', { name: /Logg herfra Older hazard/i }));
+
+  await waitFor(async () => {
+    const mission = await getMission(activeMission.id);
+    expect(mission?.fieldLogEntries.at(-1)?.mapReference?.label).toBe('Older hazard');
+  });
+});
+
+it('creates a field log from a selected visible drawing using Logg herfra with first-point map reference', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  writeMissionMapState({
+    markers: [],
+    drawings: [
+      createMissionMapDrawing({
+        kind: 'sector',
+        missionId: activeMission.id,
+        label: 'Teig logg',
+        coordinates: '12,20 40,22 34,54 16,48',
+      }, new Date('2026-06-05T10:02:00Z')),
+    ],
+  });
+
+  await renderOfflineMapPanel();
+
+  await user.type(screen.getByLabelText('Loggtekst fra kartpunkt'), 'Kontroller teig uten persondata');
+  await user.click(screen.getByRole('button', { name: /Logg herfra Teig logg/i }));
+
+  await waitFor(async () => {
+    const mission = await getMission(activeMission.id);
+    expect(mission?.fieldLogEntries.at(-1)?.mapReference).toMatchObject({
+      source: 'map-drawing',
+      label: 'Teig logg',
+      point: { x: 12, y: 20 },
+    });
+  });
 });
 
 it('logs map observations to the selected mission, not missions[0]', async () => {
@@ -532,7 +586,7 @@ it('logs map observations to the selected mission, not missions[0]', async () =>
   await user.type(screen.getByPlaceholderText(/Sanitert lokal etikett/i), 'Fare valgt oppdrag');
   await user.type(screen.getByLabelText(/Loggtekst fra kartpunkt/i), 'Valgt oppdrag får kartlogg');
   await user.click(screen.getByRole('button', { name: /Legg til lokal markør/i }));
-  await user.click(screen.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i }));
+  await user.click(screen.getByRole('button', { name: /Logg herfra Fare valgt oppdrag/i }));
 
   await waitFor(async () => {
     expect(await getMission('b')).toMatchObject({
@@ -569,7 +623,7 @@ it('uses the newest visible marker when the newest stored marker layer is hidden
   await user.click(screen.getByLabelText('Observasjon'));
 
   await user.type(screen.getByLabelText(/Loggtekst fra kartpunkt/i), 'Logg fra synlig markør');
-  await user.click(screen.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i }));
+  await user.click(screen.getByRole('button', { name: /Logg herfra Fare synlig/i }));
 
   await waitFor(async () => {
     const mission = await getMission('mission-visible-map-log');
@@ -620,7 +674,7 @@ it('renders, exports and logs only map objects from the active mission', async (
   expect(geoJsonExport).not.toContain('Sektor skjult');
 
   await user.type(screen.getByLabelText(/Loggtekst fra kartpunkt/i), 'Aktiv kartlogg');
-  await user.click(screen.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i }));
+  await user.click(screen.getByRole('button', { name: /Logg herfra Fare aktiv/i }));
   await waitFor(async () => {
     expect(await getMission('a')).toMatchObject({
       fieldLogEntries: [expect.objectContaining({ mapReference: expect.objectContaining({ label: 'Fare aktiv' }) })],
@@ -657,7 +711,7 @@ it('preserves newer local mission updates when saving a field log from the map',
   });
 
   await user.type(screen.getByLabelText(/Loggtekst fra kartpunkt/i), 'Ny lokal kartlogg');
-  await user.click(screen.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i }));
+  await user.click(screen.getByRole('button', { name: /Logg herfra Ny observasjon/i }));
 
   await waitFor(async () => {
     const mission = await getMission('mission-stale-map-log');

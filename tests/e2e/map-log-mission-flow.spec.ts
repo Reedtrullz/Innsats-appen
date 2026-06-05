@@ -27,7 +27,7 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
   });
 
   await page.goto('/kart');
-  await expect(page.getByRole('heading', { name: 'Kart' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Kart', exact: true })).toBeVisible();
   await expect(page.getByText(new RegExp(`Aktivt oppdrag: ${missionTitle}`))).toBeVisible();
   await page.getByRole('combobox', { name: /Markørtype/i }).selectOption('hazard');
   await page.getByPlaceholder(/Sanitert lokal etikett/i).fill('Fare nord');
@@ -36,7 +36,7 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
   await page.getByRole('button', { name: /Legg til lokal markør/i }).click();
   await expect(page.getByTestId('operations-marker-list')).toContainText(/Fare — Fare nord/i);
   await page.getByLabel(/Loggtekst fra kartpunkt/i).fill('Fare observert uten persondata');
-  await page.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i }).click();
+  await page.getByRole('button', { name: /Logg herfra Fare nord/i }).click();
   await expect(page.getByText(/Feltlogg opprettet lokalt/i)).toBeVisible();
 
   await page.goto('/oppdrag');
@@ -97,7 +97,7 @@ test('map marker and field log stay scoped when switching between two missions',
   await expect(page.getByText(missionSummaryPattern(missionB, locationB))).toBeVisible();
 
   await page.goto('/kart');
-  await expect(page.getByRole('heading', { name: 'Kart' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Kart', exact: true })).toBeVisible();
   await expect(page.getByText(new RegExp(`Feltlogg går til: ${escapeRegex(missionB)}`, 'i'))).toBeVisible();
   await page.getByRole('combobox', { name: /Markørtype/i }).selectOption('hazard');
   await page.getByPlaceholder(/Sanitert lokal etikett/i).fill(markerLabel);
@@ -106,7 +106,7 @@ test('map marker and field log stay scoped when switching between two missions',
   await page.getByRole('button', { name: /Legg til lokal markør/i }).click();
   await expect(page.getByTestId('operations-marker-list')).toContainText(new RegExp(escapeRegex(markerLabel), 'i'));
   await page.getByLabel(/Loggtekst fra kartpunkt/i).fill(fieldLogText);
-  await page.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i }).click();
+  await page.getByRole('button', { name: /Logg herfra Fare kun B/i }).click();
   await expect(page.getByText(/Feltlogg opprettet lokalt/i)).toBeVisible();
 
   await page.goto('/oppdrag');

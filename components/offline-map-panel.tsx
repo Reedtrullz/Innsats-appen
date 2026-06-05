@@ -121,14 +121,28 @@ function operationMeasurement(drawing: MissionMapDrawing | undefined) {
   return `${MAP_DRAWING_LABELS[drawing.kind]}: avstand ${distance} skjematiske enheter, areal ${area}.`;
 }
 
-function markerActionAriaLabel(action: 'Rediger' | 'Slett', marker: MissionMapMarker) {
+function markerActionAriaLabel(action: 'Rediger' | 'Slett' | 'Logg herfra', marker: MissionMapMarker) {
   return `${action} ${marker.label} (${marker.kind}, X ${marker.point.x}, Y ${marker.point.y})`;
 }
 
-function drawingActionAriaLabel(action: 'Rediger' | 'Slett', drawing: MissionMapDrawing) {
+function drawingActionAriaLabel(action: 'Rediger' | 'Slett' | 'Logg herfra', drawing: MissionMapDrawing) {
   const firstPoint = drawing.points[0];
   const coordinateSummary = firstPoint ? `første punkt X ${firstPoint.x}, Y ${firstPoint.y}` : 'uten punktsammendrag';
   return `${action} ${drawing.label} (${MAP_DRAWING_LABELS[drawing.kind]}, ${drawing.points.length} punkt, ${coordinateSummary})`;
+}
+
+function categoryForMapObject(mapObject: MissionMapMarker | MissionMapDrawing): FieldLogCategory {
+  if (mapObject.itemType === 'drawing') return 'observasjon';
+  return mapObject.kind === 'hazard'
+    ? 'vaer-fare'
+    : mapObject.kind === 'resource' || mapObject.kind === 'pump-location'
+      ? 'ressursbehov'
+      : 'observasjon';
+}
+
+function criticalFlagsForMapObject(mapObject: MissionMapMarker | MissionMapDrawing) {
+  const critical = mapObject.itemType === 'marker' && (mapObject.kind === 'hazard' || mapObject.kind === 'incident-site');
+  return { criticalObservation: critical, mustBeForwarded: critical };
 }
 
 function drawingPointsToCoordinateText(drawing: MissionMapDrawing) {
@@ -461,10 +475,14 @@ export function OfflineMapPanel() {
     if (editingMarkerId === marker.id) cancelMarkerEdit();
   }
 
-  async function createLogFromNewestMarker() {
-    const newest = filteredState.markers.at(-1);
-    if (!activeMission || !newest) {
-      setStatusMessage('Opprett aktivt oppdrag og minst én synlig markør før feltlogg fra kart.');
+  async function createLogFromMapObject(mapObject: MissionMapMarker | MissionMapDrawing) {
+    if (!activeMission) {
+      setStatusMessage('Opprett aktivt oppdrag før feltlogg fra kart.');
+      return;
+    }
+    const text = mapLogText.trim();
+    if (!text) {
+      setStatusMessage('Skriv kort loggtekst før du oppretter feltlogg fra kart.');
       return;
     }
     if (mapLogSavingRef.current) return;
@@ -477,18 +495,14 @@ export function OfflineMapPanel() {
         setStatusMessage('Aktivt lokalt oppdrag ble ikke funnet. Åpne oppdraget på nytt før feltlogg fra kart.');
         return;
       }
-      const category: FieldLogCategory = newest.kind === 'hazard'
-        ? 'vaer-fare'
-        : newest.kind === 'resource' || newest.kind === 'pump-location'
-          ? 'ressursbehov'
-          : 'observasjon';
+      const flags = criticalFlagsForMapObject(mapObject);
       const entry = buildFieldLogEntryFromMapObject({
         missionId: currentMission.id,
-        mapObject: newest,
-        category,
-        text: mapLogText,
-        criticalObservation: newest.kind === 'hazard' || newest.kind === 'incident-site',
-        mustBeForwarded: newest.kind === 'hazard' || newest.kind === 'incident-site',
+        mapObject,
+        category: categoryForMapObject(mapObject),
+        text,
+        criticalObservation: flags.criticalObservation,
+        mustBeForwarded: flags.mustBeForwarded,
       });
       const updated = {
         ...currentMission,
@@ -506,6 +520,15 @@ export function OfflineMapPanel() {
       mapLogSavingRef.current = false;
       setMapLogSaving(false);
     }
+  }
+
+  function createLogFromNewestVisibleMarker() {
+    const newest = filteredState.markers.at(-1);
+    if (!newest) {
+      setStatusMessage('Velg et synlig kartobjekt før feltlogg fra kart.');
+      return;
+    }
+    void createLogFromMapObject(newest);
   }
 
   function addDrawing(formData: FormData) {
@@ -736,6 +759,9 @@ export function OfflineMapPanel() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span>{MAP_MARKER_LABELS[marker.kind]} — <span>{marker.label}</span> ({marker.point.x}, {marker.point.y})</span>
                 <span className="flex gap-2">
+                  <button type="button" aria-label={markerActionAriaLabel('Logg herfra', marker)} onClick={() => void createLogFromMapObject(marker)} disabled={mapLogSaving} className="min-h-10 rounded-xl bg-slate-950 px-3 font-black text-white disabled:cursor-wait disabled:bg-slate-500">
+                    Logg herfra {marker.label}
+                  </button>
                   <button type="button" aria-label={markerActionAriaLabel('Rediger', marker)} onClick={() => startMarkerEdit(marker)} className="min-h-10 rounded-xl border border-slate-300 bg-white px-3 font-black text-slate-950">
                     Rediger {marker.label}
                   </button>
@@ -772,14 +798,14 @@ export function OfflineMapPanel() {
       <section className="space-y-3 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Logg fra kartpunkt">
         <div>
           <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Kart → feltlogg</p>
-          <h2 className="text-2xl font-black">Opprett logg fra siste markør</h2>
+          <h2 className="text-2xl font-black">Opprett logg fra synlig kartobjekt</h2>
           <p className="mt-2 text-sm font-semibold text-amber-900">Lagres bare på aktivt lokalt oppdrag. Bruk skjematiske 0-100 koordinater; ikke legg inn persondata eller skjermede posisjoner.</p>
         </div>
         <p className="text-sm font-semibold text-slate-700">Aktivt oppdrag: {activeMission ? activeMission.title : 'Ingen aktivt lokalt oppdrag funnet'}</p>
         <p className="text-sm font-black text-slate-900">Feltlogg går til: {activeMission ? activeMission.title : 'Ingen aktivt lokalt oppdrag funnet'}</p>
         <label className="block text-sm font-black text-slate-800" htmlFor="map-log-text">Loggtekst fra kartpunkt</label>
         <textarea id="map-log-text" value={mapLogText} onChange={(event) => setMapLogText(event.target.value)} className="min-h-28 w-full rounded-2xl border border-slate-300 p-3 text-base" placeholder="Kort observasjon uten persondata" />
-        <button type="button" onClick={() => void createLogFromNewestMarker()} disabled={mapLogSaving} className={`${primaryButtonClass} disabled:cursor-wait disabled:bg-slate-500`}>Opprett feltlogg fra kartpunkt</button>
+        <button type="button" onClick={createLogFromNewestVisibleMarker} disabled={mapLogSaving} className={`${primaryButtonClass} disabled:cursor-wait disabled:bg-slate-500`}>Logg fra nyeste synlige markør</button>
       </section>
 
       <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Tegneverktøy og sektorer">
@@ -799,6 +825,9 @@ export function OfflineMapPanel() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span>{MAP_DRAWING_LABELS[drawing.kind]} — <span>{drawing.label}</span> ({drawing.points.length} punkt)</span>
                 <span className="flex gap-2">
+                  <button type="button" aria-label={drawingActionAriaLabel('Logg herfra', drawing)} onClick={() => void createLogFromMapObject(drawing)} disabled={mapLogSaving} className="min-h-10 rounded-xl bg-slate-950 px-3 font-black text-white disabled:cursor-wait disabled:bg-slate-500">
+                    Logg herfra {drawing.label}
+                  </button>
                   <button type="button" aria-label={drawingActionAriaLabel('Rediger', drawing)} onClick={() => startDrawingEdit(drawing)} className="min-h-10 rounded-xl border border-slate-300 bg-white px-3 font-black text-slate-950">
                     Rediger {drawing.label}
                   </button>
