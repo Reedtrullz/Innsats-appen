@@ -8,6 +8,8 @@ export const CompetenceCodeSchema = z.enum(competenceCodes);
 export const EquipmentTermSchema = z.enum(equipmentTerms);
 export const SourceStatusSchema = z.enum(['verified', 'unverified', 'historical', 'draft', 'expired']);
 export const SourceReviewRiskSchema = z.enum(['low', 'medium', 'high']);
+export const SourcePilotReviewStatusSchema = z.enum(['not-reviewed', 'approved-for-pilot', 'rejected-for-pilot']);
+export const SourcePublicationApprovalSchema = z.enum(['approved-public', 'internal-only', 'needs-permission']);
 export const PublicationStatusSchema = z.enum(['approved', 'draft', 'retired']);
 
 const sourcePathPattern = /^(?:source-extracts|curated-notes)\/[A-Za-z0-9ÆØÅæøå._() -]+\.md$/;
@@ -38,6 +40,8 @@ export const SourceDocumentSchema = z
     reviewer: z.string().min(1),
     reviewRisk: SourceReviewRiskSchema.default('medium'),
     reviewNotes: z.string().optional(),
+    pilotReviewStatus: SourcePilotReviewStatusSchema.default('not-reviewed'),
+    publicationStatus: SourcePublicationApprovalSchema.default('needs-permission'),
     body: z.string().min(1),
     warnings: z.array(z.string()).default([]),
   })
@@ -229,7 +233,9 @@ export const ContentManifestSchema = z.object({
   copiedAssetCount: z.number().int().nonnegative().default(0),
 });
 
-export type SourceDocument = z.infer<typeof SourceDocumentSchema>;
+type SourceDocumentOutput = z.infer<typeof SourceDocumentSchema>;
+export type SourceDocument = Omit<SourceDocumentOutput, 'pilotReviewStatus' | 'publicationStatus'> &
+  Partial<Pick<SourceDocumentOutput, 'pilotReviewStatus' | 'publicationStatus'>>;
 export type ActionCard = z.input<typeof ActionCardSchema>;
 export type OperationalChecklist = z.input<typeof OperationalChecklistSchema>;
 export type ChecklistItem = z.input<typeof ChecklistItemSchema>;

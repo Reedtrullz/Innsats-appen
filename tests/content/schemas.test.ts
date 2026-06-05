@@ -69,6 +69,33 @@ it('requires review scheduling metadata for high-risk source documents', () => {
   expect(result.success).toBe(false);
 });
 
+it('defaults unreviewed source governance fields to non-approved values', () => {
+  const base = {
+    id: 'src-test',
+    title: 'Test source',
+    sourcePath: 'source-extracts/SRC - Test.md',
+    sourceType: 'source-extract',
+    status: 'verified',
+    verifiedAt: '2026-06-05',
+    owner: 'AR',
+    reviewer: 'JM',
+    reviewRisk: 'high',
+    reviewAfter: '2026-12-05',
+    body: 'Public test body',
+    warnings: [],
+  };
+
+  expect(SourceDocumentSchema.parse(base)).toMatchObject({
+    pilotReviewStatus: 'not-reviewed',
+    publicationStatus: 'needs-permission',
+  });
+  expect(SourceDocumentSchema.parse({
+    ...base,
+    pilotReviewStatus: 'approved-for-pilot',
+    publicationStatus: 'approved-public',
+  })).toMatchObject({ pilotReviewStatus: 'approved-for-pilot', publicationStatus: 'approved-public' });
+});
+
 it('rejects local filesystem source paths', () => {
   const base = {
     id: 'src-local',

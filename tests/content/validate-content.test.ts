@@ -1,6 +1,17 @@
 import { buildContentCoverageReport, validateContentGraph } from '@/scripts/validate-content';
+import { SourceDocumentSchema } from '@/lib/content/schemas';
 
 const knownSource = { id: 'src-known', title: 'Known', sourcePath: 'source-extracts/SRC - Known.md', sourceType: 'source-extract', status: 'verified', verifiedAt: '2026-06-03', reviewAfter: '2026-12-03', owner: 'content-team', reviewer: 'fagansvarlig', reviewRisk: 'low', body: 'Known', warnings: [] };
+
+it('keeps missing source governance metadata compatible with validation defaults', async () => {
+  const errors = await validateContentGraph({
+    sources: [knownSource],
+    actionCards: [{ slug: 'ok-card', title: 'Ok', phase: 'under', roles: ['lagforer'], scenarios: ['generelt'], priority: 'high', steps: ['Ok'], sourceIds: ['src-known'] }],
+  } as any);
+
+  expect(errors.join('\n')).not.toContain('pilotReviewStatus');
+  expect(SourceDocumentSchema.parse(knownSource)).toMatchObject({ pilotReviewStatus: 'not-reviewed', publicationStatus: 'needs-permission' });
+});
 
 it('reports missing source references', async () => {
   const errors = await validateContentGraph({

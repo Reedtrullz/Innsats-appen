@@ -11,6 +11,16 @@ Task 403 forklarer kilde- og varselstatus for mannskaper og ledere. Bruk appens 
 - `Høy kilde-risiko`: krever ekstra kontroll mot original kilde og lokal fagansvarlig.
 - Draft/historical: forklarer kontekst, ikke gjeldende ordre.
 
+## Kildegjennomgang versus publisering
+
+Kildefelt har tre ulike betydninger og skal ikke tolkes som samme godkjenning:
+
+- `status=verified` betyr at kildeinnholdet er strukturelt/kildefaglig gjennomgått: uttrekk, sti, eier/reviewer og revisjonsplan er gyldige for kilderekorden.
+- `pilotReviewStatus=approved-for-pilot` betyr at kilden kan støtte operative kort og sjekklister i pilot. Manglende `pilotReviewStatus` får konservativ standardverdi `not-reviewed`.
+- `publicationStatus=approved-public` betyr at genererte offentlige kildedokumenter kan vise kildebody eller utdrag. Manglende `publicationStatus` får konservativ standardverdi `needs-permission`.
+
+Standardverdiene gjør gamle importer kompatible, men godkjenner ikke kilder. `npm run report:source-governance:strict` er derfor fortsatt forventet å feile til faktiske kildegodkjenninger er registrert eksplisitt.
+
 ## Eksterne varsler
 
 MET/NVE/Kartverket/kommune-signaler er kontekst. De blir ikke offisiell ordre i appen, og appen er ikke koblet til Nødvarsel, CIM eller Nødnett.
