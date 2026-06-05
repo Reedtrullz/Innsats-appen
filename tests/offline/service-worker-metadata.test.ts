@@ -22,6 +22,7 @@ describe('service worker metadata helpers', () => {
     const sw = fs.readFileSync(path.join(process.cwd(), 'public', 'sw.js'), 'utf8');
     const staticAppShell = extractStaticAppShell(sw);
     expect(manifest().start_url).toBe('/');
+    expect(manifest().display).toBe('standalone');
     expect(sw).toContain(`const SW_CACHE_VERSION = '${SW_CACHE_VERSION}'`);
     expect(sw).toContain('BEREDSKAPSBOKA_GET_SW_STATUS');
     expect(sw).toContain('BEREDSKAPSBOKA_SKIP_WAITING');

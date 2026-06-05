@@ -12,7 +12,7 @@
 | Task 384 | `task-384-rain-gloves-darkness-stress.md` | Field-mode/touch-target tests support design | Wet/glove/dark/stress observation notes | Requires field-condition run |
 | Task 385 | `task-385-iphone-safari-real-device.md` | None equivalent | iPhone Safari screenshots/log | Requires physical iPhone or real-device lab |
 | Task 386 | `task-386-android-chrome-real-device.md` | Chromium mobile proxy only | Android Chrome screenshots/log | Requires physical Android or real-device lab |
-| Task 387 | `task-387-install-to-home-screen.md` | Manifest/service-worker tests support PWA readiness | OS-level install and standalone launch evidence | Requires physical device |
+| Task 387 | `task-387-install-to-home-screen.md` | Manifest/service-worker tests assert start_url `/` and standalone display | OS-level install and standalone launch evidence for `/` home command surface with links to `/hurtigkort`, `/sok`, `/oppdrag`, `/data-pa-enheten` | Requires physical device |
 | Task 388 | `task-388-low-connectivity.md` | Playwright offline tests support cache behavior | Weak network/cellular/captive-portal style evidence | Requires physical/network lab |
 | Task 389 | `task-389-update-after-offline.md` | SW update unit/E2E supports update prompt | Two-build offline-then-update run evidence | Requires physical device or staged deployment |
 

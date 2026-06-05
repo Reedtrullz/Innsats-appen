@@ -10,17 +10,24 @@
 
 Record pass/fail, device/browser, network state, screenshots or video paths, console/errors if available, and privacy notes. Screenshots must not contain sensitive or personal information.
 
+Evidence fields must include:
+- Installed-app launch route: `/`.
+- Screenshot of the standalone home command surface after launch.
+- Screenshot or notes proving links from `/` to `/hurtigkort`, `/sok`, `/oppdrag`, and `/data-pa-enheten` are visible or reachable.
+- Confirmation that only sanitized test mission names/data were used.
+
 ## Steps / Steg
 
 1. On iOS Safari: Share -> Add to Home Screen; on Android Chrome: install prompt/menu.
 2. Launch from the installed icon.
-3. Verify app name, icon, start_url `/hurtigkort`, standalone display and safe area.
-4. Prime cache, close app, disable network, relaunch installed PWA.
-5. Record OS-level screenshots; browser automation alone cannot prove this.
+3. Verify app name, icon, start_url `/`, standalone display and safe area.
+4. Confirm the installed app opens on `/` (home command surface) and links to `/hurtigkort`, `/sok`, `/oppdrag`, and `/data-pa-enheten` are visible or reachable.
+5. Prime cache, close app, disable network, relaunch installed PWA.
+6. Record OS-level screenshots; browser automation alone cannot prove this.
 
 ## Expected result / Forventet resultat
 
-Installed PWA launches and works offline from the OS home screen.
+Installed PWA launches at `/` (home command surface), exposes links to `/hurtigkort`, `/sok`, `/oppdrag`, and `/data-pa-enheten`, and works offline from the OS home screen.
 
 ## Privacy / Personvern
 
