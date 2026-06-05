@@ -222,11 +222,19 @@ export function subscribeOfflineMapCache(callback: () => void) {
 }
 
 export function offlineMapQuotaCopy(input: { estimatedSizeMb: number; quota?: number; usage?: number }) {
-  if (input.quota === undefined || input.usage === undefined) {
+  const quotaEstimate = input.quota;
+  const usageEstimate = input.usage;
+  if (typeof quotaEstimate !== 'number' || typeof usageEstimate !== 'number') {
     return 'Nettleserens lagringskvote er ukjent. Test offline før innsats.';
   }
-  const availableMb = Math.max(0, (input.quota - input.usage) / 1024 / 1024);
-  if (availableMb < input.estimatedSizeMb * 1.5) {
+  if (!Number.isFinite(quotaEstimate) || !Number.isFinite(usageEstimate)) {
+    return 'Nettleserens lagringskvote er ukjent. Test offline før innsats.';
+  }
+  const quota = Math.max(0, quotaEstimate);
+  const usage = Math.max(0, usageEstimate);
+  const estimatedSizeMb = Number.isFinite(input.estimatedSizeMb) ? Math.max(0, input.estimatedSizeMb) : 0;
+  const availableMb = Math.max(0, (quota - usage) / 1024 / 1024);
+  if (availableMb < estimatedSizeMb * 1.5) {
     return `Lav tilgjengelig nettleserlagring (${availableMb.toFixed(0)} MB). Denne kartpakken kan fortrenge annet offline-innhold. Velg mindre pakke eller rydd lokal data før innsats.`;
   }
   return `Tilgjengelig nettleserlagring ser tilstrekkelig ut (${availableMb.toFixed(0)} MB ledig).`;

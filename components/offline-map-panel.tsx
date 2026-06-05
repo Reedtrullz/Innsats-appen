@@ -243,8 +243,8 @@ export function OfflineMapPanel() {
       .then((estimate) => {
         if (!mounted) return;
         setStorageEstimate({
-          quota: typeof estimate.quota === 'number' ? estimate.quota : undefined,
-          usage: typeof estimate.usage === 'number' ? estimate.usage : undefined,
+          quota: typeof estimate.quota === 'number' && Number.isFinite(estimate.quota) ? estimate.quota : undefined,
+          usage: typeof estimate.usage === 'number' && Number.isFinite(estimate.usage) ? estimate.usage : undefined,
         });
       })
       .catch(() => {

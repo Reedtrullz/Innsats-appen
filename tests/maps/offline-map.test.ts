@@ -6,6 +6,7 @@ import {
   capMapFeatures,
   getOfflineMapPackage,
   getRenderableMapFeatures,
+  offlineMapQuotaCopy,
   parseCachedOfflineMapPackage,
   readCachedOfflineMapPackage,
   resetCachedOfflineMapPackage,
@@ -112,6 +113,29 @@ it('does not write a fallback cache record for unknown package ids', () => {
 it('shows cache size warnings for larger packages', () => {
   expect(cacheSizeWarningForPackage(getOfflineMapPackage('trondheim-lokal')!)).toBeNull();
   expect(cacheSizeWarningForPackage(getOfflineMapPackage('trondelag-oversikt')!)).toMatch(/Cache-varsel.*42 MB/i);
+});
+
+it('treats non-finite storage quota estimates as unknown without rendering invalid numbers', () => {
+  const quotaCopy = offlineMapQuotaCopy({ estimatedSizeMb: 12, quota: Number.NaN, usage: 4 * 1024 * 1024 });
+  const usageCopy = offlineMapQuotaCopy({ estimatedSizeMb: 12, quota: 50 * 1024 * 1024, usage: Number.POSITIVE_INFINITY });
+
+  expect(quotaCopy).toMatch(/lagringskvote er ukjent/i);
+  expect(usageCopy).toMatch(/lagringskvote er ukjent/i);
+  expect(`${quotaCopy} ${usageCopy}`).not.toMatch(/NaN|Infinity/);
+});
+
+it('clamps negative quota and usage estimates before calculating available cache space', () => {
+  expect(offlineMapQuotaCopy({
+    estimatedSizeMb: 80,
+    quota: 100 * 1024 * 1024,
+    usage: -100 * 1024 * 1024,
+  })).toMatch(/Lav tilgjengelig nettleserlagring \(100 MB\)/i);
+
+  expect(offlineMapQuotaCopy({
+    estimatedSizeMb: 1,
+    quota: -20 * 1024 * 1024,
+    usage: 0,
+  })).toMatch(/Lav tilgjengelig nettleserlagring \(0 MB\)/i);
 });
 
 it('caps schematic feature rendering for older phone performance', () => {

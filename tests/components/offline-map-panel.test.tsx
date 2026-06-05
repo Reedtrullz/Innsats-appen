@@ -51,8 +51,15 @@ function mockMapPackageCache(result: { cached: number } | Promise<{ cached: numb
   return cacheLocalMapPackageAssets;
 }
 
+const originalNavigatorStorageDescriptor = Object.getOwnPropertyDescriptor(navigator, 'storage');
+
 afterEach(async () => {
   localStorage.clear();
+  if (originalNavigatorStorageDescriptor) {
+    Object.defineProperty(navigator, 'storage', originalNavigatorStorageDescriptor);
+  } else {
+    Reflect.deleteProperty(navigator, 'storage');
+  }
   vi.doUnmock('@/lib/maps/offline-map-package-manifest');
   vi.doUnmock('@/lib/maps/map-package-cache');
   vi.resetModules();
@@ -184,6 +191,17 @@ it('shows quota-aware cache copy before saving a large offline map package', asy
 it('explains that browser storage quota can be unknown before offline map package caching', () => {
   expect(offlineMapQuotaCopy({ estimatedSizeMb: 12 })).toMatch(/lagringskvote er ukjent/i);
   expect(offlineMapQuotaCopy({ estimatedSizeMb: 12 })).toMatch(/Test offline før innsats/i);
+});
+
+it('shows unknown storage quota copy in the UI when navigator storage is absent', async () => {
+  Object.defineProperty(navigator, 'storage', {
+    configurable: true,
+    value: undefined,
+  });
+
+  await renderOfflineMapPanel();
+
+  expect(screen.getByTestId('offline-map-quota-copy')).toHaveTextContent(/Nettleserens lagringskvote er ukjent/i);
 });
 
 it('lets an approved PMTiles package be selected, cached and activated', async () => {
