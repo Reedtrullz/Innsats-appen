@@ -18,6 +18,21 @@ function configureSshStep(workflow: string) {
   return workflow.slice(start, end);
 }
 
+function workflowStep(workflow: string, startName: string, nextName?: string) {
+  const start = workflow.indexOf(`- name: ${startName}`);
+  expect(start).toBeGreaterThan(-1);
+
+  const end = nextName
+    ? workflow.indexOf(`- name: ${nextName}`, start + startName.length)
+    : workflow.length;
+
+  if (nextName) {
+    expect(end).toBeGreaterThan(start);
+  }
+
+  return workflow.slice(start, end > -1 ? end : workflow.length);
+}
+
 describe('CI workflow checks', () => {
   it('runs map package validation in production CI before build', () => {
     const workflow = readCiWorkflow();
@@ -49,18 +64,23 @@ describe('CI deploy SSH security', () => {
 describe('staging deploy verification', () => {
   it('pins staging SSH host key instead of trusting ssh-keyscan only', () => {
     const workflow = readWorkflow('.github/workflows/staging.yml');
+    const step = workflowStep(workflow, 'Configure staging SSH key', 'Write staging inventory');
 
-    expect(workflow).toMatch(/STAGING_SSH_HOST_KEY/);
-    expect(workflow).toMatch(/known_hosts/);
-    expect(workflow).not.toMatch(/ssh-keyscan -H "\$\{STAGING_HOST\}" >> ~\/\.ssh\/known_hosts/);
+    expect(step).toMatch(/STAGING_SSH_HOST_KEY/);
+    expect(step).toMatch(/known_hosts/);
+    expect(step).toMatch(/ssh-keygen -F/);
+    expect(step).not.toMatch(/ssh-keyscan\b/);
   });
 
   it('verifies staging public health exposes the exact deployed SHA', () => {
     const workflow = readWorkflow('.github/workflows/staging.yml');
+    const step = workflowStep(workflow, 'Verify staging public deployment version');
 
-    expect(workflow).toMatch(/Verify staging public deployment version/);
-    expect(workflow).toMatch(/https:\/\/\$\{STAGING_DOMAIN\}\/api\/health/);
-    expect(workflow).toMatch(/github\.sha|GITHUB_SHA/);
-    expect(workflow).toMatch(/version/);
+    expect(step).toMatch(/https:\/\/\$\{STAGING_DOMAIN\}\/api\/health/);
+    expect(step).toMatch(/EXPECTED_SHA/);
+    expect(step).toMatch(/github\.sha|\$\{\{ github\.sha \}\}/);
+    expect(step).toMatch(/health\.version/);
+    expect(step).toMatch(/process\.env\.EXPECTED_SHA/);
+    expect(step).toMatch(/health\.version\s*===\s*process\.env\.EXPECTED_SHA/);
   });
 });
