@@ -1,5 +1,6 @@
 const SW_CACHE_VERSION = 'v4';
 const CACHE_NAME = `beredskapsboka-${SW_CACHE_VERSION}`;
+const MAP_PACKAGE_CACHE_NAME = 'beredskapsboka-map-packages';
 const GENERATED_CONTENT_STALE_MS = 7 * 24 * 60 * 60 * 1000;
 const MESSAGE_TYPES = {
   getStatus: 'BEREDSKAPSBOKA_GET_SW_STATUS',
@@ -71,6 +72,14 @@ function swStatus(state = 'active') {
     staleThresholdMs: GENERATED_CONTENT_STALE_MS,
     state,
   };
+}
+
+function isLocalMapPackageAsset(pathname) {
+  if (!pathname.startsWith('/map-packages/')) return false;
+  if (pathname.includes('\\') || pathname.includes('?') || pathname.includes('#')) return false;
+  if (!/^\/map-packages\/[A-Za-z0-9._/-]+\.(?:json|pmtiles)$/.test(pathname)) return false;
+  const relativePath = pathname.slice('/map-packages/'.length);
+  return relativePath.split('/').every((segment) => segment.length > 0 && segment !== '.' && segment !== '..');
 }
 
 async function postToClients(message) {
@@ -215,7 +224,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME && key !== MAP_PACKAGE_CACHE_NAME).map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
       .then(() => postToClients({ type: MESSAGE_TYPES.status, payload: swStatus('active') })),
   );
@@ -258,6 +267,23 @@ async function networkThenCache(request) {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (event.request.method !== 'GET') return;
+
+  if (url.origin === self.location.origin && url.search === '' && url.hash === '' && isLocalMapPackageAsset(url.pathname)) {
+    event.respondWith((async () => {
+      const request = event.request;
+      const cache = await caches.open(MAP_PACKAGE_CACHE_NAME);
+      const cached = await cache.match(request);
+      try {
+        const response = await fetch(request);
+        if (response.ok) await cache.put(request, response.clone());
+        return response;
+      } catch (error) {
+        if (cached) return cached;
+        throw error;
+      }
+    })());
+    return;
+  }
 
   if (url.pathname.startsWith('/api/context/')) {
     event.respondWith(

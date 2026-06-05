@@ -20,6 +20,7 @@ import {
   approvedLocalMapPackages,
   localMapPackageForId,
 } from '@/lib/maps/offline-map-package-manifest';
+import { cacheLocalMapPackageAssets } from '@/lib/maps/map-package-cache';
 import {
   BLUE_FORCE_TRACKING_RESEARCH,
   DEFAULT_ENABLED_MAP_LAYERS,
@@ -258,7 +259,28 @@ export function OfflineMapPanel() {
     setStatusMessage(message);
   }
 
-  function cacheSelectedPackage() {
+  async function cacheSelectedPackage() {
+    if (selectedPackage.runtimeFormat === 'pmtiles') {
+      const localPackage = localMapPackageForId(selectedPackage.id);
+      if (!localPackage) {
+        setStatusMessage('Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline.');
+        return;
+      }
+      try {
+        const result = await cacheLocalMapPackageAssets(localPackage);
+        if (result.cached === 0) {
+          setStatusMessage('Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline.');
+          return;
+        }
+      } catch {
+        setStatusMessage('Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline.');
+        return;
+      }
+      writeCachedOfflineMapPackage(selectedPackage.id);
+      setStatusMessage('Lokal PMTiles-kartpakke er forhåndscachet og aktivert offline.');
+      return;
+    }
+
     writeCachedOfflineMapPackage(selectedPackage.id);
   }
 

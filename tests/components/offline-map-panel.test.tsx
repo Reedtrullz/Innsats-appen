@@ -39,9 +39,19 @@ function mockApprovedLocalMapPackages(packages = [approvedPmtilesPackage]) {
   }));
 }
 
+function mockMapPackageCache(result: { cached: number } | Promise<{ cached: number }> = { cached: 2 }) {
+  const cacheLocalMapPackageAssets = vi.fn(async () => result);
+  vi.doMock('@/lib/maps/map-package-cache', () => ({
+    MAP_PACKAGE_CACHE_NAME: 'beredskapsboka-map-packages',
+    cacheLocalMapPackageAssets,
+  }));
+  return cacheLocalMapPackageAssets;
+}
+
 afterEach(async () => {
   localStorage.clear();
   vi.doUnmock('@/lib/maps/offline-map-package-manifest');
+  vi.doUnmock('@/lib/maps/map-package-cache');
   vi.resetModules();
   await clearLocalMissionData();
 });
@@ -157,14 +167,37 @@ it('stores selected map package cache metadata in localStorage and can reset it'
 it('lets an approved PMTiles package be selected, cached and activated', async () => {
   const user = userEvent.setup();
   mockApprovedLocalMapPackages();
+  const cacheLocalMapPackageAssets = mockMapPackageCache({ cached: 2 });
 
   await renderOfflineMapPanel();
 
   await user.selectOptions(screen.getByLabelText('Velg lokal kartpakke'), 'trondheim-demo-pmtiles');
   await user.click(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }));
 
-  expect(screen.getByText(/Lokal kartpakke aktiv: Trondheim demo PMTiles/i)).toBeInTheDocument();
+  await waitFor(() => {
+    expect(cacheLocalMapPackageAssets).toHaveBeenCalledWith(approvedPmtilesPackage);
+    expect(screen.getByText(/Lokal kartpakke aktiv: Trondheim demo PMTiles/i)).toBeInTheDocument();
+  });
   expect(screen.getByTestId('offline-maplibre-container')).toBeInTheDocument();
+  await screen.findByText(/Kunne ikke åpne lokal kartpakke\. Skjematisk kart brukes som fallback/i);
+});
+
+it('keeps schematic fallback when CacheStorage cannot precache an approved PMTiles package', async () => {
+  const user = userEvent.setup();
+  mockApprovedLocalMapPackages();
+  mockMapPackageCache({ cached: 0 });
+
+  await renderOfflineMapPanel();
+
+  await user.selectOptions(screen.getByLabelText('Velg lokal kartpakke'), 'trondheim-demo-pmtiles');
+  await user.click(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }));
+
+  await waitFor(() => {
+    expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline/i);
+    expect(screen.getByTestId('offline-map-cache-status')).toHaveTextContent(/Ingen kartpakke/i);
+  });
+  expect(localStorage.getItem(OFFLINE_MAP_CACHE_STORAGE_KEY)).toBeNull();
+  expect(screen.queryByTestId('offline-maplibre-container')).not.toBeInTheDocument();
 });
 
 it('keeps the schematic fallback when an approved PMTiles package is selected but not cached', async () => {

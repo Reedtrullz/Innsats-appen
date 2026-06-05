@@ -1,7 +1,16 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { expect, test } from '@playwright/test';
 import { clearBrowserLocalState, createLocalMission, waitForServiceWorker } from './helpers';
 
 const mapTileUrlPattern = /(?:\/tiles?\/|\.mbtiles\b|mapbox|openstreetmap|maplibre|leaflet|tile\.openstreetmap)/i;
+const mapPackageFixtureDir = path.join(process.cwd(), 'public', 'map-packages');
+
+function hasLocalMapPackageFixtures() {
+  if (!fs.existsSync(mapPackageFixtureDir)) return false;
+  const entries = fs.readdirSync(mapPackageFixtureDir);
+  return entries.some((entry) => entry.endsWith('.pmtiles')) && entries.some((entry) => entry.endsWith('.json'));
+}
 
 test('offline map page is local-only, cacheable and tile-free', async ({ page, context }) => {
   const requestedUrls: string[] = [];
@@ -30,6 +39,11 @@ test('offline map page is local-only, cacheable and tile-free', async ({ page, c
   await expect(page.getByText(/ingen nettverksnedlasting/i)).toBeVisible();
   await expect(page.getByText(/ingen backend sync/i).first()).toBeVisible();
   await expect(page.getByTestId('offline-map-cache-status')).toContainText(/Ingen kartpakke/i);
+
+  if (!hasLocalMapPackageFixtures()) {
+    await expect(page.getByTestId('map-performance-guard')).toContainText(/Ytelsesvern/i);
+    await expect(page.getByTestId('offline-maplibre-container')).toHaveCount(0);
+  }
 
   await context.setOffline(false);
   await page.reload({ waitUntil: 'domcontentloaded' });

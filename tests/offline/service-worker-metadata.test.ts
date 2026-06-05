@@ -31,6 +31,15 @@ describe('service worker metadata helpers', () => {
     expect(staticAppShell.some((route) => /^\/content\//.test(route))).toBe(false);
   });
 
+  it('treats app-local map package assets as offline cacheable runtime assets', () => {
+    const sw = fs.readFileSync(path.join(process.cwd(), 'public', 'sw.js'), 'utf8');
+    expect(sw).toContain('/map-packages/');
+    expect(sw).toContain('isLocalMapPackageAsset');
+    expect(sw).toContain('MAP_PACKAGE_CACHE_NAME');
+    expect(sw).toContain('caches.open(MAP_PACKAGE_CACHE_NAME)');
+    expect(sw).toContain('cache.put(request, response.clone())');
+  });
+
   it('detects stale generated content using the mobile/offline threshold', () => {
     const now = Date.parse('2026-06-04T12:00:00.000Z');
     expect(isGeneratedContentStale('2026-06-04T11:00:00.000Z', now)).toBe(false);
