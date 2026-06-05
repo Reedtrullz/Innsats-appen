@@ -82,3 +82,39 @@ it('summarizes critical logs and map activity as mission command signals', () =>
   expect(screen.getByText(/1 sektor/i)).toBeInTheDocument();
   expect(screen.getByText(/foreslå statusoppdatering/i)).toBeInTheDocument();
 });
+
+it('pluralizes command signal counts for zero and many map/log signals', () => {
+  const { rerender } = render(<MissionCommandSignals mission={{ ...mission, fieldLogEntries: [] }} mapSummary={{ markerCount: 0, drawingCount: 0 }} />);
+
+  expect(screen.getByText(/0 kritiske logger/i)).toBeInTheDocument();
+  expect(screen.getByText(/0 markører/i)).toBeInTheDocument();
+  expect(screen.getByText(/0 sektorer\/tegninger/i)).toBeInTheDocument();
+
+  rerender(<MissionCommandSignals mission={{
+    ...mission,
+    fieldLogEntries: [
+      {
+        id: 'critical-1',
+        timestamp: '2026-06-05T10:00:00.000Z',
+        category: 'observasjon',
+        text: 'Vannstand øker',
+        criticalObservation: true,
+        mustBeForwarded: false,
+        linkedMissionId: mission.id,
+      },
+      {
+        id: 'forward-1',
+        timestamp: '2026-06-05T10:10:00.000Z',
+        category: 'observasjon',
+        text: 'Pumpebehov må videreføres',
+        criticalObservation: false,
+        mustBeForwarded: true,
+        linkedMissionId: mission.id,
+      },
+    ],
+  }} mapSummary={{ markerCount: 3, drawingCount: 2 }} />);
+
+  expect(screen.getByText(/2 kritiske logger/i)).toBeInTheDocument();
+  expect(screen.getByText(/3 markører/i)).toBeInTheDocument();
+  expect(screen.getByText(/2 sektorer\/tegninger/i)).toBeInTheDocument();
+});
