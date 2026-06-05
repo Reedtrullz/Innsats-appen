@@ -1,6 +1,8 @@
 {
   "generatedAt": "2026-06-04T17:28:59.756Z",
   "sourceCount": 7,
+  "planSourceCount": 7,
+  "planSourceHash": "sha256:c68de9bd9d76f55ad25589c0bd4129473639513add867d7fdf33c8530096ee5b",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",

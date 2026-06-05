@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 const slugPattern = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
 const publicSourcePathPattern = /^(?:\.hermes\/plans|content\/workplans)\/[A-Za-z0-9ÆØÅæøå._() -]+\.(?:md|json)$/;
+const sha256HashPattern = /^sha256:[0-9a-f]{64}$/;
 
 export const WorkplanStageSchema = z.enum(['idea', 'scope', 'build', 'verify', 'release']);
 export const WorkplanStatusSchema = z.enum(['planned', 'active', 'blocked', 'completed']);
@@ -51,6 +52,8 @@ export const WorkplanSchema = z.object({
 export const WorkplansSnapshotSchema = z.object({
   generatedAt: z.string().min(1),
   sourceCount: z.number().int().nonnegative(),
+  planSourceCount: z.number().int().nonnegative().optional(),
+  planSourceHash: z.string().regex(sha256HashPattern, 'planSourceHash must be a sha256:<64 hex> digest').optional(),
   workplans: z.array(WorkplanSchema),
 }).superRefine((snapshot, ctx) => {
   if (snapshot.sourceCount !== snapshot.workplans.length) {

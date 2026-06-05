@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
 import { ContentManifestSchema, type ContentManifest } from '@/lib/content/schemas';
 import {
   WorkplanSchema,
@@ -27,12 +28,20 @@ export interface SyncWorkplansOptions {
   snapshotSourcePath?: string;
   obsidianProjectDir?: string;
   now?: string;
+  mode?: 'write' | 'check';
 }
 
 export interface SyncWorkplansResult {
   snapshot: WorkplansSnapshot;
   workplans: Workplan[];
   obsidianNotePath?: string;
+}
+
+interface LocalPlanReadResult {
+  workplans: Workplan[];
+  planSourceCount: number;
+  planSourceHash: string;
+  sourceDirectoryExists: boolean;
 }
 
 function repoPath(rootDir: string, ...parts: string[]) {
@@ -329,28 +338,50 @@ export function parseWorkplanMarkdown({ fileName, relativePath, markdown, update
   });
 }
 
-async function readLocalPlanFiles(rootDir: string, plansDir: string): Promise<Workplan[]> {
-  if (!(await pathExists(plansDir))) return [];
+async function readLocalPlanFiles(rootDir: string, plansDir: string): Promise<LocalPlanReadResult> {
+  if (!(await pathExists(plansDir))) {
+    return { workplans: [], planSourceCount: 0, planSourceHash: hashPlanSources([]), sourceDirectoryExists: false };
+  }
   const entries = (await fs.readdir(plansDir)).filter((file) => file.endsWith('.md')).sort((a, b) => a.localeCompare(b, 'nb'));
   const workplans: Workplan[] = [];
+  const sourcePayload: Array<{ relativePath: string; markdown: string }> = [];
   for (const fileName of entries) {
     const filePath = path.join(plansDir, fileName);
     const markdown = await fs.readFile(filePath, 'utf8');
     const stat = await fs.stat(filePath);
+    const relativePath = path.relative(rootDir, filePath).replace(/\\/g, '/');
+    sourcePayload.push({ relativePath, markdown });
     workplans.push(parseWorkplanMarkdown({
       fileName,
-      relativePath: path.relative(rootDir, filePath),
+      relativePath,
       markdown,
       updatedAt: stat.mtime.toISOString(),
     }));
   }
-  return workplans;
+  return {
+    workplans,
+    planSourceCount: sourcePayload.length,
+    planSourceHash: hashPlanSources(sourcePayload),
+    sourceDirectoryExists: true,
+  };
 }
 
-async function readSnapshotSource(snapshotSourcePath: string): Promise<Workplan[]> {
-  if (!(await pathExists(snapshotSourcePath))) return [];
-  const snapshot = WorkplansSnapshotSchema.parse(JSON.parse(await fs.readFile(snapshotSourcePath, 'utf8')));
-  return snapshot.workplans.map((workplan) => WorkplanSchema.parse({ ...workplan, sourceType: workplan.sourceType ?? 'manual-snapshot' }));
+async function readWorkplansSnapshot(snapshotSourcePath: string): Promise<WorkplansSnapshot | undefined> {
+  if (!(await pathExists(snapshotSourcePath))) return undefined;
+  return WorkplansSnapshotSchema.parse(JSON.parse(await fs.readFile(snapshotSourcePath, 'utf8')));
+}
+
+async function readSnapshotSource(snapshotSourcePath: string): Promise<WorkplansSnapshot | undefined> {
+  const snapshot = await readWorkplansSnapshot(snapshotSourcePath);
+  if (!snapshot) return undefined;
+  const workplans = snapshot.workplans.map((workplan) => WorkplanSchema.parse({ ...workplan, sourceType: workplan.sourceType ?? 'manual-snapshot' }));
+  return WorkplansSnapshotSchema.parse({
+    ...snapshot,
+    sourceCount: workplans.length,
+    planSourceCount: snapshot.planSourceCount ?? workplans.length,
+    planSourceHash: snapshot.planSourceHash ?? hashSnapshotWorkplans(workplans),
+    workplans,
+  });
 }
 
 async function readManifest(generatedDir: string): Promise<ContentManifest> {
@@ -477,6 +508,31 @@ function latestWorkplanTimestamp(workplans: Workplan[], fallback: string) {
   return workplans.map((workplan) => workplan.updatedAt).sort().at(-1) ?? fallback;
 }
 
+function hashPlanSources(sources: Array<{ relativePath: string; markdown: string }>) {
+  const stablePayload = JSON.stringify(sources.map((source) => ({
+    relativePath: source.relativePath.replace(/\\/g, '/'),
+    markdown: source.markdown,
+  })));
+  return `sha256:${crypto.createHash('sha256').update(stablePayload).digest('hex')}`;
+}
+
+function hashSnapshotWorkplans(workplans: Workplan[]) {
+  const stablePayload = JSON.stringify(workplans.map((workplan) => ({
+    ...workplan,
+    sourcePath: workplan.sourcePath.replace(/\\/g, '/'),
+  })));
+  return `sha256:${crypto.createHash('sha256').update(stablePayload).digest('hex')}`;
+}
+
+function describeSnapshotDrift(snapshotSourcePath: string, expectedCount: number, expectedHash: string, actualCount: number | undefined, actualHash: string | undefined) {
+  return [
+    `Workplan snapshot drift detected in ${snapshotSourcePath}.`,
+    `Expected planSourceCount=${expectedCount} and planSourceHash=${expectedHash}.`,
+    `Tracked snapshot has planSourceCount=${actualCount ?? 'missing'} and planSourceHash=${actualHash ?? 'missing'}.`,
+    'Run npm run sync:workplans and commit content/workplans/workplans.json.',
+  ].join(' ');
+}
+
 export async function syncWorkplans(options: SyncWorkplansOptions = {}): Promise<SyncWorkplansResult> {
   const rootDir = path.resolve(options.rootDir ?? process.cwd());
   const plansDir = path.resolve(options.plansDir ?? repoPath(rootDir, '.hermes/plans'));
@@ -484,17 +540,35 @@ export async function syncWorkplans(options: SyncWorkplansOptions = {}): Promise
   const publicGeneratedDir = path.resolve(options.publicGeneratedDir ?? repoPath(rootDir, 'public/generated-content'));
   const snapshotSourcePath = path.resolve(options.snapshotSourcePath ?? repoPath(rootDir, 'content/workplans/workplans.json'));
   const runGeneratedAt = options.now ?? new Date().toISOString();
+  const mode = options.mode ?? 'write';
 
-  const localWorkplans = await readLocalPlanFiles(rootDir, plansDir);
-  const workplans = localWorkplans.length > 0 ? localWorkplans : await readSnapshotSource(snapshotSourcePath);
-  const snapshotGeneratedAt = options.now ?? latestWorkplanTimestamp(workplans, runGeneratedAt);
+  const localPlanSource = await readLocalPlanFiles(rootDir, plansDir);
+  const trackedSnapshot = await readSnapshotSource(snapshotSourcePath);
+  const hasLocalSource = localPlanSource.sourceDirectoryExists;
+  if (!hasLocalSource && !trackedSnapshot) {
+    throw new Error(`Workplan snapshot missing at ${snapshotSourcePath}; no local Hermes plans directory found to regenerate it.`);
+  }
+
+  const workplans = hasLocalSource ? localPlanSource.workplans : (trackedSnapshot?.workplans ?? []);
+  const planSourceCount = hasLocalSource ? localPlanSource.planSourceCount : (trackedSnapshot?.planSourceCount ?? trackedSnapshot?.sourceCount ?? 0);
+  const planSourceHash = hasLocalSource ? localPlanSource.planSourceHash : (trackedSnapshot?.planSourceHash ?? hashSnapshotWorkplans(trackedSnapshot?.workplans ?? []));
+  const snapshotGeneratedAt = options.now ?? (hasLocalSource ? latestWorkplanTimestamp(workplans, runGeneratedAt) : (trackedSnapshot?.generatedAt ?? runGeneratedAt));
   const snapshot = WorkplansSnapshotSchema.parse({
     generatedAt: snapshotGeneratedAt,
     sourceCount: workplans.length,
+    planSourceCount,
+    planSourceHash,
     workplans,
   });
 
-  if (localWorkplans.length > 0) await writeJson(snapshotSourcePath, snapshot);
+  if (mode === 'check') {
+    if (hasLocalSource && (!trackedSnapshot || trackedSnapshot.planSourceCount !== planSourceCount || trackedSnapshot.planSourceHash !== planSourceHash)) {
+      throw new Error(describeSnapshotDrift(snapshotSourcePath, planSourceCount, planSourceHash, trackedSnapshot?.planSourceCount, trackedSnapshot?.planSourceHash));
+    }
+    return { snapshot, workplans: snapshot.workplans };
+  }
+
+  if (hasLocalSource) await writeJson(snapshotSourcePath, snapshot);
   await writeJson(path.join(generatedDir, 'workplans.json'), snapshot);
   await writeJson(path.join(publicGeneratedDir, 'workplans.json'), snapshot);
 
@@ -515,7 +589,12 @@ export async function syncWorkplans(options: SyncWorkplansOptions = {}): Promise
 }
 
 async function main() {
-  const result = await syncWorkplans();
+  const mode = process.argv.includes('--check') ? 'check' : 'write';
+  const result = await syncWorkplans({ mode });
+  if (mode === 'check') {
+    console.log(`Workplan snapshot fresh (${result.workplans.length} workplans)`);
+    return;
+  }
   console.log(`Synced ${result.workplans.length} workplans${result.obsidianNotePath ? ` and updated ${result.obsidianNotePath}` : ''}`);
 }
 

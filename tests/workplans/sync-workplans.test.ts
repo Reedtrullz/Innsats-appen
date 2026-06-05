@@ -357,3 +357,160 @@ it('writes generated/public workplans JSON and an Obsidian index note from local
   expect(obsidianNote).toContain('Pilot Workplan');
   expect(obsidianNote).toContain('Task 1: Build sync script');
 });
+
+it('fails check mode when local Hermes plans drift from the tracked workplan snapshot', async () => {
+  const root = await tempRoot();
+  const plansDir = path.join(root, '.hermes/plans');
+  const generatedDir = path.join(root, 'content/generated');
+  const publicGeneratedDir = path.join(root, 'public/generated-content');
+  const snapshotSourcePath = path.join(root, 'content/workplans/workplans.json');
+  await fs.mkdir(plansDir, { recursive: true });
+  await fs.writeFile(
+    path.join(plansDir, '2026-06-04_120000-pilot-workplan.md'),
+    '# Pilot Workplan\n\n**Goal:** Ship Obsidian-backed release sync.\n\n### Task 1: Build sync script\n',
+  );
+  await fs.mkdir(path.dirname(snapshotSourcePath), { recursive: true });
+  await fs.writeFile(snapshotSourcePath, JSON.stringify({
+    generatedAt: '2026-06-04T12:00:00.000Z',
+    sourceCount: 1,
+    workplans: [
+      {
+        id: 'stale-plan',
+        title: 'Stale Plan',
+        sourcePath: 'content/workplans/workplans.json',
+        sourceType: 'manual-snapshot',
+        summary: 'This stale tracked snapshot should fail check mode.',
+        stage: 'build',
+        risk: 'medium',
+        status: 'active',
+        taskCount: 0,
+        updatedAt: '2026-06-04T12:00:00.000Z',
+        tasks: [],
+      },
+    ],
+  }, null, 2));
+
+  await expect(syncWorkplans({
+    rootDir: root,
+    generatedDir,
+    publicGeneratedDir,
+    snapshotSourcePath,
+    mode: 'check',
+    now: '2026-06-04T12:30:00.000Z',
+  })).rejects.toThrow(/workplan snapshot drift/i);
+
+  await expect(fs.readFile(path.join(generatedDir, 'workplans.json'), 'utf8')).rejects.toThrow();
+  await expect(fs.readFile(path.join(publicGeneratedDir, 'workplans.json'), 'utf8')).rejects.toThrow();
+});
+
+it('passes check mode in snapshot-only environments without local Hermes plans', async () => {
+  const root = await tempRoot();
+  const generatedDir = path.join(root, 'content/generated');
+  const publicGeneratedDir = path.join(root, 'public/generated-content');
+  const snapshotSourcePath = path.join(root, 'content/workplans/workplans.json');
+  await fs.mkdir(path.dirname(snapshotSourcePath), { recursive: true });
+  await fs.writeFile(snapshotSourcePath, JSON.stringify({
+    generatedAt: '2026-06-04T12:00:00.000Z',
+    sourceCount: 1,
+    planSourceCount: 1,
+    planSourceHash: 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+    workplans: [
+      {
+        id: 'manual-snapshot-plan',
+        title: 'Manual Snapshot Plan',
+        sourcePath: 'content/workplans/workplans.json',
+        sourceType: 'manual-snapshot',
+        summary: 'Snapshot-only CI can still validate generated mirrors.',
+        stage: 'verify',
+        risk: 'low',
+        status: 'active',
+        taskCount: 0,
+        updatedAt: '2026-06-04T12:00:00.000Z',
+        tasks: [],
+      },
+    ],
+  }, null, 2));
+
+  const result = await syncWorkplans({
+    rootDir: root,
+    generatedDir,
+    publicGeneratedDir,
+    snapshotSourcePath,
+    mode: 'check',
+    now: '2026-06-04T12:30:00.000Z',
+  });
+
+  expect(result.workplans).toHaveLength(1);
+  expect(result.snapshot.planSourceHash).toBe('sha256:1111111111111111111111111111111111111111111111111111111111111111');
+  await expect(fs.readFile(path.join(generatedDir, 'workplans.json'), 'utf8')).rejects.toThrow();
+});
+
+it('fails check mode in snapshot-only environments when the tracked workplan snapshot is missing', async () => {
+  const root = await tempRoot();
+  const generatedDir = path.join(root, 'content/generated');
+  const publicGeneratedDir = path.join(root, 'public/generated-content');
+  const snapshotSourcePath = path.join(root, 'content/workplans/workplans.json');
+
+  await expect(syncWorkplans({
+    rootDir: root,
+    generatedDir,
+    publicGeneratedDir,
+    snapshotSourcePath,
+    mode: 'check',
+    now: '2026-06-04T12:30:00.000Z',
+  })).rejects.toThrow(/workplan snapshot.*missing/i);
+
+  await expect(fs.readFile(path.join(generatedDir, 'workplans.json'), 'utf8')).rejects.toThrow();
+});
+
+it('fails check mode when the local Hermes plans directory is present but emptied', async () => {
+  const root = await tempRoot();
+  const plansDir = path.join(root, '.hermes/plans');
+  const generatedDir = path.join(root, 'content/generated');
+  const publicGeneratedDir = path.join(root, 'public/generated-content');
+  const snapshotSourcePath = path.join(root, 'content/workplans/workplans.json');
+  await fs.mkdir(plansDir, { recursive: true });
+  await fs.mkdir(path.dirname(snapshotSourcePath), { recursive: true });
+  await fs.writeFile(snapshotSourcePath, JSON.stringify({
+    generatedAt: '2026-06-04T12:00:00.000Z',
+    sourceCount: 1,
+    planSourceCount: 1,
+    planSourceHash: 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+    workplans: [
+      {
+        id: 'stale-plan',
+        title: 'Stale Plan',
+        sourcePath: 'content/workplans/workplans.json',
+        sourceType: 'manual-snapshot',
+        summary: 'The tracked snapshot should fail because local plans were removed.',
+        stage: 'build',
+        risk: 'medium',
+        status: 'active',
+        taskCount: 0,
+        updatedAt: '2026-06-04T12:00:00.000Z',
+        tasks: [],
+      },
+    ],
+  }, null, 2));
+
+  await expect(syncWorkplans({
+    rootDir: root,
+    generatedDir,
+    publicGeneratedDir,
+    snapshotSourcePath,
+    mode: 'check',
+    now: '2026-06-04T12:30:00.000Z',
+  })).rejects.toThrow(/workplan snapshot drift/i);
+});
+
+it('rejects malformed workplan source hash metadata', () => {
+  const result = WorkplansSnapshotSchema.safeParse({
+    generatedAt: '2026-06-04T12:00:00.000Z',
+    sourceCount: 0,
+    planSourceCount: 0,
+    planSourceHash: 'sha256:snapshot-only',
+    workplans: [],
+  });
+
+  expect(result.success).toBe(false);
+});

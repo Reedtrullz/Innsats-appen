@@ -45,6 +45,9 @@ jobs:
       - name: Audit for high or critical vulnerabilities
         run: npm run audit:ci
 
+      - name: Check workplan snapshot freshness
+        run: npm run check:workplans
+
       - name: Build content artifacts
         run: npm run build:content
 
