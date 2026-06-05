@@ -5,8 +5,7 @@ import { FIELD_LOG_CATEGORY_OPTIONS, FIELD_LOG_CATEGORY_LABELS, FIELD_LOG_LOCAL_
 import type { FieldLogCategory, MissionContext } from '@/lib/mission/schemas';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
-
-type MissionUpdate = (mission: MissionContext) => MissionContext;
+import type { MissionUpdate } from './quick-field-log-composer';
 
 function operationalPrivacyErrorMessage(context: string) {
   return `${context}: Lokal tekst ble stoppet fordi den kan inneholde persondata, pasientdata, skjermet informasjon eller private lokasjoner. Bruk ordinære systemer for slike opplysninger.`;
