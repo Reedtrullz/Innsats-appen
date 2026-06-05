@@ -49,7 +49,7 @@ Verified 2026-06-05:
 - GitHub environments `production` and `staging` exist for `Reedtrullz/Innsats-appen`.
 - `main` branch protection is enabled with strict required status check `Automatic checks`; force pushes and deletions are disabled.
 - Staging environment variables are configured: `STAGING_SSH_HOST_KEY`, `STAGING_DOMAIN`, `STAGING_PORT`, `STAGING_HOST`, `STAGING_USER`.
-- Manual secret action still required before staging can run: set environment secret `STAGING_SSH_PRIVATE_KEY` in GitHub environment `staging`. The value is private key material and must not be pasted into repo docs, chat, or logs.
+- Repository secret `STAGING_SSH_PRIVATE_KEY` exists and is available to the staging workflow through `secrets.STAGING_SSH_PRIVATE_KEY`. The secret value is private key material and must not be pasted into repo docs, chat, or logs.
 
 ## Felles grense
 

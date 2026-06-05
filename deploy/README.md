@@ -47,7 +47,7 @@ GitHub-side governance verified 2026-06-05 for `Reedtrullz/Innsats-appen`:
 Staging environment configuration:
 
 ```text
-STAGING_SSH_PRIVATE_KEY = environment secret for the staging deploy user (manual secret action; do not log or commit)
+STAGING_SSH_PRIVATE_KEY = repository secret for the staging deploy user (configured by owner; do not log or commit)
 STAGING_SSH_HOST_KEY = exact pinned known_hosts line for STAGING_HOST
 STAGING_DOMAIN = staging.innsats.reidar.tech
 STAGING_PORT = 3007
@@ -55,7 +55,7 @@ STAGING_HOST = 198.23.137.16
 STAGING_USER = deploy
 ```
 
-As of 2026-06-05, non-secret staging variables are configured in the GitHub `staging` environment. The `STAGING_SSH_PRIVATE_KEY` environment secret still requires manual setup before the staging workflow can run.
+As of 2026-06-05, non-secret staging variables are configured in the GitHub `staging` environment and repository secret `STAGING_SSH_PRIVATE_KEY` is configured by name. The staging environment has no separate environment-scoped private-key secret; the workflow intentionally reads the repository secret via `secrets.STAGING_SSH_PRIVATE_KEY`.
 
 ## One-time prerequisites
 
