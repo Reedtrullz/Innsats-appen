@@ -7,12 +7,13 @@ Task 390 uses `.github/workflows/staging.yml` as the pre-pilot staging deploymen
 Required GitHub environment/secret configuration before the workflow can run:
 
 - `STAGING_SSH_PRIVATE_KEY` secret for the staging deploy user.
+- `STAGING_SSH_HOST_KEY` variable containing the pinned SSH known_hosts entry for `STAGING_HOST`.
 - `STAGING_HOST` variable, defaulting to `198.23.137.16` only if the repo environment does not override it.
 - `STAGING_USER` variable, defaulting to `deploy`.
 - `STAGING_DOMAIN` variable or workflow input, default `staging.innsats.reidar.tech`.
 - `STAGING_PORT` variable or workflow input, default `3007`.
 
-This file does not claim staging has been executed. Before broader pilot, run the staging workflow for the exact SHA and save its completed/successful run URL.
+This file does not claim staging has been executed. Before broader pilot, run the staging workflow for the exact SHA and save its completed/successful run URL. Staging run evidence must include the public `/api/health` JSON showing `version` equals the exact GitHub SHA for the workflow run.
 
 Current production comparison point: verify the live SHA with `https://innsats.reidar.tech/api/health` before comparing staging. The last audited application-code baseline is SHA `1a26acbfc6f72152e14906d3ecc04d424275aee4`; the last documented deployed snapshot before this docs refresh is SHA `1750a377362c44734dd802be8095ad317957f1c9`, verified by GitHub Actions run `27030600338`. See `docs/release/current-deployment-status.md`.
 

@@ -116,6 +116,7 @@ jobs:
       STAGING_USER: ${{ vars.STAGING_USER || 'deploy' }}
       STAGING_DOMAIN: ${{ inputs.staging_domain || vars.STAGING_DOMAIN || 'staging.innsats.reidar.tech' }}
       STAGING_PORT: ${{ inputs.staging_port || vars.STAGING_PORT || '3007' }}
+      STAGING_SSH_HOST_KEY: ${{ vars.STAGING_SSH_HOST_KEY }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -134,7 +135,12 @@ jobs:
           chmod 700 ~/.ssh
           printf '%s\n' "${{ secrets.STAGING_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_innsats_staging
           chmod 600 ~/.ssh/id_rsa_innsats_staging
-          ssh-keyscan -H "${STAGING_HOST}" >> ~/.ssh/known_hosts
+          if [ -z "${STAGING_SSH_HOST_KEY}" ]; then
+            echo "STAGING_SSH_HOST_KEY variable is required for pinned staging host-key verification" >&2
+            exit 2
+          fi
+          printf '%s\n' "${STAGING_SSH_HOST_KEY}" > ~/.ssh/known_hosts
+          ssh-keygen -F "${STAGING_HOST}" -f ~/.ssh/known_hosts >/dev/null
           ssh -i ~/.ssh/id_rsa_innsats_staging -o BatchMode=yes -o StrictHostKeyChecking=yes "${STAGING_USER}@${STAGING_HOST}" 'echo "STAGING SSH OK"'
 
       - name: Write staging inventory
@@ -172,3 +178,22 @@ jobs:
             -e "app_host_port=${STAGING_PORT}" \
             -e "met_user_agent=${MET_USER_AGENT}" \
             -e "caddy_marker_name=Beredskapsboka-staging"
+
+      - name: Verify staging public deployment version
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          curl -fsS --max-time 20 --retry 6 --retry-delay 5 \
+            --header "User-Agent: ${MET_USER_AGENT}" \
+            "https://${STAGING_DOMAIN}/api/health" \
+            | EXPECTED_SHA="${EXPECTED_SHA}" node -e '
+              let body = "";
+              process.stdin.on("data", (chunk) => body += chunk);
+              process.stdin.on("end", () => {
+                const health = JSON.parse(body);
+                console.log(JSON.stringify({ status: health.status, nodeEnv: health.nodeEnv, version: health.version, expected: process.env.EXPECTED_SHA, matches: health.version === process.env.EXPECTED_SHA }, null, 2));
+                if (health.status !== "healthy" || health.version !== process.env.EXPECTED_SHA) process.exit(2);
+              });
+            '
