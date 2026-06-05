@@ -14,6 +14,16 @@ function configureSshStep(workflow: string) {
   return workflow.slice(start, end);
 }
 
+describe('CI workflow checks', () => {
+  it('runs map package validation in production CI before build', () => {
+    const workflow = readCiWorkflow();
+
+    expect(workflow).toMatch(/name:\s*Validate local map packages/i);
+    expect(workflow).toMatch(/npm run validate:maps/);
+    expect(workflow.indexOf('npm run validate:maps')).toBeLessThan(workflow.indexOf('npm run build:app'));
+  });
+});
+
 describe('CI deploy SSH security', () => {
   it('compares scanned host key with a pinned expected host key before writing known_hosts', () => {
     const step = configureSshStep(readCiWorkflow());

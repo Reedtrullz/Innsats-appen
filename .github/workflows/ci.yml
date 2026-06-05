@@ -51,6 +51,9 @@ jobs:
       - name: Build content artifacts
         run: npm run build:content
 
+      - name: Validate local map packages
+        run: npm run validate:maps
+
       - name: TypeScript
         run: npm run typecheck
 
