@@ -58,6 +58,8 @@ export function OfflineMapLibreView({
           style: packageManifest.styleUrl,
           center: packageManifest.center,
           zoom: Math.max(packageManifest.minZoom, Math.min(packageManifest.maxZoom, packageManifest.minZoom + 2)),
+          minZoom: packageManifest.minZoom,
+          maxZoom: packageManifest.maxZoom,
           attributionControl: { compact: true },
           cooperativeGestures: true,
         });

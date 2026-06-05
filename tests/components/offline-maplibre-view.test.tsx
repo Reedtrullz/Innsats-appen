@@ -86,6 +86,8 @@ describe('OfflineMapLibreView', () => {
       style: '/map-packages/demo-style.json',
       center: [10.4, 63.4],
       zoom: 10,
+      minZoom: 8,
+      maxZoom: 14,
       attributionControl: { compact: true },
       cooperativeGestures: true,
     });
