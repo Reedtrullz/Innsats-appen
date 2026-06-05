@@ -51,6 +51,7 @@ import {
   operationItemsForRender,
   parseCoordinateText,
   resetMissionMapState,
+  sanitizeMapText,
   subscribeMissionMapState,
   updateMissionMapDrawing,
   updateMissionMapMarker,
@@ -142,6 +143,11 @@ function isImportMapTextValue(value: unknown): value is string | number | null |
   return value === undefined || value === null || typeof value === 'string' || typeof value === 'number';
 }
 
+function importMapTextHasBlockedValue(value: unknown, maxLength = 120) {
+  if (!isImportMapTextValue(value)) return true;
+  return Boolean(detectSensitiveOperationalText(sanitizeMapText(value, maxLength)));
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object';
 }
@@ -186,11 +192,8 @@ function importFeatureHasBlockedMapText(feature: unknown) {
     && MAP_DRAWING_KINDS.includes(properties.kind as MapDrawingKind)
     && isSupportedImportDrawingFeature(properties.kind as MapDrawingKind, geometry);
   if (!markerFeature && !drawingFeature) return false;
-  const values = [properties.label, properties.note];
-  return values.some((value) => {
-    if (!isImportMapTextValue(value)) return true;
-    return Boolean(detectSensitiveOperationalText(String(value ?? '')));
-  });
+  return importMapTextHasBlockedValue(properties.label)
+    || importMapTextHasBlockedValue(properties.note, 240);
 }
 
 function geoJsonImportHasBlockedMapText(text: string) {
