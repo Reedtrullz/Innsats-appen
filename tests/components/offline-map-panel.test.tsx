@@ -437,6 +437,42 @@ it('edits and deletes only active-mission markers from the map panel', async () 
   expect(readMissionMapState().markers.some((marker) => marker.label === 'Other mission resource')).toBe(true);
 });
 
+it('gives duplicate-label marker edit and delete buttons distinguishable accessible names', async () => {
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  writeMissionMapState({
+    markers: [
+      createMissionMapMarker({ kind: 'hazard', missionId: activeMission.id, label: 'Same label', x: 20, y: 30 }, new Date('2026-06-05T10:00:00Z')),
+      createMissionMapMarker({ kind: 'resource', missionId: activeMission.id, label: 'Same label', x: 40, y: 50 }, new Date('2026-06-05T10:01:00Z')),
+    ],
+    drawings: [],
+  });
+
+  await renderOfflineMapPanel();
+
+  expect(screen.getByRole('button', { name: /Rediger Same label.*hazard.*X 20.*Y 30/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Rediger Same label.*resource.*X 40.*Y 50/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Slett Same label.*hazard.*X 20.*Y 30/i })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Slett Same label.*resource.*X 40.*Y 50/i })).toBeInTheDocument();
+});
+
+it('rejects a blank coordinate when editing a local marker', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  const marker = createMissionMapMarker({ kind: 'hazard', missionId: activeMission.id, label: 'Blank coordinate test', x: 20, y: 30 }, new Date('2026-06-05T10:00:00Z'));
+  writeMissionMapState({ markers: [marker], drawings: [] });
+
+  await renderOfflineMapPanel();
+
+  await user.click(screen.getByRole('button', { name: /Rediger Blank coordinate test/i }));
+  await user.clear(screen.getByLabelText('Rediger markør X 0-100'));
+  await user.click(screen.getByRole('button', { name: /lagre markørendring/i }));
+
+  expect(screen.getByTestId('operations-map-status')).toHaveTextContent('Markørkoordinater må være skjematiske verdier fra 0 til 100.');
+  expect(readMissionMapState().markers.find((item) => item.id === marker.id)?.point).toEqual({ x: 20, y: 30 });
+});
+
 it('blocks local marker saves when no active mission exists', async () => {
   const user = userEvent.setup();
   await renderOfflineMapPanel();

@@ -113,6 +113,16 @@ function operationMeasurement(drawing: MissionMapDrawing | undefined) {
   return `${MAP_DRAWING_LABELS[drawing.kind]}: avstand ${distance} skjematiske enheter, areal ${area}.`;
 }
 
+function markerActionAriaLabel(action: 'Rediger' | 'Slett', marker: MissionMapMarker) {
+  return `${action} ${marker.label} (${marker.kind}, X ${marker.point.x}, Y ${marker.point.y})`;
+}
+
+function parseMarkerEditCoordinate(value: string) {
+  if (value.trim() === '') return null;
+  const coordinate = Number(value);
+  return Number.isFinite(coordinate) && coordinate >= 0 && coordinate <= 100 ? coordinate : null;
+}
+
 function SchematicMap({ packageId, state, enabledLayers }: { packageId: string; state: MissionMapState; enabledLayers: MapLayerKey[] }) {
   const selectedPackage = getOfflineMapPackage(packageId) ?? OFFLINE_MAP_PACKAGES[0];
   const renderedFeatures = getRenderableMapFeatures(selectedPackage);
@@ -401,9 +411,9 @@ export function OfflineMapPanel() {
       setStatusMessage('Opprett aktivt oppdrag før du endrer lokale kartobjekter.');
       return;
     }
-    const x = Number(markerEditDraft.x);
-    const y = Number(markerEditDraft.y);
-    if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x > 100 || y < 0 || y > 100) {
+    const x = parseMarkerEditCoordinate(markerEditDraft.x);
+    const y = parseMarkerEditCoordinate(markerEditDraft.y);
+    if (x === null || y === null) {
       setStatusMessage('Markørkoordinater må være skjematiske verdier fra 0 til 100.');
       return;
     }
@@ -652,10 +662,10 @@ export function OfflineMapPanel() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span>{MAP_MARKER_LABELS[marker.kind]} — <span>{marker.label}</span> ({marker.point.x}, {marker.point.y})</span>
                 <span className="flex gap-2">
-                  <button type="button" onClick={() => startMarkerEdit(marker)} className="min-h-10 rounded-xl border border-slate-300 bg-white px-3 font-black text-slate-950">
+                  <button type="button" aria-label={markerActionAriaLabel('Rediger', marker)} onClick={() => startMarkerEdit(marker)} className="min-h-10 rounded-xl border border-slate-300 bg-white px-3 font-black text-slate-950">
                     Rediger {marker.label}
                   </button>
-                  <button type="button" onClick={() => deleteMarker(marker)} className="min-h-10 rounded-xl border border-red-300 bg-white px-3 font-black text-red-900">
+                  <button type="button" aria-label={markerActionAriaLabel('Slett', marker)} onClick={() => deleteMarker(marker)} className="min-h-10 rounded-xl border border-red-300 bg-white px-3 font-black text-red-900">
                     Slett {marker.label}
                   </button>
                 </span>
