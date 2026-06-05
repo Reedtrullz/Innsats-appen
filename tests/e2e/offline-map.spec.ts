@@ -39,7 +39,7 @@ function hasLocalMapPackageFixtures() {
   return entries.some((entry) => entry.endsWith('.pmtiles')) && entries.some((entry) => entry.endsWith('.json'));
 }
 
-test('offline map page is local-only, cacheable and tile-free', async ({ page, context }, testInfo) => {
+test('offline map page is local-only, schematic and tile-free', async ({ page, context }, testInfo) => {
   const baseOrigin = baseOriginFor(testInfo);
   const requestedUrls: string[] = [];
   page.on('request', (request) => requestedUrls.push(request.url()));
@@ -78,17 +78,13 @@ test('offline map page is local-only, cacheable and tile-free', async ({ page, c
   await expect(page.getByRole('heading', { name: 'Kart', exact: true })).toBeVisible();
   await expect(page.getByText(new RegExp(`Aktivt oppdrag: ${missionTitle}`, 'i'))).toBeVisible();
 
-  await page.getByRole('combobox', { name: /Velg lokal kartpakke/i }).selectOption('trondelag-oversikt');
-  await expect(page.getByText(/Cache-varsel: Trøndelag oversiktspakke.*42 MB/i)).toBeVisible();
+  await page.getByRole('combobox', { name: /Velg skjematisk kartpakke/i }).selectOption('trondelag-oversikt');
   await expect(page.getByTestId('map-performance-guard')).toContainText(/viser maks 12/i);
-
-  await page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }).click();
-  await expect(page.getByTestId('offline-map-cache-status')).toContainText(/Cachet lokalt: Trøndelag oversiktspakke/i);
-  await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-offline-map-cache-v1'))).toContain('trondelag-oversikt');
-
-  await page.getByRole('button', { name: /Tilbakestill kartcache/i }).click();
+  await expect(page.getByTestId('map-performance-guard')).toContainText(/2 skjult/i);
+  await expect(page.getByText(/Ingen godkjente PMTiles-pakker er tilgjengelige/i)).toBeVisible();
+  await expect(page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /Tilbakestill kartcache/i })).toHaveCount(0);
   await expect(page.getByTestId('offline-map-cache-status')).toContainText(/Ingen kartpakke/i);
-  await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-offline-map-cache-v1'))).toBeNull();
 
   await page.getByRole('combobox', { name: /Markørtype/i }).selectOption('il-ko');
   await page.getByPlaceholder(/Sanitert lokal etikett/i).fill('KO lokal');

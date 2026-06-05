@@ -5,6 +5,7 @@ import { FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY } from '@/lib/field-mo
 import { saveSelectedActiveMissionId } from '@/lib/mission/active-mission-selection';
 import { clearLocalMissionData, getMission, saveMission } from '@/lib/mission/local-store';
 import { OFFLINE_MAP_CACHE_STORAGE_KEY, offlineMapQuotaCopy } from '@/lib/maps/offline-map';
+import type { LocalMapPackageManifest } from '@/lib/maps/offline-map-package-manifest';
 import {
   OPERATIONS_MAP_STORAGE_KEY,
   SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
@@ -38,7 +39,16 @@ const approvedPmtilesPackage = Object.freeze({
   provenance: 'Test-only approved PMTiles package fixture for offline map selection coverage.',
 } as const);
 
-function mockApprovedLocalMapPackages(packages = [approvedPmtilesPackage]) {
+const alternateApprovedPmtilesPackage = Object.freeze({
+  ...approvedPmtilesPackage,
+  id: 'stjordal-demo-pmtiles',
+  title: 'Stjørdal demo PMTiles',
+  url: '/map-packages/stjordal-demo.pmtiles',
+  styleUrl: '/map-packages/stjordal-demo-style.json',
+  provenance: 'Second test-only approved PMTiles package fixture for package-change coverage.',
+} as const);
+
+function mockApprovedLocalMapPackages(packages: readonly LocalMapPackageManifest[] = [approvedPmtilesPackage]) {
   vi.resetModules();
   vi.doMock('@/lib/maps/offline-map-package-manifest', () => ({
     approvedLocalMapPackages: Object.freeze(packages),
@@ -269,6 +279,7 @@ it('explains that browser storage quota can be unknown before offline map packag
 });
 
 it('shows unknown storage quota copy in the UI when navigator storage is absent', async () => {
+  mockApprovedLocalMapPackages();
   Object.defineProperty(navigator, 'storage', {
     configurable: true,
     value: undefined,
@@ -331,7 +342,7 @@ it('prevents duplicate PMTiles precache writes while one save is in progress', a
 
 it('does not activate an old PMTiles package when selected package changes before precache resolves', async () => {
   const user = userEvent.setup();
-  mockApprovedLocalMapPackages();
+  mockApprovedLocalMapPackages([approvedPmtilesPackage, alternateApprovedPmtilesPackage]);
   let resolveCache!: (result: { cached: number }) => void;
   const pendingCache = new Promise<{ cached: number }>((resolve) => {
     resolveCache = resolve;
@@ -342,7 +353,7 @@ it('does not activate an old PMTiles package when selected package changes befor
 
   await user.selectOptions(screen.getByLabelText('Velg lokal kartpakke'), 'trondheim-demo-pmtiles');
   await user.click(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }));
-  await user.selectOptions(screen.getByLabelText('Velg lokal kartpakke'), 'trondelag-oversikt');
+  await user.selectOptions(screen.getByLabelText('Velg lokal kartpakke'), 'stjordal-demo-pmtiles');
 
   await act(async () => {
     resolveCache({ cached: 2 });
@@ -411,7 +422,7 @@ it('keeps rendered map marker count capped for the large district package', asyn
   const user = userEvent.setup();
   await renderOfflineMapPanel();
 
-  await user.selectOptions(screen.getByRole('combobox', { name: /Velg lokal kartpakke/i }), 'trondelag-oversikt');
+  await user.selectOptions(screen.getByRole('combobox', { name: /Velg skjematisk kartpakke/i }), 'trondelag-oversikt');
   expect(screen.getByTestId('map-performance-guard')).toHaveTextContent(/viser maks 12/i);
   expect(screen.getByTestId('map-performance-guard')).toHaveTextContent(/2 skjult/i);
 });

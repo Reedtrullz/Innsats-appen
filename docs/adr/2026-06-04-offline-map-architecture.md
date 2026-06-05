@@ -95,3 +95,5 @@ No runtime tile URL may point to Kartverket, OpenStreetMap or any external provi
 Kartverket-derived data requires visible attribution `©Kartverket` and a link to Kartverket where possible. Geovekst zoom levels 12-20 require explicit permission before copying or packaging. Until package provenance is documented, the app must not claim a Kartverket offline base map.
 
 The existing schematic map remains the safe fallback and the source of truth for local operational overlays when a local package is missing, unsupported, expired, too large, or not approved.
+
+Current pilot state: the schematic map package list is not the same as approved PMTiles package manifests. Until `approvedLocalMapPackages` contains at least one reviewed PMTiles/style pair under `/map-packages/`, the UI must not present PMTiles cache/install as available.
