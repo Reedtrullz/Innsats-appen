@@ -1,3 +1,5 @@
+import { assertNoSensitiveOperationalText } from '@/lib/privacy/sensitive-text';
+
 export type MapMarkerKind = 'incident-site' | 'hazard' | 'resource' | 'meeting-point' | 'il-ko' | 'pump-location' | 'observation';
 export type MapDrawingKind = 'point' | 'line' | 'polygon' | 'sector';
 export type MapLayerKey = MapMarkerKind | MapDrawingKind;
@@ -106,6 +108,20 @@ export function sanitizeMapText(value: unknown, maxLength = 120) {
     .slice(0, maxLength);
 }
 
+function safeMapText(value: unknown, context: string, maxLength = 120) {
+  const sanitized = sanitizeMapText(value, maxLength);
+  assertNoSensitiveOperationalText(sanitized, context);
+  return sanitized;
+}
+
+function trySafeMapText(value: unknown, context: string, maxLength = 120) {
+  try {
+    return safeMapText(value, context, maxLength);
+  } catch {
+    return null;
+  }
+}
+
 function strictCoordinate(value: unknown): number | null {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
   if (typeof value !== 'string') return null;
@@ -144,9 +160,9 @@ export function createMissionMapMarker(input: { kind: MapMarkerKind; missionId?:
   if (!MAP_MARKER_KINDS.includes(input.kind)) throw new Error('Unsupported marker kind');
   const point = normalizeSchematicPoint({ x: input.x, y: input.y });
   if (!point) throw new Error('Marker coordinates must be schematic values from 0 to 100');
-  const label = sanitizeMapText(input.label) || MAP_MARKER_LABELS[input.kind];
+  const label = safeMapText(input.label, 'operationsMap.marker.label') || MAP_MARKER_LABELS[input.kind];
   const missionId = sanitizeMapText(input.missionId, 80);
-  const note = sanitizeMapText(input.note, 240);
+  const note = safeMapText(input.note, 'operationsMap.marker.note', 240);
   return {
     id: stableId(input.kind, now),
     ...(missionId ? { missionId } : {}),
@@ -164,9 +180,9 @@ export function createMissionMapDrawing(input: { kind: MapDrawingKind; missionId
   const points = parseCoordinateText(input.coordinates).slice(0, MAX_POINTS_PER_DRAWING);
   const minimumPoints = input.kind === 'point' ? 1 : input.kind === 'line' ? 2 : 3;
   if (points.length < minimumPoints) throw new Error(`${MAP_DRAWING_LABELS[input.kind]} needs at least ${minimumPoints} schematic point(s)`);
-  const label = sanitizeMapText(input.label) || MAP_DRAWING_LABELS[input.kind];
+  const label = safeMapText(input.label, 'operationsMap.drawing.label') || MAP_DRAWING_LABELS[input.kind];
   const missionId = sanitizeMapText(input.missionId, 80);
-  const note = sanitizeMapText(input.note, 240);
+  const note = safeMapText(input.note, 'operationsMap.drawing.note', 240);
   return {
     id: stableId(input.kind, now),
     ...(missionId ? { missionId } : {}),
@@ -234,21 +250,27 @@ export function mapStateForMission(state: MissionMapState, missionId: string): M
 }
 
 export function updateMissionMapMarker(state: MissionMapState, missionId: string, markerId: string, patch: Partial<Pick<MissionMapMarker, 'kind' | 'label' | 'point' | 'note'>>): MissionMapState {
+  const guardedPatch = { ...patch };
+  if (Object.prototype.hasOwnProperty.call(guardedPatch, 'label')) guardedPatch.label = safeMapText(guardedPatch.label, 'operationsMap.marker.label');
+  if (Object.prototype.hasOwnProperty.call(guardedPatch, 'note')) guardedPatch.note = safeMapText(guardedPatch.note, 'operationsMap.marker.note', 240) || undefined;
   return normalizeMissionMapState({
     ...state,
     markers: state.markers.map((marker) => {
       if (marker.id !== markerId || marker.missionId !== missionId) return marker;
-      return normalizeMarker({ ...marker, ...patch }) ?? marker;
+      return normalizeMarker({ ...marker, ...guardedPatch }) ?? marker;
     }),
   });
 }
 
 export function updateMissionMapDrawing(state: MissionMapState, missionId: string, drawingId: string, patch: Partial<Pick<MissionMapDrawing, 'kind' | 'label' | 'points' | 'note'>>): MissionMapState {
+  const guardedPatch = { ...patch };
+  if (Object.prototype.hasOwnProperty.call(guardedPatch, 'label')) guardedPatch.label = safeMapText(guardedPatch.label, 'operationsMap.drawing.label');
+  if (Object.prototype.hasOwnProperty.call(guardedPatch, 'note')) guardedPatch.note = safeMapText(guardedPatch.note, 'operationsMap.drawing.note', 240) || undefined;
   return normalizeMissionMapState({
     ...state,
     drawings: state.drawings.map((drawing) => {
       if (drawing.id !== drawingId || drawing.missionId !== missionId) return drawing;
-      return normalizeDrawing({ ...drawing, ...patch }) ?? drawing;
+      return normalizeDrawing({ ...drawing, ...guardedPatch }) ?? drawing;
     }),
   });
 }
@@ -358,7 +380,7 @@ export function buildGeoJsonExport(state: MissionMapState) {
       ...normalized.markers.map((marker) => ({
         type: 'Feature' as const,
         geometry: { type: 'Point' as const, coordinates: [marker.point.x, marker.point.y] },
-        properties: { itemType: 'marker', kind: marker.kind, label: marker.label, localOnly: true },
+        properties: { itemType: 'marker', kind: marker.kind, label: safeMapText(marker.label, 'operationsMap.export.marker.label'), localOnly: true },
       })),
       ...normalized.drawings.map((drawing) => ({
         type: 'Feature' as const,
@@ -367,7 +389,7 @@ export function buildGeoJsonExport(state: MissionMapState) {
           : drawing.kind === 'line'
             ? { type: 'LineString' as const, coordinates: drawing.points.map((point) => [point.x, point.y]) }
             : { type: 'Polygon' as const, coordinates: polygonCoordinates(drawing.points) },
-        properties: { itemType: 'drawing', kind: drawing.kind, label: drawing.label, localOnly: true },
+        properties: { itemType: 'drawing', kind: drawing.kind, label: safeMapText(drawing.label, 'operationsMap.export.drawing.label'), localOnly: true },
       })),
     ],
   };
@@ -405,19 +427,23 @@ export function importGeoJsonText(text: string, now = new Date(), missionId?: st
   for (const feature of parsed.features.slice(0, MAX_IMPORTED_GEOJSON_FEATURES)) {
     if (!isRecord(feature) || feature.type !== 'Feature' || !isRecord(feature.geometry) || !isRecord(feature.properties)) continue;
     const properties = feature.properties;
-    const label = sanitizeMapText(properties.label) || 'Importert kartobjekt';
-    const note = sanitizeMapText(properties.note, 240);
     if (properties.itemType === 'marker' && MAP_MARKER_KINDS.includes(properties.kind as MapMarkerKind) && feature.geometry.type === 'Point' && Array.isArray(feature.geometry.coordinates)) {
+      const label = trySafeMapText(properties.label, 'operationsMap.import.marker.label');
+      const note = trySafeMapText(properties.note, 'operationsMap.import.marker.note', 240);
+      if (label === null || note === null) continue;
       const point = normalizeSchematicPoint({ x: feature.geometry.coordinates[0], y: feature.geometry.coordinates[1] });
-      if (point) markers.push({ id: stableId('import-marker', now), ...(scopedMissionId ? { missionId: scopedMissionId } : {}), itemType: 'marker', kind: properties.kind as MapMarkerKind, label, point, ...(note ? { note } : {}), createdAt: now.toISOString() });
+      if (point) markers.push({ id: stableId('import-marker', now), ...(scopedMissionId ? { missionId: scopedMissionId } : {}), itemType: 'marker', kind: properties.kind as MapMarkerKind, label: label || 'Importert kartobjekt', point, ...(note ? { note } : {}), createdAt: now.toISOString() });
       continue;
     }
     if (properties.itemType === 'drawing' && MAP_DRAWING_KINDS.includes(properties.kind as MapDrawingKind)) {
       const kind = properties.kind as MapDrawingKind;
+      const label = trySafeMapText(properties.label, 'operationsMap.import.drawing.label');
+      const note = trySafeMapText(properties.note, 'operationsMap.import.drawing.note', 240);
+      if (label === null || note === null) continue;
       const cleanPoints = drawingPointsFromGeometry(kind, feature.geometry).filter((point): point is SchematicPoint => Boolean(point));
       const withoutClosingDuplicate = cleanPoints.length > 1 && cleanPoints[0].x === cleanPoints.at(-1)?.x && cleanPoints[0].y === cleanPoints.at(-1)?.y ? cleanPoints.slice(0, -1) : cleanPoints;
       const minimumPoints = kind === 'point' ? 1 : kind === 'line' ? 2 : 3;
-      if (withoutClosingDuplicate.length >= minimumPoints) drawings.push({ id: stableId('import-drawing', now), ...(scopedMissionId ? { missionId: scopedMissionId } : {}), itemType: 'drawing', kind, label, points: withoutClosingDuplicate.slice(0, MAX_POINTS_PER_DRAWING), ...(note ? { note } : {}), createdAt: now.toISOString() });
+      if (withoutClosingDuplicate.length >= minimumPoints) drawings.push({ id: stableId('import-drawing', now), ...(scopedMissionId ? { missionId: scopedMissionId } : {}), itemType: 'drawing', kind, label: label || 'Importert kartobjekt', points: withoutClosingDuplicate.slice(0, MAX_POINTS_PER_DRAWING), ...(note ? { note } : {}), createdAt: now.toISOString() });
     }
   }
   return normalizeMissionMapState({ markers, drawings });
@@ -429,13 +455,17 @@ function svgEscape(value: string) {
 
 export function buildMapImageSvg(state: MissionMapState) {
   const normalized = normalizeMissionMapState(state);
-  const markerSvg = normalized.markers.map((marker) => `<circle cx="${marker.point.x}" cy="${marker.point.y}" r="2.8" fill="#0f172a"><title>${svgEscape(MAP_MARKER_LABELS[marker.kind])}: ${svgEscape(marker.label)}</title></circle>`).join('');
+  const markerSvg = normalized.markers.map((marker) => {
+    const label = safeMapText(marker.label, 'operationsMap.svg.marker.label');
+    return `<circle cx="${marker.point.x}" cy="${marker.point.y}" r="2.8" fill="#0f172a"><title>${svgEscape(MAP_MARKER_LABELS[marker.kind])}: ${svgEscape(label)}</title></circle>`;
+  }).join('');
   const drawingSvg = normalized.drawings.map((drawing) => {
+    const label = safeMapText(drawing.label, 'operationsMap.svg.drawing.label');
     const points = drawing.points.map((point) => `${point.x},${point.y}`).join(' ');
-    if (drawing.kind === 'polygon' || drawing.kind === 'sector') return `<polygon points="${points}" fill="rgba(14,165,233,0.18)" stroke="#0369a1" stroke-width="1"><title>${svgEscape(drawing.label)}</title></polygon>`;
-    if (drawing.kind === 'line') return `<polyline points="${points}" fill="none" stroke="#16a34a" stroke-width="1.2"><title>${svgEscape(drawing.label)}</title></polyline>`;
+    if (drawing.kind === 'polygon' || drawing.kind === 'sector') return `<polygon points="${points}" fill="rgba(14,165,233,0.18)" stroke="#0369a1" stroke-width="1"><title>${svgEscape(label)}</title></polygon>`;
+    if (drawing.kind === 'line') return `<polyline points="${points}" fill="none" stroke="#16a34a" stroke-width="1.2"><title>${svgEscape(label)}</title></polyline>`;
     const point = drawing.points[0];
-    return `<rect x="${point.x - 2}" y="${point.y - 2}" width="4" height="4" fill="#7c3aed"><title>${svgEscape(drawing.label)}</title></rect>`;
+    return `<rect x="${point.x - 2}" y="${point.y - 2}" width="4" height="4" fill="#7c3aed"><title>${svgEscape(label)}</title></rect>`;
   }).join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 112" role="img" aria-label="Sanitert lokalt kartbilde"><rect width="100" height="100" fill="#f8fafc"/><path d="M0 20 H100 M0 40 H100 M0 60 H100 M0 80 H100 M20 0 V100 M40 0 V100 M60 0 V100 M80 0 V100" stroke="#cbd5e1" stroke-width="0.35"/>${drawingSvg}${markerSvg}<text x="2" y="108" font-size="3" fill="#7c2d12">${svgEscape(LOCATION_EXPORT_PRIVACY_WARNING.slice(0, 140))}</text></svg>`;
 }
