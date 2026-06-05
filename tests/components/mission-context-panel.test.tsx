@@ -72,13 +72,30 @@ it('can open another local mission as the active dashboard', async () => {
   expect(await screen.findByText(/B · Lokasjon B/i)).toBeInTheDocument();
 });
 
-it('wires Hurtiglogg composer into the active mission dashboard', async () => {
-  await saveMission(mission({ id: 'mission-dashboard-quick-log', title: 'Dashboard quick log', locationText: 'Oppdragstavle' }));
+it('wires Hurtiglogg composer and log overview into the active mission dashboard', async () => {
+  await saveMission(mission({
+    id: 'mission-dashboard-quick-log',
+    title: 'Dashboard quick log',
+    locationText: 'Oppdragstavle',
+    fieldLogEntries: [
+      {
+        id: 'dashboard-log-overview-entry',
+        timestamp: '2026-06-04T08:10:00.000Z',
+        category: 'observasjon',
+        text: 'Dashboard loggoversikt entry',
+        linkedMissionId: 'mission-dashboard-quick-log',
+        criticalObservation: false,
+        mustBeForwarded: false,
+      },
+    ],
+  }));
 
   await renderMissionPanel(<MissionContextPanel mode="list" contentVersion="test" checklists={[]} actionCards={[]} />);
 
   expect(await screen.findByText('Hurtiglogg · Oppdragstavle')).toBeInTheDocument();
   expect(document.querySelector('#hurtiglogg')).not.toBeNull();
+  expect(document.querySelector('#loggoversikt')).not.toBeNull();
+  expect(screen.getByRole('region', { name: /loggoversikt/i })).toHaveTextContent('Dashboard loggoversikt entry');
 });
 
 it('stores the checklist that matches the selected mission scenario and phase', async () => {
@@ -580,7 +597,7 @@ it('lets users add, filter and export a structured local field log with patient-
     });
   });
 
-  expect(screen.getByText(/Sperrepunkt A/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/Sperrepunkt A/i).length).toBeGreaterThan(0);
   expect(screen.getAllByText(/Kritisk observasjon/i).length).toBeGreaterThan(0);
   expect(screen.getAllByText(/Må videresendes/i).length).toBeGreaterThan(0);
 

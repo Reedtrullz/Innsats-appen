@@ -19,6 +19,7 @@ import { TiltakCard } from './tiltak-card';
 import { MissionMapSummary } from './mission-map-summary';
 import { LocalMissionControls } from './mission/local-mission-controls';
 import { FieldLogControls } from './mission/field-log-controls';
+import { MissionLogOverview } from './mission/mission-log-overview';
 import { QuickFieldLogComposer } from './mission/quick-field-log-composer';
 import { RuhWelfareControls } from './mission/ruh-welfare-controls';
 import { AfterActionReportControls } from './mission/after-action-report-controls';
@@ -48,7 +49,7 @@ function matchingChecklist(checklists: OperationalChecklist[], mission: MissionC
     ?? checklists[0];
 }
 
-const missionDashboardHashTargets = new Set(['hurtiglogg', 'etterrapport', 'ruh-velferd', 'oppdragsmappe']);
+const missionDashboardHashTargets = new Set(['hurtiglogg', 'loggoversikt', 'etterrapport', 'ruh-velferd', 'oppdragsmappe']);
 
 type MissionUpdate = (mission: MissionContext) => MissionContext;
 
@@ -272,6 +273,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
       <div id="hurtiglogg">
         <QuickFieldLogComposer mission={mission} onMissionChange={onMissionChange} sourceLabel="Oppdragstavle" criticalObservationAriaLabel="Hurtiglogg kritisk flagg" mustBeForwardedAriaLabel="Hurtiglogg videresending flagg" />
       </div>
+      <MissionLogOverview mission={mission} />
       <FieldLogControls mission={mission} onMissionChange={onMissionChange} />
       <RuhWelfareControls mission={mission} onMissionChange={onMissionChange} />
       <EquipmentReadinessExportControls mission={mission} checklists={checklists} />
