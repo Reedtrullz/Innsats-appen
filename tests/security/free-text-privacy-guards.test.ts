@@ -28,6 +28,23 @@ describe('sensitive operational free-text guards', () => {
     expect(() => assertNoSensitiveOperationalText(text, 'safe.copy')).not.toThrow();
   });
 
+  it.each([
+    ['valid fødselsnummer without keyword', '01017000027'],
+    ['valid D-number without keyword', '41017000010'],
+    ['phone number with operational note', '+47 987 65 432 observert ved møteplass'],
+    ['email address in local note', 'kontakt ola.nordmann@example.com'],
+  ])('rejects high-confidence personal/contact data: %s', (_label, text) => {
+    expect(detectSensitiveOperationalText(text)).not.toBeNull();
+    expect(() => assertNoSensitiveOperationalText(text, 'fieldLog.text')).toThrow(/persondata|pasientdata|private|kontakt|identifikator/i);
+  });
+
+  it.each(['Objekt 010170 uten komplett identifikator', 'Kanal 12 status ok', 'Skjematisk punkt 10,20'])(
+    'still allows safe operational shorthand: %s',
+    (text) => {
+      expect(detectSensitiveOperationalText(text)).toBeNull();
+    },
+  );
+
   it('reports recursive context labels without echoing full sensitive input', () => {
     const sensitiveText = 'fødselsnummer 01017012345';
 
