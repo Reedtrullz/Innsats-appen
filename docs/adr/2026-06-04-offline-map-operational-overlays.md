@@ -21,6 +21,8 @@ The map remains a decision-support sketch, not an authoritative navigation map a
 
 For this iteration, schematic 0-100 coordinates remain the only supported coordinates for markers, sectors, logging links, mission summaries and exports.
 
+In the governed local tile-package iteration, mission-scoped overlays remain the source of operational annotations; any MapLibre/PMTiles base map is context only and does not change the local overlay schema, logging schema, or export privacy rules.
+
 ## Privacy and governance constraints
 
 Exports and imports must show this warning:

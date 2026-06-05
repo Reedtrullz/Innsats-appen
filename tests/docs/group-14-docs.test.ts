@@ -125,6 +125,19 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(maintenance).toMatch(/issues: write/);
   });
 
+  it('requires governed local tile packages before MapLibre or Kartverket map use', () => {
+    const architecture = read('docs/adr/2026-06-04-offline-map-architecture.md');
+    const overlays = read('docs/adr/2026-06-04-offline-map-operational-overlays.md');
+
+    expect(architecture).toContain('Governed local tile-package iteration');
+    expect(architecture).toContain('PMTiles is the browser runtime package format');
+    expect(architecture).toContain('MBTiles is build-time/source input only');
+    expect(architecture).toContain('No runtime tile URL may point to Kartverket, OpenStreetMap or any external provider');
+    expect(architecture).toContain('©Kartverket');
+    expect(architecture).toContain('Geovekst zoom levels 12-20 require explicit permission before copying or packaging');
+    expect(overlays).toContain('mission-scoped overlays remain the source of operational annotations');
+  });
+
   it('keeps the next map iteration local-only until tile-package governance exists', () => {
     const architecture = read('docs/adr/2026-06-04-offline-map-architecture.md');
     const overlays = read('docs/adr/2026-06-04-offline-map-operational-overlays.md');

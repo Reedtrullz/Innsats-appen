@@ -85,3 +85,13 @@ The implementation must include:
 The operational map/logging/Feltmodus integration iteration continues to use the accepted schematic local map architecture. No MapLibre, Leaflet, MBTiles or Kartverket tile runtime is added by the operational-integration iteration.
 
 If real offline tiles are needed later, create a separate governed package plan before coding. That plan must cover license/attribution, tile source approval, package generation, package signing or integrity, update cadence, offline storage quota, user consent, cache eviction, bundle/performance budgets, and production verification that no external tile network calls occur during offline use.
+
+## Governed local tile-package iteration
+
+This iteration may add an optional browser-only MapLibre renderer for approved local tile packages. PMTiles is the browser runtime package format because it can be read from app-local static files through MapLibre's custom protocol without a tile server. MBTiles is build-time/source input only; any MBTiles package must be converted or transformed before it is referenced by the browser.
+
+No runtime tile URL may point to Kartverket, OpenStreetMap or any external provider. Field use must be able to disable the network after app install/package caching and still render the selected map package or gracefully fall back to the schematic map.
+
+Kartverket-derived data requires visible attribution `©Kartverket` and a link to Kartverket where possible. Geovekst zoom levels 12-20 require explicit permission before copying or packaging. Until package provenance is documented, the app must not claim a Kartverket offline base map.
+
+The existing schematic map remains the safe fallback and the source of truth for local operational overlays when a local package is missing, unsupported, expired, too large, or not approved.
