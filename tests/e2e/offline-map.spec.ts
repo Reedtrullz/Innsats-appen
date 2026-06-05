@@ -36,8 +36,8 @@ test('offline map page is local-only, cacheable and tile-free', async ({ page, c
   await expect(page.getByRole('heading', { name: 'Kart' })).toBeVisible();
   await expect(page.getByText(/Schematic local map package, not authoritative navigation/i).first()).toBeVisible();
   await expect(page.getByText(/Ingen eksterne kartfliser/i).first()).toBeVisible();
-  await expect(page.getByText(/ingen nettverksnedlasting/i)).toBeVisible();
-  await expect(page.getByText(/ingen backend sync/i).first()).toBeVisible();
+  await expect(page.getByText(/CacheStorage for offline bruk/i)).toBeVisible();
+  await expect(page.getByText(/Ingen ekstern tile-provider, backend-sync/i).first()).toBeVisible();
   await expect(page.getByTestId('offline-map-cache-status')).toContainText(/Ingen kartpakke/i);
 
   if (!hasLocalMapPackageFixtures()) {
