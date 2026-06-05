@@ -53,13 +53,13 @@ it('shows før utrykning combined workflow, latest procedure notice, and must-re
   expect(screen.getByText(/Kontroller ordre, vær\/farer/i)).toBeInTheDocument();
 });
 
-it('shows under-phase operational entry points for map, log and active mission', () => {
+it('shows under-phase operational entry points for map, quick log and active mission', () => {
   render(<UnderPage />);
 
   expect(screen.getByRole('heading', { name: /Under innsats/i })).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /Åpne aktivt oppdrag/i })).toHaveAttribute('href', '/oppdrag');
   expect(screen.getByRole('link', { name: /Åpne kart/i })).toHaveAttribute('href', '/kart');
-  expect(screen.getByRole('link', { name: /Loggfør observasjon/i })).toHaveAttribute('href', '/oppdrag#feltlogg');
+  expect(screen.getByRole('link', { name: /Hurtiglogg/i })).toHaveAttribute('href', '/oppdrag#hurtiglogg');
   expect(screen.getByText(/Kart og logg er lokal beslutningsstøtte/i)).toBeInTheDocument();
 });
 

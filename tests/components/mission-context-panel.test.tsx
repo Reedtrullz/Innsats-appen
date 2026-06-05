@@ -78,6 +78,7 @@ it('wires Hurtiglogg composer into the active mission dashboard', async () => {
   await renderMissionPanel(<MissionContextPanel mode="list" contentVersion="test" checklists={[]} actionCards={[]} />);
 
   expect(await screen.findByText('Hurtiglogg · Oppdragstavle')).toBeInTheDocument();
+  expect(document.querySelector('#hurtiglogg')).not.toBeNull();
 });
 
 it('stores the checklist that matches the selected mission scenario and phase', async () => {

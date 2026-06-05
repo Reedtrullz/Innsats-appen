@@ -34,7 +34,7 @@ export const FIELD_MODE_THEMES: Array<{ value: FieldModeTheme; label: string; de
 
 export const QUICK_ACTIONS = [
   { id: 'map', label: 'Kart', href: '/kart', helpText: 'Åpner lokal skjematisk kartflate med markører, sektorer og kartlogg.' },
-  { id: 'create-note', label: 'Opprett note', href: '/oppdrag#feltlogg', helpText: 'Åpner lokal feltlogg/notat på aktiv oppdragstavle.' },
+  { id: 'quick-log', label: 'Hurtiglogg', href: '/oppdrag#hurtiglogg', helpText: 'Åpner rask lokal loggføring på aktiv oppdragstavle.' },
   { id: 'active-mission', label: 'Aktivt oppdrag', href: '/oppdrag', helpText: 'Åpner mission dashboard med status, kart/logg og sjekkliste.' },
   { id: 'run-checklist', label: 'Kjør sjekkliste', href: '/oppdrag#sjekkliste', helpText: 'Åpner anbefalt lokal sjekkliste for aktivt oppdrag.' },
   { id: 'five-point-order', label: '5-punktsordre', href: '/oppdrag#5-punktsordre', helpText: 'Åpner lokal 5-punktsordre-mal.' },

@@ -10,7 +10,7 @@ function UnderOperationalEntryPoints() {
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
         <a href="/oppdrag" className="rounded-2xl bg-white p-4 font-black text-slate-950">Åpne aktivt oppdrag</a>
         <a href="/kart" className="rounded-2xl bg-white p-4 font-black text-slate-950">Åpne kart</a>
-        <a href="/oppdrag#feltlogg" className="rounded-2xl bg-white p-4 font-black text-slate-950">Loggfør observasjon</a>
+        <a href="/oppdrag#hurtiglogg" className="rounded-2xl bg-white p-4 font-black text-slate-950">Hurtiglogg</a>
       </div>
     </section>
   );

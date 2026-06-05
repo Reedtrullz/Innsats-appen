@@ -22,7 +22,7 @@ afterEach(async () => {
 });
 
 describe('FieldModePanel', () => {
-  it('renders feltmodus toggles, quick actions and persistent offline status copy', async () => {
+  it('renders feltmodus toggles, Hurtiglogg quick actions and persistent offline status copy', async () => {
     await renderFieldModePanel();
 
     expect(screen.getByRole('heading', { name: /Feltmodus for hansker/i })).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe('FieldModePanel', () => {
 
     const quickActions = within(screen.getByRole('region', { name: /Én trykkflate/i }));
     expect(quickActions.getByRole('link', { name: 'Kart' })).toHaveAttribute('href', '/kart');
-    expect(quickActions.getByRole('link', { name: 'Opprett note' })).toHaveAttribute('href', '/oppdrag#feltlogg');
+    expect(quickActions.getByRole('link', { name: 'Hurtiglogg' })).toHaveAttribute('href', '/oppdrag#hurtiglogg');
     expect(quickActions.getByRole('link', { name: 'Aktivt oppdrag' })).toHaveAttribute('href', '/oppdrag');
     expect(quickActions.getByRole('link', { name: 'Kjør sjekkliste' })).toHaveAttribute('href', '/oppdrag#sjekkliste');
     expect(quickActions.getByRole('link', { name: '5-punktsordre' })).toHaveAttribute('href', '/oppdrag#5-punktsordre');

@@ -18,6 +18,8 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await expect(page.getByRole('heading', { name: 'Under', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: /FIG under innsats/i }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: /5-punktsordre/i }).first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /Åpne kart/i })).toHaveAttribute('href', '/kart');
+  await expect(page.getByRole('link', { name: /Hurtiglogg/i })).toHaveAttribute('href', '/oppdrag#hurtiglogg');
 
   await page.goto('/etter');
   await expect(page.getByRole('heading', { name: 'Etter', exact: true })).toBeVisible();
@@ -35,6 +37,12 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   });
 
   await expect(page.getByRole('heading', { name: /Situasjonsoversikt nå/i })).toBeVisible();
+
+  await page.goto('/under');
+  await page.getByRole('link', { name: /Hurtiglogg/i }).click();
+  await expect(page).toHaveURL(/\/oppdrag#hurtiglogg$/);
+  await expect(page.locator('#hurtiglogg').getByText(/Hurtiglogg · Oppdragstavle/i)).toBeVisible();
+  await expect(page.locator('#hurtiglogg')).toBeInViewport();
 
   await page.goto('/etter');
   await page.getByRole('link', { name: /Åpne etterrapport/i }).click();
