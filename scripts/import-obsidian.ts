@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import matter from 'gray-matter';
 import { fileURLToPath } from 'node:url';
 import { SourceDocumentSchema, type ContentManifest, type SourceDocument } from '@/lib/content/schemas';
@@ -9,12 +10,21 @@ const GENERIC_ASSET_NAMES = new Set(['i-icon-32.png', 'fullscreen_on.png', 'Atta
 const DEFAULT_SOURCE_OWNER = 'content-team';
 const DEFAULT_SOURCE_REVIEWER = 'fagansvarlig';
 const DEFAULT_SOURCE_VERIFIED_AT = '2026-06-03';
+const SOURCE_SNAPSHOT_METADATA_FILE = 'source-snapshot-metadata.json';
+
+interface SourceSnapshotMetadata {
+  sourceSnapshotGeneratedAt: string;
+  sourceSnapshotHash: string;
+  sourceCount: number;
+}
 
 export interface ImportOptions {
   generatedDir?: string;
   publicAssetsDir?: string;
   publicGeneratedDir?: string;
   minRealSourceCount?: number;
+  allowPregenerated?: boolean;
+  now?: string | Date;
 }
 
 export interface ImportResult {
@@ -25,6 +35,71 @@ export interface ImportResult {
 
 function repoPath(...parts: string[]) {
   return path.join(process.cwd(), ...parts);
+}
+
+function buildTimestamp(now?: string | Date) {
+  return now instanceof Date ? now.toISOString() : (now ?? new Date().toISOString());
+}
+
+function sourceSnapshotHash(sources: SourceDocument[]) {
+  const stablePayload = JSON.stringify(sources.map((source) => ({ ...source })).sort((a, b) => a.id.localeCompare(b.id)));
+  return `sha256:${crypto.createHash('sha256').update(stablePayload).digest('hex')}`;
+}
+
+function emptyManifest(now: string): ContentManifest {
+  return {
+    contentVersion: now,
+    generatedAt: now,
+    sourceCount: 0,
+    actionCardCount: 0,
+    checklistCount: 0,
+    trainingPathCount: 0,
+    protectionMeasureCount: 0,
+    glossaryCount: 0,
+    faqCount: 0,
+    equipmentTaxonomyCount: 0,
+    exportTemplateCount: 0,
+    imageMetadataCount: 0,
+    localOverlayCount: 0,
+    changelogCount: 0,
+    mustReadCount: 0,
+    workplanCount: 0,
+    copiedAssetCount: 0,
+    usedPregeneratedFallback: false,
+  };
+}
+
+function manifestWithDefaults(previous: ContentManifest | undefined, now: string): ContentManifest {
+  const base = emptyManifest(now);
+  if (!previous) return base;
+  return {
+    contentVersion: previous.contentVersion ?? base.contentVersion,
+    generatedAt: previous.generatedAt ?? base.generatedAt,
+    ...(previous.sourceSnapshotGeneratedAt ? { sourceSnapshotGeneratedAt: previous.sourceSnapshotGeneratedAt } : {}),
+    ...(previous.sourceSnapshotHash ? { sourceSnapshotHash: previous.sourceSnapshotHash } : {}),
+    usedPregeneratedFallback: previous.usedPregeneratedFallback ?? base.usedPregeneratedFallback,
+    sourceCount: previous.sourceCount ?? base.sourceCount,
+    actionCardCount: previous.actionCardCount ?? base.actionCardCount,
+    checklistCount: previous.checklistCount ?? base.checklistCount,
+    trainingPathCount: previous.trainingPathCount ?? base.trainingPathCount,
+    protectionMeasureCount: previous.protectionMeasureCount ?? base.protectionMeasureCount,
+    glossaryCount: previous.glossaryCount ?? base.glossaryCount,
+    faqCount: previous.faqCount ?? base.faqCount,
+    equipmentTaxonomyCount: previous.equipmentTaxonomyCount ?? base.equipmentTaxonomyCount,
+    exportTemplateCount: previous.exportTemplateCount ?? base.exportTemplateCount,
+    imageMetadataCount: previous.imageMetadataCount ?? base.imageMetadataCount,
+    localOverlayCount: previous.localOverlayCount ?? base.localOverlayCount,
+    changelogCount: previous.changelogCount ?? base.changelogCount,
+    mustReadCount: previous.mustReadCount ?? base.mustReadCount,
+    workplanCount: previous.workplanCount ?? base.workplanCount,
+    copiedAssetCount: previous.copiedAssetCount ?? base.copiedAssetCount,
+  };
+}
+
+function sourceSnapshotGeneratedAtForHash(currentHash: string, now: string, previous?: ContentManifest, previousSnapshot?: SourceSnapshotMetadata) {
+  if (previousSnapshot?.sourceSnapshotHash === currentHash) return previousSnapshot.sourceSnapshotGeneratedAt;
+  if (previous?.sourceSnapshotHash === currentHash && previous.sourceSnapshotGeneratedAt) return previous.sourceSnapshotGeneratedAt;
+  return now;
 }
 
 export function slugifySourceId(stem: string): string {
@@ -113,33 +188,29 @@ async function pathExists(filePath: string) {
   }
 }
 
-async function readManifest(generatedDir: string): Promise<ContentManifest> {
+async function readManifest(generatedDir: string): Promise<ContentManifest | undefined> {
   const manifestPath = path.join(generatedDir, 'manifest.json');
-  if (!(await pathExists(manifestPath))) {
-    return {
-      contentVersion: new Date().toISOString(),
-      generatedAt: new Date().toISOString(),
-      sourceCount: 0,
-      actionCardCount: 0,
-      checklistCount: 0,
-      trainingPathCount: 0,
-      protectionMeasureCount: 0,
-      glossaryCount: 0,
-      faqCount: 0,
-      equipmentTaxonomyCount: 0,
-      exportTemplateCount: 0,
-      imageMetadataCount: 0,
-      localOverlayCount: 0,
-      changelogCount: 0,
-      mustReadCount: 0,
-      workplanCount: 0,
-      copiedAssetCount: 0,
-    };
-  }
+  if (!(await pathExists(manifestPath))) return undefined;
   return JSON.parse(await fs.readFile(manifestPath, 'utf8'));
 }
 
-async function readPregeneratedImportResult(generatedDir: string, publicGeneratedDir: string, publicAssetsDir: string): Promise<ImportResult> {
+async function readSourceSnapshotMetadata(generatedDir: string): Promise<SourceSnapshotMetadata | undefined> {
+  const metadataPath = path.join(generatedDir, SOURCE_SNAPSHOT_METADATA_FILE);
+  if (!(await pathExists(metadataPath))) return undefined;
+  const parsed = JSON.parse(await fs.readFile(metadataPath, 'utf8')) as Partial<SourceSnapshotMetadata>;
+  if (!parsed.sourceSnapshotGeneratedAt || !parsed.sourceSnapshotHash || typeof parsed.sourceCount !== 'number') return undefined;
+  return {
+    sourceSnapshotGeneratedAt: parsed.sourceSnapshotGeneratedAt,
+    sourceSnapshotHash: parsed.sourceSnapshotHash,
+    sourceCount: parsed.sourceCount,
+  };
+}
+
+async function writeSourceSnapshotMetadata(generatedDir: string, metadata: SourceSnapshotMetadata) {
+  await writeJson(path.join(generatedDir, SOURCE_SNAPSHOT_METADATA_FILE), metadata);
+}
+
+async function readPregeneratedImportResult(generatedDir: string, publicGeneratedDir: string, publicAssetsDir: string, now: string): Promise<ImportResult> {
   const sourcePath = path.join(generatedDir, 'source-documents.json');
   if (!(await pathExists(sourcePath))) {
     throw new Error(`Source extract directory is unavailable and ${sourcePath} does not exist`);
@@ -149,14 +220,32 @@ async function readPregeneratedImportResult(generatedDir: string, publicGenerate
   await writeJson(path.join(publicGeneratedDir, 'source-documents.json'), sources.map((source: SourceDocument) => ({ ...source, body: source.body.slice(0, 12000) })));
   const copiedAssets = (await pathExists(publicAssetsDir)) ? (await fs.readdir(publicAssetsDir)).sort() : [];
   const previous = await readManifest(generatedDir);
-  const now = new Date().toISOString();
+  const previousSnapshot = await readSourceSnapshotMetadata(generatedDir);
+  const currentSourceSnapshotHash = sourceSnapshotHash(sources);
+  const sourceSnapshotGeneratedAt = previous?.sourceSnapshotGeneratedAt ?? previousSnapshot?.sourceSnapshotGeneratedAt;
+  const expectedSourceSnapshotHash = previous?.sourceSnapshotHash ?? previousSnapshot?.sourceSnapshotHash;
+  if (!sourceSnapshotGeneratedAt) {
+    throw new Error('Pregenerated content fallback requires source snapshot metadata so stale source snapshots are not reported as fresh');
+  }
+  if (expectedSourceSnapshotHash && expectedSourceSnapshotHash !== currentSourceSnapshotHash) {
+    throw new Error('Pregenerated source-documents.json does not match source snapshot metadata; regenerate source extracts before fallback');
+  }
+  const previousManifest = manifestWithDefaults(previous, now);
   const manifest: ContentManifest = {
-    ...previous,
+    ...previousManifest,
     contentVersion: now,
     generatedAt: now,
+    sourceSnapshotGeneratedAt,
+    sourceSnapshotHash: currentSourceSnapshotHash,
+    usedPregeneratedFallback: true,
     sourceCount: sources.length,
     copiedAssetCount: copiedAssets.length,
   };
+  await writeSourceSnapshotMetadata(generatedDir, {
+    sourceSnapshotGeneratedAt,
+    sourceSnapshotHash: currentSourceSnapshotHash,
+    sourceCount: sources.length,
+  });
   await writeJson(path.join(generatedDir, 'manifest.json'), manifest);
   await writeJson(path.join(publicGeneratedDir, 'manifest.json'), manifest);
   return { sources, copiedAssets, manifest };
@@ -230,10 +319,11 @@ export async function importObsidianSources(basePath = DEFAULT_SOURCE_PATH, opti
   const publicGeneratedDir = path.resolve(options.publicGeneratedDir ?? repoPath('public/generated-content'));
   const sourceExtractDir = path.join(sourceRoot, 'source-extracts');
   const minRealSourceCount = options.minRealSourceCount ?? (isDefaultSourceRoot ? 61 : 0);
+  const now = buildTimestamp(options.now);
 
   if (!(await pathExists(sourceExtractDir))) {
-    if (process.env.ALLOW_PREGENERATED_CONTENT === '1') {
-      return readPregeneratedImportResult(generatedDir, publicGeneratedDir, publicAssetsDir);
+    if (options.allowPregenerated || process.env.ALLOW_PREGENERATED_CONTENT === '1') {
+      return readPregeneratedImportResult(generatedDir, publicGeneratedDir, publicAssetsDir, now);
     }
     throw new Error(`Source extract directory not found: ${sourceExtractDir}`);
   }
@@ -268,15 +358,26 @@ export async function importObsidianSources(basePath = DEFAULT_SOURCE_PATH, opti
 
   await writeJson(path.join(generatedDir, 'source-documents.json'), sources);
   await writeJson(path.join(publicGeneratedDir, 'source-documents.json'), sources.map((source) => ({ ...source, body: source.body.slice(0, 12000) })));
-  const previous = await readManifest(generatedDir);
-  const now = new Date().toISOString();
+  const previousRawManifest = await readManifest(generatedDir);
+  const previousSnapshot = await readSourceSnapshotMetadata(generatedDir);
+  const previous = manifestWithDefaults(previousRawManifest, now);
+  const currentSourceSnapshotHash = sourceSnapshotHash(sources);
+  const sourceSnapshotGeneratedAt = sourceSnapshotGeneratedAtForHash(currentSourceSnapshotHash, now, previousRawManifest, previousSnapshot);
   const manifest: ContentManifest = {
     ...previous,
     contentVersion: now,
     generatedAt: now,
+    sourceSnapshotGeneratedAt,
+    sourceSnapshotHash: currentSourceSnapshotHash,
+    usedPregeneratedFallback: false,
     sourceCount: sources.length,
     copiedAssetCount: allCopiedAssets.size,
   };
+  await writeSourceSnapshotMetadata(generatedDir, {
+    sourceSnapshotGeneratedAt,
+    sourceSnapshotHash: currentSourceSnapshotHash,
+    sourceCount: sources.length,
+  });
   await writeJson(path.join(generatedDir, 'manifest.json'), manifest);
   await writeJson(path.join(publicGeneratedDir, 'manifest.json'), manifest);
   return { sources, copiedAssets: [...allCopiedAssets].sort(), manifest };

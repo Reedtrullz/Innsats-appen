@@ -197,6 +197,15 @@ function validateGeneratedArtifacts(errors: string[], graph: GraphInput) {
     for (const [key, expected] of Object.entries(counts)) {
       if (graph.manifest[key] !== expected) errors.push(`manifest ${key}=${graph.manifest[key]} does not match generated count ${expected}`);
     }
+    if (typeof graph.manifest.sourceSnapshotGeneratedAt !== 'string' || graph.manifest.sourceSnapshotGeneratedAt.trim().length === 0) {
+      errors.push('manifest sourceSnapshotGeneratedAt is required to distinguish source snapshot freshness from build time');
+    }
+    if (typeof graph.manifest.sourceSnapshotHash !== 'string' || graph.manifest.sourceSnapshotHash.trim().length === 0) {
+      errors.push('manifest sourceSnapshotHash is required to identify the source snapshot used by the build');
+    }
+    if (typeof graph.manifest.usedPregeneratedFallback !== 'boolean') {
+      errors.push('manifest usedPregeneratedFallback must be a boolean');
+    }
   }
 
   const publicGraph = graph.publicGraph;

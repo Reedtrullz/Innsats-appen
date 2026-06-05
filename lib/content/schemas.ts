@@ -209,6 +209,9 @@ export const MustReadNoticeSchema = z.object({
 export const ContentManifestSchema = z.object({
   contentVersion: z.string().min(1),
   generatedAt: z.string().min(1),
+  sourceSnapshotGeneratedAt: z.string().min(1).optional(),
+  sourceSnapshotHash: z.string().min(1).optional(),
+  usedPregeneratedFallback: z.boolean(),
   sourceCount: z.number().int().nonnegative().default(0),
   actionCardCount: z.number().int().nonnegative().default(0),
   checklistCount: z.number().int().nonnegative().default(0),

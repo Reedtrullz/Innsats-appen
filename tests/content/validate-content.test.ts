@@ -292,6 +292,9 @@ it('reports generated artifact manifest, public mirror, and search-index mismatc
   } as any);
   const joined = errors.join('\n');
   expect(joined).toContain('manifest sourceCount=2 does not match generated count 1');
+  expect(joined).toContain('manifest sourceSnapshotGeneratedAt is required to distinguish source snapshot freshness from build time');
+  expect(joined).toContain('manifest sourceSnapshotHash is required to identify the source snapshot used by the build');
+  expect(joined).toContain('manifest usedPregeneratedFallback must be a boolean');
   expect(joined).toContain('public generated manifest does not mirror content generated manifest');
   expect(joined).toContain('public source src-known field title does not mirror content generated source');
   expect(joined).toContain('search index source document ids missing kilde:src-known');

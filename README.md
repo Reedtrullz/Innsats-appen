@@ -27,7 +27,7 @@ The Obsidian knowledge bank is the source of source extracts and project notes. 
 OBSIDIAN_BEREDSKAPSBOKA_PATH=/path/to/your/Obsidian/Beredskapsboka
 ```
 
-Curated MVP content lives in `content/curated/*.yaml`. Build scripts compile it to `content/generated/*` and mirror browser-readable JSON to `public/generated-content/*`. The sanitized `content/generated/source-documents.json` snapshot is committed so clean GitHub Actions runners can build and test without access to the private Obsidian vault; refresh it with `npm run build:content` and rely on the privacy tests before committing changes.
+Curated MVP content lives in `content/curated/*.yaml`. Build scripts compile it to `content/generated/*` and mirror browser-readable JSON to `public/generated-content/*`. The sanitized `content/generated/source-documents.json` snapshot and its tracked `content/generated/source-snapshot-metadata.json` sidecar are committed so clean GitHub Actions/Docker runners can build and test without access to the private Obsidian vault while still preserving source-snapshot freshness metadata; refresh both with `npm run build:content` and rely on the privacy tests before committing changes.
 
 Workplans live in `.hermes/plans/*.md` when developing locally. `npm run sync:workplans` extracts safe metadata/task headings into `content/workplans/workplans.json`, mirrors `content/generated/workplans.json` + `public/generated-content/workplans.json`, and writes `20-Workplans.md` in the Obsidian project folder when the vault is available. `/release` fetches the generated local workplan artifact from `/generated-content/workplans.json` and merges it into the browser-local release board while preserving local status overrides; dette er en statisk artefakt uten backend-synk.
 

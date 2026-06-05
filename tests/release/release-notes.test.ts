@@ -5,6 +5,9 @@ import { buildReleaseNotes, contentVersionToReleaseId, releaseNotesToMarkdown } 
 const manifest: ContentManifest = {
   contentVersion: '2026-06-04 07:16:22.17',
   generatedAt: '2026-06-04T07:16:22.170Z',
+  sourceSnapshotGeneratedAt: '2026-06-04T07:16:22.170Z',
+  sourceSnapshotHash: 'sha256:test-snapshot',
+  usedPregeneratedFallback: false,
   sourceCount: 2,
   actionCardCount: 3,
   checklistCount: 1,

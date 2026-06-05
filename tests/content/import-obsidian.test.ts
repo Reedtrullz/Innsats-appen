@@ -102,6 +102,20 @@ it('uses pregenerated source documents when explicitly allowed and source extrac
       warnings: [],
     },
   ]));
+  await fs.writeFile(path.join(generatedDir, 'manifest.json'), JSON.stringify({
+    contentVersion: '2026-06-04T22:25:38.764Z',
+    generatedAt: '2026-06-04T22:25:38.764Z',
+    sourceSnapshotGeneratedAt: '2026-06-04T22:25:38.764Z',
+    usedPregeneratedFallback: false,
+    sourceCount: 1,
+    actionCardCount: 0,
+    checklistCount: 0,
+    trainingPathCount: 0,
+    protectionMeasureCount: 0,
+    glossaryCount: 0,
+    faqCount: 0,
+    copiedAssetCount: 0,
+  }));
 
   const previous = process.env.ALLOW_PREGENERATED_CONTENT;
   process.env.ALLOW_PREGENERATED_CONTENT = '1';
@@ -120,6 +134,190 @@ it('uses pregenerated source documents when explicitly allowed and source extrac
     if (previous === undefined) delete process.env.ALLOW_PREGENERATED_CONTENT;
     else process.env.ALLOW_PREGENERATED_CONTENT = previous;
   }
+});
+
+it('does not rewrite source snapshot generatedAt when using pregenerated fallback', async () => {
+  const outputRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'beredskapsboka-pregenerated-freshness-'));
+  const generatedDir = path.join(outputRoot, 'generated');
+  const publicGeneratedDir = path.join(outputRoot, 'public-generated');
+  const publicAssetsDir = path.join(outputRoot, 'assets');
+  const originalSnapshotGeneratedAt = '2026-06-04T22:25:38.764Z';
+  const fallbackBuildTime = '2030-01-01T00:00:00.000Z';
+
+  await fs.mkdir(generatedDir, { recursive: true });
+  await fs.mkdir(publicAssetsDir, { recursive: true });
+  await fs.writeFile(path.join(generatedDir, 'source-documents.json'), JSON.stringify([
+    {
+      id: 'src-known',
+      title: 'SRC - Known',
+      sourcePath: 'source-extracts/SRC - Known.md',
+      sourceType: 'source-extract',
+      status: 'verified',
+      body: 'Known source body',
+      warnings: [],
+    },
+  ]));
+  await fs.writeFile(path.join(generatedDir, 'manifest.json'), JSON.stringify({
+    contentVersion: originalSnapshotGeneratedAt,
+    generatedAt: originalSnapshotGeneratedAt,
+    sourceSnapshotGeneratedAt: originalSnapshotGeneratedAt,
+    usedPregeneratedFallback: false,
+    sourceCount: 1,
+    actionCardCount: 0,
+    checklistCount: 0,
+    trainingPathCount: 0,
+    protectionMeasureCount: 0,
+    glossaryCount: 0,
+    faqCount: 0,
+    copiedAssetCount: 0,
+  }));
+
+  const result = await importObsidianSources(path.join(outputRoot, 'missing-vault'), {
+    generatedDir,
+    publicAssetsDir,
+    publicGeneratedDir,
+    allowPregenerated: true,
+    now: fallbackBuildTime,
+  });
+
+  expect(result.manifest.generatedAt).toBe(fallbackBuildTime);
+  expect(result.manifest.sourceSnapshotGeneratedAt).toBe(originalSnapshotGeneratedAt);
+  expect(result.manifest.sourceSnapshotGeneratedAt).not.toBe(fallbackBuildTime);
+  expect(result.manifest.sourceSnapshotHash).toMatch(/^sha256:[0-9a-f]{64}$/);
+  expect(result.manifest.usedPregeneratedFallback).toBe(true);
+});
+
+it('refuses pregenerated fallback when source snapshot metadata is unavailable', async () => {
+  const outputRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'beredskapsboka-pregenerated-no-manifest-'));
+  const generatedDir = path.join(outputRoot, 'generated');
+  const publicGeneratedDir = path.join(outputRoot, 'public-generated');
+  const publicAssetsDir = path.join(outputRoot, 'assets');
+  await fs.mkdir(generatedDir, { recursive: true });
+  await fs.writeFile(path.join(generatedDir, 'source-documents.json'), JSON.stringify([
+    {
+      id: 'src-known',
+      title: 'SRC - Known',
+      sourcePath: 'source-extracts/SRC - Known.md',
+      sourceType: 'source-extract',
+      status: 'verified',
+      body: 'Known source body',
+      warnings: [],
+    },
+  ]));
+
+  await expect(importObsidianSources(path.join(outputRoot, 'missing-vault'), {
+    generatedDir,
+    publicAssetsDir,
+    publicGeneratedDir,
+    allowPregenerated: true,
+    now: '2030-01-01T00:00:00.000Z',
+  })).rejects.toThrow(/source snapshot metadata/);
+});
+
+it('uses tracked source snapshot metadata when pregenerated fallback has no manifest', async () => {
+  const fixtureRoot = path.resolve('tests/fixtures/obsidian-mini');
+  const outputRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'beredskapsboka-pregenerated-sidecar-'));
+  const generatedDir = path.join(outputRoot, 'generated');
+  const publicGeneratedDir = path.join(outputRoot, 'public-generated');
+  const publicAssetsDir = path.join(outputRoot, 'assets');
+  const sourceSnapshotGeneratedAt = '2026-06-04T22:25:38.764Z';
+  const fallbackBuildTime = '2030-01-01T00:00:00.000Z';
+
+  await importObsidianSources(fixtureRoot, {
+    generatedDir,
+    publicAssetsDir,
+    publicGeneratedDir,
+    minRealSourceCount: 0,
+    now: sourceSnapshotGeneratedAt,
+  });
+  await fs.rm(path.join(generatedDir, 'manifest.json'));
+
+  const result = await importObsidianSources(path.join(outputRoot, 'missing-vault'), {
+    generatedDir,
+    publicAssetsDir,
+    publicGeneratedDir,
+    allowPregenerated: true,
+    now: fallbackBuildTime,
+  });
+
+  expect(result.manifest.generatedAt).toBe(fallbackBuildTime);
+  expect(result.manifest.sourceSnapshotGeneratedAt).toBe(sourceSnapshotGeneratedAt);
+  expect(result.manifest.sourceSnapshotHash).toMatch(/^sha256:[0-9a-f]{64}$/);
+  expect(result.manifest.usedPregeneratedFallback).toBe(true);
+});
+
+it('refuses pregenerated fallback when source documents do not match the manifest hash', async () => {
+  const outputRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'beredskapsboka-pregenerated-hash-mismatch-'));
+  const generatedDir = path.join(outputRoot, 'generated');
+  const publicGeneratedDir = path.join(outputRoot, 'public-generated');
+  const publicAssetsDir = path.join(outputRoot, 'assets');
+  await fs.mkdir(generatedDir, { recursive: true });
+  await fs.writeFile(path.join(generatedDir, 'source-documents.json'), JSON.stringify([
+    {
+      id: 'src-known',
+      title: 'SRC - Known changed',
+      sourcePath: 'source-extracts/SRC - Known.md',
+      sourceType: 'source-extract',
+      status: 'verified',
+      body: 'Changed source body',
+      warnings: [],
+    },
+  ]));
+  await fs.writeFile(path.join(generatedDir, 'manifest.json'), JSON.stringify({
+    contentVersion: '2026-06-04T22:25:38.764Z',
+    generatedAt: '2026-06-04T22:25:38.764Z',
+    sourceSnapshotGeneratedAt: '2026-06-04T22:25:38.764Z',
+    sourceSnapshotHash: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+    usedPregeneratedFallback: false,
+    sourceCount: 1,
+    actionCardCount: 0,
+    checklistCount: 0,
+    trainingPathCount: 0,
+    protectionMeasureCount: 0,
+    glossaryCount: 0,
+    faqCount: 0,
+    copiedAssetCount: 0,
+  }));
+
+  await expect(importObsidianSources(path.join(outputRoot, 'missing-vault'), {
+    generatedDir,
+    publicAssetsDir,
+    publicGeneratedDir,
+    allowPregenerated: true,
+    now: '2030-01-01T00:00:00.000Z',
+  })).rejects.toThrow(/source snapshot metadata/);
+});
+
+it('refuses pregenerated fallback when source documents do not match the sidecar hash', async () => {
+  const outputRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'beredskapsboka-pregenerated-sidecar-hash-mismatch-'));
+  const generatedDir = path.join(outputRoot, 'generated');
+  const publicGeneratedDir = path.join(outputRoot, 'public-generated');
+  const publicAssetsDir = path.join(outputRoot, 'assets');
+  await fs.mkdir(generatedDir, { recursive: true });
+  await fs.writeFile(path.join(generatedDir, 'source-documents.json'), JSON.stringify([
+    {
+      id: 'src-known',
+      title: 'SRC - Known changed',
+      sourcePath: 'source-extracts/SRC - Known.md',
+      sourceType: 'source-extract',
+      status: 'verified',
+      body: 'Changed source body',
+      warnings: [],
+    },
+  ]));
+  await fs.writeFile(path.join(generatedDir, 'source-snapshot-metadata.json'), JSON.stringify({
+    sourceSnapshotGeneratedAt: '2026-06-04T22:25:38.764Z',
+    sourceSnapshotHash: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+    sourceCount: 1,
+  }));
+
+  await expect(importObsidianSources(path.join(outputRoot, 'missing-vault'), {
+    generatedDir,
+    publicAssetsDir,
+    publicGeneratedDir,
+    allowPregenerated: true,
+    now: '2030-01-01T00:00:00.000Z',
+  })).rejects.toThrow(/source snapshot metadata/);
 });
 
 it('redacts common local path forms without touching URLs', () => {
