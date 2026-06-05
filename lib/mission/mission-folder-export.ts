@@ -56,7 +56,14 @@ export function buildMissionFolderExport(input: {
 }) {
   const generatedAt = input.generatedAt ?? new Date().toISOString();
   const mapState = missionFolderMapState(input.mapState, input.mission.id);
-  const mapPackage = sanitizeLocalMapPackageSummary(input.mapPackage);
+  const reportMapPackage = sanitizeLocalMapPackageSummary(input.mapPackage);
+  const mapPackage = reportMapPackage ? {
+    packageId: reportMapPackage.id,
+    title: reportMapPackage.title,
+    attribution: reportMapPackage.attribution,
+    version: reportMapPackage.version,
+    provenance: reportMapPackage.provenance,
+  } : undefined;
   assertNoSensitiveOperationalTextInValue({
     mission: {
       ...input.mission,
@@ -76,7 +83,7 @@ export function buildMissionFolderExport(input: {
     checklists: input.checklists,
     checklistRuns: input.checklistRuns,
     mapState,
-    mapPackage,
+    mapPackage: reportMapPackage,
     generatedAt,
   });
 
@@ -102,7 +109,7 @@ export function exportMissionFolderMarkdown(bundle: MissionFolderExport) {
   const mapPackageLines = bundle.artifacts.mapPackage ? [
     '## Kartpakke',
     `- Tittel: ${bundle.artifacts.mapPackage.title}`,
-    `- Pakke-ID: ${bundle.artifacts.mapPackage.id}`,
+    `- Pakke-ID: ${bundle.artifacts.mapPackage.packageId}`,
     `- Versjon: ${bundle.artifacts.mapPackage.version}`,
     `- Attribusjon: ${bundle.artifacts.mapPackage.attribution}`,
     `- Opprinnelse/proveniens: ${bundle.artifacts.mapPackage.provenance}`,

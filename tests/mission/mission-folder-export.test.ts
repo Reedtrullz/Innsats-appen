@@ -84,12 +84,13 @@ it('includes sanitized map package provenance in mission-folder exports', () => 
   });
 
   expect(bundle.artifacts.mapPackage).toEqual({
-    id: 'trondheim-lokal',
+    packageId: 'trondheim-lokal',
     title: 'Trondheim lokalpakke',
     attribution: 'Demo attribution',
     version: '2026.06-a',
     provenance: 'Local training package bundled with app',
   });
+  expect(JSON.stringify(bundle.artifacts.mapPackage)).not.toContain('"id"');
 
   const markdown = exportMissionFolderMarkdown(bundle);
   expect(markdown).toContain('## Kartpakke');
@@ -131,7 +132,7 @@ it('omits unsafe map package ids while preserving useful provenance in mission-f
   });
 
   expect(bundle.artifacts.mapPackage).toEqual({
-    id: '',
+    packageId: '',
     title: 'Sanitert lokal kartpakke',
     attribution: 'Demo attribution',
     version: '2026.06-a',
@@ -172,7 +173,7 @@ it('strips URL and path-like content from mission-folder map package text fields
   });
 
   expect(bundle.artifacts.mapPackage).toEqual({
-    id: 'trondheim-lokal',
+    packageId: 'trondheim-lokal',
     title: '',
     attribution: '',
     version: '',
