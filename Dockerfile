@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-ARG NODE_VERSION=22
+ARG NODE_VERSION=22.22.3
 
 FROM node:${NODE_VERSION}-slim AS deps
 WORKDIR /app
@@ -29,9 +29,11 @@ RUN npm run build
 FROM node:${NODE_VERSION}-slim AS runner
 WORKDIR /app
 
+ARG VERSION=local
 ENV NODE_ENV=production \
     PORT=3000 \
     HOSTNAME=0.0.0.0 \
+    VERSION=${VERSION} \
     NEXT_TELEMETRY_DISABLED=1
 
 RUN mkdir -p /app/.next && chown -R node:node /app
