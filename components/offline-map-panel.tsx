@@ -10,6 +10,7 @@ import {
   getOfflineMapPackage,
   getRenderableMapFeatures,
   offlineMapCacheSnapshot,
+  offlineMapQuotaCopy,
   parseCachedOfflineMapPackage,
   resetCachedOfflineMapPackage,
   subscribeOfflineMapCache,
@@ -190,6 +191,7 @@ export function OfflineMapPanel() {
   const [mapLogText, setMapLogText] = useState('');
   const [mapLogSaving, setMapLogSaving] = useState(false);
   const [mapPackageCacheSaving, setMapPackageCacheSaving] = useState(false);
+  const [storageEstimate, setStorageEstimate] = useState<{ quota?: number; usage?: number }>({});
   const mapLogSavingRef = useRef(false);
   const mapPackageCacheSavingRef = useRef(false);
   const latestSelectedPackageIdRef = useRef(selectedPackageId);
@@ -216,6 +218,11 @@ export function OfflineMapPanel() {
   ];
   const selectedPackage = mapPackageOptionForId(selectedPackageId, mapPackageOptions) ?? mapPackageOptions[0];
   const selectedWarning = cacheSizeWarningForPackage(selectedPackage);
+  const selectedQuotaCopy = offlineMapQuotaCopy({
+    estimatedSizeMb: selectedPackage.estimatedSizeMb,
+    quota: storageEstimate.quota,
+    usage: storageEstimate.usage,
+  });
   const selectedSchematicPackage = getOfflineMapPackage(selectedPackage.id) ?? OFFLINE_MAP_PACKAGES[0];
   const cachedLocalMapPackage = cachedPackage?.runtimeFormat === 'pmtiles' ? localMapPackageForId(cachedPackage.packageId) : undefined;
   const activeMissionMapState = useMemo(() => activeMission ? mapStateForMission(mapState, activeMission.id) : { markers: [], drawings: [] }, [activeMission, mapState]);
@@ -224,6 +231,29 @@ export function OfflineMapPanel() {
   useEffect(() => {
     latestSelectedPackageIdRef.current = selectedPackage.id;
   }, [selectedPackage.id]);
+
+  useEffect(() => {
+    let mounted = true;
+    if (typeof navigator === 'undefined' || typeof navigator.storage?.estimate !== 'function') {
+      return () => {
+        mounted = false;
+      };
+    }
+    navigator.storage.estimate()
+      .then((estimate) => {
+        if (!mounted) return;
+        setStorageEstimate({
+          quota: typeof estimate.quota === 'number' ? estimate.quota : undefined,
+          usage: typeof estimate.usage === 'number' ? estimate.usage : undefined,
+        });
+      })
+      .catch(() => {
+        if (mounted) setStorageEstimate({});
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const loadFieldMode = () => {
@@ -514,6 +544,7 @@ export function OfflineMapPanel() {
           )}
           <p className="mt-1">Anslått lokal cache: {selectedPackage.estimatedSizeMb} MB. Versjon: {selectedPackage.version}.</p>
           {selectedWarning ? <p className="mt-3 rounded-xl bg-orange-100 p-3 font-black text-orange-950">{selectedWarning}</p> : null}
+          <p className="mt-3 rounded-xl bg-sky-50 p-3 font-black text-sky-950" data-testid="offline-map-quota-copy">{selectedQuotaCopy}</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <button type="button" onClick={() => void cacheSelectedPackage()} disabled={mapPackageCacheSaving} className="min-h-11 rounded-xl bg-sky-900 px-4 font-black text-white disabled:cursor-wait disabled:bg-slate-500">{mapPackageCacheSaving ? 'Forhåndscacher kartpakke lokalt…' : 'Lagre valgt kartpakke lokalt'}</button>

@@ -4,7 +4,7 @@ import { afterEach, vi } from 'vitest';
 import { FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY } from '@/lib/field-mode/field-mode';
 import { saveSelectedActiveMissionId } from '@/lib/mission/active-mission-selection';
 import { clearLocalMissionData, getMission, saveMission } from '@/lib/mission/local-store';
-import { OFFLINE_MAP_CACHE_STORAGE_KEY } from '@/lib/maps/offline-map';
+import { OFFLINE_MAP_CACHE_STORAGE_KEY, offlineMapQuotaCopy } from '@/lib/maps/offline-map';
 import { OPERATIONS_MAP_STORAGE_KEY, SCHEMATIC_GEOJSON_COORDINATE_SYSTEM } from '@/lib/maps/operations-map';
 import { readLocalAuditLog } from '@/lib/privacy/local-profile';
 import type { FieldLogEntry, MissionContext } from '@/lib/mission/schemas';
@@ -165,6 +165,25 @@ it('stores selected map package cache metadata in localStorage and can reset it'
     expect(localStorage.getItem(OFFLINE_MAP_CACHE_STORAGE_KEY)).toBeNull();
     expect(screen.getByTestId('offline-map-cache-status')).toHaveTextContent(/Ingen kartpakke/i);
   });
+});
+
+it('shows quota-aware cache copy before saving a large offline map package', async () => {
+  const user = userEvent.setup();
+  Object.defineProperty(navigator, 'storage', {
+    configurable: true,
+    value: { estimate: vi.fn(async () => ({ quota: 50 * 1024 * 1024, usage: 40 * 1024 * 1024 })) },
+  });
+  await renderOfflineMapPanel();
+
+  await user.selectOptions(screen.getByLabelText('Velg lokal kartpakke'), 'trondelag-oversikt');
+
+  expect(await screen.findByText(/kan fortrenge annet offline-innhold/i)).toBeInTheDocument();
+  expect(screen.getByText(/tilgjengelig nettleserlagring/i)).toBeInTheDocument();
+});
+
+it('explains that browser storage quota can be unknown before offline map package caching', () => {
+  expect(offlineMapQuotaCopy({ estimatedSizeMb: 12 })).toMatch(/lagringskvote er ukjent/i);
+  expect(offlineMapQuotaCopy({ estimatedSizeMb: 12 })).toMatch(/Test offline før innsats/i);
 });
 
 it('lets an approved PMTiles package be selected, cached and activated', async () => {

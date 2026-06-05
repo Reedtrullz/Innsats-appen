@@ -221,7 +221,18 @@ export function subscribeOfflineMapCache(callback: () => void) {
   };
 }
 
+export function offlineMapQuotaCopy(input: { estimatedSizeMb: number; quota?: number; usage?: number }) {
+  if (input.quota === undefined || input.usage === undefined) {
+    return 'Nettleserens lagringskvote er ukjent. Test offline før innsats.';
+  }
+  const availableMb = Math.max(0, (input.quota - input.usage) / 1024 / 1024);
+  if (availableMb < input.estimatedSizeMb * 1.5) {
+    return `Lav tilgjengelig nettleserlagring (${availableMb.toFixed(0)} MB). Denne kartpakken kan fortrenge annet offline-innhold. Velg mindre pakke eller rydd lokal data før innsats.`;
+  }
+  return `Tilgjengelig nettleserlagring ser tilstrekkelig ut (${availableMb.toFixed(0)} MB ledig).`;
+}
+
 export function cacheSizeWarningForPackage(mapPackage: Pick<OfflineMapPackage, 'estimatedSizeMb' | 'title'>) {
   if (mapPackage.estimatedSizeMb < OFFLINE_MAP_CACHE_WARNING_THRESHOLD_MB) return null;
-  return `Cache-varsel: ${mapPackage.title} er anslått til ${mapPackage.estimatedSizeMb} MB. Store lokale kartpakker kan fortrenge annet offline-innhold på eldre telefoner.`;
+  return `Cache-varsel: ${mapPackage.title} er anslått til ${mapPackage.estimatedSizeMb} MB. Store lokale kartpakker kan påvirke annet offline-innhold på eldre telefoner.`;
 }
