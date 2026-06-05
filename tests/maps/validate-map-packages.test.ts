@@ -58,6 +58,25 @@ describe('validate map package files', () => {
     }] })).rejects.toThrow(/external tile URL/i);
   });
 
+  it('rejects styles that reference same-origin runtime tile glyph or sprite URLs outside map-packages', async () => {
+    const root = await tempRoot();
+    await fs.mkdir(path.join(root, 'public/map-packages'), { recursive: true });
+    await fs.writeFile(path.join(root, 'public/map-packages/trondheim-demo.pmtiles'), 'fixture');
+    await fs.writeFile(path.join(root, 'public/map-packages/trondheim-demo-style.json'), JSON.stringify({
+      version: 8,
+      sources: { base: { type: 'vector', tiles: ['/tiles/{z}/{x}/{y}.pbf'] } },
+      glyphs: '/fonts/{fontstack}/{range}.pbf',
+      sprite: '/mapbox/sprite',
+      layers: [],
+    }));
+
+    await expect(validateMapPackageFiles({ rootDir: root, packages: [{
+      id: 'trondheim-demo-pmtiles',
+      url: '/map-packages/trondheim-demo.pmtiles',
+      styleUrl: '/map-packages/trondheim-demo-style.json',
+    }] })).rejects.toThrow(/unapproved local map URL/i);
+  });
+
   it('passes when referenced package/style files exist and style uses pmtiles only', async () => {
     const root = await tempRoot();
     await fs.mkdir(path.join(root, 'public/map-packages'), { recursive: true });

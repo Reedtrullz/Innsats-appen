@@ -1,8 +1,6 @@
 import { expect, test, type TestInfo } from '@playwright/test';
 import { clearBrowserLocalState, createLocalMission, waitForServiceWorker } from './helpers';
 
-const mapTileUrlPattern = /(?:\/tiles?\/|\.mbtiles\b|mapbox|openstreetmap|maplibre|leaflet|tile\.openstreetmap|statkart|kartverket|\/wmts\/|gatekeeper\/gk)/i;
-
 function baseOriginFor(testInfo: TestInfo) {
   const configuredBaseUrl = testInfo.project.use.baseURL;
   if (typeof configuredBaseUrl !== 'string') throw new Error('Playwright baseURL must be configured for map/log URL guards.');
@@ -15,7 +13,7 @@ function isForbiddenTileProviderRequest(url: string, baseOrigin: string) {
     if (parsedUrl.pathname.startsWith('/map-packages/')) return false;
     return /(?:\/tiles?\/|\.mbtiles\b)/i.test(parsedUrl.pathname);
   }
-  return mapTileUrlPattern.test(url);
+  return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
 }
 
 test('map/log request guard flags external official tile providers but allows local packages', () => {
@@ -25,6 +23,10 @@ test('map/log request guard flags external official tile providers but allows lo
   expect(isForbiddenTileProviderRequest(`${baseOrigin}/tiles/12/1/1.pbf`, baseOrigin)).toBe(true);
   expect(isForbiddenTileProviderRequest('https://opencache.statkart.no/gatekeeper/gk/gk.open_gmaps?layers=norges_grunnkart', baseOrigin)).toBe(true);
   expect(isForbiddenTileProviderRequest('https://api.kartverket.no/wmts/topo/default/webmercator/12/1/1.png', baseOrigin)).toBe(true);
+  expect(isForbiddenTileProviderRequest('https://basemaps.cartocdn.com/light_all/12/1/1.png', baseOrigin)).toBe(true);
+  expect(isForbiddenTileProviderRequest('https://api.maptiler.com/maps/basic/style.json?key=secret', baseOrigin)).toBe(true);
+  expect(isForbiddenTileProviderRequest('https://example.invalid/offline-style.json', baseOrigin)).toBe(true);
+  expect(isForbiddenTileProviderRequest('https://cdn.example.invalid/vector/12/1/1.pbf', baseOrigin)).toBe(true);
 });
 
 function escapeRegex(value: string) {

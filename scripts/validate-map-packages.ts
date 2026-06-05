@@ -44,11 +44,33 @@ export function publicPath(rootDir: string, assetPath: string) {
   return filePath;
 }
 
+function assertApprovedStyleUrl(value: string, currentPath: string): void {
+  if (/https?:\/\//i.test(value)) {
+    throw new Error(`Style JSON contains external tile URL at ${currentPath}: ${value}`);
+  }
+
+  if (value.startsWith('pmtiles:///')) {
+    const assetPath = `/${value.slice('pmtiles:///'.length)}`;
+    publicPath(process.cwd(), assetPath);
+    return;
+  }
+
+  if (value.startsWith('/')) {
+    if (!value.startsWith(LOCAL_MAP_PACKAGE_PREFIX)) {
+      throw new Error(`Style JSON contains unapproved local map URL at ${currentPath}: ${value}`);
+    }
+    publicPath(process.cwd(), value);
+    return;
+  }
+
+  if (/^[a-z][a-z0-9+.-]*:/i.test(value)) {
+    throw new Error(`Style JSON contains unapproved map URL protocol at ${currentPath}: ${value}`);
+  }
+}
+
 export function assertNoExternalUrls(value: unknown, currentPath = '$'): void {
   if (typeof value === 'string') {
-    if (/https?:\/\//i.test(value)) {
-      throw new Error(`Style JSON contains external tile URL at ${currentPath}: ${value}`);
-    }
+    assertApprovedStyleUrl(value, currentPath);
     return;
   }
 

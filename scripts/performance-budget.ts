@@ -90,6 +90,15 @@ export function checkPerformanceBudget(rootDir = process.cwd(), budget = default
     for (const entry of routeEntries(manifest)) {
       const files = [...new Set(entry.assets.map((asset) => assetFile(rootDir, asset)).filter((file) => fs.existsSync(file)))];
       for (const file of files) routeAssetFiles.add(file);
+      for (const file of files) {
+        if (isOptionalMapRuntimeChunk(file)) {
+          findings.push({
+            label: `MapLibre/PMTiles runtime included in initial route ${entry.route}: ${path.relative(rootDir, file)}`,
+            gzipBytes: gzipSize(file),
+            budgetBytes: 0,
+          });
+        }
+      }
       const gzipBytes = files.reduce((sum, file) => sum + gzipSize(file), 0);
       const summary = { label: `route ${entry.route}`, gzipBytes, budgetBytes: budget.maxRouteJsGzipBytes };
       summaries.push(summary);

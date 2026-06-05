@@ -25,10 +25,10 @@ describe('app-wide security headers', () => {
     expect(csp).toContain("style-src 'self' 'unsafe-inline'");
     expect(csp).toContain("img-src 'self' data: blob:");
     expect(csp).toContain("connect-src 'self'");
-    expect(csp).toContain('https://api.met.no');
-    expect(csp).toContain('https://api.kartverket.no');
-    expect(csp).toContain('https://ws.geonorge.no');
-    expect(csp).toContain('https://api01.nve.no');
+    expect(csp).not.toContain('https://api.met.no');
+    expect(csp).not.toContain('https://api.kartverket.no');
+    expect(csp).not.toContain('https://ws.geonorge.no');
+    expect(csp).not.toContain('https://api01.nve.no');
     expect(csp).toContain("frame-ancestors 'none'");
     expect(csp).toContain("base-uri 'self'");
     expect(csp).toContain("form-action 'self'");

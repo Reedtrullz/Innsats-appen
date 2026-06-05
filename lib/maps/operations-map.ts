@@ -399,6 +399,7 @@ export function importGeoJsonText(text: string, now = new Date(), missionId?: st
   }
   if (!isRecord(parsed) || parsed.type !== 'FeatureCollection' || parsed.coordinateSystem !== SCHEMATIC_GEOJSON_COORDINATE_SYSTEM || !Array.isArray(parsed.features)) return emptyMissionMapState();
   const scopedMissionId = sanitizeMapText(missionId, 80);
+  if (!scopedMissionId) return emptyMissionMapState();
   const markers: MissionMapMarker[] = [];
   const drawings: MissionMapDrawing[] = [];
   for (const feature of parsed.features.slice(0, MAX_IMPORTED_GEOJSON_FEATURES)) {

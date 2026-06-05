@@ -87,4 +87,22 @@ describe('performance budget script', () => {
     expect(result.ok).toBe(false);
     expect(result.findings.some((finding) => finding.label.includes('static/chunks/map-runtime.js'))).toBe(true);
   });
+
+  it('fails when MapLibre or PMTiles runtime is included in an initial route chunk even under byte budgets', () => {
+    const root = makeBuild(
+      {
+        'static/chunks/app.js': 'console.log("small route")',
+        'static/chunks/map-runtime.js': 'maplibre-gl pmtiles initial-route runtime',
+      },
+      { '/kart': ['static/chunks/app.js', 'static/chunks/map-runtime.js'] },
+    );
+    const result = checkPerformanceBudget(root, {
+      maxRouteJsGzipBytes: 1024,
+      maxChunkGzipBytes: 1024,
+      maxOptionalMapRuntimeChunkGzipBytes: 1024,
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.findings.some((finding) => /MapLibre\/PMTiles runtime included in initial route/i.test(finding.label))).toBe(true);
+  });
 });

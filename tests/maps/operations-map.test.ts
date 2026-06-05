@@ -155,16 +155,19 @@ it('exports sanitized schematic GeoJSON and imports only supported local fields'
   expect(geoJsonExportText(state)).toContain('FeatureCollection');
   expect(JSON.stringify(exported)).not.toMatch(/\"note\"/);
 
-  const imported = importGeoJsonText(JSON.stringify({
+  const geoJson = JSON.stringify({
     type: 'FeatureCollection',
     coordinateSystem: SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
     features: [
       { type: 'Feature', geometry: { type: 'Point', coordinates: [22, 33, 999] }, properties: { itemType: 'marker', kind: 'il-ko', label: '<KO>', secret: 'drop-me' } },
       { type: 'Feature', geometry: { type: 'Point', coordinates: [200, 33] }, properties: { itemType: 'marker', kind: 'hazard', label: 'bad' } },
     ],
-  }), now);
+  });
+  expect(importGeoJsonText(geoJson, now)).toEqual({ markers: [], drawings: [] });
+
+  const imported = importGeoJsonText(geoJson, now, 'mission-import-a');
   expect(imported.markers).toHaveLength(1);
-  expect(imported.markers[0]).toMatchObject({ kind: 'il-ko', label: 'KO', point: { x: 22, y: 33 } });
+  expect(imported.markers[0]).toMatchObject({ missionId: 'mission-import-a', kind: 'il-ko', label: 'KO', point: { x: 22, y: 33 } });
   expect(JSON.stringify(imported)).not.toContain('drop-me');
 });
 

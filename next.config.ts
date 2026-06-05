@@ -11,7 +11,7 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
-      "connect-src 'self' https://api.met.no https://api.kartverket.no https://ws.geonorge.no https://api01.nve.no",
+      "connect-src 'self'",
       "font-src 'self' data:",
       "manifest-src 'self'",
       "worker-src 'self' blob:",
