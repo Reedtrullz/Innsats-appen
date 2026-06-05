@@ -6,12 +6,22 @@ import {
   capMapFeatures,
   getOfflineMapPackage,
   getRenderableMapFeatures,
+  normalizeCachedOfflineMapPackage,
   parseCachedOfflineMapPackage,
   readCachedOfflineMapPackage,
   resetCachedOfflineMapPackage,
   writeCachedOfflineMapPackage,
   type SchematicMapFeature,
 } from '@/lib/maps/offline-map';
+import {
+  resetApprovedLocalMapPackagesForTest,
+  seedApprovedLocalMapPackageForTest,
+} from '@/lib/maps/offline-map-package-manifest';
+import { afterEach } from 'vitest';
+
+afterEach(() => {
+  resetApprovedLocalMapPackagesForTest();
+});
 
 it('documents a static schematic MVP approach without tile-provider network policy', () => {
   expect(OFFLINE_MAP_APPROACH.decision).toMatch(/Static schematic local map/i);
@@ -29,6 +39,25 @@ it('normalizes cached package records and ignores unknown package ids', () => {
   });
   expect(parseCachedOfflineMapPackage('{"packageId":"hemmelig"}')).toBeNull();
   expect(parseCachedOfflineMapPackage('not json')).toBeNull();
+});
+
+it('accepts approved PMTiles package ids in the offline map cache record', () => {
+  seedApprovedLocalMapPackageForTest({
+    id: 'trondheim-demo-pmtiles',
+    title: 'Trondheim demo PMTiles',
+    url: '/map-packages/trondheim-demo.pmtiles',
+    styleUrl: '/map-packages/trondheim-demo-style.json',
+  });
+
+  expect(normalizeCachedOfflineMapPackage({
+    packageId: 'trondheim-demo-pmtiles',
+    version: '2026.06-a',
+    cachedAt: '2026-06-05T10:00:00.000Z',
+  })).toMatchObject({
+    packageId: 'trondheim-demo-pmtiles',
+    title: 'Trondheim demo PMTiles',
+    runtimeFormat: 'pmtiles',
+  });
 });
 
 it('writes and resets simulated map package cache in browser storage only', () => {

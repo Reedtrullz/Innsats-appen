@@ -1,4 +1,7 @@
+import { localMapPackageForId } from '@/lib/maps/offline-map-package-manifest';
+
 export type OfflineMapPackageId = 'trondheim-lokal' | 'trondelag-oversikt' | 'ovelse-liten';
+export type OfflineMapRuntimeFormat = 'schematic' | 'pmtiles';
 
 export type SchematicMapFeatureKind = 'depot' | 'meeting-point' | 'risk-area' | 'route' | 'resource';
 
@@ -22,11 +25,12 @@ export type OfflineMapPackage = {
 };
 
 export type CachedOfflineMapPackage = {
-  packageId: OfflineMapPackageId;
+  packageId: string;
   title: string;
   estimatedSizeMb: number;
   version: string;
   cachedAt: string;
+  runtimeFormat: OfflineMapRuntimeFormat;
 };
 
 export const OFFLINE_MAP_CACHE_STORAGE_KEY = 'beredskapsboka-offline-map-cache-v1';
@@ -118,13 +122,25 @@ export function normalizeCachedOfflineMapPackage(value: unknown): CachedOfflineM
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const record = value as Partial<Record<keyof CachedOfflineMapPackage, unknown>>;
   const mapPackage = typeof record.packageId === 'string' ? getOfflineMapPackage(record.packageId) : undefined;
-  if (!mapPackage) return null;
+  if (mapPackage) {
+    return {
+      packageId: mapPackage.id,
+      title: mapPackage.title,
+      estimatedSizeMb: mapPackage.estimatedSizeMb,
+      version: typeof record.version === 'string' ? record.version : mapPackage.version,
+      cachedAt: typeof record.cachedAt === 'string' ? record.cachedAt : new Date(0).toISOString(),
+      runtimeFormat: 'schematic',
+    };
+  }
+  const localMapPackage = typeof record.packageId === 'string' ? localMapPackageForId(record.packageId) : undefined;
+  if (!localMapPackage) return null;
   return {
-    packageId: mapPackage.id,
-    title: mapPackage.title,
-    estimatedSizeMb: mapPackage.estimatedSizeMb,
-    version: typeof record.version === 'string' ? record.version : mapPackage.version,
+    packageId: localMapPackage.id,
+    title: localMapPackage.title,
+    estimatedSizeMb: localMapPackage.estimatedSizeMb,
+    version: typeof record.version === 'string' ? record.version : localMapPackage.version,
     cachedAt: typeof record.cachedAt === 'string' ? record.cachedAt : new Date(0).toISOString(),
+    runtimeFormat: 'pmtiles',
   };
 }
 
@@ -154,14 +170,17 @@ export function readCachedOfflineMapPackage(storage?: Pick<Storage, 'getItem'>):
   }
 }
 
-export function writeCachedOfflineMapPackage(packageId: OfflineMapPackageId, storage?: Pick<Storage, 'setItem'>, now = new Date()): CachedOfflineMapPackage {
-  const mapPackage = getOfflineMapPackage(packageId) ?? OFFLINE_MAP_PACKAGES[0];
+export function writeCachedOfflineMapPackage(packageId: string, storage?: Pick<Storage, 'setItem'>, now = new Date()): CachedOfflineMapPackage {
+  const schematicMapPackage = getOfflineMapPackage(packageId);
+  const localMapPackage = schematicMapPackage ? undefined : localMapPackageForId(packageId);
+  const mapPackage = schematicMapPackage ?? localMapPackage ?? OFFLINE_MAP_PACKAGES[0];
   const cached: CachedOfflineMapPackage = {
     packageId: mapPackage.id,
     title: mapPackage.title,
     estimatedSizeMb: mapPackage.estimatedSizeMb,
     version: mapPackage.version,
     cachedAt: now.toISOString(),
+    runtimeFormat: localMapPackage ? 'pmtiles' : 'schematic',
   };
   try {
     const resolvedStorage = storage ?? getBrowserLocalStorage();

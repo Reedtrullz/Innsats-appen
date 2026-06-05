@@ -6,6 +6,10 @@ import { FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY } from '@/lib/field-mo
 import { saveSelectedActiveMissionId } from '@/lib/mission/active-mission-selection';
 import { clearLocalMissionData, getMission, saveMission } from '@/lib/mission/local-store';
 import { OFFLINE_MAP_CACHE_STORAGE_KEY } from '@/lib/maps/offline-map';
+import {
+  resetApprovedLocalMapPackagesForTest,
+  seedApprovedLocalMapPackageForTest,
+} from '@/lib/maps/offline-map-package-manifest';
 import { OPERATIONS_MAP_STORAGE_KEY, SCHEMATIC_GEOJSON_COORDINATE_SYSTEM } from '@/lib/maps/operations-map';
 import { readLocalAuditLog } from '@/lib/privacy/local-profile';
 import type { FieldLogEntry, MissionContext } from '@/lib/mission/schemas';
@@ -14,6 +18,7 @@ import { flushAsyncEffects } from '../helpers/react-effects';
 
 afterEach(async () => {
   localStorage.clear();
+  resetApprovedLocalMapPackagesForTest();
   await clearLocalMissionData();
 });
 
@@ -122,6 +127,24 @@ it('stores selected map package cache metadata in localStorage and can reset it'
     expect(localStorage.getItem(OFFLINE_MAP_CACHE_STORAGE_KEY)).toBeNull();
     expect(screen.getByTestId('offline-map-cache-status')).toHaveTextContent(/Ingen kartpakke/i);
   });
+});
+
+it('lets an approved PMTiles package be selected, cached and activated', async () => {
+  const user = userEvent.setup();
+  seedApprovedLocalMapPackageForTest({
+    id: 'trondheim-demo-pmtiles',
+    title: 'Trondheim demo PMTiles',
+    url: '/map-packages/trondheim-demo.pmtiles',
+    styleUrl: '/map-packages/trondheim-demo-style.json',
+  });
+
+  await renderOfflineMapPanel();
+
+  await user.selectOptions(screen.getByLabelText('Velg lokal kartpakke'), 'trondheim-demo-pmtiles');
+  await user.click(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }));
+
+  expect(screen.getByText(/Lokal kartpakke aktiv: Trondheim demo PMTiles/i)).toBeInTheDocument();
+  expect(screen.getByTestId('offline-maplibre-container')).toBeInTheDocument();
 });
 
 it('keeps rendered map marker count capped for the large district package', async () => {
