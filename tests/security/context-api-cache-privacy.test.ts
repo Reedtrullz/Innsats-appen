@@ -181,3 +181,20 @@ it('adds private no-store to upstream failure error responses', async () => {
     expectPrivateNoStore(response);
   }
 });
+
+it('returns private no-store rate-limit responses for context API bursts', async () => {
+  vi.stubGlobal('fetch', metFetchFixture());
+
+  const requests = await Promise.all(Array.from({ length: 8 }, () =>
+    weatherGET(new Request('http://test/api/context/weather?lat=63.43&lon=10.39', {
+      headers: { 'x-forwarded-for': '203.0.113.10' },
+    })),
+  ));
+
+  const limited = requests.filter((response) => response.status === 429);
+  expect(limited.length).toBeGreaterThan(0);
+  for (const response of limited) {
+    expect(response.headers.get('Cache-Control')).toBe('private, no-store');
+    expect(await response.json()).toEqual({ error: 'rate limit exceeded' });
+  }
+});
