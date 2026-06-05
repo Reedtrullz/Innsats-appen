@@ -77,6 +77,7 @@ export function buildMissionFolderExport(input: {
   generatedAt?: string;
 }) {
   const generatedAt = input.generatedAt ?? new Date().toISOString();
+  assertNoSensitiveOperationalTextInValue(input.mapState, 'missionFolder.mapState');
   const mapState = missionFolderMapState(input.mapState, input.mission.id);
   const fieldLogEntries = missionFolderFieldLogEntries(input.mission);
   const scopedMission = {

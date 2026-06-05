@@ -521,6 +521,7 @@ export function buildRuhWelfareSummary(mission: MissionContext, equipmentDamageL
 }
 
 function assertAfterActionMapStateSafe(mapState: MissionMapState | undefined, missionId: string): void {
+  assertNoSensitiveOperationalTextInValue(mapState, 'afterAction.mapState');
   const scopedMapState = mapStateForMission(normalizeMissionMapState(mapState ?? { markers: [], drawings: [] }), missionId);
   assertNoSensitiveOperationalTextInValue({
     markers: scopedMapState.markers.map((marker) => ({ label: marker.label })),
