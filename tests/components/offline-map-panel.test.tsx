@@ -716,6 +716,12 @@ it('edits active-mission sectors and refreshes measurement copy', async () => {
 
   await renderOfflineMapPanel();
 
+  const measurementReadout = screen.getByTestId('map-measurement-readout');
+  await waitFor(() => {
+    expect(measurementReadout).toHaveTextContent('Sektor/teig: avstand 40.0 skjematiske enheter, areal 100.0.');
+  });
+  const initialMeasurementText = measurementReadout.textContent;
+
   await user.click(screen.getByRole('button', { name: /rediger Teig alfa/i }));
   await user.clear(screen.getByLabelText('Rediger sektoretikett'));
   await user.type(screen.getByLabelText('Rediger sektoretikett'), 'Teig bravo');
@@ -724,7 +730,17 @@ it('edits active-mission sectors and refreshes measurement copy', async () => {
   await user.click(screen.getByRole('button', { name: /lagre sektorendring/i }));
 
   expect(screen.getByText('Teig bravo')).toBeInTheDocument();
-  expect(screen.getByTestId('map-measurement-readout')).toHaveTextContent(/Sektor\/teig: avstand/i);
+  await waitFor(() => {
+    expect(measurementReadout.textContent).not.toBe(initialMeasurementText);
+    expect(measurementReadout).toHaveTextContent('Sektor/teig: avstand 80.0 skjematiske enheter, areal 400.0.');
+  });
+  expect(screen.getByTestId('map-drawing-sector').querySelector('polygon')).toHaveAttribute('points', '10,10 30,10 30,30 10,30');
+  expect(readMissionMapState().drawings.find((drawing) => drawing.label === 'Teig bravo' && drawing.missionId === activeMission.id)?.points).toEqual([
+    { x: 10, y: 10 },
+    { x: 30, y: 10 },
+    { x: 30, y: 30 },
+    { x: 10, y: 30 },
+  ]);
 });
 
 it('deletes active-mission sectors without touching other mission drawings', async () => {
