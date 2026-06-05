@@ -107,7 +107,7 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(workflow).toMatch(/Verify health JSON/i);
     expect(workflow).toMatch(/nodeEnv/);
     expect(workflow).toMatch(/production/);
-    expect(workflow).toMatch(/status.*healthy|healthy.*status/s);
+    expect(workflow).toMatch(/status[\s\S]*healthy|healthy[\s\S]*status/);
     expect(workflow).not.toMatch(/web-push|PushManager|cookie|localStorage|IndexedDB/);
   });
 

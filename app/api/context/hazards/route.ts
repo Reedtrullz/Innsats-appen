@@ -1,4 +1,5 @@
 import { fetchNveHazardSignals, normalizeNveDateRange } from '@/lib/integrations/nve';
+import { checkContextRateLimit } from '@/lib/integrations/context-rate-limit';
 import { guardAllowedQuery, guardExternalContextSignals } from '@/lib/integrations/route-guards';
 import { contextGuardError, contextJson } from '../private-context-response';
 
@@ -16,6 +17,10 @@ export async function GET(request: Request) {
     if (start || end) normalizeNveDateRange(start ?? defaultStart, end ?? defaultEnd);
   } catch {
     return contextJson({ error: 'invalid date range' }, { status: 400 });
+  }
+  const rateLimit = checkContextRateLimit(request, 'hazards');
+  if (!rateLimit.ok) {
+    return contextJson({ error: 'rate limit exceeded' }, { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) } });
   }
   try {
     const signals = await fetchNveHazardSignals({ municipality, start, end });

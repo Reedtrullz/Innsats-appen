@@ -2,6 +2,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { GET as geocodeGET } from '@/app/api/context/geocode/route';
 import { GET as hazardsGET } from '@/app/api/context/hazards/route';
 import { GET as weatherGET } from '@/app/api/context/weather/route';
+import { resetContextRateLimitForTests } from '@/lib/integrations/context-rate-limit';
 
 const privateNoStore = 'private, no-store';
 
@@ -13,6 +14,7 @@ function expectPrivateNoStore(response: Response) {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  resetContextRateLimitForTests();
 });
 
 function kartverketFetchFixture() {

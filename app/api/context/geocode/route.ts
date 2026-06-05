@@ -1,4 +1,5 @@
 import { fetchKartverketSignals } from '@/lib/integrations/kartverket';
+import { checkContextRateLimit } from '@/lib/integrations/context-rate-limit';
 import { guardAllowedQuery, guardExternalContextSignals, guardLatLon } from '@/lib/integrations/route-guards';
 import { contextGuardError, contextJson } from '../private-context-response';
 
@@ -13,6 +14,10 @@ export async function GET(request: Request) {
     if (hasQ) {
       const q = allowed.value.q;
       if (!q) return contextJson({ error: 'q is required' }, { status: 400 });
+      const rateLimit = checkContextRateLimit(request, 'geocode');
+      if (!rateLimit.ok) {
+        return contextJson({ error: 'rate limit exceeded' }, { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) } });
+      }
       const signals = await fetchKartverketSignals({ q });
       const guarded = guardExternalContextSignals(signals);
       if (!guarded.ok) return contextGuardError(guarded);
@@ -20,6 +25,10 @@ export async function GET(request: Request) {
     }
     const latLon = guardLatLon(params);
     if (!latLon.ok) return contextGuardError(latLon);
+    const rateLimit = checkContextRateLimit(request, 'geocode');
+    if (!rateLimit.ok) {
+      return contextJson({ error: 'rate limit exceeded' }, { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) } });
+    }
     const signals = await fetchKartverketSignals(latLon.value);
     const guarded = guardExternalContextSignals(signals);
     if (!guarded.ok) return contextGuardError(guarded);

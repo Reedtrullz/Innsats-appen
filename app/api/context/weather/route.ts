@@ -1,4 +1,5 @@
 import { fetchMetSignals } from '@/lib/integrations/met';
+import { checkContextRateLimit } from '@/lib/integrations/context-rate-limit';
 import { guardAllowedQuery, guardExternalContextSignals, guardLatLon } from '@/lib/integrations/route-guards';
 import { contextGuardError, contextJson } from '../private-context-response';
 
@@ -8,6 +9,10 @@ export async function GET(request: Request) {
   if (!allowed.ok) return contextGuardError(allowed);
   const latLon = guardLatLon(params);
   if (!latLon.ok) return contextGuardError(latLon);
+  const rateLimit = checkContextRateLimit(request, 'weather');
+  if (!rateLimit.ok) {
+    return contextJson({ error: 'rate limit exceeded' }, { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) } });
+  }
   try {
     const signals = await fetchMetSignals(latLon.value);
     const guarded = guardExternalContextSignals(signals);
