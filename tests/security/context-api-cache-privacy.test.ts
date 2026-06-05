@@ -2,7 +2,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { GET as geocodeGET } from '@/app/api/context/geocode/route';
 import { GET as hazardsGET } from '@/app/api/context/hazards/route';
 import { GET as weatherGET } from '@/app/api/context/weather/route';
-import { resetContextRateLimitForTests } from '@/lib/integrations/context-rate-limit';
+import { checkContextRateLimit, resetContextRateLimitForTests } from '@/lib/integrations/context-rate-limit';
 
 const privateNoStore = 'private, no-store';
 
@@ -185,18 +185,99 @@ it('adds private no-store to upstream failure error responses', async () => {
 });
 
 it('returns private no-store rate-limit responses for context API bursts', async () => {
-  vi.stubGlobal('fetch', metFetchFixture());
+  const fetchFixture = kartverketFetchFixture();
+  vi.stubGlobal('fetch', fetchFixture);
 
   const requests = await Promise.all(Array.from({ length: 8 }, () =>
-    weatherGET(new Request('http://test/api/context/weather?lat=63.43&lon=10.39', {
-      headers: { 'x-forwarded-for': '203.0.113.10' },
+    geocodeGET(new Request('http://test/api/context/geocode?lat=63.43&lon=10.39', {
+      headers: { 'x-real-ip': '203.0.113.10', 'x-forwarded-for': '198.51.100.99' },
     })),
   ));
 
   const limited = requests.filter((response) => response.status === 429);
-  expect(limited.length).toBeGreaterThan(0);
+  expect(limited).toHaveLength(2);
+  expect(fetchFixture).toHaveBeenCalledTimes(6);
   for (const response of limited) {
     expect(response.headers.get('Cache-Control')).toBe('private, no-store');
+    expect(response.headers.get('Retry-After')).toBeTruthy();
     expect(await response.json()).toEqual({ error: 'rate limit exceeded' });
   }
+});
+
+it('ignores spoofed x-forwarded-for values for context API rate limits', async () => {
+  vi.stubGlobal('fetch', metFetchFixture());
+
+  const requests = await Promise.all(Array.from({ length: 8 }, (_, index) =>
+    weatherGET(new Request('http://test/api/context/weather?lat=63.43&lon=10.39', {
+      headers: { 'x-forwarded-for': `203.0.113.${index + 1}` },
+    })),
+  ));
+
+  const limited = requests.filter((response) => response.status === 429);
+  expect(limited).toHaveLength(2);
+  for (const response of limited) {
+    expect(response.headers.get('Cache-Control')).toBe('private, no-store');
+    expect(response.headers.get('Retry-After')).toBeTruthy();
+    expect(await response.json()).toEqual({ error: 'rate limit exceeded' });
+  }
+});
+
+it('normalizes invalid x-real-ip values to the shared local rate-limit bucket', () => {
+  const now = 1_000;
+  const decisions = Array.from({ length: 8 }, (_, index) => checkContextRateLimit(new Request('http://test/api/context/weather', {
+    headers: {
+      'x-real-ip': `203.0.113.${index}-${'x'.repeat(64)}`,
+      'x-forwarded-for': `198.51.100.${index}`,
+    },
+  }), 'weather', now));
+
+  const limited = decisions.filter((decision) => !decision.ok);
+  expect(limited).toHaveLength(2);
+  for (const decision of limited) {
+    expect(decision.retryAfterSeconds).toBeGreaterThan(0);
+  }
+});
+
+it('does not spend rate-limit budget on rejected guard queries', async () => {
+  const fetchFixture = metFetchFixture();
+  vi.stubGlobal('fetch', fetchFixture);
+  const headers = { 'x-real-ip': '203.0.113.44' };
+
+  const invalidRequests = await Promise.all(Array.from({ length: 8 }, () =>
+    weatherGET(new Request('http://test/api/context/weather?lat=abc&lon=10.39', { headers })),
+  ));
+  for (const response of invalidRequests) {
+    expect(response.status).toBe(400);
+    expectPrivateNoStore(response);
+  }
+
+  const validResponse = await weatherGET(new Request('http://test/api/context/weather?lat=63.43&lon=10.39', { headers }));
+
+  expect(validResponse.status).toBe(200);
+  expectPrivateNoStore(validResponse);
+  expect(fetchFixture).toHaveBeenCalled();
+});
+
+it('evicts oldest rate-limit buckets once the bucket cap is reached', () => {
+  const now = 1_000;
+  expect(checkContextRateLimit(new Request('http://test/api/context/weather', {
+    headers: { 'x-real-ip': '203.0.113.1' },
+  }), 'weather', now)).toEqual({ ok: true });
+
+  for (let index = 2; index <= 1_001; index += 1) {
+    expect(checkContextRateLimit(new Request('http://test/api/context/weather', {
+      headers: { 'x-real-ip': `bucket-${index}` },
+    }), 'weather', now)).toEqual({ ok: true });
+  }
+
+  const oldestBucketRequests = Array.from({ length: 6 }, () =>
+    checkContextRateLimit(new Request('http://test/api/context/weather', {
+      headers: { 'x-real-ip': '203.0.113.1' },
+    }), 'weather', now),
+  );
+
+  expect(oldestBucketRequests).toEqual(Array.from({ length: 6 }, () => ({ ok: true })));
+  expect(checkContextRateLimit(new Request('http://test/api/context/weather', {
+    headers: { 'x-real-ip': '203.0.113.1' },
+  }), 'weather', now).ok).toBe(false);
 });

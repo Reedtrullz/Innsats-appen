@@ -182,7 +182,10 @@
             marker: "# {mark} ANSIBLE MANAGED - {{ caddy_marker_name }}"
             block: |
               {{ app_domain }} {
-                reverse_proxy {{ app_bind_address }}:{{ app_host_port }}
+                reverse_proxy {{ app_bind_address }}:{{ app_host_port }} {
+                  header_up X-Real-IP {remote_host}
+                  header_up X-Forwarded-For {remote_host}
+                }
               }
             backup: true
             mode: '0644'
