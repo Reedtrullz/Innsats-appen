@@ -171,6 +171,30 @@ it('exports sanitized schematic GeoJSON and imports only supported local fields'
   expect(JSON.stringify(imported)).not.toContain('drop-me');
 });
 
+it('rejects sensitive text in local map markers and drawings before storage', () => {
+  expect(() => createMissionMapMarker({ kind: 'observation', label: '01017000027', x: 10, y: 20 }, now)).toThrow(/persondata|identifikator|pasientdata|private/i);
+  expect(() => createMissionMapMarker({ kind: 'observation', label: 'Obs', x: 10, y: 20, note: 'kontakt ola.nordmann@example.com' }, now)).toThrow(/persondata|kontakt|private/i);
+  expect(() => createMissionMapDrawing({ kind: 'sector', label: 'pasient Ola Nordmann', coordinates: '0,0 10,0 10,10' }, now)).toThrow(/persondata|pasientdata/i);
+});
+
+it('rejects sensitive text during GeoJSON import and export', () => {
+  const imported = importGeoJsonText(JSON.stringify({
+    type: 'FeatureCollection',
+    coordinateSystem: SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
+    features: [
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [22, 33] }, properties: { itemType: 'marker', kind: 'il-ko', label: '01017000027' } },
+    ],
+  }), now, 'mission-a');
+  expect(imported.markers).toHaveLength(0);
+
+  const unsafeState: MissionMapState = {
+    markers: [{ id: 'unsafe', itemType: 'marker', kind: 'observation', label: '01017000027', point: { x: 10, y: 20 }, createdAt: now.toISOString() }],
+    drawings: [],
+  };
+  expect(() => buildMapImageSvg(unsafeState)).toThrow(/persondata|identifikator|pasientdata|private/i);
+  expect(() => buildGeoJsonExport(unsafeState)).toThrow(/persondata|identifikator|pasientdata|private/i);
+});
+
 it('rejects malformed GeoJSON coordinates, missing schematic marker, mismatched geometry and huge point lists', () => {
   expect(importGeoJsonText(JSON.stringify({
     type: 'FeatureCollection',
