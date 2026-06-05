@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor, type RenderResult } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within, type RenderResult } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, vi } from 'vitest';
 import { FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY } from '@/lib/field-mode/field-mode';
@@ -518,6 +518,20 @@ it('blocks local marker saves when no active mission exists', async () => {
     expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toBeNull();
     expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Opprett aktivt oppdrag før du lagrer lokale kartobjekter/i);
   });
+});
+
+it('shows a local privacy error when map marker text contains persondata', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  await renderOfflineMapPanel();
+
+  const markerRegion = screen.getByRole('region', { name: /Lokale markører og lag/i });
+  await user.type(within(markerRegion).getByLabelText('Etikett'), '01017000027');
+  await user.click(screen.getByRole('button', { name: /Legg til lokal markør/i }));
+
+  expect(await screen.findByRole('alert')).toHaveTextContent(/persondata|pasientdata|identifikator|private/i);
+  expect(readMissionMapState().markers).toHaveLength(0);
 });
 
 it('creates a field-log entry on the active mission from a selected map marker', async () => {

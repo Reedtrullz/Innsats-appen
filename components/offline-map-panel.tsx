@@ -127,6 +127,12 @@ function operationMeasurement(drawing: MissionMapDrawing | undefined) {
   return `${MAP_DRAWING_LABELS[drawing.kind]}: avstand ${distance} skjematiske enheter, areal ${area}.`;
 }
 
+function privacyErrorText(error: unknown) {
+  return error instanceof Error && /persondata|pasientdata|private|skjermet|identifikator|kontakt|unsupported map text value/i.test(error.message)
+    ? 'Karttekst ble stoppet lokalt fordi den kan inneholde persondata, pasientdata, kontaktinfo eller skjermet/privat lokasjon.'
+    : 'Kunne ikke lagre lokal karttekst. Kontroller innholdet og prøv igjen.';
+}
+
 function markerActionAriaLabel(action: 'Rediger' | 'Slett' | 'Logg herfra', marker: MissionMapMarker) {
   return `${action} ${marker.label} (${marker.kind}, X ${marker.point.x}, Y ${marker.point.y})`;
 }
@@ -253,6 +259,7 @@ export function OfflineMapPanel() {
   const [geoJsonExport, setGeoJsonExport] = useState('');
   const [geoJsonImport, setGeoJsonImport] = useState('');
   const [statusMessage, setStatusMessage] = useState('Lokale kartlag er klare.');
+  const [mapPrivacyError, setMapPrivacyError] = useState<string | null>(null);
   const [activeMission, setActiveMission] = useState<MissionContext | null>(null);
   const [mapLogText, setMapLogText] = useState('');
   const [mapLogSaving, setMapLogSaving] = useState(false);
@@ -362,6 +369,13 @@ export function OfflineMapPanel() {
 
   function persistState(next: MissionMapState, message: string) {
     writeMissionMapState(next);
+    setMapPrivacyError(null);
+    setStatusMessage(message);
+  }
+
+  function showMapPrivacyError(error: unknown) {
+    const message = privacyErrorText(error);
+    setMapPrivacyError(message);
     setStatusMessage(message);
   }
 
@@ -419,10 +433,12 @@ export function OfflineMapPanel() {
 
   function addMarker(formData: FormData) {
     if (!activeMission) {
+      setMapPrivacyError(null);
       setStatusMessage('Opprett aktivt oppdrag før du lagrer lokale kartobjekter.');
       return;
     }
     try {
+      setMapPrivacyError(null);
       const marker = createMissionMapMarker({
         kind: markerKind,
         missionId: activeMission.id,
@@ -433,7 +449,7 @@ export function OfflineMapPanel() {
       });
       persistState({ ...mapState, markers: [...mapState.markers, marker] }, `La til ${MAP_MARKER_LABELS[marker.kind]} lokalt.`);
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Kunne ikke legge til markør.');
+      showMapPrivacyError(error);
     }
   }
 
@@ -455,21 +471,28 @@ export function OfflineMapPanel() {
   function saveMarkerEdit(event: FormEvent<HTMLFormElement>, marker: MissionMapMarker) {
     event.preventDefault();
     if (!activeMission) {
+      setMapPrivacyError(null);
       setStatusMessage('Opprett aktivt oppdrag før du endrer lokale kartobjekter.');
       return;
     }
     const x = parseMarkerEditCoordinate(markerEditDraft.x);
     const y = parseMarkerEditCoordinate(markerEditDraft.y);
     if (x === null || y === null) {
+      setMapPrivacyError(null);
       setStatusMessage('Markørkoordinater må være skjematiske verdier fra 0 til 100.');
       return;
     }
-    persistState(updateMissionMapMarker(mapState, activeMission.id, marker.id, {
-      label: markerEditDraft.label,
-      point: { x, y },
-      note: markerEditDraft.note,
-    }), 'Oppdaterte lokal markør.');
-    cancelMarkerEdit();
+    try {
+      setMapPrivacyError(null);
+      persistState(updateMissionMapMarker(mapState, activeMission.id, marker.id, {
+        label: markerEditDraft.label,
+        point: { x, y },
+        note: markerEditDraft.note,
+      }), 'Oppdaterte lokal markør.');
+      cancelMarkerEdit();
+    } catch (error) {
+      showMapPrivacyError(error);
+    }
   }
 
   function deleteMarker(marker: MissionMapMarker) {
@@ -539,10 +562,12 @@ export function OfflineMapPanel() {
 
   function addDrawing(formData: FormData) {
     if (!activeMission) {
+      setMapPrivacyError(null);
       setStatusMessage('Opprett aktivt oppdrag før du lagrer lokale kartobjekter.');
       return;
     }
     try {
+      setMapPrivacyError(null);
       const drawing = createMissionMapDrawing({
         kind: drawingKind,
         missionId: activeMission.id,
@@ -553,7 +578,7 @@ export function OfflineMapPanel() {
       setLastDrawing(drawing);
       persistState({ ...mapState, drawings: [...mapState.drawings, drawing] }, `Lagret ${MAP_DRAWING_LABELS[drawing.kind]} lokalt.`);
     } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : 'Kunne ikke legge til tegning.');
+      showMapPrivacyError(error);
     }
   }
 
@@ -574,24 +599,30 @@ export function OfflineMapPanel() {
   function saveDrawingEdit(event: FormEvent<HTMLFormElement>, drawing: MissionMapDrawing) {
     event.preventDefault();
     if (!activeMission) {
+      setMapPrivacyError(null);
       setStatusMessage('Opprett aktivt oppdrag før du endrer lokale kartobjekter.');
       return;
     }
-    const points = parseCoordinateText(drawingEditDraft.coordinates);
-    const minimumPoints = minimumPointCountForDrawing(drawing.kind);
-    if (points.length < minimumPoints) {
-      setStatusMessage(`${MAP_DRAWING_LABELS[drawing.kind]} trenger minst ${minimumPoints} skjematiske punkt.`);
-      return;
+    try {
+      setMapPrivacyError(null);
+      const points = parseCoordinateText(drawingEditDraft.coordinates);
+      const minimumPoints = minimumPointCountForDrawing(drawing.kind);
+      if (points.length < minimumPoints) {
+        setStatusMessage(`${MAP_DRAWING_LABELS[drawing.kind]} trenger minst ${minimumPoints} skjematiske punkt.`);
+        return;
+      }
+      const nextState = updateMissionMapDrawing(mapState, activeMission.id, drawing.id, {
+        label: drawingEditDraft.label,
+        points,
+        note: drawingEditDraft.note,
+      });
+      const updatedDrawing = nextState.drawings.find((item) => item.id === drawing.id && item.missionId === activeMission.id);
+      if (updatedDrawing) setLastDrawing(updatedDrawing);
+      persistState(nextState, 'Oppdaterte lokal sektor/teig.');
+      cancelDrawingEdit();
+    } catch (error) {
+      showMapPrivacyError(error);
     }
-    const nextState = updateMissionMapDrawing(mapState, activeMission.id, drawing.id, {
-      label: drawingEditDraft.label,
-      points,
-      note: drawingEditDraft.note,
-    });
-    const updatedDrawing = nextState.drawings.find((item) => item.id === drawing.id && item.missionId === activeMission.id);
-    if (updatedDrawing) setLastDrawing(updatedDrawing);
-    persistState(nextState, 'Oppdaterte lokal sektor/teig.');
-    cancelDrawingEdit();
   }
 
   function deleteDrawing(drawing: MissionMapDrawing) {
@@ -624,36 +655,56 @@ export function OfflineMapPanel() {
 
   function exportSvg() {
     if (!activeMission) {
+      setMapPrivacyError(null);
       setStatusMessage('Opprett aktivt oppdrag før du eksporterer lokale kartobjekter.');
       return;
     }
-    setImageExport(buildMapImageSvg(activeMissionMapState));
-    appendLocalAuditEntry('export-created', { exportKind: 'map-svg', markerCount: activeMissionMapState.markers.length, drawingCount: activeMissionMapState.drawings.length });
-    setStatusMessage('Sanitert SVG kartbilde er generert lokalt for aktivt oppdrag.');
+    try {
+      setMapPrivacyError(null);
+      const svg = buildMapImageSvg(activeMissionMapState);
+      appendLocalAuditEntry('export-created', { exportKind: 'map-svg', markerCount: activeMissionMapState.markers.length, drawingCount: activeMissionMapState.drawings.length });
+      setImageExport(svg);
+      setStatusMessage('Sanitert SVG kartbilde er generert lokalt for aktivt oppdrag.');
+    } catch (error) {
+      showMapPrivacyError(error);
+    }
   }
 
   function exportGeoJson() {
     if (!activeMission) {
+      setMapPrivacyError(null);
       setStatusMessage('Opprett aktivt oppdrag før du eksporterer lokale kartobjekter.');
       return;
     }
-    setGeoJsonExport(geoJsonExportText(activeMissionMapState));
-    appendLocalAuditEntry('export-created', { exportKind: 'map-geojson', markerCount: activeMissionMapState.markers.length, drawingCount: activeMissionMapState.drawings.length });
-    setStatusMessage('Sanitert GeoJSON er generert lokalt for aktivt oppdrag.');
+    try {
+      setMapPrivacyError(null);
+      const geoJson = geoJsonExportText(activeMissionMapState);
+      appendLocalAuditEntry('export-created', { exportKind: 'map-geojson', markerCount: activeMissionMapState.markers.length, drawingCount: activeMissionMapState.drawings.length });
+      setGeoJsonExport(geoJson);
+      setStatusMessage('Sanitert GeoJSON er generert lokalt for aktivt oppdrag.');
+    } catch (error) {
+      showMapPrivacyError(error);
+    }
   }
 
   function importGeoJson() {
     if (!activeMission) {
+      setMapPrivacyError(null);
       setStatusMessage('Opprett aktivt oppdrag før du importerer kartobjekter.');
       return;
     }
-    const imported = importGeoJsonText(geoJsonImport, new Date(), activeMission.id);
-    const count = imported.markers.length + imported.drawings.length;
-    if (count === 0) {
-      setStatusMessage('Ingen støttede skjematiske GeoJSON-objekter funnet.');
-      return;
+    try {
+      setMapPrivacyError(null);
+      const imported = importGeoJsonText(geoJsonImport, new Date(), activeMission.id);
+      const count = imported.markers.length + imported.drawings.length;
+      if (count === 0) {
+        setStatusMessage('Ingen støttede skjematiske GeoJSON-objekter funnet.');
+        return;
+      }
+      persistState(mergeMissionMapState(mapState, imported), `Importerte ${count} lokale kartobjekter fra GeoJSON til aktivt oppdrag.`);
+    } catch (error) {
+      showMapPrivacyError(error);
     }
-    persistState(mergeMissionMapState(mapState, imported), `Importerte ${count} lokale kartobjekter fra GeoJSON til aktivt oppdrag.`);
   }
 
   return (
@@ -743,6 +794,11 @@ export function OfflineMapPanel() {
           </div>
           <p className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700" data-testid="operations-map-status">{statusMessage}</p>
         </div>
+        {mapPrivacyError ? (
+          <p role="alert" className="rounded-2xl border border-rose-200 bg-rose-50 p-3 text-sm font-semibold text-rose-900">
+            {mapPrivacyError}
+          </p>
+        ) : null}
         <form action={addMarker} className="grid gap-3 md:grid-cols-2">
           <label className="text-sm font-bold">Type<select aria-label="Markørtype" value={markerKind} onChange={(event) => setMarkerKind(event.target.value as MapMarkerKind)} className="mt-1 min-h-11 w-full rounded-xl border px-3">{MAP_MARKER_KINDS.map((kind) => <option key={kind} value={kind}>{MAP_MARKER_LABELS[kind]}</option>)}</select></label>
           <label className="text-sm font-bold">Etikett<input name="markerLabel" required placeholder="Sanitert lokal etikett" className="mt-1 min-h-11 w-full rounded-xl border px-3" /></label>
