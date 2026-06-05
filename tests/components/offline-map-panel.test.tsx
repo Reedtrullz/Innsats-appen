@@ -534,6 +534,48 @@ it('shows a local privacy error when map marker text contains persondata', async
   expect(readMissionMapState().markers).toHaveLength(0);
 });
 
+it('shows a local privacy error when GeoJSON import only contains rejected map text', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  await renderOfflineMapPanel();
+
+  fireEvent.change(screen.getByRole('textbox', { name: /Importer GeoJSON/i }), { target: { value: JSON.stringify({
+    type: 'FeatureCollection',
+    coordinateSystem: SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
+    features: [
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [22, 33] }, properties: { itemType: 'marker', kind: 'observation', label: '01017000027' } },
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [44, 55] }, properties: { itemType: 'marker', kind: 'observation', label: 'Trygg import', note: 'kontakt ola.nordmann@example.com' } },
+    ],
+  }) } });
+  await user.click(screen.getByRole('button', { name: /Importer GeoJSON lokalt/i }));
+
+  expect(await screen.findByRole('alert')).toHaveTextContent(/persondata|pasientdata|identifikator|kontakt|private/i);
+  expect(readMissionMapState().markers).toHaveLength(0);
+  expect(screen.getByTestId('operations-map-status')).not.toHaveTextContent(/Ingen støttede skjematiske GeoJSON-objekter/i);
+});
+
+it('keeps marker edit mode open when edited text is stopped by the privacy guard', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  writeMissionMapState({
+    markers: [createMissionMapMarker({ kind: 'observation', missionId: activeMission.id, label: 'Trygg observasjon', x: 20, y: 30 }, new Date('2026-06-05T10:00:00Z'))],
+    drawings: [],
+  });
+  await renderOfflineMapPanel();
+
+  await user.click(screen.getByRole('button', { name: /Rediger Trygg observasjon/i }));
+  const editForm = screen.getByRole('form', { name: /Rediger markør Trygg observasjon/i });
+  await user.clear(within(editForm).getByLabelText(/Rediger markøretikett/i));
+  await user.type(within(editForm).getByLabelText(/Rediger markøretikett/i), '01017000027');
+  await user.click(within(editForm).getByRole('button', { name: /Lagre markørendring/i }));
+
+  expect(await screen.findByRole('alert')).toHaveTextContent(/persondata|identifikator|private/i);
+  expect(screen.getByRole('form', { name: /Rediger markør Trygg observasjon/i })).toBeInTheDocument();
+  expect(readMissionMapState().markers[0]).toMatchObject({ label: 'Trygg observasjon' });
+});
+
 it('creates a field-log entry on the active mission from a selected map marker', async () => {
   const user = userEvent.setup();
   await saveMission(activeMission);

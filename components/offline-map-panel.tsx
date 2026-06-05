@@ -65,6 +65,7 @@ import { buildFieldLogEntryFromMapObject } from '@/lib/mission/map-log-link';
 import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
 import { getMission, listMissions, saveMission } from '@/lib/mission/local-store';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
+import { detectSensitiveOperationalText } from '@/lib/privacy/sensitive-text';
 import { DEFAULT_FIELD_MODE_SETTINGS, FIELD_MODE_STORAGE_EVENT, readFieldModeSettings } from '@/lib/field-mode/field-mode';
 import type { FieldLogCategory, MissionContext } from '@/lib/mission/schemas';
 
@@ -131,6 +132,34 @@ function privacyErrorText(error: unknown) {
   return error instanceof Error && /persondata|pasientdata|private|skjermet|identifikator|kontakt|unsupported map text value/i.test(error.message)
     ? 'Karttekst ble stoppet lokalt fordi den kan inneholde persondata, pasientdata, kontaktinfo eller skjermet/privat lokasjon.'
     : 'Kunne ikke lagre lokal karttekst. Kontroller innholdet og prøv igjen.';
+}
+
+function isImportMapTextValue(value: unknown): value is string | number | null | undefined {
+  return value === undefined || value === null || typeof value === 'string' || typeof value === 'number';
+}
+
+function importFeatureHasBlockedMapText(feature: unknown) {
+  if (!feature || typeof feature !== 'object') return false;
+  const properties = 'properties' in feature ? (feature as { properties?: unknown }).properties : undefined;
+  if (!properties || typeof properties !== 'object') return false;
+  const values = [
+    'label' in properties ? (properties as { label?: unknown }).label : undefined,
+    'note' in properties ? (properties as { note?: unknown }).note : undefined,
+  ];
+  return values.some((value) => {
+    if (!isImportMapTextValue(value)) return true;
+    return Boolean(detectSensitiveOperationalText(String(value ?? '')));
+  });
+}
+
+function geoJsonImportHasBlockedMapText(text: string) {
+  try {
+    const parsed = JSON.parse(text) as unknown;
+    if (!parsed || typeof parsed !== 'object' || !('features' in parsed) || !Array.isArray((parsed as { features?: unknown }).features)) return false;
+    return (parsed as { features: unknown[] }).features.some(importFeatureHasBlockedMapText);
+  } catch {
+    return false;
+  }
 }
 
 function markerActionAriaLabel(action: 'Rediger' | 'Slett' | 'Logg herfra', marker: MissionMapMarker) {
@@ -695,9 +724,14 @@ export function OfflineMapPanel() {
     }
     try {
       setMapPrivacyError(null);
+      const importHadBlockedMapText = geoJsonImportHasBlockedMapText(geoJsonImport);
       const imported = importGeoJsonText(geoJsonImport, new Date(), activeMission.id);
       const count = imported.markers.length + imported.drawings.length;
       if (count === 0) {
+        if (importHadBlockedMapText) {
+          showMapPrivacyError(new Error('GeoJSON import rejected persondata/kontakt/private map text.'));
+          return;
+        }
         setStatusMessage('Ingen støttede skjematiske GeoJSON-objekter funnet.');
         return;
       }
