@@ -227,6 +227,12 @@ function stringField(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function singleLineStringField(value: unknown, maxLength: number) {
+  const text = stringField(value).replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trimEnd();
+}
+
 const KNOWN_LOCAL_MAP_PACKAGE_IDS = new Set([
   ...OFFLINE_MAP_PACKAGES.map((mapPackage) => mapPackage.id),
   ...approvedLocalMapPackages.map((mapPackage) => mapPackage.id),
@@ -257,8 +263,8 @@ const UNSAFE_LOCAL_MAP_PACKAGE_TEXT = [
   /\.(?:pmtiles|mbtiles|pbf|mvt|json|geojson|zip|tar|gz)\b/i,
 ];
 
-function safeMapPackageText(value: unknown) {
-  const text = stringField(value);
+function safeMapPackageText(value: unknown, maxLength: number) {
+  const text = singleLineStringField(value, maxLength);
   if (!text) return '';
   if (UNSAFE_LOCAL_MAP_PACKAGE_TEXT.some((pattern) => pattern.test(text))) return '';
   return text;
@@ -275,14 +281,14 @@ function safePackageId(value: unknown) {
 export function sanitizeLocalMapPackageSummary(mapPackage: unknown): LocalMapPackageExportSummary | undefined {
   if (!mapPackage || typeof mapPackage !== 'object' || Array.isArray(mapPackage)) return undefined;
   const source = mapPackage as Record<string, unknown>;
-  const title = safeMapPackageText(source.title);
-  const provenance = safeMapPackageText(source.provenance);
+  const title = safeMapPackageText(source.title, 80);
+  const provenance = safeMapPackageText(source.provenance, 500);
   if (!title && !provenance) return undefined;
   return {
     id: safePackageId(source.id),
     title,
-    attribution: safeMapPackageText(source.attribution),
-    version: safeMapPackageText(source.version),
+    attribution: safeMapPackageText(source.attribution, 240),
+    version: safeMapPackageText(source.version, 40),
     provenance,
   };
 }
@@ -746,14 +752,18 @@ export function exportAfterActionMarkdown(report: AfterActionReport) {
 
 const AFTER_ACTION_JSON_OMIT_KEYS = new Set(['id', 'objectId', 'linkedMissionId', 'rawRef', 'activeChecklistIds', 'notes', 'note']);
 
-function stripInternalExportFields(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(stripInternalExportFields);
+function stripInternalExportFields(value: unknown, keyHint?: string): unknown {
+  if (Array.isArray(value)) return value.map((item) => stripInternalExportFields(item));
   if (!value || typeof value !== 'object') return value;
-  return Object.fromEntries(
-    Object.entries(value as Record<string, unknown>)
-      .filter(([key]) => !AFTER_ACTION_JSON_OMIT_KEYS.has(key))
-      .map(([key, item]) => [key, stripInternalExportFields(item)]),
-  );
+  const source = value as Record<string, unknown>;
+  const entries = Object.entries(source)
+    .filter(([key]) => !AFTER_ACTION_JSON_OMIT_KEYS.has(key))
+    .map(([key, item]) => [key, stripInternalExportFields(item, key)]);
+  if (keyHint === 'mapPackage') {
+    const packageId = typeof source.id === 'string' && source.id.trim() ? source.id.trim() : '';
+    if (packageId) entries.unshift(['packageId', packageId]);
+  }
+  return Object.fromEntries(entries);
 }
 
 export function exportAfterActionJson(report: AfterActionReport) {

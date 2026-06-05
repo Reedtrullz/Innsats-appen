@@ -489,6 +489,59 @@ it('strips relative and local filesystem paths from after-action map package tex
   }
 });
 
+it('normalizes map package text to single-line values before Markdown, JSON and PDF export', () => {
+  const report = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapPackage: {
+      id: 'trondheim-lokal',
+      title: 'Kontrollert\n## Injected heading',
+      attribution: 'Demo attribution\r\n- injected bullet',
+      version: '2026.06-a\tbuild',
+      provenance: 'Lokal\nproveniens uten filsti',
+    },
+  });
+
+  expect(report.sections.mapPackage).toEqual({
+    id: 'trondheim-lokal',
+    title: 'Kontrollert ## Injected heading',
+    attribution: 'Demo attribution - injected bullet',
+    version: '2026.06-a build',
+    provenance: 'Lokal proveniens uten filsti',
+  });
+  const markdown = exportAfterActionMarkdown(report);
+  const html = exportAfterActionPdfReadyHtml(report);
+  const json = exportAfterActionJson(report);
+  expect(markdown).not.toContain('\n## Injected heading');
+  expect(markdown).not.toContain('\n- injected bullet');
+  expect(html).not.toContain('<h2>Injected heading</h2>');
+  expect(json).toContain('Kontrollert ## Injected heading');
+});
+
+it('exports controlled map package id consistently as packageId in after-action JSON', () => {
+  const report = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapPackage: {
+      id: 'trondheim-lokal',
+      title: 'Trondheim lokalpakke',
+      provenance: 'Local training package bundled with app',
+    },
+  });
+
+  const parsed = JSON.parse(exportAfterActionJson(report));
+  expect(parsed.sections.mapPackage).toMatchObject({
+    packageId: 'trondheim-lokal',
+    title: 'Trondheim lokalpakke',
+    provenance: 'Local training package bundled with app',
+  });
+  expect(JSON.stringify(parsed.sections.mapPackage)).not.toContain('"id"');
+});
+
 it('does not create after-action map package sections from id-only or attribution-version-only input', () => {
   const idOnlyReport = buildAfterActionReport({
     mission,
