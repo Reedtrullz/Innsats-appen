@@ -224,6 +224,37 @@ it('drops unsafe legacy local map objects during normalization, storage and merg
   expect(mergeMissionMapState({ markers: [unsafeMarker], drawings: [] }, { markers: [safeMarker], drawings: [unsafeDrawing] })).toEqual({ markers: [safeMarker], drawings: [] });
 });
 
+it('drops non-primitive legacy map labels and notes during normalization and import', () => {
+  const safeMarker = createMissionMapMarker({ kind: 'observation', missionId: 'mission-a', label: 'Trygg observasjon', x: 10, y: 20 }, now);
+  const objectLabelMarker = { ...safeMarker, id: 'object-label', label: { nested: '01017000027' } };
+  const objectNoteDrawing = { ...createMissionMapDrawing({ kind: 'sector', missionId: 'mission-a', label: 'Trygg teig', coordinates: '0,0 10,0 10,10' }, now), id: 'object-note', note: { nested: 'kontakt ola.nordmann@example.com' } };
+
+  expect(normalizeMissionMapState({ markers: [objectLabelMarker, safeMarker], drawings: [objectNoteDrawing] })).toEqual({ markers: [safeMarker], drawings: [] });
+
+  const imported = importGeoJsonText(JSON.stringify({
+    type: 'FeatureCollection',
+    coordinateSystem: SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
+    features: [
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [10, 20] }, properties: { itemType: 'marker', kind: 'observation', label: { nested: 'object' } } },
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [30, 40] }, properties: { itemType: 'marker', kind: 'observation', label: 'Trygg import', note: { nested: 'object' } } },
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [50, 60] }, properties: { itemType: 'marker', kind: 'observation', label: 'Trygg import' } },
+    ],
+  }), now, 'mission-a');
+
+  expect(imported.markers).toHaveLength(1);
+  expect(imported.markers[0]).toMatchObject({ label: 'Trygg import', point: { x: 50, y: 60 } });
+});
+
+it('rejects non-primitive caller-provided map export text with contextual errors', () => {
+  const objectLabelState = {
+    markers: [{ id: 'object-label', itemType: 'marker' as const, kind: 'observation' as const, label: { nested: '01017000027' } as unknown as string, point: { x: 10, y: 20 }, createdAt: now.toISOString() }],
+    drawings: [],
+  } satisfies MissionMapState;
+
+  expect(() => buildMapImageSvg(objectLabelState)).toThrow(/operationsMap\.svg\.markers\[0\]\.label|unsupported|rejected/i);
+  expect(() => buildGeoJsonExport(objectLabelState)).toThrow(/operationsMap\.export\.markers\[0\]\.label|unsupported|rejected/i);
+});
+
 it('rejects sensitive notes in caller-provided map export state', () => {
   const unsafeNoteState: MissionMapState = {
     markers: [{ id: 'unsafe-note', itemType: 'marker', kind: 'observation', label: 'Obs', note: 'kontakt ola.nordmann@example.com', point: { x: 10, y: 20 }, createdAt: now.toISOString() }],

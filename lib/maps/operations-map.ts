@@ -108,7 +108,16 @@ export function sanitizeMapText(value: unknown, maxLength = 120) {
     .slice(0, maxLength);
 }
 
+function isMapTextInput(value: unknown): value is string | number | null | undefined {
+  return value === undefined || value === null || typeof value === 'string' || typeof value === 'number';
+}
+
+function unsupportedMapTextError(context: string) {
+  return new Error(`Local operational text rejected at ${context}: unsupported map text value.`);
+}
+
 function safeMapText(value: unknown, context: string, maxLength = 120) {
+  if (!isMapTextInput(value)) throw unsupportedMapTextError(context);
   const sanitized = sanitizeMapText(value, maxLength);
   assertNoSensitiveOperationalText(sanitized, context);
   return sanitized;
@@ -116,6 +125,7 @@ function safeMapText(value: unknown, context: string, maxLength = 120) {
 
 function trySafeMapText(value: unknown, context: string, maxLength = 120) {
   void context;
+  if (!isMapTextInput(value)) return null;
   const sanitized = sanitizeMapText(value, maxLength);
   return detectSensitiveOperationalText(sanitized) ? null : sanitized;
 }
@@ -476,12 +486,12 @@ export function buildMapImageSvg(state: MissionMapState) {
 
 function assertMissionMapStateTextSafe(state: MissionMapState, context: string) {
   state.markers.forEach((marker, index) => {
-    assertNoSensitiveOperationalText(marker.label, `${context}.markers[${index}].label`);
-    assertNoSensitiveOperationalText(marker.note, `${context}.markers[${index}].note`);
+    safeMapText(marker.label, `${context}.markers[${index}].label`);
+    safeMapText(marker.note, `${context}.markers[${index}].note`, 240);
   });
   state.drawings.forEach((drawing, index) => {
-    assertNoSensitiveOperationalText(drawing.label, `${context}.drawings[${index}].label`);
-    assertNoSensitiveOperationalText(drawing.note, `${context}.drawings[${index}].note`);
+    safeMapText(drawing.label, `${context}.drawings[${index}].label`);
+    safeMapText(drawing.note, `${context}.drawings[${index}].note`, 240);
   });
 }
 
