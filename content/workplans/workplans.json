@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-04T17:28:59.756Z",
-  "sourceCount": 7,
-  "planSourceCount": 7,
-  "planSourceHash": "sha256:c68de9bd9d76f55ad25589c0bd4129473639513add867d7fdf33c8530096ee5b",
+  "generatedAt": "2026-06-05T10:32:17.347Z",
+  "sourceCount": 8,
+  "planSourceCount": 8,
+  "planSourceHash": "sha256:f558149789ad0870be878b006b32a79805e0233f49eb3dd04ba3df6ff9a29563",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -5702,6 +5702,233 @@
             "Final closeout completed in commit 1cecc14aefc9492d024b2c11e833d127ba59563b: check:ci PASS, focused production E2E PASS, post-implementation/provenance re-audits PASS/APPROVED, workplan sync verified, GitHub Actions run 26967774163 success for exact SHA with deploy job success."
           ],
           "sourceHeading": "Task 18: Final audit, workplan sync, CI and deployment verification"
+        }
+      ]
+    },
+    {
+      "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration",
+      "title": "Operational Map, Logging and Field Mode Deep Integration Implementation Plan",
+      "sourcePath": ".hermes/plans/2026-06-05_121615-operational-map-logging-fieldmode-next-iteration.md",
+      "sourceType": "hermes-plan",
+      "summary": "Mature Innsats-appen from a schematic map MVP into a practical offline field tool where local map packages, mission-scoped overlays, field logging, Feltmodus, phases and after-action exports work together without backend, login, sync, live tracking, patient/persondata or official command-system claims.",
+      "stage": "build",
+      "risk": "high",
+      "status": "active",
+      "owner": "AR",
+      "evidence": [
+        "Plan drafted 2026-06-05T10:16:15Z from user request for Innsats-appen next operational iteration after command surface UI, Feltmodus, offline map/logging work, and live deployment at 81ac716007138cfee6531ac50029ff5c1222754a.",
+        "Current code inspected: offline map, operations-map overlays, map-log link helper, mission dashboard, field log, after-action report, mission folder export, phase pages, service worker, workplan sync parser, package scripts, existing ADRs and Obsidian 20-Workplans mirror.",
+        "External docs checked: Kartverket terms of use (CC BY 4.0, attribution ©Kartverket, Geovekst zoom 12-20 special permission), MapLibre PMTiles protocol docs, and Protomaps PMTiles browser/MapLibre docs."
+      ],
+      "taskCount": 23,
+      "updatedAt": "2026-06-05T10:32:17.347Z",
+      "tasks": [
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-1",
+          "title": "Supersede the schematic-only ADR with a governed local tile-package decision",
+          "status": "planned",
+          "stage": "scope",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 1: Supersede the schematic-only ADR with a governed local tile-package decision"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-2",
+          "title": "Add local map package manifest schema and validation",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 2: Add local map package manifest schema and validation"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-3",
+          "title": "Add package-file validation script for local map assets",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 3: Add package-file validation script for local map assets"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-4",
+          "title": "Extend map package selection and cache state for approved PMTiles manifests",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 4: Extend map package selection and cache state for approved PMTiles manifests"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-5",
+          "title": "[PARENT-DIRECT] Add MapLibre/PMTiles dependencies behind browser-only boundaries",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 5: [PARENT-DIRECT] Add MapLibre/PMTiles dependencies behind browser-only boundaries"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-6",
+          "title": "[PARENT-DIRECT] Create optional MapLibre PMTiles viewport with schematic fallback",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 6: [PARENT-DIRECT] Create optional MapLibre PMTiles viewport with schematic fallback"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-7",
+          "title": "Add service-worker and CacheStorage support for local map package assets",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 7: Add service-worker and CacheStorage support for local map package assets"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-8",
+          "title": "Add offline map package caching/install status with quota-aware copy",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 8: Add offline map package caching/install status with quota-aware copy"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-9",
+          "title": "Add edit helpers for mission-scoped map markers and sectors",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 9: Add edit helpers for mission-scoped map markers and sectors"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-10",
+          "title": "Add marker edit/delete UI on /kart",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 10: Add marker edit/delete UI on /kart"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-11",
+          "title": "Add sector/teig edit/delete UI and measurement refresh",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 11: Add sector/teig edit/delete UI and measurement refresh"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-12",
+          "title": "Add explicit Logg herfra controls on every visible map object",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 12: Add explicit Logg herfra controls on every visible map object"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-13",
+          "title": "Extract a shared quick field-log composer for dashboard, phases and Feltmodus",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 13: Extract a shared quick field-log composer for dashboard, phases and Feltmodus"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-14",
+          "title": "[PARENT-DIRECT] Wire quick logging and map summaries into mission dashboard",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 14: [PARENT-DIRECT] Wire quick logging and map summaries into mission dashboard"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-15",
+          "title": "Wire map/log quick actions into /under and Feltmodus",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 15: Wire map/log quick actions into /under and Feltmodus"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-16",
+          "title": "Strengthen Før-fase preparation around active mission and offline map readiness",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 16: Strengthen Før-fase preparation around active mission and offline map readiness"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-17",
+          "title": "Improve RUH and welfare reporting integration in Etter phase",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 17: Improve RUH and welfare reporting integration in Etter phase"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-18",
+          "title": "Add mission log overview section scoped to active mission",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 18: Add mission log overview section scoped to active mission"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-19",
+          "title": "Include map package metadata in reports and oppdragsmappe",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 19: Include map package metadata in reports and oppdragsmappe"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-20",
+          "title": "Add production E2E for offline Map + Log + Feltmodus flow",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 20: Add production E2E for offline Map + Log + Feltmodus flow"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-21",
+          "title": "Update docs for map/log/Feltmodus architecture and field use",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 21: Update docs for map/log/Feltmodus architecture and field use"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-22",
+          "title": "Run post-implementation audit and fix blockers with RED tests",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 22: Run post-implementation audit and fix blockers with RED tests"
+        },
+        {
+          "id": "2026-06-05_121615-operational-map-logging-fieldmode-next-iteration-task-23",
+          "title": "Close out workplan ledger, CI, deploy and live verification",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 23: Close out workplan ledger, CI, deploy and live verification"
         }
       ]
     }
