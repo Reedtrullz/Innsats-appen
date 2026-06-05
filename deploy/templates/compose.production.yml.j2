@@ -1,6 +1,6 @@
 services:
   web:
-    image: "{{ docker_image }}"
+    image: "{{ compose_image | default(docker_image) }}"
     container_name: "{{ container_name }}"
     restart: unless-stopped
     ports:
@@ -9,7 +9,7 @@ services:
       NODE_ENV: production
       PORT: "3000"
       HOSTNAME: "0.0.0.0"
-      VERSION: "{{ app_version }}"
+      VERSION: "{{ compose_app_version | default(app_version) }}"
       MET_USER_AGENT: "{{ met_user_agent }}"
     healthcheck:
       test:

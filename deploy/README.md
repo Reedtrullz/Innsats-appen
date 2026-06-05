@@ -98,6 +98,18 @@ APP_VERSION=latest ansible-playbook -i deploy/inventory/hosts.yml deploy/playboo
 
 The playbook uses `force_source: true` when pulling, so a mutable `:latest` tag is rechecked instead of silently reusing a stale local image.
 
+## Rollback behavior
+
+Before pulling a candidate image, the playbook inspects the currently running `beredskapsboka` container and tags its image ID as a local rollback image (`beredskapsboka:rollback`). Candidate deployment, local health verification, Caddy validation/reload, and exact public `/api/health.version` verification run inside an Ansible `block`.
+
+If any candidate verification step fails, the `rescue` path re-renders `compose.production.yml` with the rollback image and the previous `VERSION` value, recreates the container from that previous image, verifies local and public health again, and then fails the Ansible run with an explicit rollback message. That means production should keep serving the previous healthy version, while CI/local deploy automation still reports the candidate deploy as failed.
+
+First-time deploys do not have a previous image to restore. If the first candidate fails, the playbook fails without pretending rollback was possible.
+
+Run production deploys with the full playbook command shown above. Tag-filtered runs such as `--tags deploy` are for diagnostics only; they can skip public verification and rollback tasks, so they do not carry the rollback-safety guarantee.
+
+Rollback restores the previous image/version for the current configured domain and port. Treat intentional changes to `app_domain`, `app_host_port`, `app_bind_address`, or `caddy_marker_name` as a separate routing migration and verify the Caddy rollback story explicitly.
+
 ## Verification performed by the playbook
 
 - Docker CLI exists on VPS.
