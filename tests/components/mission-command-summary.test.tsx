@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { expect, it } from 'vitest';
-import { MissionCommandHeader, MissionExportShortcuts, MissionProgressSummary } from '@/components/mission-command-summary';
+import { MissionCommandHeader, MissionCommandSignals, MissionExportShortcuts, MissionProgressSummary } from '@/components/mission-command-summary';
 import type { OperationalChecklist } from '@/lib/content/schemas';
 import type { MissionContext } from '@/lib/mission/schemas';
 
@@ -59,4 +59,26 @@ it('renders progress status and export shortcuts', () => {
   expect(screen.getByText('Under innsats')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: '5-punktsordre' })).toHaveAttribute('href', '#5-punktsordre');
   expect(screen.getByRole('link', { name: 'Sambandsplan' })).toHaveAttribute('href', '#sambandsplan');
+});
+
+it('summarizes critical logs and map activity as mission command signals', () => {
+  const criticalMission: MissionContext = {
+    ...mission,
+    fieldLogEntries: [{
+      id: 'critical-1',
+      timestamp: '2026-06-05T10:00:00.000Z',
+      category: 'observasjon',
+      text: 'Vannstand øker',
+      criticalObservation: true,
+      mustBeForwarded: true,
+      linkedMissionId: mission.id,
+    }],
+  };
+
+  render(<MissionCommandSignals mission={criticalMission} mapSummary={{ markerCount: 2, drawingCount: 1 }} />);
+
+  expect(screen.getByText(/1 kritisk logg/i)).toBeInTheDocument();
+  expect(screen.getByText(/2 markører/i)).toBeInTheDocument();
+  expect(screen.getByText(/1 sektor/i)).toBeInTheDocument();
+  expect(screen.getByText(/foreslå statusoppdatering/i)).toBeInTheDocument();
 });

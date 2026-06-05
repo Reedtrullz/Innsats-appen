@@ -14,11 +14,12 @@ import type { MissionContext } from '@/lib/mission/schemas';
 import { ChecklistRunner } from './checklist-runner';
 import { ContextSignalPanel, markStoredContextSignalsStale } from './context-signal-panel';
 import { DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS, disabledExternalDataSources, displaySignalsForExternalDataSourceSettings, externalDataSourceSettingsSnapshot, parseExternalDataSourceSettings, subscribeExternalDataSourceSettings } from '@/lib/integrations/source-settings';
-import { MissionCommandHeader, MissionExportShortcuts, MissionProgressSummary } from './mission-command-summary';
+import { MissionCommandHeader, MissionCommandSignals, MissionExportShortcuts, MissionProgressSummary } from './mission-command-summary';
 import { TiltakCard } from './tiltak-card';
 import { MissionMapSummary } from './mission-map-summary';
 import { LocalMissionControls } from './mission/local-mission-controls';
 import { FieldLogControls } from './mission/field-log-controls';
+import { QuickFieldLogComposer } from './mission/quick-field-log-composer';
 import { RuhWelfareControls } from './mission/ruh-welfare-controls';
 import { AfterActionReportControls } from './mission/after-action-report-controls';
 import { MissionFolderExportControls } from './mission/mission-folder-export-controls';
@@ -47,7 +48,7 @@ function matchingChecklist(checklists: OperationalChecklist[], mission: MissionC
     ?? checklists[0];
 }
 
-const missionDashboardHashTargets = new Set(['etterrapport', 'ruh-velferd', 'oppdragsmappe']);
+const missionDashboardHashTargets = new Set(['hurtiglogg', 'etterrapport', 'ruh-velferd', 'oppdragsmappe']);
 
 type MissionUpdate = (mission: MissionContext) => MissionContext;
 
@@ -207,6 +208,10 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
     }
   }, [mapStateSnapshot]);
   const scopedMapState = useMemo(() => mapStateForMission(mapState, mission.id), [mapState, mission.id]);
+  const commandMapSummary = useMemo(() => ({
+    markerCount: scopedMapState.markers.length,
+    drawingCount: scopedMapState.drawings.length,
+  }), [scopedMapState.drawings.length, scopedMapState.markers.length]);
 
   const staleSignals = useMemo(() => {
     const storedSignals = mission.externalSignals.length > 0 ? markStoredContextSignalsStale(mission.externalSignals) : [];
@@ -245,6 +250,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
         <MissionExportShortcuts />
       </div>
 
+      <MissionCommandSignals mission={mission} mapSummary={commandMapSummary} />
       <MissionMapSummary mission={mission} mapState={scopedMapState} />
 
       <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950">
@@ -263,6 +269,9 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
       ) : null}
 
       <LocalMissionControls mission={mission} displaySignals={staleSignals} onMissionChange={onMissionChange} />
+      <div id="hurtiglogg">
+        <QuickFieldLogComposer mission={mission} onMissionChange={onMissionChange} sourceLabel="Oppdragstavle" criticalObservationAriaLabel="Hurtiglogg kritisk flagg" mustBeForwardedAriaLabel="Hurtiglogg videresending flagg" />
+      </div>
       <FieldLogControls mission={mission} onMissionChange={onMissionChange} />
       <RuhWelfareControls mission={mission} onMissionChange={onMissionChange} />
       <EquipmentReadinessExportControls mission={mission} checklists={checklists} />

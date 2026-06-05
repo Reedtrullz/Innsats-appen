@@ -13,6 +13,8 @@ export type QuickFieldLogComposerProps = {
   defaultCategory?: FieldLogCategory;
   sourceLabel: string;
   className?: string;
+  criticalObservationAriaLabel?: string;
+  mustBeForwardedAriaLabel?: string;
 };
 
 function quickFieldLogPrivacyErrorMessage() {
@@ -25,6 +27,8 @@ export function QuickFieldLogComposer({
   defaultCategory = 'observasjon',
   sourceLabel,
   className = '',
+  criticalObservationAriaLabel,
+  mustBeForwardedAriaLabel,
 }: QuickFieldLogComposerProps) {
   const [category, setCategory] = useState<FieldLogCategory>(defaultCategory);
   const [text, setText] = useState('');
@@ -109,11 +113,11 @@ export function QuickFieldLogComposer({
 
       <div className="grid gap-2 sm:grid-cols-2">
         <label className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm font-bold">
-          <input checked={criticalObservation} onChange={(event) => setCriticalObservation(event.target.checked)} name="criticalObservation" type="checkbox" className="h-5 w-5" />
+          <input aria-label={criticalObservationAriaLabel} checked={criticalObservation} onChange={(event) => setCriticalObservation(event.target.checked)} name="criticalObservation" type="checkbox" className="h-5 w-5" />
           Kritisk observasjon
         </label>
         <label className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm font-bold">
-          <input checked={mustBeForwarded} onChange={(event) => setMustBeForwarded(event.target.checked)} name="mustBeForwarded" type="checkbox" className="h-5 w-5" />
+          <input aria-label={mustBeForwardedAriaLabel} checked={mustBeForwarded} onChange={(event) => setMustBeForwarded(event.target.checked)} name="mustBeForwarded" type="checkbox" className="h-5 w-5" />
           Må videresendes
         </label>
       </div>

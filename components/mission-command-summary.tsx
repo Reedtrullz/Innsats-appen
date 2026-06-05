@@ -17,6 +17,10 @@ function activeChecklistForMission(mission: MissionContext, checklists: Operatio
     ?? checklists[0];
 }
 
+function commandCountLabel(count: number, singular: string, plural: string) {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
 function taskCompletionText(mission: MissionContext) {
   const totalTasks = mission.tasks.length;
   const completedTasks = mission.tasks.filter((task) => task.status === 'done').length;
@@ -84,6 +88,24 @@ export function MissionProgressSummary({ mission, checklists }: { mission: Missi
           <dd className="mt-1 font-black text-slate-950">{taskCompletionText(mission)}</dd>
         </div>
       </dl>
+    </section>
+  );
+}
+
+
+export function MissionCommandSignals({ mission, mapSummary }: { mission: MissionContext; mapSummary: { markerCount: number; drawingCount: number } }) {
+  const criticalCount = (mission.fieldLogEntries ?? []).filter((entry) => entry.criticalObservation || entry.mustBeForwarded).length;
+  const markerText = commandCountLabel(mapSummary.markerCount, 'markør', 'markører');
+  const drawingText = commandCountLabel(mapSummary.drawingCount, 'sektor', 'sektorer/tegninger');
+
+  return (
+    <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200" aria-label="Oppdragssignaler">
+      <p className="text-xs font-black uppercase tracking-wide text-sky-700">Oppdragssignaler</p>
+      <ul className="mt-2 space-y-2 text-sm font-bold text-slate-800">
+        <li>{criticalCount} kritisk logg / videresending registrert lokalt</li>
+        <li>{markerText} og {drawingText} på aktivt oppdrag</li>
+      </ul>
+      <p className="mt-2 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Foreslå statusoppdatering manuelt. Ingenting sendes eller godkjennes automatisk.</p>
     </section>
   );
 }
