@@ -62,7 +62,7 @@ npm run e2e:prod -- tests/e2e/offline.spec.ts
 
 - `/`, `/sok`, `/hurtigkort`, `/for`, `/under`, `/etter`, `/kilder`, and `/moduler/*` expose the operational command entry point, local/offline search, source-backed cards, phase pages, source views, and specialist modules.
 - `/oppdrag/ny` creates a local mission context; `/oppdrag` shows the active mission dashboard with situation, next recommended action, recommended cards, matching checklist progress, map/log summaries, after-action/oppdragsmappe exports, order/comms export tools, and cached/stale public context signals.
-- `/kart`, `/under`, Feltmodus quick actions and `/oppdrag` support the local-only Kart → Logg → Oppdrag → Etterrapport → Oppdragsmappe workflow documented in `docs/map-log-fieldmode-workflow.md`.
+- `/kart`, `/under`, Feltmodus quick actions and `/oppdrag` support the local-only Kart → Logg → Oppdrag → Etterrapport → Oppdragsmappe workflow documented in `docs/map-log-fieldmode-workflow.md`. MapLibre/PMTiles packages are optional local assets; the app must still work with the schematic fallback and must not fetch external tile-provider URLs at runtime.
 - `/mer` keeps secondary support surfaces together: sources, learning/modules, map, field mode, privacy, device-data controls, and admin links.
 - `/release` is a standalone release-readiness board for launch planning, stage gates, active work, generated local workplan artifacts, risk attention, local JSON export, and launch-material links. It intentionally avoids the operational app shell and has ingen backend-synk.
 

@@ -138,17 +138,19 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(overlays).toContain('mission-scoped overlays remain the source of operational annotations');
   });
 
-  it('keeps the next map iteration local-only until tile-package governance exists', () => {
+  it('keeps governed local tile-package runtime local-only', () => {
     const architecture = read('docs/adr/2026-06-04-offline-map-architecture.md');
     const overlays = read('docs/adr/2026-06-04-offline-map-operational-overlays.md');
     const packageJson = JSON.parse(read('package.json')) as { dependencies: Record<string, string>; devDependencies: Record<string, string> };
     const allDependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
 
-    expect(architecture).toContain('Next iteration boundary');
-    expect(architecture).toContain('No MapLibre, Leaflet, MBTiles or Kartverket tile runtime is added by the operational-integration iteration');
-    expect(architecture).toContain('separate governed package plan');
-    expect(overlays).toContain('schematic 0-100 coordinates remain the only supported coordinates');
-    const forbiddenMapDependencies = ['maplibre-gl', 'leaflet', '@maplibre/maplibre-gl-js-amplify', 'mbtiles'];
+    expect(architecture).toContain('Governed local tile-package iteration');
+    expect(architecture).toContain('PMTiles is the browser runtime package format');
+    expect(architecture).toContain('No runtime tile URL may point to Kartverket, OpenStreetMap or any external provider');
+    expect(overlays).toContain('mission-scoped overlays remain the source of operational annotations');
+    expect(Object.keys(allDependencies)).toContain('maplibre-gl');
+    expect(Object.keys(allDependencies)).toContain('pmtiles');
+    const forbiddenMapDependencies = ['leaflet', '@maplibre/maplibre-gl-js-amplify', 'mbtiles'];
     for (const dependency of forbiddenMapDependencies) {
       expect(Object.keys(allDependencies)).not.toContain(dependency);
     }
@@ -162,5 +164,19 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(doc).toContain('No backend sync, no login, no live tracking');
     expect(doc).toContain('MapLibre/Leaflet/MBTiles requires a separate governed package plan');
     expect(doc).toContain('Do not enter patient/persondata');
+  });
+
+  it('documents the operational map log and field-mode workflow', () => {
+    const workflow = read('docs/map-log-fieldmode-workflow.md');
+    const offlineGuide = read('docs/guides/offline-use.md');
+    const readme = read('README.md');
+
+    expect(workflow).toContain('Logg herfra');
+    expect(workflow).toContain('Oppdragsmappe');
+    expect(workflow).toContain('Feltmodus');
+    expect(workflow).toContain('PMTiles');
+    expect(workflow).toContain('fallback til skjematisk kart');
+    expect(offlineGuide).toContain('test kartpakke og hurtiglogg offline før innsats');
+    expect(readme).toContain('MapLibre/PMTiles packages are optional local assets');
   });
 });
