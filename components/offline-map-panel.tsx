@@ -189,7 +189,10 @@ export function OfflineMapPanel() {
   const [activeMission, setActiveMission] = useState<MissionContext | null>(null);
   const [mapLogText, setMapLogText] = useState('');
   const [mapLogSaving, setMapLogSaving] = useState(false);
+  const [mapPackageCacheSaving, setMapPackageCacheSaving] = useState(false);
   const mapLogSavingRef = useRef(false);
+  const mapPackageCacheSavingRef = useRef(false);
+  const latestSelectedPackageIdRef = useRef(selectedPackageId);
 
   const mapPackageOptions: MapPackageOption[] = [
     ...OFFLINE_MAP_PACKAGES.map((item) => ({
@@ -217,6 +220,10 @@ export function OfflineMapPanel() {
   const cachedLocalMapPackage = cachedPackage?.runtimeFormat === 'pmtiles' ? localMapPackageForId(cachedPackage.packageId) : undefined;
   const activeMissionMapState = useMemo(() => activeMission ? mapStateForMission(mapState, activeMission.id) : { markers: [], drawings: [] }, [activeMission, mapState]);
   const filteredState = filterMissionMapStateByLayers(activeMissionMapState, enabledLayers);
+
+  useEffect(() => {
+    latestSelectedPackageIdRef.current = selectedPackage.id;
+  }, [selectedPackage.id]);
 
   useEffect(() => {
     const loadFieldMode = () => {
@@ -259,11 +266,24 @@ export function OfflineMapPanel() {
     setStatusMessage(message);
   }
 
+  function selectMapPackage(packageId: string) {
+    latestSelectedPackageIdRef.current = packageId;
+    setSelectedPackageId(packageId);
+  }
+
   async function cacheSelectedPackage() {
-    if (selectedPackage.runtimeFormat === 'pmtiles') {
-      const localPackage = localMapPackageForId(selectedPackage.id);
+    if (mapPackageCacheSavingRef.current) return;
+    const packageToCache = selectedPackage;
+
+    if (packageToCache.runtimeFormat === 'pmtiles') {
+      mapPackageCacheSavingRef.current = true;
+      setMapPackageCacheSaving(true);
+      setStatusMessage('Forhåndscacher lokal PMTiles-kartpakke til CacheStorage.');
+      const localPackage = localMapPackageForId(packageToCache.id);
       if (!localPackage) {
         setStatusMessage('Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline.');
+        mapPackageCacheSavingRef.current = false;
+        setMapPackageCacheSaving(false);
         return;
       }
       try {
@@ -272,16 +292,22 @@ export function OfflineMapPanel() {
           setStatusMessage('Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline.');
           return;
         }
+        if (latestSelectedPackageIdRef.current !== packageToCache.id) {
+          setStatusMessage('Kartcache ble avbrutt fordi valgt pakke endret seg. Velg Lagre på nytt for den aktive kartpakken.');
+          return;
+        }
+        writeCachedOfflineMapPackage(packageToCache.id);
+        setStatusMessage('Lokal PMTiles-kartpakke er forhåndscachet og aktivert offline.');
       } catch {
         setStatusMessage('Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline.');
-        return;
+      } finally {
+        mapPackageCacheSavingRef.current = false;
+        setMapPackageCacheSaving(false);
       }
-      writeCachedOfflineMapPackage(selectedPackage.id);
-      setStatusMessage('Lokal PMTiles-kartpakke er forhåndscachet og aktivert offline.');
       return;
     }
 
-    writeCachedOfflineMapPackage(selectedPackage.id);
+    writeCachedOfflineMapPackage(packageToCache.id);
   }
 
   function resetCache() {
@@ -461,11 +487,11 @@ export function OfflineMapPanel() {
           <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Lokale kartpakker</p>
           <h2 className="text-2xl font-black">Velg og cache område</h2>
           <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">
-            Valget simulerer en lokal kartpakke-cache i localStorage. Det gjøres ingen nettverksnedlasting, ingen backend sync og ingen deling med oppdrag eller andre enheter.
+            App-lokale PMTiles- og stilfiler kan forhåndscaches til CacheStorage for offline bruk. Ingen ekstern tile-provider, backend-sync eller deling med oppdrag eller andre enheter brukes; localStorage lagrer bare hvilken kartpakke som er aktivert.
           </p>
         </div>
         <label className="block text-sm font-black text-slate-800" htmlFor="offline-map-package">Velg lokal kartpakke</label>
-        <select id="offline-map-package" aria-label="Velg lokal kartpakke" value={selectedPackage.id} onChange={(event) => setSelectedPackageId(event.target.value)} className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-3 text-base font-semibold text-slate-950">
+        <select id="offline-map-package" aria-label="Velg lokal kartpakke" value={selectedPackage.id} onChange={(event) => selectMapPackage(event.target.value)} className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-3 text-base font-semibold text-slate-950">
           {mapPackageOptions.map((mapPackage) => (
             <option key={mapPackage.id} value={mapPackage.id}>
               {mapPackage.title} ({mapPackage.runtimeFormat === 'pmtiles' ? 'lokal PMTiles' : `${mapPackage.estimatedSizeMb} MB`})
@@ -490,7 +516,7 @@ export function OfflineMapPanel() {
           {selectedWarning ? <p className="mt-3 rounded-xl bg-orange-100 p-3 font-black text-orange-950">{selectedWarning}</p> : null}
         </div>
         <div className="flex flex-wrap gap-3">
-          <button type="button" onClick={cacheSelectedPackage} className="min-h-11 rounded-xl bg-sky-900 px-4 font-black text-white">Lagre valgt kartpakke lokalt</button>
+          <button type="button" onClick={() => void cacheSelectedPackage()} disabled={mapPackageCacheSaving} className="min-h-11 rounded-xl bg-sky-900 px-4 font-black text-white disabled:cursor-wait disabled:bg-slate-500">{mapPackageCacheSaving ? 'Forhåndscacher kartpakke lokalt…' : 'Lagre valgt kartpakke lokalt'}</button>
           <button type="button" onClick={resetCache} className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 font-black text-slate-950">Tilbakestill kartcache</button>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700" data-testid="offline-map-cache-status">
