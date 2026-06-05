@@ -6,8 +6,9 @@
 #   - Target host is logged into GHCR if the image is private.
 #   - community.docker collection installed on the control node.
 # Variables:
-#   - docker_image: image tag to deploy (default ghcr.io/reedtrullz/innsats-appen:latest)
-#   - app_version: version exposed by /api/health (default APP_VERSION env or latest)
+#   - docker_image: immutable image tag to deploy (for example ghcr.io/reedtrullz/innsats-appen:<git-sha>)
+#   - app_version: full 40-character git SHA exposed by /api/health (default APP_VERSION env)
+#   - allow_mutable_tag: set true only for an intentional latest/manual recovery deploy
 #   - app_domain: public domain (inventory default innsats.reidar.tech)
 # Usage:
 #   APP_VERSION=$(git rev-parse HEAD) ansible-playbook -i deploy/inventory/hosts.yml deploy/playbook.yml -e "docker_image=ghcr.io/reedtrullz/innsats-appen:$(git rev-parse --short=12 HEAD)"
@@ -23,6 +24,7 @@
     app_dir: /opt/apps/beredskapsboka
     docker_image: ghcr.io/reedtrullz/innsats-appen:latest
     app_version: "{{ lookup('ansible.builtin.env', 'APP_VERSION') | default('latest', true) }}"
+    allow_mutable_tag: false
     met_user_agent: "{{ lookup('ansible.builtin.env', 'MET_USER_AGENT') | default('Beredskapsboka/0.1 (+https://innsats.reidar.tech)', true) }}"
     health_url: "http://{{ app_bind_address }}:{{ app_host_port }}/api/health"
     public_health_url: "https://{{ app_domain }}/api/health"
@@ -38,7 +40,13 @@
           - app_host_port | int < 65536
           - app_bind_address in ['127.0.0.1', 'localhost']
           - docker_image is match('^ghcr.io/[a-z0-9._-]+/[a-z0-9._-]+:[A-Za-z0-9._-]+$')
-        fail_msg: Invalid Beredskapsboka deployment variables.
+          - allow_mutable_tag | bool or docker_image is match('^ghcr.io/[a-z0-9._-]+/[a-z0-9._-]+:(?:staging-)?[0-9a-f]{7,40}$')
+          - allow_mutable_tag | bool or app_version is match('^[0-9a-f]{40}$')
+        fail_msg: >-
+          Invalid Beredskapsboka deployment variables. Production deploys require
+          an immutable SHA-like GHCR image tag, and app_version must be the full
+          40-character git SHA exposed by /api/health. Set allow_mutable_tag=true
+          only for an intentional mutable-tag deploy.
         success_msg: Beredskapsboka deployment variables validated.
       tags: [always]
 

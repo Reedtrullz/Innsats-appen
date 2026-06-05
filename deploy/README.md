@@ -90,11 +90,15 @@ ansible-playbook -i deploy/inventory/hosts.yml deploy/playbook.yml \
   -e "docker_image=ghcr.io/reedtrullz/innsats-appen:$(git rev-parse --short=12 HEAD)"
 ```
 
-For a manual latest-tag deploy:
+For a manual mutable-tag recovery deploy, make the override explicit and understand that this bypasses the immutable SHA guard:
 
 ```bash
-APP_VERSION=latest ansible-playbook -i deploy/inventory/hosts.yml deploy/playbook.yml
+APP_VERSION=latest ansible-playbook -i deploy/inventory/hosts.yml deploy/playbook.yml \
+  -e "docker_image=ghcr.io/reedtrullz/innsats-appen:latest" \
+  -e "allow_mutable_tag=true"
 ```
+
+Do not use the mutable override for normal production deploys. Standard production deploys must pass a SHA-like image tag and a full 40-character `APP_VERSION`; `/api/health.version` must match that full SHA before the playbook reports success.
 
 The playbook uses `force_source: true` when pulling, so a mutable `:latest` tag is rechecked instead of silently reusing a stale local image.
 

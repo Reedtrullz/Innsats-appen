@@ -9,6 +9,14 @@ function readComposeTemplate() {
   return readFileSync('deploy/templates/compose.production.yml.j2', 'utf8');
 }
 
+function immutableImageRegexFrom(playbook: string) {
+  const match = playbook.match(/allow_mutable_tag \| bool or docker_image is match\('([^']+)'\)/);
+  if (!match) {
+    throw new Error('Missing immutable docker_image assertion in deploy/playbook.yml');
+  }
+  return new RegExp(match[1]);
+}
+
 describe('deploy playbook safety', () => {
   it('has rollback or blue-green candidate verification before promotion', () => {
     const playbook = readDeployPlaybook();
@@ -61,5 +69,30 @@ describe('deploy playbook safety', () => {
     expect(playbook).toMatch(/previous_app_version != 'unknown'/);
     expect(playbook).toMatch(/Fail deployment after successful rollback/);
     expect(playbook).toMatch(/Candidate deployment failed and Beredskapsboka was rolled back/);
+  });
+
+  it('defaults mutable production deploy overrides off and rejects latest tags unless explicit', () => {
+    const playbook = readDeployPlaybook();
+
+    expect(playbook).toMatch(/allow_mutable_tag:\s*false/);
+    expect(playbook).toMatch(/allow_mutable_tag \| bool/);
+    expect(playbook).toMatch(/docker_image is match\('/);
+    expect(playbook).toMatch(/Set allow_mutable_tag=true\s+only for an intentional mutable-tag deploy/);
+  });
+
+  it('keeps production and staging immutable tags valid while rejecting latest by default', () => {
+    const immutableImageRegex = immutableImageRegexFrom(readDeployPlaybook());
+
+    expect(immutableImageRegex.test('ghcr.io/reedtrullz/innsats-appen:abcdef123456')).toBe(true);
+    expect(immutableImageRegex.test('ghcr.io/reedtrullz/innsats-appen:staging-abcdef123456')).toBe(true);
+    expect(immutableImageRegex.test('ghcr.io/reedtrullz/innsats-appen:latest')).toBe(false);
+    expect(immutableImageRegex.test('ghcr.io/reedtrullz/innsats-appen:staging-latest')).toBe(false);
+  });
+
+  it('requires exact 40-character app versions unless mutable deploy override is explicit', () => {
+    const playbook = readDeployPlaybook();
+
+    expect(playbook).toMatch(/allow_mutable_tag \| bool or app_version is match\('\^\[0-9a-f\]\{40\}\$'\)/);
+    expect(playbook).toMatch(/app_version must be the full\s+40-character git SHA/);
   });
 });
