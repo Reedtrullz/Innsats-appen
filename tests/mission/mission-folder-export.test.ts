@@ -59,6 +59,53 @@ it('builds a local mission folder bundle with map artifacts and privacy warnings
   expect(markdown).toContain('Sanitert GeoJSON');
 });
 
+it('includes sanitized map package provenance in mission-folder exports', () => {
+  const unsafeMapPackage = {
+    id: 'trondheim-demo-pmtiles',
+    title: 'Trondheim demo PMTiles',
+    attribution: 'Demo attribution',
+    version: '2026.06-a',
+    provenance: 'Local training package bundled with app',
+    url: '/map-packages/trondheim-demo.pmtiles',
+    styleUrl: '/map-packages/trondheim-demo-style.json',
+    tileUrl: 'https://tiles.example.invalid/{z}/{x}/{y}.pbf',
+    bounds: [10.2, 63.2, 10.6, 63.6],
+    center: [10.4, 63.4],
+  } as any;
+
+  const bundle = buildMissionFolderExport({
+    mission,
+    checklists: [],
+    checklistRuns: [],
+    mapPackage: unsafeMapPackage,
+    generatedAt: '2026-06-04T11:00:00.000Z',
+  } as any);
+
+  expect(bundle.artifacts.mapPackage).toEqual({
+    id: 'trondheim-demo-pmtiles',
+    title: 'Trondheim demo PMTiles',
+    attribution: 'Demo attribution',
+    version: '2026.06-a',
+    provenance: 'Local training package bundled with app',
+  });
+
+  const markdown = exportMissionFolderMarkdown(bundle);
+  expect(markdown).toContain('## Kartpakke');
+  expect(markdown).toContain('Trondheim demo PMTiles');
+  expect(markdown).toContain('Demo attribution');
+  expect(markdown).toContain('Local training package bundled with app');
+
+  for (const exported of [JSON.stringify(bundle), markdown]) {
+    expect(exported).not.toContain('https://');
+    expect(exported).not.toContain('/map-packages/trondheim-demo.pmtiles');
+    expect(exported).not.toContain('/map-packages/trondheim-demo-style.json');
+    expect(exported).not.toContain('styleUrl');
+    expect(exported).not.toContain('tileUrl');
+    expect(exported).not.toContain('bounds');
+    expect(exported).not.toContain('center');
+  }
+});
+
 it('rejects mission folder export when included field log contains high-confidence sensitive free text', () => {
   expect(() => buildMissionFolderExport({
     mission: {

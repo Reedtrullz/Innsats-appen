@@ -1,7 +1,7 @@
 import type { OperationalChecklist } from '@/lib/content/schemas';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
 import { buildGeoJsonExport, buildMapImageSvg, geoJsonExportText, mapStateForMission, normalizeMissionMapState, type MissionMapState } from '@/lib/maps/operations-map';
-import { buildAfterActionReport, exportAfterActionMarkdown } from './after-action-report';
+import { buildAfterActionReport, exportAfterActionMarkdown, sanitizeLocalMapPackageSummary } from './after-action-report';
 import { exportFieldLogMarkdown } from './field-log';
 import type { ChecklistRun, MissionContext } from './schemas';
 
@@ -51,10 +51,12 @@ export function buildMissionFolderExport(input: {
   checklists: OperationalChecklist[];
   checklistRuns: ChecklistRun[];
   mapState?: MissionMapState;
+  mapPackage?: unknown;
   generatedAt?: string;
 }) {
   const generatedAt = input.generatedAt ?? new Date().toISOString();
   const mapState = missionFolderMapState(input.mapState, input.mission.id);
+  const mapPackage = sanitizeLocalMapPackageSummary(input.mapPackage);
   assertNoSensitiveOperationalTextInValue({
     mission: {
       ...input.mission,
@@ -63,12 +65,18 @@ export function buildMissionFolderExport(input: {
     },
     checklistRuns: input.checklistRuns.map((run) => ({ notesByItemId: run.notesByItemId })),
     mapState: missionFolderMapText(mapState),
+    mapPackage: mapPackage ? {
+      title: mapPackage.title,
+      attribution: mapPackage.attribution,
+      provenance: mapPackage.provenance,
+    } : undefined,
   }, 'missionFolder');
   const afterActionReport = buildAfterActionReport({
     mission: input.mission,
     checklists: input.checklists,
     checklistRuns: input.checklistRuns,
     mapState,
+    mapPackage,
     generatedAt,
   });
 
@@ -83,6 +91,7 @@ export function buildMissionFolderExport(input: {
       mapGeoJson: geoJsonExportText(mapState),
       mapSvg: buildMapImageSvg(mapState),
       mapFeatureCollection: buildGeoJsonExport(mapState),
+      mapPackage,
     },
   };
 }
@@ -90,6 +99,15 @@ export function buildMissionFolderExport(input: {
 export type MissionFolderExport = ReturnType<typeof buildMissionFolderExport>;
 
 export function exportMissionFolderMarkdown(bundle: MissionFolderExport) {
+  const mapPackageLines = bundle.artifacts.mapPackage ? [
+    '## Kartpakke',
+    `- Tittel: ${bundle.artifacts.mapPackage.title}`,
+    `- Pakke-ID/proveniens: ${bundle.artifacts.mapPackage.id}`,
+    `- Versjon: ${bundle.artifacts.mapPackage.version}`,
+    `- Attribusjon: ${bundle.artifacts.mapPackage.attribution}`,
+    `- Opprinnelse: ${bundle.artifacts.mapPackage.provenance}`,
+    '',
+  ] : [];
   return [
     '# Oppdragsmappe',
     '',
@@ -106,6 +124,7 @@ export function exportMissionFolderMarkdown(bundle: MissionFolderExport) {
     '- Sanitert GeoJSON',
     '- Sanitert SVG kartbilde',
     '',
+    ...mapPackageLines,
     '## Etterrapport',
     bundle.artifacts.afterActionMarkdown.trim(),
     '',

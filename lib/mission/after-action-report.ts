@@ -109,6 +109,14 @@ export type AfterActionRuhWelfareSummary = {
   warning: string;
 };
 
+export type LocalMapPackageExportSummary = {
+  id: string;
+  title: string;
+  attribution: string;
+  version: string;
+  provenance: string;
+};
+
 export type AfterActionReport = {
   schemaVersion: number;
   generatedAt: string;
@@ -137,6 +145,7 @@ export type AfterActionReport = {
       items: string[];
       warning: string;
     };
+    mapPackage?: LocalMapPackageExportSummary;
     contextSignals: Array<{
       source: MissionContext['externalSignals'][number]['source'];
       kind: string;
@@ -172,6 +181,7 @@ export type BuildAfterActionReportInput = {
   localSambandText?: string;
   localLogText?: string;
   mapState?: MissionMapState;
+  mapPackage?: unknown;
 };
 
 function trimToSection(value: string | undefined): TextSection {
@@ -209,6 +219,23 @@ function buildMapSummary(mapState: MissionMapState | undefined) {
     ],
     warning: 'Skjematiske 0-100 kartdata fra lokal nettleser. Ikke autoritativ navigasjon eller offisiell posisjon.',
   };
+}
+
+function stringField(value: unknown) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+export function sanitizeLocalMapPackageSummary(mapPackage: unknown): LocalMapPackageExportSummary | undefined {
+  if (!mapPackage || typeof mapPackage !== 'object') return undefined;
+  const source = mapPackage as Record<string, unknown>;
+  const summary = {
+    id: stringField(source.id),
+    title: stringField(source.title),
+    attribution: stringField(source.attribution),
+    version: stringField(source.version),
+    provenance: stringField(source.provenance),
+  };
+  return Object.values(summary).some((value) => value.length > 0) ? summary : undefined;
 }
 
 function withNote(note: string | undefined) {
@@ -427,11 +454,17 @@ function assertAfterActionMapStateSafe(mapState: MissionMapState | undefined, mi
   }, 'afterAction.mapState');
 }
 
-function assertAfterActionInputSafe({ mission, checklistRuns, localOrderText, localSambandText, localLogText, mapState }: BuildAfterActionReportInput): void {
+function assertAfterActionInputSafe({ mission, checklistRuns, localOrderText, localSambandText, localLogText, mapState, mapPackage }: BuildAfterActionReportInput): void {
+  const sanitizedMapPackage = sanitizeLocalMapPackageSummary(mapPackage);
   assertNoSensitiveOperationalTextInValue({
     localOrderText,
     localSambandText,
     localLogText,
+    mapPackage: sanitizedMapPackage ? {
+      title: sanitizedMapPackage.title,
+      attribution: sanitizedMapPackage.attribution,
+      provenance: sanitizedMapPackage.provenance,
+    } : undefined,
     mission: {
       title: mission.title,
       locationText: mission.locationText,
@@ -451,13 +484,14 @@ function assertAfterActionInputSafe({ mission, checklistRuns, localOrderText, lo
   assertAfterActionMapStateSafe(mapState, mission.id);
 }
 
-export function buildAfterActionReport({ mission, checklists, checklistRuns, generatedAt, localOrderText, localSambandText, localLogText, mapState }: BuildAfterActionReportInput): AfterActionReport {
-  assertAfterActionInputSafe({ mission, checklists, checklistRuns, generatedAt, localOrderText, localSambandText, localLogText, mapState });
+export function buildAfterActionReport({ mission, checklists, checklistRuns, generatedAt, localOrderText, localSambandText, localLogText, mapState, mapPackage }: BuildAfterActionReportInput): AfterActionReport {
+  assertAfterActionInputSafe({ mission, checklists, checklistRuns, generatedAt, localOrderText, localSambandText, localLogText, mapState, mapPackage });
   const reportChecklists = checklistSummaries(checklists, checklistRuns);
   const resourceEntries = mission.resourceRequests.map(resourceEntry);
   const equipmentDamageLoss = resourceEntries.filter(isEquipmentDamageOrLoss);
   const localLogSource = localLogText?.trim() ? localLogText : structuredFieldLogEntries(mission);
   const scopedMapState = mapStateForMission(normalizeMissionMapState(mapState ?? { markers: [], drawings: [] }), mission.id);
+  const mapPackageSummary = sanitizeLocalMapPackageSummary(mapPackage);
   return {
     schemaVersion: AFTER_ACTION_SCHEMA_VERSION,
     generatedAt: generatedAt ?? new Date().toISOString(),
@@ -481,6 +515,7 @@ export function buildAfterActionReport({ mission, checklists, checklistRuns, gen
       samband: trimToSection(localSambandText),
       localLog: logEntries(localLogSource),
       mapSummary: buildMapSummary(scopedMapState),
+      mapPackage: mapPackageSummary,
       contextSignals: mission.externalSignals.map((signal) => ({
         source: signal.source,
         kind: signal.kind,
@@ -587,6 +622,15 @@ export function exportAfterActionMarkdown(report: AfterActionReport) {
   lines.push(`- Advarsel: ${reportMapSummary.warning}`);
   bulletOrPlaceholder(lines, reportMapSummary.items, 'Ingen lokale kartmarkører eller sektorer registrert');
   lines.push('');
+  if (report.sections.mapPackage) {
+    lines.push('## Kartpakke');
+    lines.push(`- Tittel: ${report.sections.mapPackage.title}`);
+    lines.push(`- Pakke-ID/proveniens: ${report.sections.mapPackage.id}`);
+    lines.push(`- Versjon: ${report.sections.mapPackage.version}`);
+    lines.push(`- Attribusjon: ${report.sections.mapPackage.attribution}`);
+    lines.push(`- Opprinnelse: ${report.sections.mapPackage.provenance}`);
+    lines.push('');
+  }
   lines.push('## Vær/farer (saniterte lokale sammendrag)');
   bulletOrPlaceholder(lines, report.sections.contextSignals.map((signal) => `${signal.title}: ${signal.summary} (${signal.source}, ${signal.severity}, ${signal.staleness})`), 'Ingen lokale sammendrag lagret');
   lines.push('');

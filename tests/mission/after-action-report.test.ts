@@ -289,6 +289,59 @@ it('rejects high-confidence sensitive map labels before building an after-action
   })).toThrow(/afterAction\.mapState\.markers\[0\]\.label/i);
 });
 
+it('includes sanitized map package summary in after-action exports', () => {
+  const unsafeMapPackage = {
+    id: 'trondheim-demo-pmtiles',
+    title: 'Trondheim demo PMTiles',
+    attribution: 'Demo attribution',
+    version: '2026.06-a',
+    provenance: 'Local training package bundled with app',
+    url: '/map-packages/trondheim-demo.pmtiles',
+    styleUrl: '/map-packages/trondheim-demo-style.json',
+    tileUrl: 'https://tiles.example.invalid/{z}/{x}/{y}.pbf',
+    bounds: [10.2, 63.2, 10.6, 63.6],
+    center: [10.4, 63.4],
+  } as any;
+
+  const report = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapPackage: unsafeMapPackage,
+  } as any);
+
+  expect(report.sections.mapPackage).toEqual({
+    id: 'trondheim-demo-pmtiles',
+    title: 'Trondheim demo PMTiles',
+    attribution: 'Demo attribution',
+    version: '2026.06-a',
+    provenance: 'Local training package bundled with app',
+  });
+
+  const markdown = exportAfterActionMarkdown(report);
+  const html = exportAfterActionPdfReadyHtml(report);
+  const json = exportAfterActionJson(report);
+  expect(markdown).toContain('## Kartpakke');
+  expect(markdown).toContain('Trondheim demo PMTiles');
+  expect(markdown).toContain('Local training package bundled with app');
+  expect(html).toContain('Kartpakke');
+  expect(html).toContain('Trondheim demo PMTiles');
+  expect(html).toContain('Local training package bundled with app');
+  expect(json).toContain('Trondheim demo PMTiles');
+  expect(json).toContain('Local training package bundled with app');
+
+  for (const exported of [json, markdown, html]) {
+    expect(exported).not.toContain('https://');
+    expect(exported).not.toContain('/map-packages/trondheim-demo.pmtiles');
+    expect(exported).not.toContain('/map-packages/trondheim-demo-style.json');
+    expect(exported).not.toContain('styleUrl');
+    expect(exported).not.toContain('tileUrl');
+    expect(exported).not.toContain('bounds');
+    expect(exported).not.toContain('center');
+  }
+});
+
 it('includes sanitized schematic map summary in after-action report when provided', () => {
   const report = buildAfterActionReport({
     mission,
