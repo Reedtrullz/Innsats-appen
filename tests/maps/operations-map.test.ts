@@ -21,6 +21,9 @@ import {
   operationItemsForRender,
   readMissionMapState,
   resetMissionMapState,
+  deleteMissionMapObject,
+  updateMissionMapDrawing,
+  updateMissionMapMarker,
   writeMissionMapState,
   type MissionMapState,
 } from '@/lib/maps/operations-map';
@@ -63,6 +66,54 @@ it('keeps mission ids on imported map state', () => {
 
   expect(mapStateForMission(state, 'mission-a').markers).toHaveLength(1);
   expect(mapStateForMission(state, 'mission-a').drawings).toHaveLength(1);
+});
+
+it('updates only the matching marker inside the same mission', () => {
+  const state = normalizeMissionMapState({
+    markers: [
+      { id: 'a', missionId: 'mission-a', itemType: 'marker', kind: 'hazard', label: 'Old', point: { x: 10, y: 20 }, createdAt: '2026-06-05T10:00:00.000Z' },
+      { id: 'b', missionId: 'mission-b', itemType: 'marker', kind: 'resource', label: 'Other mission', point: { x: 80, y: 20 }, createdAt: '2026-06-05T10:00:00.000Z' },
+    ],
+    drawings: [],
+  });
+
+  const next = updateMissionMapMarker(state, 'mission-a', 'a', { label: 'Updated', point: { x: 12, y: 24 } });
+
+  expect(next.markers.find((marker) => marker.id === 'a')).toMatchObject({ label: 'Updated', point: { x: 12, y: 24 } });
+  expect(next.markers.find((marker) => marker.id === 'b')?.label).toBe('Other mission');
+});
+
+it('updates only the matching drawing inside the same mission and keeps invalid patches unchanged', () => {
+  const state = normalizeMissionMapState({
+    markers: [],
+    drawings: [
+      { id: 'shared', missionId: 'mission-a', itemType: 'drawing', kind: 'sector', label: 'A sector', points: [{ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 1 }], createdAt: '2026-06-05T10:00:00.000Z' },
+      { id: 'shared', missionId: 'mission-b', itemType: 'drawing', kind: 'sector', label: 'B sector', points: [{ x: 10, y: 10 }, { x: 20, y: 20 }, { x: 30, y: 10 }], createdAt: '2026-06-05T10:00:00.000Z' },
+      { id: 'other', missionId: 'mission-b', itemType: 'drawing', kind: 'sector', label: 'Other B sector', points: [{ x: 11, y: 11 }, { x: 21, y: 21 }, { x: 31, y: 11 }], createdAt: '2026-06-05T10:00:00.000Z' },
+    ],
+  });
+
+  const updated = updateMissionMapDrawing(state, 'mission-a', 'shared', { label: 'Updated sector', points: [{ x: 4, y: 4 }, { x: 5, y: 5 }, { x: 6, y: 4 }] });
+  expect(updated.drawings.find((drawing) => drawing.id === 'shared' && drawing.missionId === 'mission-a')).toMatchObject({ label: 'Updated sector', points: [{ x: 4, y: 4 }, { x: 5, y: 5 }, { x: 6, y: 4 }] });
+  expect(updated.drawings.find((drawing) => drawing.id === 'shared' && drawing.missionId === 'mission-b')?.label).toBe('B sector');
+  expect(updated.drawings.find((drawing) => drawing.id === 'other')?.label).toBe('Other B sector');
+
+  const invalid = updateMissionMapDrawing(updated, 'mission-a', 'shared', { kind: 'sector', points: [{ x: 4, y: 4 }, { x: 5, y: 5 }] });
+  expect(invalid.drawings.find((drawing) => drawing.id === 'shared' && drawing.missionId === 'mission-a')).toMatchObject({ label: 'Updated sector', points: [{ x: 4, y: 4 }, { x: 5, y: 5 }, { x: 6, y: 4 }] });
+});
+
+it('deletes drawings only inside the active mission', () => {
+  const state = normalizeMissionMapState({
+    markers: [],
+    drawings: [
+      { id: 'a', missionId: 'mission-a', itemType: 'drawing', kind: 'sector', label: 'A sector', points: [{ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 1 }], createdAt: '2026-06-05T10:00:00.000Z' },
+      { id: 'b', missionId: 'mission-b', itemType: 'drawing', kind: 'sector', label: 'B sector', points: [{ x: 10, y: 10 }, { x: 20, y: 20 }, { x: 30, y: 10 }], createdAt: '2026-06-05T10:00:00.000Z' },
+    ],
+  });
+
+  const next = deleteMissionMapObject(state, 'mission-a', 'a');
+
+  expect(next.drawings.map((drawing) => drawing.id)).toEqual(['b']);
 });
 
 it('filters layers and caps rendered local operations', () => {

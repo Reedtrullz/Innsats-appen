@@ -233,6 +233,33 @@ export function mapStateForMission(state: MissionMapState, missionId: string): M
   };
 }
 
+export function updateMissionMapMarker(state: MissionMapState, missionId: string, markerId: string, patch: Partial<Pick<MissionMapMarker, 'kind' | 'label' | 'point' | 'note'>>): MissionMapState {
+  return normalizeMissionMapState({
+    ...state,
+    markers: state.markers.map((marker) => {
+      if (marker.id !== markerId || marker.missionId !== missionId) return marker;
+      return normalizeMarker({ ...marker, ...patch }) ?? marker;
+    }),
+  });
+}
+
+export function updateMissionMapDrawing(state: MissionMapState, missionId: string, drawingId: string, patch: Partial<Pick<MissionMapDrawing, 'kind' | 'label' | 'points' | 'note'>>): MissionMapState {
+  return normalizeMissionMapState({
+    ...state,
+    drawings: state.drawings.map((drawing) => {
+      if (drawing.id !== drawingId || drawing.missionId !== missionId) return drawing;
+      return normalizeDrawing({ ...drawing, ...patch }) ?? drawing;
+    }),
+  });
+}
+
+export function deleteMissionMapObject(state: MissionMapState, missionId: string, objectId: string): MissionMapState {
+  return normalizeMissionMapState({
+    markers: state.markers.filter((marker) => marker.id !== objectId || marker.missionId !== missionId),
+    drawings: state.drawings.filter((drawing) => drawing.id !== objectId || drawing.missionId !== missionId),
+  });
+}
+
 export function readMissionMapState(storage?: Pick<Storage, 'getItem'>): MissionMapState {
   try {
     const resolvedStorage = storage ?? getBrowserLocalStorage();
