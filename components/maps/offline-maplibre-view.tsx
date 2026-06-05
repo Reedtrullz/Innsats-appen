@@ -1,20 +1,47 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import type { LocalMapPackageManifest } from '@/lib/maps/offline-map-package-manifest';
 import { registerPmtilesProtocolOnce } from '@/lib/maps/maplibre-runtime';
 
-type MapInstanceLike = { remove: () => void };
+type MapInstanceLike = {
+  remove: () => void;
+  on?: (event: 'error' | string, handler: () => void) => void;
+};
 
-export function OfflineMapLibreView({ packageManifest }: { packageManifest?: LocalMapPackageManifest }) {
+type MapLibreLoadState = {
+  packageId?: string;
+  status: string;
+  fallbackActive: boolean;
+};
+
+export function OfflineMapLibreView({
+  packageManifest,
+  fallback,
+}: {
+  packageManifest?: LocalMapPackageManifest;
+  fallback?: ReactNode;
+}) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [status, setStatus] = useState('Klargjør lokal kartpakke.');
+  const [loadState, setLoadState] = useState<MapLibreLoadState>({
+    status: 'Klargjør lokal kartpakke.',
+    fallbackActive: false,
+  });
 
   useEffect(() => {
     if (!packageManifest || !containerRef.current) return undefined;
 
     let map: MapInstanceLike | undefined;
     let disposed = false;
+    const packageId = packageManifest.id;
+    const activateFallback = () => {
+      if (disposed) return;
+      setLoadState({
+        packageId,
+        status: 'Kunne ikke åpne lokal kartpakke. Skjematisk kart brukes som fallback.',
+        fallbackActive: true,
+      });
+    };
 
     async function boot() {
       try {
@@ -34,9 +61,15 @@ export function OfflineMapLibreView({ packageManifest }: { packageManifest?: Loc
           attributionControl: { compact: true },
           cooperativeGestures: true,
         });
-        setStatus(`Lokal kartpakke aktiv: ${packageManifest.title}.`);
+        map.on?.('error', activateFallback);
+        if (disposed) return;
+        setLoadState({
+          packageId,
+          status: `Lokal kartpakke aktiv: ${packageManifest.title}.`,
+          fallbackActive: false,
+        });
       } catch {
-        setStatus('Kunne ikke åpne lokal kartpakke. Skjematisk kart brukes som fallback.');
+        activateFallback();
       }
     }
 
@@ -55,14 +88,24 @@ export function OfflineMapLibreView({ packageManifest }: { packageManifest?: Loc
     );
   }
 
+  const status = loadState.packageId === packageManifest.id ? loadState.status : 'Klargjør lokal kartpakke.';
+  const fallbackActive = loadState.packageId === packageManifest.id && loadState.fallbackActive;
+
   return (
-    <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 text-white shadow-sm" aria-label="Lokal offline kartpakke">
-      <div ref={containerRef} data-testid="offline-maplibre-container" className="h-80 w-full" />
-      <figcaption className="space-y-1 border-t border-slate-700 bg-slate-950 p-4 text-xs font-semibold text-slate-200">
-        <p>{status}</p>
-        <p>{packageManifest.attribution}</p>
-        <p>Ikke autoritativ navigasjon. Lokale markører og sektorer er beslutningsstøtte og lagres bare i nettleseren.</p>
-      </figcaption>
-    </figure>
+    <div className="space-y-3">
+      <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 text-white shadow-sm" aria-label="Lokal offline kartpakke">
+        <div ref={containerRef} data-testid="offline-maplibre-container" className="h-80 w-full" />
+        <figcaption className="space-y-1 border-t border-slate-700 bg-slate-950 p-4 text-xs font-semibold text-slate-200">
+          <p>{status}</p>
+          <p>{packageManifest.attribution}</p>
+          <p>Ikke autoritativ navigasjon. Lokale markører og sektorer er beslutningsstøtte og lagres bare i nettleseren.</p>
+        </figcaption>
+      </figure>
+      {fallbackActive && fallback ? (
+        <div aria-label="Skjematisk kartfallback" className="rounded-3xl border border-amber-200 bg-amber-50 p-3">
+          {fallback}
+        </div>
+      ) : null}
+    </div>
   );
 }

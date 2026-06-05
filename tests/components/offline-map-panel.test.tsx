@@ -167,6 +167,19 @@ it('lets an approved PMTiles package be selected, cached and activated', async (
   expect(screen.getByTestId('offline-maplibre-container')).toBeInTheDocument();
 });
 
+it('keeps the schematic fallback when an approved PMTiles package is selected but not cached', async () => {
+  const user = userEvent.setup();
+  mockApprovedLocalMapPackages();
+
+  await renderOfflineMapPanel();
+
+  await user.selectOptions(screen.getByLabelText('Velg lokal kartpakke'), 'trondheim-demo-pmtiles');
+
+  expect(screen.queryByTestId('offline-maplibre-container')).not.toBeInTheDocument();
+  expect(screen.getByTestId('map-performance-guard')).toHaveTextContent(/Ytelsesvern/i);
+  expect(screen.getByTestId('offline-map-cache-status')).toHaveTextContent(/Ingen kartpakke/i);
+});
+
 it('keeps rendered map marker count capped for the large district package', async () => {
   const user = userEvent.setup();
   await renderOfflineMapPanel();

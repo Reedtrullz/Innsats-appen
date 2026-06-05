@@ -426,7 +426,10 @@ export function OfflineMapPanel() {
       ) : null}
 
       {cachedLocalMapPackage ? (
-        <OfflineMapLibreView packageManifest={cachedLocalMapPackage} />
+        <OfflineMapLibreView
+          packageManifest={cachedLocalMapPackage}
+          fallback={<SchematicMap packageId={selectedSchematicPackage.id} state={filteredState} enabledLayers={enabledLayers} />}
+        />
       ) : (
         <SchematicMap packageId={selectedSchematicPackage.id} state={filteredState} enabledLayers={enabledLayers} />
       )}
@@ -453,7 +456,7 @@ export function OfflineMapPanel() {
             <>
               <p className="mt-1">Godkjent lokal PMTiles-pakke fra app-lokal fil.</p>
               <p className="mt-1">PMTiles: {selectedPackage.url}. Stil: {selectedPackage.styleUrl}.</p>
-              <p className="mt-1">Skjematisk kart beholdes som fallback når PMTiles ikke er valgt.</p>
+              <p className="mt-1">Skjematisk kart beholdes som fallback når PMTiles ikke er cachet eller aktivert.</p>
             </>
           ) : (
             <>
@@ -567,7 +570,7 @@ export function OfflineMapPanel() {
         <h2 className="text-xl font-black text-slate-950">Attribusjon og begrensninger</h2>
         <p className="mt-2">{OFFLINE_MAP_ATTRIBUTION}</p>
         <p className="mt-2">{OFFLINE_MAP_LIMITATION_COPY}</p>
-        <p className="mt-2">MVP-en bruker ikke MBTiles, MapLibre, Leaflet, OpenStreetMap-fliser, rå oppstrømsgeometri eller delt live-posisjon.</p>
+        <p className="mt-2">MVP-en bruker bare godkjente app-lokale PMTiles/MapLibre-pakker når de er cachet; ingen MBTiles-runtime, Leaflet, OpenStreetMap-fliser, rå oppstrømsgeometri eller delt live-posisjon.</p>
       </section>
     </section>
   );
