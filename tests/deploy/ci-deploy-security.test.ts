@@ -1,8 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
+function readWorkflow(path: string) {
+  return readFileSync(path, 'utf8');
+}
+
 function readCiWorkflow() {
-  return readFileSync('.github/workflows/ci.yml', 'utf8');
+  return readWorkflow('.github/workflows/ci.yml');
 }
 
 function configureSshStep(workflow: string) {
@@ -39,5 +43,24 @@ describe('CI deploy SSH security', () => {
     expect(mismatchCheckIndex).toBeGreaterThan(-1);
     expect(writeKnownHostsIndex).toBeGreaterThan(mismatchCheckIndex);
     expect(step).not.toMatch(/ssh-keyscan\s+-H\s+198\.23\.137\.16\s+>>\s+~\/\.ssh\/known_hosts/);
+  });
+});
+
+describe('staging deploy verification', () => {
+  it('pins staging SSH host key instead of trusting ssh-keyscan only', () => {
+    const workflow = readWorkflow('.github/workflows/staging.yml');
+
+    expect(workflow).toMatch(/STAGING_SSH_HOST_KEY/);
+    expect(workflow).toMatch(/known_hosts/);
+    expect(workflow).not.toMatch(/ssh-keyscan -H "\$\{STAGING_HOST\}" >> ~\/\.ssh\/known_hosts/);
+  });
+
+  it('verifies staging public health exposes the exact deployed SHA', () => {
+    const workflow = readWorkflow('.github/workflows/staging.yml');
+
+    expect(workflow).toMatch(/Verify staging public deployment version/);
+    expect(workflow).toMatch(/https:\/\/\$\{STAGING_DOMAIN\}\/api\/health/);
+    expect(workflow).toMatch(/github\.sha|GITHUB_SHA/);
+    expect(workflow).toMatch(/version/);
   });
 });
