@@ -34,6 +34,23 @@ Må fortsatt være blokkert før bredere pilot dersom evidence mangler:
 3. Avgrenset øvelse med real-device evidence og supportkanal.
 4. Debrief og beslutning før bredere pilot.
 
+## GitHub deployment governance gate
+
+Before pilot, verify:
+
+- `main` branch has protection enabled.
+- Required status check includes `Automatic checks` for the `CI / Deploy` workflow.
+- Production deploy uses a GitHub `production` environment.
+- Staging deploy uses a GitHub `staging` environment.
+- Direct production pushes remain an owner-managed exception: branch protection currently does not enforce admins, so any direct push must have owner sign-off and must still wait for exact-SHA CI/deploy verification before being called live.
+
+Verified 2026-06-05:
+
+- GitHub environments `production` and `staging` exist for `Reedtrullz/Innsats-appen`.
+- `main` branch protection is enabled with strict required status check `Automatic checks`; force pushes and deletions are disabled.
+- Staging environment variables are configured: `STAGING_SSH_HOST_KEY`, `STAGING_DOMAIN`, `STAGING_PORT`, `STAGING_HOST`, `STAGING_USER`.
+- Manual secret action still required before staging can run: set environment secret `STAGING_SSH_PRIVATE_KEY` in GitHub environment `staging`. The value is private key material and must not be pasted into repo docs, chat, or logs.
+
 ## Felles grense
 
 Beredskapsboka er beslutningsstøtte, ikke et offisielt kommando-, journal- eller varslingssystem. Ikke skriv inn persondata, private posisjoner, reelle Nødnettgrupper eller annen skjermet informasjon. Appen har ingen backend-sync i MVP; lokal ordre, samband og offisielle kilder gjelder alltid.

@@ -158,6 +158,9 @@ jobs:
       - build-and-push
     timeout-minutes: 20
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://innsats.reidar.tech
 
     steps:
       - name: Check out repository

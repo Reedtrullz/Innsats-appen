@@ -34,6 +34,29 @@ gh run list --commit "$(git rev-parse origin/main)" --limit 5 --json databaseId,
 
 The last audited application-code baseline was SHA `1a26acbfc6f72152e14906d3ecc04d424275aee4`; the last documented deployed snapshot before this docs refresh was SHA `1750a377362c44734dd802be8095ad317957f1c9`, verified by GitHub Actions run `27030600338`. See `docs/release/current-deployment-status.md` for details and release-board caveats.
 
+## GitHub deployment governance
+
+GitHub-side governance verified 2026-06-05 for `Reedtrullz/Innsats-appen`:
+
+- Environments `production` and `staging` exist.
+- Production deploy job declares environment `production`.
+- Staging deploy job declares environment `staging`.
+- `main` branch protection is enabled with strict required status check `Automatic checks`; force pushes and deletions are disabled.
+- Admin direct pushes are not blocked by the current protection rule. Treat any direct production push as owner-sign-off only, and never claim live/deployed until the exact pushed SHA has completed CI/deploy successfully and `/api/health.version` matches.
+
+Staging environment configuration:
+
+```text
+STAGING_SSH_PRIVATE_KEY = environment secret for the staging deploy user (manual secret action; do not log or commit)
+STAGING_SSH_HOST_KEY = exact pinned known_hosts line for STAGING_HOST
+STAGING_DOMAIN = staging.innsats.reidar.tech
+STAGING_PORT = 3007
+STAGING_HOST = 198.23.137.16
+STAGING_USER = deploy
+```
+
+As of 2026-06-05, non-secret staging variables are configured in the GitHub `staging` environment. The `STAGING_SSH_PRIVATE_KEY` environment secret still requires manual setup before the staging workflow can run.
+
 ## One-time prerequisites
 
 ### GitHub Actions secret and host key pin
