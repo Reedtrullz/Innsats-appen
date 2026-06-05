@@ -39,11 +39,33 @@ function missionFolderMapText(mapState: MissionMapState) {
   };
 }
 
+function belongsToMission(linkedMissionId: string | undefined, missionId: string) {
+  return !linkedMissionId || linkedMissionId === missionId;
+}
+
+function missionFolderChecklists(checklists: OperationalChecklist[], mission: MissionContext) {
+  const activeIds = new Set(mission.activeChecklistIds ?? []);
+  if (activeIds.size === 0) return checklists;
+  const scoped = checklists.filter((checklist) => activeIds.has(checklist.slug));
+  return scoped.length > 0 ? scoped : checklists;
+}
+
 function missionFolderFieldLogEntries(mission: MissionContext) {
-  return (mission.fieldLogEntries ?? []).map((entry) => ({
-    ...entry,
-    linkedMissionId: undefined,
-  }));
+  return (mission.fieldLogEntries ?? [])
+    .filter((entry) => belongsToMission(entry.linkedMissionId, mission.id))
+    .map((entry) => ({
+      ...entry,
+      linkedMissionId: undefined,
+    }));
+}
+
+function missionFolderRuhReports(mission: MissionContext) {
+  return (mission.ruhReports ?? [])
+    .filter((report) => belongsToMission(report.linkedMissionId, mission.id))
+    .map((report) => ({
+      ...report,
+      linkedMissionId: undefined,
+    }));
 }
 
 export function buildMissionFolderExport(input: {
@@ -56,6 +78,13 @@ export function buildMissionFolderExport(input: {
 }) {
   const generatedAt = input.generatedAt ?? new Date().toISOString();
   const mapState = missionFolderMapState(input.mapState, input.mission.id);
+  const fieldLogEntries = missionFolderFieldLogEntries(input.mission);
+  const scopedMission = {
+    ...input.mission,
+    fieldLogEntries,
+    ruhReports: missionFolderRuhReports(input.mission),
+  };
+  const checklists = missionFolderChecklists(input.checklists, input.mission);
   const reportMapPackage = sanitizeLocalMapPackageSummary(input.mapPackage);
   const mapPackage = reportMapPackage ? {
     packageId: reportMapPackage.id,
@@ -66,7 +95,7 @@ export function buildMissionFolderExport(input: {
   } : undefined;
   assertNoSensitiveOperationalTextInValue({
     mission: {
-      ...input.mission,
+      ...scopedMission,
       externalSignals: undefined,
       externalSignalHistory: undefined,
     },
@@ -79,8 +108,8 @@ export function buildMissionFolderExport(input: {
     } : undefined,
   }, 'missionFolder');
   const afterActionReport = buildAfterActionReport({
-    mission: input.mission,
-    checklists: input.checklists,
+    mission: scopedMission,
+    checklists,
     checklistRuns: input.checklistRuns,
     mapState,
     mapPackage: reportMapPackage,
@@ -94,7 +123,7 @@ export function buildMissionFolderExport(input: {
     mission: missionSummary(input.mission),
     artifacts: {
       afterActionMarkdown: exportAfterActionMarkdown(afterActionReport),
-      fieldLogMarkdown: exportFieldLogMarkdown({ mission: input.mission, entries: missionFolderFieldLogEntries(input.mission) }),
+      fieldLogMarkdown: exportFieldLogMarkdown({ mission: scopedMission, entries: fieldLogEntries }),
       mapGeoJson: geoJsonExportText(mapState),
       mapSvg: buildMapImageSvg(mapState),
       mapFeatureCollection: buildGeoJsonExport(mapState),

@@ -1,5 +1,6 @@
+import type { OperationalChecklist } from '@/lib/content/schemas';
 import { buildMissionFolderExport, exportMissionFolderMarkdown } from '@/lib/mission/mission-folder-export';
-import type { MissionContext } from '@/lib/mission/schemas';
+import type { ChecklistRun, MissionContext } from '@/lib/mission/schemas';
 
 const mission: MissionContext = {
   id: 'folder-mission',
@@ -212,6 +213,96 @@ it('does not create mission-folder map package artifacts from attribution-versio
 
   expect(bundle.artifacts.mapPackage).toBeUndefined();
   expect(exportMissionFolderMarkdown(bundle)).not.toContain('## Kartpakke');
+});
+
+it('filters mission-folder checklists to active mission IDs and hides internal checklist identifiers', () => {
+  const scopedChecklists: OperationalChecklist[] = [
+    {
+      slug: 'active-checklist',
+      title: 'Aktiv sjekkliste',
+      phase: 'etter',
+      roles: ['lagforer'],
+      scenarios: ['generelt'],
+      sourceIds: ['src-active-checklist'],
+      items: [{ id: 'active-required-item', label: 'Aktivt påkrevd punkt', required: true, sourceIds: ['src-active-checklist'] }],
+    },
+    {
+      slug: 'unrelated-checklist',
+      title: 'Urelatert sjekkliste',
+      phase: 'etter',
+      roles: ['lagforer'],
+      scenarios: ['generelt'],
+      sourceIds: ['src-unrelated-checklist'],
+      items: [{ id: 'unrelated-required-item', label: 'Urelatert påkrevd punkt', required: true, sourceIds: ['src-unrelated-checklist'] }],
+    },
+  ];
+  const scopedRuns: ChecklistRun[] = [
+    { id: 'run-active', missionId: mission.id, templateSlug: 'active-checklist', checkedItemIds: [], notesByItemId: {}, equipmentStatusByItemId: {}, updatedAt: '2026-06-04T10:00:00.000Z', schemaVersion: 1 },
+    { id: 'run-unrelated', missionId: mission.id, templateSlug: 'unrelated-checklist', checkedItemIds: [], notesByItemId: {}, equipmentStatusByItemId: {}, updatedAt: '2026-06-04T10:00:00.000Z', schemaVersion: 1 },
+  ];
+
+  const bundle = buildMissionFolderExport({
+    mission: { ...mission, activeChecklistIds: ['active-checklist'] },
+    checklists: scopedChecklists,
+    checklistRuns: scopedRuns,
+    generatedAt: '2026-06-04T11:00:00.000Z',
+  });
+  const exported = `${JSON.stringify(bundle)}\n${exportMissionFolderMarkdown(bundle)}`;
+
+  expect(exported).toContain('Aktiv sjekkliste');
+  expect(exported).toContain('Aktivt påkrevd punkt');
+  expect(exported).not.toContain('Urelatert sjekkliste');
+  expect(exported).not.toContain('Urelatert påkrevd punkt');
+  expect(exported).not.toContain('active-checklist');
+  expect(exported).not.toContain('unrelated-checklist');
+  expect(exported).not.toContain('src-active-checklist');
+  expect(exported).not.toContain('sourceIds');
+});
+
+it('excludes field logs linked to another mission from mission-folder exports', () => {
+  const bundle = buildMissionFolderExport({
+    mission: {
+      ...mission,
+      fieldLogEntries: [
+        { id: 'field-current-folder-scope', timestamp: '2026-06-04T09:15:00.000Z', category: 'observasjon', text: 'Current folder log retained', criticalObservation: false, mustBeForwarded: false, linkedMissionId: mission.id },
+        { id: 'field-other-folder-scope', timestamp: '2026-06-04T09:20:00.000Z', category: 'hms-avvik', text: 'Other folder log must not export', criticalObservation: true, mustBeForwarded: true, linkedMissionId: 'other-mission' },
+      ],
+    },
+    checklists: [],
+    checklistRuns: [],
+    generatedAt: '2026-06-04T11:00:00.000Z',
+  });
+  const exported = `${JSON.stringify(bundle)}\n${exportMissionFolderMarkdown(bundle)}`;
+
+  expect(exported).toContain('Current folder log retained');
+  expect(exported).not.toContain('Other folder log must not export');
+  expect(exported).not.toContain('other-mission');
+  expect(exported).not.toContain('field-other-folder-scope');
+});
+
+it('blocks inline Markdown and HTML injection from mission-folder map package text fields', () => {
+  const bundle = buildMissionFolderExport({
+    mission,
+    checklists: [],
+    checklistRuns: [],
+    mapPackage: {
+      id: 'trondheim-lokal',
+      title: '[Kart](javascript:alert(1))',
+      attribution: '<svg onload=alert(1)>',
+      version: '<v1>',
+      provenance: '<img src=x onerror=alert(1)>',
+    },
+    generatedAt: '2026-06-04T11:00:00.000Z',
+  });
+
+  for (const exported of [JSON.stringify(bundle), exportMissionFolderMarkdown(bundle)]) {
+    expect(exported).not.toContain('javascript:');
+    expect(exported).not.toContain('[Kart](');
+    expect(exported).not.toContain('<img');
+    expect(exported).not.toContain('<svg onload');
+    expect(exported).not.toContain('onerror=');
+    expect(exported).not.toContain('onload=');
+  }
 });
 
 it('rejects mission folder export when included field log contains high-confidence sensitive free text', () => {

@@ -197,8 +197,23 @@ function logEntries(value: string | undefined) {
 }
 
 
+function scopedFieldLogEntries(mission: MissionContext) {
+  return (mission.fieldLogEntries ?? []).filter((entry) => !entry.linkedMissionId || entry.linkedMissionId === mission.id);
+}
+
+function scopedRuhReports(mission: MissionContext) {
+  return (mission.ruhReports ?? []).filter((report) => !report.linkedMissionId || report.linkedMissionId === mission.id);
+}
+
+function scopedChecklistsForMission(checklists: OperationalChecklist[], mission: MissionContext) {
+  const activeIds = new Set(mission.activeChecklistIds ?? []);
+  if (activeIds.size === 0) return checklists;
+  const scoped = checklists.filter((checklist) => activeIds.has(checklist.slug));
+  return scoped.length > 0 ? scoped : checklists;
+}
+
 function structuredFieldLogEntries(mission: MissionContext) {
-  const entries = sortFieldLogEntries(mission.fieldLogEntries ?? []);
+  const entries = sortFieldLogEntries(scopedFieldLogEntries(mission));
   if (entries.length === 0) return undefined;
   return entries.map((entry) => {
     const location = entry.locationText ? ` — ${entry.locationText}` : '';
@@ -259,6 +274,10 @@ const UNSAFE_LOCAL_MAP_PACKAGE_ID_PREFIXES = [
 const UNSAFE_LOCAL_MAP_PACKAGE_TEXT = [
   /https?:\/\//i,
   /:\/\//,
+  /javascript\s*:/i,
+  /\[[^\]]+\]\s*\(/,
+  /<[^>]*>/,
+  /\bon[a-z]+\s*=/i,
   /[\\/]/,
   /\.(?:pmtiles|mbtiles|pbf|mvt|json|geojson|zip|tar|gz)\b/i,
 ];
@@ -470,7 +489,7 @@ export function buildRuhWelfareSummary(mission: MissionContext, equipmentDamageL
   const items: string[] = [];
   const equipmentEntries = equipmentDamageLossEntries ?? mission.resourceRequests.map(resourceEntry).filter(isEquipmentDamageOrLoss);
 
-  for (const entry of sortFieldLogEntries(mission.fieldLogEntries ?? [])) {
+  for (const entry of sortFieldLogEntries(scopedFieldLogEntries(mission))) {
     if (!entry.criticalObservation && !entry.mustBeForwarded) continue;
     const flags = [entry.criticalObservation ? 'kritisk observasjon' : '', entry.mustBeForwarded ? 'må videresendes' : ''].filter(Boolean).join(', ');
     addRuhWelfareItem(items, `Feltlogg (${flags}): ${entry.text}`);
@@ -481,7 +500,7 @@ export function buildRuhWelfareSummary(mission: MissionContext, equipmentDamageL
     addRuhWelfareItem(items, `Skade/tap utstyr (${entry.kindLabel}): ${details.join(' — ') || 'Oppfølging registrert'}`);
   }
 
-  for (const report of [...(mission.ruhReports ?? [])].sort((a, b) => a.timestamp.localeCompare(b.timestamp))) {
+  for (const report of scopedRuhReports(mission).sort((a, b) => a.timestamp.localeCompare(b.timestamp))) {
     if (!report.followUpNeeded && report.risk !== 'hoy') continue;
     addRuhWelfareItem(items, `Lokal RUH (${RUH_CATEGORY_LABELS[report.category]}, risiko ${RUH_RISK_LABELS[report.risk]}): ${report.whatHappened}`);
   }
@@ -541,7 +560,8 @@ function assertAfterActionInputSafe({ mission, checklistRuns, localOrderText, lo
 
 export function buildAfterActionReport({ mission, checklists, checklistRuns, generatedAt, localOrderText, localSambandText, localLogText, mapState, mapPackage }: BuildAfterActionReportInput): AfterActionReport {
   assertAfterActionInputSafe({ mission, checklists, checklistRuns, generatedAt, localOrderText, localSambandText, localLogText, mapState, mapPackage });
-  const reportChecklists = checklistSummaries(checklists, checklistRuns);
+  const scopedChecklists = scopedChecklistsForMission(checklists, mission);
+  const reportChecklists = checklistSummaries(scopedChecklists, checklistRuns);
   const resourceEntries = mission.resourceRequests.map(resourceEntry);
   const equipmentDamageLoss = resourceEntries.filter(isEquipmentDamageOrLoss);
   const localLogSource = localLogText?.trim() ? localLogText : structuredFieldLogEntries(mission);
@@ -599,7 +619,7 @@ export function buildAfterActionReport({ mission, checklists, checklistRuns, gen
       ruhWelfareSummary: buildRuhWelfareSummary(mission, equipmentDamageLoss),
       lessonsLearned: normalizedLessonsLearned(mission.lessonsLearned),
       feedback: normalizedFeedback(mission.feedback),
-      mbkSummary: buildMbkSummary(checklists, checklistRuns, equipmentDamageLoss, resourceEntries),
+      mbkSummary: buildMbkSummary(scopedChecklists, checklistRuns, equipmentDamageLoss, resourceEntries),
     },
   };
 }
@@ -638,7 +658,7 @@ export function exportMbkStatusSummaryMarkdown(report: AfterActionReport) {
   lines.push('');
   lines.push('## Sjekklister');
   for (const checklist of mbk.checklistSummaries) {
-    lines.push(`- ${checklist.title} (${checklist.checklistSlug}): ${checklist.checkedEquipmentItems} sjekket, ${checklist.incompleteRequiredEquipmentItems} påkrevde åpne`);
+    lines.push(`- ${checklist.title}: ${checklist.checkedEquipmentItems} sjekket, ${checklist.incompleteRequiredEquipmentItems} påkrevde åpne`);
   }
   return `${lines.join('\n')}\n`;
 }
@@ -701,14 +721,12 @@ export function exportAfterActionMarkdown(report: AfterActionReport) {
   for (const checklist of report.sections.checklists) {
     lines.push(`### ${checklist.title}`);
     lines.push(`- Status: ${checklist.checkedCount}/${checklist.totalCount} sjekket`);
-    lines.push(`- Kilder: ${checklist.sourceIds.join(', ') || 'Ingen kilder registrert'}`);
     if (checklist.incompleteRequiredItems.length === 0) {
       lines.push('- Ingen ufullstendige påkrevde punkter registrert');
     } else {
       lines.push('- Ufullstendige påkrevde punkter:');
       for (const item of checklist.incompleteRequiredItems) {
-        const sourceSuffix = item.sourceIds.length > 0 ? ` (${item.sourceIds.join(', ')})` : '';
-        lines.push(`  - ${item.label}${item.note ? ` — ${item.note}` : ''}${sourceSuffix}`);
+        lines.push(`  - ${item.label}${item.note ? ` — ${item.note}` : ''}`);
       }
     }
   }
@@ -750,7 +768,7 @@ export function exportAfterActionMarkdown(report: AfterActionReport) {
   return `${lines.join('\n')}\n`;
 }
 
-const AFTER_ACTION_JSON_OMIT_KEYS = new Set(['id', 'objectId', 'linkedMissionId', 'rawRef', 'activeChecklistIds', 'notes', 'note']);
+const AFTER_ACTION_JSON_OMIT_KEYS = new Set(['id', 'objectId', 'linkedMissionId', 'rawRef', 'activeChecklistIds', 'notes', 'note', 'checklistSlug', 'sourceIds']);
 
 function stripInternalExportFields(value: unknown, keyHint?: string): unknown {
   if (Array.isArray(value)) return value.map((item) => stripInternalExportFields(item));

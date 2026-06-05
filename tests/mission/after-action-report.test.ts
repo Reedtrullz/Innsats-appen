@@ -245,6 +245,114 @@ it('keeps RUH and welfare summary ok for routine reminders and positive feedback
   expect(markdown).toContain('Utstyr: Utstyr fungerte');
 });
 
+it('excludes field logs and RUH reports linked to another mission from after-action exports', () => {
+  const report = buildAfterActionReport({
+    mission: {
+      ...mission,
+      id: 'mission-current-scope',
+      resourceRequests: [],
+      fieldLogEntries: [
+        {
+          id: 'field-current-scope',
+          timestamp: '2026-06-03T10:00:00.000Z',
+          category: 'observasjon',
+          text: 'Current mission log retained',
+          linkedMissionId: 'mission-current-scope',
+          criticalObservation: true,
+          mustBeForwarded: true,
+        },
+        {
+          id: 'field-other-scope',
+          timestamp: '2026-06-03T10:05:00.000Z',
+          category: 'hms-avvik',
+          text: 'Other mission critical log must not export',
+          linkedMissionId: 'mission-other-scope',
+          criticalObservation: true,
+          mustBeForwarded: true,
+        },
+      ],
+      ruhReports: [
+        {
+          id: 'ruh-other-scope',
+          timestamp: '2026-06-03T10:10:00.000Z',
+          category: 'hms',
+          whatHappened: 'Other mission RUH must not export',
+          immediateMeasure: 'Handled elsewhere',
+          risk: 'hoy',
+          followUpNeeded: true,
+          linkedMissionId: 'mission-other-scope',
+        },
+      ],
+    },
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+  });
+
+  expect(report.sections.localLog.entries.join('\n')).toContain('Current mission log retained');
+  expect(report.sections.localLog.entries.join('\n')).not.toContain('Other mission critical log must not export');
+  expect(report.sections.ruhWelfareSummary.items.join('\n')).toContain('Current mission log retained');
+  expect(report.sections.ruhWelfareSummary.items.join('\n')).not.toContain('Other mission critical log must not export');
+  expect(report.sections.ruhWelfareSummary.items.join('\n')).not.toContain('Other mission RUH must not export');
+
+  for (const exported of [exportAfterActionMarkdown(report), exportAfterActionJson(report), exportAfterActionPdfReadyHtml(report)]) {
+    expect(exported).toContain('Current mission log retained');
+    expect(exported).not.toContain('Other mission critical log must not export');
+    expect(exported).not.toContain('Other mission RUH must not export');
+    expect(exported).not.toContain('mission-other-scope');
+  }
+});
+
+it('omits internal checklist slugs source ids and item ids from after-action exports', () => {
+  const report = buildAfterActionReport({ mission, checklists, checklistRuns: runs, generatedAt: '2026-06-03T11:00:00.000Z' });
+  const afterActionExports = [
+    exportAfterActionMarkdown(report),
+    exportAfterActionJson(report),
+    exportAfterActionPdfReadyHtml(report),
+  ];
+  const mbkMarkdown = exportMbkStatusSummaryMarkdown(report);
+
+  for (const value of afterActionExports) {
+    expect(value).toContain('Etterkontroll lag');
+    expect(value).toContain('Skade og tap er notert lokalt');
+    expect(value).not.toContain('etterkontroll-lag');
+    expect(value).not.toContain('src-etterkontroll');
+    expect(value).not.toContain('skade-tap-notert');
+    expect(value).not.toContain('checklistSlug');
+    expect(value).not.toContain('sourceIds');
+  }
+  expect(mbkMarkdown).toContain('Etterkontroll lag');
+  expect(mbkMarkdown).not.toContain('etterkontroll-lag');
+  expect(mbkMarkdown).not.toContain('src-etterkontroll');
+  expect(mbkMarkdown).not.toContain('checklistSlug');
+  expect(mbkMarkdown).not.toContain('sourceIds');
+});
+
+it('blocks inline Markdown and HTML injection from map package text fields', () => {
+  const report = buildAfterActionReport({
+    mission,
+    checklists,
+    checklistRuns: runs,
+    generatedAt: '2026-06-03T11:00:00.000Z',
+    mapPackage: {
+      id: 'trondheim-lokal',
+      title: '[Kart](javascript:alert(1))',
+      attribution: '<svg onload=alert(1)>',
+      version: '<v1>',
+      provenance: '<img src=x onerror=alert(1)>',
+    },
+  });
+
+  for (const exported of [exportAfterActionMarkdown(report), exportAfterActionJson(report), exportAfterActionPdfReadyHtml(report)]) {
+    expect(exported).not.toContain('javascript:');
+    expect(exported).not.toContain('[Kart](');
+    expect(exported).not.toContain('<img');
+    expect(exported).not.toContain('<svg');
+    expect(exported).not.toContain('onerror=');
+    expect(exported).not.toContain('onload=');
+  }
+});
+
 it('blocks high-confidence sensitive after-action local order, log, mission and resource notes', () => {
   expect(() => buildAfterActionReport({
     mission,
