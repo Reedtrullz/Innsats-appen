@@ -13,6 +13,9 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await expect(page.getByRole('heading', { name: 'Før', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: /FIG før innsats/i }).first()).toBeVisible();
   await expect(page.getByRole('heading', { name: /Før utrykning samlet kontroll/i }).first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /Start lokalt oppdrag/i })).toHaveAttribute('href', '/oppdrag/ny');
+  await expect(page.getByRole('link', { name: /Klargjør offline kart/i })).toHaveAttribute('href', '/kart');
+  await expect(page.getByRole('link', { name: /Test Feltmodus/i })).toHaveAttribute('href', '/feltmodus');
 
   await page.goto('/under');
   await expect(page.getByRole('heading', { name: 'Under', exact: true })).toBeVisible();
