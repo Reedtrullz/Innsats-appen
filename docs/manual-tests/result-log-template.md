@@ -5,6 +5,11 @@
 - Execution environment: physical device / real-device cloud lab / emulator / Chromium proxy.
 - Date/time:
 - Build SHA:
+- Deployed SHA from `https://innsats.reidar.tech/api/health`:
+- Update-after-offline SHA(s), if applicable: Build A / Build B:
+- Evidence route(s):
+- Sanitized local test data used:
+- Browser-local data cleared after test: yes/no
 - Content version / cache version:
 - URL tested:
 - Device model:
@@ -15,5 +20,5 @@
 - Pass/Fail:
 - Evidence: screenshot/video/log paths with sanitized data only.
 - Defects found:
-- Privacy notes: confirm no persondata, patientdata, private locations, sensitive samband or official operational plans were captured.
+- Privacy notes: confirm no persondata, patientdata, real Nødnett groups, private addresses, skjermede positions, sensitive samband or official operational plans were captured.
 - Follow-up issue/team/date (no person name):

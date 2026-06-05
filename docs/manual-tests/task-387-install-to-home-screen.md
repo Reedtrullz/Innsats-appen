@@ -16,6 +16,15 @@ Evidence fields must include:
 - Screenshot or notes proving links from `/` to `/hurtigkort`, `/sok`, `/oppdrag`, and `/data-pa-enheten` are visible or reachable.
 - Confirmation that only sanitized test mission names/data were used.
 
+## Evidence required
+
+- Device/browser/OS version.
+- Exact deployed SHA from `https://innsats.reidar.tech/api/health`.
+- Screenshots of route markers using sanitized test mission names only.
+- Offline/low-connectivity/update condition used.
+- Pass/fail result and notes.
+- Confirmation that no persondata, patient data, real Nødnett groups, private addresses, or skjermede positions were entered.
+
 ## Steps / Steg
 
 1. On iOS Safari: Share -> Add to Home Screen; on Android Chrome: install prompt/menu.

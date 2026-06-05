@@ -10,6 +10,15 @@
 
 Record pass/fail, device/browser, network state, screenshots or video paths, console/errors if available, and privacy notes. Screenshots must not contain sensitive or personal information.
 
+## Evidence required
+
+- Device/browser/OS version.
+- Exact deployed SHA from `https://innsats.reidar.tech/api/health`.
+- Screenshots of route markers using sanitized test mission names only.
+- Offline/low-connectivity/update condition used.
+- Pass/fail result and notes.
+- Confirmation that no persondata, patient data, real Nødnett groups, private addresses, or skjermede positions were entered.
+
 ## Steps / Steg
 
 1. Use a physical Android device or real-device lab; desktop Chromium emulation is not enough.

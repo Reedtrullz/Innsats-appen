@@ -10,11 +10,11 @@
 | Task 382 | `task-382-etter-innsats-mbk.md` | MBK/unit/export tests support correctness | Manual after-action MBK flow | Manual scenario required |
 | Task 383 | `task-383-offline-use.md` | Offline Playwright covers service worker/cache/fallback | Manual offline smoke on target device/browser | Manual device evidence recommended |
 | Task 384 | `task-384-rain-gloves-darkness-stress.md` | Field-mode/touch-target tests support design | Wet/glove/dark/stress observation notes | Requires field-condition run |
-| Task 385 | `task-385-iphone-safari-real-device.md` | None equivalent | iPhone Safari screenshots/log | Requires physical iPhone or real-device lab |
-| Task 386 | `task-386-android-chrome-real-device.md` | Chromium mobile proxy only | Android Chrome screenshots/log | Requires physical Android or real-device lab |
-| Task 387 | `task-387-install-to-home-screen.md` | Manifest/service-worker tests assert start_url `/` and standalone display | OS-level install and standalone launch evidence for `/` home command surface with links to `/hurtigkort`, `/sok`, `/oppdrag`, `/data-pa-enheten` | Requires physical device |
-| Task 388 | `task-388-low-connectivity.md` | Playwright offline tests support cache behavior | Weak network/cellular/captive-portal style evidence | Requires physical/network lab |
-| Task 389 | `task-389-update-after-offline.md` | SW update unit/E2E supports update prompt | Two-build offline-then-update run evidence | Requires physical device or staged deployment |
+| Task 385 | `task-385-iphone-safari-real-device.md` | None equivalent | iPhone Safari screenshots/log with exact deployed SHA and sanitized mission route markers | Requires physical iPhone or real-device lab |
+| Task 386 | `task-386-android-chrome-real-device.md` | Chromium mobile proxy only | Android Chrome screenshots/log with exact deployed SHA and sanitized mission route markers | Requires physical Android or real-device lab |
+| Task 387 | `task-387-install-to-home-screen.md` | Manifest/service-worker tests assert start_url `/` and standalone display | OS-level install and standalone launch evidence for `/` home command surface with exact deployed SHA and sanitized screenshots of `/hurtigkort`, `/sok`, `/oppdrag`, `/data-pa-enheten` reachability | Requires physical device |
+| Task 388 | `task-388-low-connectivity.md` | Playwright offline tests support cache behavior | Weak network/cellular/captive-portal evidence with exact deployed SHA, condition used, and sanitized route markers | Requires physical/network lab |
+| Task 389 | `task-389-update-after-offline.md` | SW update unit/E2E supports update prompt | Two-build offline-then-update evidence with exact deployed SHA(s), update condition, and sanitized route markers | Requires physical device or staged deployment |
 
 Task 376 is automated import/export roundtrip coverage in `tests/e2e/local-data-import-export-roundtrip.spec.ts`; it is not the browser compatibility matrix. Supplemental browser coverage lives in `browser-compatibility-smoke-matrix.md`.
 
