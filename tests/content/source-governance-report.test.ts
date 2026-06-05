@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { expect, it } from 'vitest';
 import { buildSourceGovernanceReport } from '@/lib/content/source-governance';
 
@@ -102,4 +103,20 @@ it('exposes source governance npm scripts', () => {
   expect(packageJson.scripts['report:source-governance:strict']).toBe(
     'tsx scripts/report-source-governance.ts --strict',
   );
+});
+
+it('keeps strict source-governance output as complete JSON while exiting with gate failure', () => {
+  const result = spawnSync('npx', ['tsx', 'scripts/report-source-governance.ts', '--strict'], {
+    cwd: process.cwd(),
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024 * 10,
+  });
+
+  expect(result.status).toBe(2);
+  expect(result.stderr).toContain('Source governance strict gate failed:');
+  const report = JSON.parse(result.stdout) as ReturnType<typeof buildSourceGovernanceReport>;
+  expect(report.summary.pilotBlockingReferencedSourceCount).toBeGreaterThan(0);
+  expect(JSON.stringify(report)).not.toContain('"body"');
+  expect(JSON.stringify(report)).not.toContain('"owner"');
+  expect(JSON.stringify(report)).not.toContain('"reviewer"');
 });

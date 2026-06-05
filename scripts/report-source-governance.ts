@@ -23,5 +23,5 @@ if (strict && report.findings.pilotBlockingReferencedSources.length > 0) {
   console.error(
     `Source governance strict gate failed: ${report.findings.pilotBlockingReferencedSources.length} referenced sources are not verified, pilot-approved, and public-approved.`,
   );
-  process.exit(2);
+  process.exitCode = 2;
 }
