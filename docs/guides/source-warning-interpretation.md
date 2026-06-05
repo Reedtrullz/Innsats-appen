@@ -21,6 +21,8 @@ Kildefelt har tre ulike betydninger og skal ikke tolkes som samme godkjenning:
 
 Standardverdiene gjør gamle importer kompatible, men godkjenner ikke kilder. `npm run report:source-governance:strict` er derfor fortsatt forventet å feile til faktiske kildegodkjenninger er registrert eksplisitt.
 
+`pilotReviewStatus=rejected-for-pilot` betyr at kilden ikke kan brukes som pilotbelegg for operative kort/sjekklister før den er erstattet eller støttet av primær autoritetskilde. Deep-research-notater er satt slik i pilotpasset 2026-06-05 fordi de er syntetiserte bakgrunnsnotater, ikke primærkilder.
+
 ## Eksterne varsler
 
 MET/NVE/Kartverket/kommune-signaler er kontekst. De blir ikke offisiell ordre i appen, og appen er ikke koblet til Nødvarsel, CIM eller Nødnett.

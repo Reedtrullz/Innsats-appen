@@ -59,6 +59,8 @@ it('uses source review frontmatter when present and safe defaults when missing',
       'reviewer: kari',
       'reviewRisk: high',
       'reviewNotes: Kontrollert mot offentlig prosedyre.',
+      'pilotReviewStatus: approved-for-pilot',
+      'publicationStatus: approved-public',
       '---',
       '# Metadata',
       'Kilde uten lokale stier.',
@@ -80,6 +82,8 @@ it('uses source review frontmatter when present and safe defaults when missing',
     reviewer: 'kari',
     reviewRisk: 'high',
     reviewNotes: 'Kontrollert mot offentlig prosedyre.',
+    pilotReviewStatus: 'approved-for-pilot',
+    publicationStatus: 'approved-public',
   });
 });
 

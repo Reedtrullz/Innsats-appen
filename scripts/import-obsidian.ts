@@ -158,6 +158,8 @@ function sourceReviewMetadata(data: Record<string, unknown>, status: SourceDocum
   const reviewAfter = metadataDate(data.reviewAfter ?? data.review_after) ?? (requiresSchedule ? formatDateOnly(addDays(verifiedDate, 90)) : formatDateOnly(addDays(verifiedDate, 180)));
   const expiresAt = metadataDate(data.expiresAt ?? data.expires_at);
   const reviewNotes = metadataString(data.reviewNotes ?? data.review_notes);
+  const pilotReviewStatus = metadataString(data.pilotReviewStatus ?? data.pilot_review_status);
+  const publicationStatus = metadataString(data.publicationStatus ?? data.publication_status);
   return {
     verifiedAt,
     reviewAfter,
@@ -166,6 +168,8 @@ function sourceReviewMetadata(data: Record<string, unknown>, status: SourceDocum
     reviewer: metadataString(data.reviewer) ?? DEFAULT_SOURCE_REVIEWER,
     reviewRisk,
     ...(reviewNotes ? { reviewNotes } : {}),
+    ...(pilotReviewStatus ? { pilotReviewStatus } : {}),
+    ...(publicationStatus ? { publicationStatus } : {}),
   };
 }
 
