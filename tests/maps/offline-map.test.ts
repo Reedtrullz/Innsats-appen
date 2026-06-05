@@ -15,7 +15,8 @@ import {
 
 it('documents a static schematic MVP approach without tile-provider network policy', () => {
   expect(OFFLINE_MAP_APPROACH.decision).toMatch(/Static schematic local map/i);
-  expect(OFFLINE_MAP_APPROACH.decision).toMatch(/MBTiles\/MapLibre\/Leaflet deferred/i);
+  expect(OFFLINE_MAP_APPROACH.decision).toMatch(/MapLibre\/PMTiles packages/i);
+  expect(OFFLINE_MAP_APPROACH.decision).toMatch(/approved app-local files/i);
   expect(OFFLINE_MAP_APPROACH.networkPolicy).toMatch(/No tile URLs/i);
   expect(OFFLINE_MAP_PACKAGES.every((mapPackage) => mapPackage.estimatedSizeMb > 0)).toBe(true);
 });
