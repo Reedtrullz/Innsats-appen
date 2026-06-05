@@ -154,6 +154,7 @@ it('renders a static offline map with attribution and local-only limitations', a
 });
 
 it('uses larger map controls when field glove mode is enabled', async () => {
+  mockApprovedLocalMapPackages();
   localStorage.setItem(FIELD_MODE_STORAGE_KEY, JSON.stringify({ enabled: true, gloveMode: true, theme: 'day', outdoorReadabilityReviewed: true }));
   await renderOfflineMapPanel();
 
@@ -218,15 +219,18 @@ it('updates map controls when field mode changes while the map is open', async (
 
 it('stores selected map package cache metadata in localStorage and can reset it', async () => {
   const user = userEvent.setup();
+  mockApprovedLocalMapPackages();
+  const cacheLocalMapPackageAssets = mockMapPackageCache({ cached: 2 });
   await renderOfflineMapPanel();
 
-  await user.selectOptions(screen.getByRole('combobox', { name: /Velg lokal kartpakke/i }), 'trondelag-oversikt');
-  expect(screen.getByText(/Cache-varsel: Trøndelag oversiktspakke.*42 MB/i)).toBeInTheDocument();
+  await user.selectOptions(screen.getByRole('combobox', { name: /Velg lokal kartpakke/i }), 'trondheim-demo-pmtiles');
+  expect(screen.getByText(/Cache-varsel: Trondheim demo PMTiles.*12 MB/i)).toBeInTheDocument();
 
   await user.click(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }));
   await waitFor(() => {
-    expect(localStorage.getItem(OFFLINE_MAP_CACHE_STORAGE_KEY)).toContain('trondelag-oversikt');
-    expect(screen.getByTestId('offline-map-cache-status')).toHaveTextContent(/Cachet lokalt: Trøndelag oversiktspakke/i);
+    expect(cacheLocalMapPackageAssets).toHaveBeenCalledWith(approvedPmtilesPackage);
+    expect(localStorage.getItem(OFFLINE_MAP_CACHE_STORAGE_KEY)).toContain('trondheim-demo-pmtiles');
+    expect(screen.getByTestId('offline-map-cache-status')).toHaveTextContent(/Lokal kartpakke aktiv: Trondheim demo PMTiles/i);
   });
 
   await user.click(screen.getByRole('button', { name: /Tilbakestill kartcache/i }));
@@ -247,13 +251,14 @@ it('separates schematic map choices from approved PMTiles packages', async () =>
 
 it('shows quota-aware cache copy before saving a large offline map package', async () => {
   const user = userEvent.setup();
+  mockApprovedLocalMapPackages();
   Object.defineProperty(navigator, 'storage', {
     configurable: true,
     value: { estimate: vi.fn(async () => ({ quota: 50 * 1024 * 1024, usage: 40 * 1024 * 1024 })) },
   });
   await renderOfflineMapPanel();
 
-  await user.selectOptions(screen.getByLabelText('Velg lokal kartpakke'), 'trondelag-oversikt');
+  await user.selectOptions(screen.getByLabelText('Velg lokal kartpakke'), 'trondheim-demo-pmtiles');
 
   expect(await screen.findByText(/kan fortrenge annet offline-innhold/i)).toBeInTheDocument();
   expect(screen.getByText(/tilgjengelig nettleserlagring/i)).toBeInTheDocument();
