@@ -555,6 +555,29 @@ it('shows a local privacy error when GeoJSON import only contains rejected map t
   expect(screen.getByTestId('operations-map-status')).not.toHaveTextContent(/Ingen støttede skjematiske GeoJSON-objekter/i);
 });
 
+it('imports safe GeoJSON features while alerting about privacy-rejected import text', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  await renderOfflineMapPanel();
+
+  fireEvent.change(screen.getByRole('textbox', { name: /Importer GeoJSON/i }), { target: { value: JSON.stringify({
+    type: 'FeatureCollection',
+    coordinateSystem: SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
+    features: [
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [22, 33] }, properties: { itemType: 'marker', kind: 'observation', label: '01017000027' } },
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [44, 55] }, properties: { itemType: 'marker', kind: 'observation', label: 'Trygg import' } },
+    ],
+  }) } });
+  await user.click(screen.getByRole('button', { name: /Importer GeoJSON lokalt/i }));
+
+  expect(await screen.findByRole('alert')).toHaveTextContent(/persondata|pasientdata|identifikator|private/i);
+  expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Importerte 1 lokale kartobjekter/i);
+  expect(readMissionMapState().markers).toHaveLength(1);
+  expect(readMissionMapState().markers[0]).toMatchObject({ label: 'Trygg import', point: { x: 44, y: 55 } });
+  expect(JSON.stringify(readMissionMapState())).not.toContain('01017000027');
+});
+
 it('keeps unsupported GeoJSON-like input on the generic import status path', async () => {
   const user = userEvent.setup();
   await saveMission(activeMission);
