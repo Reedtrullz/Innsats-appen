@@ -142,9 +142,11 @@ test('mission and local export form controls have accessible labels', async ({ p
 
 test('map and field-mode controls expose screen-reader labels', async ({ page }) => {
   await page.goto('/kart');
-  await expect(page.getByRole('region', { name: /Lokale kartpakker/i }).getByRole('combobox', { name: /Velg lokal kartpakke/i })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Tilbakestill kartcache/i })).toBeVisible();
+  const mapPackageRegion = page.getByRole('region', { name: /Lokale kartpakker/i });
+  await expect(mapPackageRegion.getByRole('combobox', { name: /Velg skjematisk kartpakke/i })).toBeVisible();
+  await expect(mapPackageRegion.getByText(/Ingen godkjente PMTiles-pakker er tilgjengelige/i)).toBeVisible();
+  await expect(page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /Tilbakestill kartcache/i })).toHaveCount(0);
 
   const markerRegion = page.getByRole('region', { name: /Lokale markører og lag/i });
   await expect(markerRegion.getByRole('combobox', { name: /Markørtype/i })).toBeVisible();

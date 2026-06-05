@@ -59,10 +59,10 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
   await page.goto('/kart');
   await expect(page.getByRole('heading', { name: 'Kart', exact: true })).toBeVisible();
   await expect(page.getByText(new RegExp(`Aktivt oppdrag: ${missionTitle}`))).toBeVisible();
-  await page.getByRole('combobox', { name: /Velg lokal kartpakke/i }).selectOption('trondelag-oversikt');
-  await expect(page.getByText(/Cache-varsel: Trøndelag oversiktspakke.*42 MB/i)).toBeVisible();
-  await page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }).click();
-  await expect(page.getByTestId('offline-map-cache-status')).toContainText(/Cachet lokalt: Trøndelag oversiktspakke/i);
+  await page.getByRole('combobox', { name: /Velg skjematisk kartpakke/i }).selectOption('trondelag-oversikt');
+  await expect(page.getByTestId('map-performance-guard')).toContainText(/viser maks 12/i);
+  await expect(page.getByText(/Ingen godkjente PMTiles-pakker er tilgjengelige/i)).toBeVisible();
+  await expect(page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toHaveCount(0);
   await page.getByRole('combobox', { name: /Markørtype/i }).selectOption('hazard');
   await page.getByPlaceholder(/Sanitert lokal etikett/i).fill(markerLabel);
   await page.getByRole('spinbutton', { name: /X 0-100/i }).fill('22');
