@@ -1,21 +1,25 @@
 import { expect, test } from '@playwright/test';
+import { clearBrowserLocalState, createLocalMission, waitForServiceWorker } from './helpers';
 
 const mapTileUrlPattern = /(?:\/tiles?\/|\.mbtiles\b|mapbox|openstreetmap|maplibre|leaflet|tile\.openstreetmap)/i;
 
 test('offline map page is local-only, cacheable and tile-free', async ({ page, context }) => {
   const requestedUrls: string[] = [];
   page.on('request', (request) => requestedUrls.push(request.url()));
-  await page.addInitScript(() => {
-    localStorage.removeItem('beredskapsboka-offline-map-cache-v1');
-    localStorage.removeItem('beredskapsboka-operations-map-v1');
+  const missionTitle = `Offline kart ${Date.now()}`;
+
+  await clearBrowserLocalState(page);
+  await createLocalMission(page, {
+    title: missionTitle,
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'generelt',
+    location: 'Skjematisk offlineområde',
   });
 
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Beredskapsboka' })).toBeVisible();
-  await page.waitForFunction(() => 'serviceWorker' in navigator);
-  await page.evaluate(async () => {
-    await navigator.serviceWorker.ready;
-  });
+  await waitForServiceWorker(page);
   await context.setOffline(true);
 
   await page.goto('/kart', { waitUntil: 'domcontentloaded' });
@@ -30,6 +34,7 @@ test('offline map page is local-only, cacheable and tile-free', async ({ page, c
   await context.setOffline(false);
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: 'Kart' })).toBeVisible();
+  await expect(page.getByText(new RegExp(`Aktivt oppdrag: ${missionTitle}`, 'i'))).toBeVisible();
 
   await page.getByRole('combobox', { name: /Velg lokal kartpakke/i }).selectOption('trondelag-oversikt');
   await expect(page.getByText(/Cache-varsel: Trøndelag oversiktspakke.*42 MB/i)).toBeVisible();

@@ -363,7 +363,7 @@ function drawingPointsFromGeometry(kind: MapDrawingKind, geometry: Record<string
   return geometry.coordinates[0].slice(0, MAX_POINTS_PER_DRAWING + 1).map((coords) => Array.isArray(coords) ? normalizeSchematicPoint({ x: coords[0], y: coords[1] }) : null);
 }
 
-export function importGeoJsonText(text: string, now = new Date()): MissionMapState {
+export function importGeoJsonText(text: string, now = new Date(), missionId?: string): MissionMapState {
   let parsed: unknown;
   try {
     parsed = JSON.parse(text);
@@ -371,6 +371,7 @@ export function importGeoJsonText(text: string, now = new Date()): MissionMapSta
     return emptyMissionMapState();
   }
   if (!isRecord(parsed) || parsed.type !== 'FeatureCollection' || parsed.coordinateSystem !== SCHEMATIC_GEOJSON_COORDINATE_SYSTEM || !Array.isArray(parsed.features)) return emptyMissionMapState();
+  const scopedMissionId = sanitizeMapText(missionId, 80);
   const markers: MissionMapMarker[] = [];
   const drawings: MissionMapDrawing[] = [];
   for (const feature of parsed.features.slice(0, MAX_IMPORTED_GEOJSON_FEATURES)) {
@@ -380,7 +381,7 @@ export function importGeoJsonText(text: string, now = new Date()): MissionMapSta
     const note = sanitizeMapText(properties.note, 240);
     if (properties.itemType === 'marker' && MAP_MARKER_KINDS.includes(properties.kind as MapMarkerKind) && feature.geometry.type === 'Point' && Array.isArray(feature.geometry.coordinates)) {
       const point = normalizeSchematicPoint({ x: feature.geometry.coordinates[0], y: feature.geometry.coordinates[1] });
-      if (point) markers.push({ id: stableId('import-marker', now), itemType: 'marker', kind: properties.kind as MapMarkerKind, label, point, ...(note ? { note } : {}), createdAt: now.toISOString() });
+      if (point) markers.push({ id: stableId('import-marker', now), ...(scopedMissionId ? { missionId: scopedMissionId } : {}), itemType: 'marker', kind: properties.kind as MapMarkerKind, label, point, ...(note ? { note } : {}), createdAt: now.toISOString() });
       continue;
     }
     if (properties.itemType === 'drawing' && MAP_DRAWING_KINDS.includes(properties.kind as MapDrawingKind)) {
@@ -388,7 +389,7 @@ export function importGeoJsonText(text: string, now = new Date()): MissionMapSta
       const cleanPoints = drawingPointsFromGeometry(kind, feature.geometry).filter((point): point is SchematicPoint => Boolean(point));
       const withoutClosingDuplicate = cleanPoints.length > 1 && cleanPoints[0].x === cleanPoints.at(-1)?.x && cleanPoints[0].y === cleanPoints.at(-1)?.y ? cleanPoints.slice(0, -1) : cleanPoints;
       const minimumPoints = kind === 'point' ? 1 : kind === 'line' ? 2 : 3;
-      if (withoutClosingDuplicate.length >= minimumPoints) drawings.push({ id: stableId('import-drawing', now), itemType: 'drawing', kind, label, points: withoutClosingDuplicate.slice(0, MAX_POINTS_PER_DRAWING), ...(note ? { note } : {}), createdAt: now.toISOString() });
+      if (withoutClosingDuplicate.length >= minimumPoints) drawings.push({ id: stableId('import-drawing', now), ...(scopedMissionId ? { missionId: scopedMissionId } : {}), itemType: 'drawing', kind, label, points: withoutClosingDuplicate.slice(0, MAX_POINTS_PER_DRAWING), ...(note ? { note } : {}), createdAt: now.toISOString() });
     }
   }
   return normalizeMissionMapState({ markers, drawings });

@@ -280,6 +280,53 @@ it('uses the newest visible marker when the newest stored marker layer is hidden
   });
 });
 
+it('renders, exports and logs only map objects from the active mission', async () => {
+  const user = userEvent.setup();
+  await seedMissions([
+    mission({ id: 'a', title: 'Aktiv kartmission', updatedAt: '2026-06-04T10:00:00.000Z' }),
+    mission({ id: 'b', title: 'Skjult kartmission', updatedAt: '2026-06-04T09:00:00.000Z' }),
+  ]);
+  saveSelectedActiveMissionId('a');
+  localStorage.setItem(OPERATIONS_MAP_STORAGE_KEY, JSON.stringify({
+    markers: [
+      { id: 'marker-a', missionId: 'a', itemType: 'marker', kind: 'hazard', label: 'Fare aktiv', point: { x: 12, y: 34 }, createdAt: '2026-06-04T10:01:00.000Z' },
+      { id: 'marker-b', missionId: 'b', itemType: 'marker', kind: 'observation', label: 'Observasjon skjult', point: { x: 56, y: 78 }, createdAt: '2026-06-04T10:02:00.000Z' },
+    ],
+    drawings: [
+      { id: 'drawing-a', missionId: 'a', itemType: 'drawing', kind: 'sector', label: 'Sektor aktiv', points: [{ x: 10, y: 10 }, { x: 20, y: 10 }, { x: 20, y: 20 }], createdAt: '2026-06-04T10:03:00.000Z' },
+      { id: 'drawing-b', missionId: 'b', itemType: 'drawing', kind: 'sector', label: 'Sektor skjult', points: [{ x: 60, y: 60 }, { x: 70, y: 60 }, { x: 70, y: 70 }], createdAt: '2026-06-04T10:04:00.000Z' },
+    ],
+  }));
+
+  await renderOfflineMapPanel();
+  expect(await screen.findByText(/Aktivt oppdrag: Aktiv kartmission/i)).toBeInTheDocument();
+  expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/Fare — Fare aktiv/i);
+  expect(screen.getByTestId('operations-marker-list')).not.toHaveTextContent(/Observasjon skjult/i);
+
+  await user.click(screen.getByRole('button', { name: /Lag kartbilde/i }));
+  const svgExport = (screen.getByLabelText(/Kartbilde SVG/i) as HTMLTextAreaElement).value;
+  expect(svgExport).toContain('Fare aktiv');
+  expect(svgExport).toContain('Sektor aktiv');
+  expect(svgExport).not.toContain('Observasjon skjult');
+  expect(svgExport).not.toContain('Sektor skjult');
+
+  await user.click(screen.getByRole('button', { name: /Lag GeoJSON eksport/i }));
+  const geoJsonExport = (screen.getByLabelText(/GeoJSON eksport/i) as HTMLTextAreaElement).value;
+  expect(geoJsonExport).toContain('Fare aktiv');
+  expect(geoJsonExport).toContain('Sektor aktiv');
+  expect(geoJsonExport).not.toContain('Observasjon skjult');
+  expect(geoJsonExport).not.toContain('Sektor skjult');
+
+  await user.type(screen.getByLabelText(/Loggtekst fra kartpunkt/i), 'Aktiv kartlogg');
+  await user.click(screen.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i }));
+  await waitFor(async () => {
+    expect(await getMission('a')).toMatchObject({
+      fieldLogEntries: [expect.objectContaining({ mapReference: expect.objectContaining({ label: 'Fare aktiv' }) })],
+    });
+    expect(await getMission('b')).toMatchObject({ fieldLogEntries: [] });
+  });
+});
+
 it('preserves newer local mission updates when saving a field log from the map', async () => {
   const user = userEvent.setup();
   const existingEntry: FieldLogEntry = {
@@ -364,9 +411,11 @@ it('blocks local drawing saves when no active mission exists', async () => {
   });
 });
 
-it('imports supported schematic GeoJSON and documents KML and blue-force as post-MVP', async () => {
+it('imports supported schematic GeoJSON into the active mission and documents KML and blue-force as post-MVP', async () => {
   const user = userEvent.setup();
+  await saveMission(activeMission);
   await renderOfflineMapPanel();
+  expect(await screen.findByText(/Aktivt oppdrag: Kartlogg test/i)).toBeInTheDocument();
 
   fireEvent.change(screen.getByRole('textbox', { name: /Importer GeoJSON/i }), { target: { value: JSON.stringify({
     type: 'FeatureCollection',
@@ -379,7 +428,26 @@ it('imports supported schematic GeoJSON and documents KML and blue-force as post
 
   expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/IL-KO — KO lokal/i);
   expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toContain('il-ko');
+  expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toContain('"missionId":"mission-map-log"');
   expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).not.toContain('drop');
   expect(screen.getByText(/KML-import er ikke implementert i MVP/i)).toBeInTheDocument();
   expect(screen.getByText(/Delt live posisjon\/blue-force tracking skal ikke bygges i MVP/i)).toBeInTheDocument();
+});
+
+it('blocks GeoJSON import when no active mission exists', async () => {
+  const user = userEvent.setup();
+  await renderOfflineMapPanel();
+  expect(await screen.findByText(/Aktivt oppdrag: Ingen aktivt lokalt oppdrag funnet/i)).toBeInTheDocument();
+
+  fireEvent.change(screen.getByRole('textbox', { name: /Importer GeoJSON/i }), { target: { value: JSON.stringify({
+    type: 'FeatureCollection',
+    coordinateSystem: SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
+    features: [
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [22, 33] }, properties: { itemType: 'marker', kind: 'il-ko', label: 'KO uten oppdrag' } },
+    ],
+  }) } });
+  await user.click(screen.getByRole('button', { name: /Importer GeoJSON lokalt/i }));
+
+  expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toBeNull();
+  expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Opprett aktivt oppdrag før du importerer kartobjekter/i);
 });

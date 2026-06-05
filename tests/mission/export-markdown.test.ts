@@ -90,6 +90,8 @@ it('exports local task, quick status and resource summary without raw external p
   expect(markdown).toContain('Ikke legg inn eller del navn, ID, pasientdetaljer, helsejournal');
   expect(markdown).toContain('## Situasjonsoversikt nå');
   expect(markdown).toContain('Kraftig regn: Lokalt sammendrag av varsel');
+  expect(markdown).toContain('- Aktive sjekklister: 1 registrert lokalt');
+  expect(markdown).not.toContain('fig-under-innsats');
   expect(markdown).toContain('- [in-progress] Sikre adkomst fra nord');
   expect(markdown).toContain('- [needs-assistance] Trenger transport av ekstra sperremateriell — Ingen navn');
   expect(markdown).toContain('- på posisjon (2026-06-03T10:02:00.000Z)');

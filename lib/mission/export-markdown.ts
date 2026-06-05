@@ -55,7 +55,7 @@ export function exportMissionStatusSummaryMarkdown({ mission }: { mission: Missi
   lines.push(`- Fase/rolle/scenario: ${mission.phase} / ${mission.role} / ${mission.scenario}`);
   lines.push(`- Sted: ${mission.locationText}`);
   lines.push(`- Oppdatert: ${mission.updatedAt}`);
-  lines.push(`- Aktive sjekklister: ${mission.activeChecklistIds.length > 0 ? mission.activeChecklistIds.join(', ') : 'Ingen registrert'}`);
+  lines.push(`- Aktive sjekklister: ${mission.activeChecklistIds.length > 0 ? `${mission.activeChecklistIds.length} registrert lokalt` : 'Ingen registrert'}`);
   lines.push(`- Åpne oppgaver: ${openTasks.length}`);
   if (mission.notes) lines.push(`- Notater: ${mission.notes}`);
   lines.push('');

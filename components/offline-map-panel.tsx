@@ -36,6 +36,7 @@ import {
   measurePolygonArea,
   mergeMissionMapState,
   missionMapStateSnapshot,
+  mapStateForMission,
   normalizeMissionMapState,
   operationItemsForRender,
   resetMissionMapState,
@@ -171,7 +172,8 @@ export function OfflineMapPanel() {
 
   const selectedPackage = getOfflineMapPackage(selectedPackageId) ?? OFFLINE_MAP_PACKAGES[0];
   const selectedWarning = cacheSizeWarningForPackage(selectedPackage);
-  const filteredState = filterMissionMapStateByLayers(mapState, enabledLayers);
+  const activeMissionMapState = useMemo(() => activeMission ? mapStateForMission(mapState, activeMission.id) : { markers: [], drawings: [] }, [activeMission, mapState]);
+  const filteredState = filterMissionMapStateByLayers(activeMissionMapState, enabledLayers);
 
   useEffect(() => {
     const loadFieldMode = () => {
@@ -314,31 +316,55 @@ export function OfflineMapPanel() {
   }
 
   function resetOperations() {
-    resetMissionMapState();
+    if (!activeMission) {
+      setStatusMessage('Opprett aktivt oppdrag før du nullstiller lokale kartobjekter.');
+      return;
+    }
+    const nextState: MissionMapState = {
+      markers: mapState.markers.filter((marker) => marker.missionId !== activeMission.id),
+      drawings: mapState.drawings.filter((drawing) => drawing.missionId !== activeMission.id),
+    };
     setLastDrawing(undefined);
-    setStatusMessage('Lokale sektorer og markører er nullstilt.');
+    if (nextState.markers.length === 0 && nextState.drawings.length === 0) {
+      resetMissionMapState();
+      setStatusMessage('Lokale sektorer og markører for aktivt oppdrag er nullstilt.');
+      return;
+    }
+    persistState(nextState, 'Lokale sektorer og markører for aktivt oppdrag er nullstilt.');
   }
 
   function exportSvg() {
-    setImageExport(buildMapImageSvg(mapState));
-    appendLocalAuditEntry('export-created', { exportKind: 'map-svg', markerCount: mapState.markers.length, drawingCount: mapState.drawings.length });
-    setStatusMessage('Sanitert SVG kartbilde er generert lokalt.');
+    if (!activeMission) {
+      setStatusMessage('Opprett aktivt oppdrag før du eksporterer lokale kartobjekter.');
+      return;
+    }
+    setImageExport(buildMapImageSvg(activeMissionMapState));
+    appendLocalAuditEntry('export-created', { exportKind: 'map-svg', markerCount: activeMissionMapState.markers.length, drawingCount: activeMissionMapState.drawings.length });
+    setStatusMessage('Sanitert SVG kartbilde er generert lokalt for aktivt oppdrag.');
   }
 
   function exportGeoJson() {
-    setGeoJsonExport(geoJsonExportText(mapState));
-    appendLocalAuditEntry('export-created', { exportKind: 'map-geojson', markerCount: mapState.markers.length, drawingCount: mapState.drawings.length });
-    setStatusMessage('Sanitert GeoJSON er generert lokalt.');
+    if (!activeMission) {
+      setStatusMessage('Opprett aktivt oppdrag før du eksporterer lokale kartobjekter.');
+      return;
+    }
+    setGeoJsonExport(geoJsonExportText(activeMissionMapState));
+    appendLocalAuditEntry('export-created', { exportKind: 'map-geojson', markerCount: activeMissionMapState.markers.length, drawingCount: activeMissionMapState.drawings.length });
+    setStatusMessage('Sanitert GeoJSON er generert lokalt for aktivt oppdrag.');
   }
 
   function importGeoJson() {
-    const imported = importGeoJsonText(geoJsonImport);
+    if (!activeMission) {
+      setStatusMessage('Opprett aktivt oppdrag før du importerer kartobjekter.');
+      return;
+    }
+    const imported = importGeoJsonText(geoJsonImport, new Date(), activeMission.id);
     const count = imported.markers.length + imported.drawings.length;
     if (count === 0) {
       setStatusMessage('Ingen støttede skjematiske GeoJSON-objekter funnet.');
       return;
     }
-    persistState(mergeMissionMapState(mapState, imported), `Importerte ${count} lokale kartobjekter fra GeoJSON.`);
+    persistState(mergeMissionMapState(mapState, imported), `Importerte ${count} lokale kartobjekter fra GeoJSON til aktivt oppdrag.`);
   }
 
   return (
@@ -445,7 +471,7 @@ export function OfflineMapPanel() {
           <label className="text-sm font-bold">Notat uten persondata<textarea name="drawingNote" className="mt-1 min-h-20 w-full rounded-xl border p-3" /></label>
           <button type="submit" className={primaryButtonClass}>Lagre lokal tegning/sektor</button>
         </form>
-        <p className="rounded-2xl bg-slate-50 p-3 text-sm font-black text-slate-800" data-testid="map-measurement-readout">{operationMeasurement(lastDrawing ?? mapState.drawings.at(-1))}</p>
+        <p className="rounded-2xl bg-slate-50 p-3 text-sm font-black text-slate-800" data-testid="map-measurement-readout">{operationMeasurement(lastDrawing ?? activeMissionMapState.drawings.at(-1))}</p>
         <div className="flex flex-wrap gap-3">
           <button type="button" onClick={resetOperations} className="min-h-11 rounded-xl border border-red-300 bg-white px-4 font-black text-red-900">Nullstill lokale sektorer/markører</button>
         </div>
