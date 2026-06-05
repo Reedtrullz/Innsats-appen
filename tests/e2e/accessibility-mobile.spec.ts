@@ -154,7 +154,7 @@ test('map and field-mode controls expose screen-reader labels', async ({ page })
   await expect(markerRegion.getByRole('textbox', { name: /Notat uten persondata/i })).toBeVisible();
   const mapLogRegion = page.getByRole('region', { name: /Logg fra kartpunkt/i });
   await expect(mapLogRegion.getByLabel(/Loggtekst fra kartpunkt/i)).toBeVisible();
-  await expect(mapLogRegion.getByRole('button', { name: /Opprett feltlogg fra kartpunkt/i })).toBeVisible();
+  await expect(mapLogRegion.getByRole('button', { name: /Logg fra nyeste synlige markør/i })).toBeVisible();
 
   const drawingRegion = page.getByRole('region', { name: /Tegneverktøy og sektorer/i });
   await expect(drawingRegion.getByRole('combobox', { name: /Tegnetype/i })).toBeVisible();
@@ -166,6 +166,19 @@ test('map and field-mode controls expose screen-reader labels', async ({ page })
   await expect(exportRegion.getByRole('textbox', { name: /Importer GeoJSON/i })).toBeVisible();
 
   await page.goto('/feltmodus');
+  const fieldQuickActions = page.getByRole('region', { name: /Én trykkflate til operativt arbeid/i });
+  for (const [name, href] of [
+    ['Kart', '/kart'],
+    ['Hurtiglogg', '/oppdrag#hurtiglogg'],
+    ['Aktivt oppdrag', '/oppdrag'],
+    ['Kjør sjekkliste', '/oppdrag#sjekkliste'],
+    ['5-punktsordre', '/oppdrag#5-punktsordre'],
+    ['Sambandsplan', '/oppdrag#sambandsplan'],
+    ['Eksporter status', '/oppdrag#statusrapport'],
+    ['Søk', '/sok#stress-search'],
+  ] as const) {
+    await expect(fieldQuickActions.getByRole('link', { name })).toHaveAttribute('href', href);
+  }
   await expect(page.getByLabel(/Slå på feltmodus/i)).toBeVisible();
   await expect(page.getByLabel(/Hanskemodus/i)).toBeVisible();
   await expect(page.getByRole('group', { name: /Lysmodus/i })).toBeVisible();

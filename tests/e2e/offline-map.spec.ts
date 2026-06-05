@@ -1,10 +1,25 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { expect, test } from '@playwright/test';
+import { expect, test, type TestInfo } from '@playwright/test';
 import { clearBrowserLocalState, createLocalMission, waitForServiceWorker } from './helpers';
 
 const mapTileUrlPattern = /(?:\/tiles?\/|\.mbtiles\b|mapbox|openstreetmap|maplibre|leaflet|tile\.openstreetmap)/i;
 const mapPackageFixtureDir = path.join(process.cwd(), 'public', 'map-packages');
+
+function baseOriginFor(testInfo: TestInfo) {
+  const configuredBaseUrl = testInfo.project.use.baseURL;
+  if (typeof configuredBaseUrl !== 'string') throw new Error('Playwright baseURL must be configured for offline map URL guards.');
+  return new URL(configuredBaseUrl).origin;
+}
+
+function isForbiddenTileProviderRequest(url: string, baseOrigin: string) {
+  const parsedUrl = new URL(url);
+  if (parsedUrl.origin === baseOrigin) {
+    if (parsedUrl.pathname.startsWith('/map-packages/')) return false;
+    return /(?:\/tiles?\/|\.mbtiles\b)/i.test(parsedUrl.pathname);
+  }
+  return mapTileUrlPattern.test(url);
+}
 
 function hasLocalMapPackageFixtures() {
   if (!fs.existsSync(mapPackageFixtureDir)) return false;
@@ -12,7 +27,8 @@ function hasLocalMapPackageFixtures() {
   return entries.some((entry) => entry.endsWith('.pmtiles')) && entries.some((entry) => entry.endsWith('.json'));
 }
 
-test('offline map page is local-only, cacheable and tile-free', async ({ page, context }) => {
+test('offline map page is local-only, cacheable and tile-free', async ({ page, context }, testInfo) => {
+  const baseOrigin = baseOriginFor(testInfo);
   const requestedUrls: string[] = [];
   page.on('request', (request) => requestedUrls.push(request.url()));
   const missionTitle = `Offline kart ${Date.now()}`;
@@ -33,7 +49,7 @@ test('offline map page is local-only, cacheable and tile-free', async ({ page, c
 
   await page.goto('/kart', { waitUntil: 'domcontentloaded' });
   await expect(page.getByText(/offline|frakoblet/i).first()).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Kart' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Kart', exact: true })).toBeVisible();
   await expect(page.getByText(/Schematic local map package, not authoritative navigation/i).first()).toBeVisible();
   await expect(page.getByText(/Ingen eksterne kartfliser/i).first()).toBeVisible();
   await expect(page.getByText(/CacheStorage for offline bruk/i)).toBeVisible();
@@ -47,7 +63,7 @@ test('offline map page is local-only, cacheable and tile-free', async ({ page, c
 
   await context.setOffline(false);
   await page.reload({ waitUntil: 'domcontentloaded' });
-  await expect(page.getByRole('heading', { name: 'Kart' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Kart', exact: true })).toBeVisible();
   await expect(page.getByText(new RegExp(`Aktivt oppdrag: ${missionTitle}`, 'i'))).toBeVisible();
 
   await page.getByRole('combobox', { name: /Velg lokal kartpakke/i }).selectOption('trondelag-oversikt');
@@ -80,5 +96,6 @@ test('offline map page is local-only, cacheable and tile-free', async ({ page, c
   await expect(page.getByText(/KML-import er ikke implementert i MVP/i)).toBeVisible();
   await expect(page.getByText(/Delt live posisjon\/blue-force tracking skal ikke bygges i MVP/i)).toBeVisible();
 
-  expect(requestedUrls.filter((url) => mapTileUrlPattern.test(url))).toEqual([]);
+  const forbiddenTileProviderUrls = requestedUrls.filter((url) => isForbiddenTileProviderRequest(url, baseOrigin));
+  expect(forbiddenTileProviderUrls).toEqual([]);
 });

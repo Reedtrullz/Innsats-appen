@@ -47,6 +47,14 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await expect(page.locator('#hurtiglogg').getByText(/Hurtiglogg · Oppdragstavle/i)).toBeVisible();
   await expect(page.locator('#hurtiglogg')).toBeInViewport();
 
+  await page.goto('/feltmodus');
+  const fieldModeQuickActions = page.getByRole('region', { name: /Én trykkflate til operativt arbeid/i });
+  await expect(fieldModeQuickActions.getByRole('link', { name: 'Kart' })).toHaveAttribute('href', '/kart');
+  await expect(fieldModeQuickActions.getByRole('link', { name: 'Hurtiglogg' })).toHaveAttribute('href', '/oppdrag#hurtiglogg');
+  await fieldModeQuickActions.getByRole('link', { name: 'Hurtiglogg' }).click();
+  await expect(page).toHaveURL(/\/oppdrag#hurtiglogg$/);
+  await expect(page.locator('#hurtiglogg')).toBeInViewport();
+
   await page.goto('/etter');
   await page.getByRole('link', { name: /Åpne etterrapport/i }).click();
   await expect(page).toHaveURL(/\/oppdrag#etterrapport$/);
@@ -101,14 +109,14 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await expect(page.getByLabel(/PDF-klar feltlogg HTML/i)).toHaveValue(/<!doctype html>/i);
 
   await expect(page.getByRole('heading', { name: /RUH og velferd/i })).toBeVisible();
-  await expect(page.getByText(/ikke offisiell HMS\/RUH-innsending/i)).toBeVisible();
+  await expect(page.getByText(new RegExp('ikke offisiell HMS/RUH-innsending', 'i')).first()).toBeVisible();
   await page.getByLabel(/RUH kategori/i).selectOption('nestenulykke');
   await page.getByLabel(/Hva skjedde/i).fill('Nestenulykke ved glatt terskel uten personskade.');
   await page.getByLabel(/Umiddelbart tiltak/i).fill('Tørket område og satt ut varsling.');
   await page.getByLabel(/RUH risiko/i).selectOption('hoy');
   await page.getByLabel(/RUH trenger videre tiltak/i).check();
   await page.getByRole('button', { name: /Legg til RUH/i }).click();
-  await expect(page.getByText(/Nestenulykke ved glatt terskel/i)).toBeVisible();
+  await expect(page.getByText(/Nestenulykke ved glatt terskel/i).first()).toBeVisible();
   await page.getByRole('button', { name: /Lag RUH Markdown/i }).click();
   await expect(page.getByLabel(/RUH Markdown/i)).toHaveValue(/Lokal forenklet RUH/);
   await page.getByRole('button', { name: /Lag RUH JSON/i }).click();
