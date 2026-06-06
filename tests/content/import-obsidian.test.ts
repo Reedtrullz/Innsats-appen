@@ -373,3 +373,85 @@ it('redacts absolute local paths from imported source bodies', async () => {
   expect(serialized).not.toContain('/tmp/beredskapsboka');
   expect(serialized).toContain('[redigert lokal sti]');
 });
+
+it('omits source body from public generated docs until publication is approved', async () => {
+  const fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'beredskapsboka-public-redaction-'));
+  await fs.mkdir(path.join(fixtureRoot, 'source-extracts'), { recursive: true });
+  await fs.writeFile(path.join(fixtureRoot, 'source-extracts', 'SRC - Needs Permission.md'), [
+    '---',
+    'status: verified',
+    'pilotReviewStatus: approved-for-pilot',
+    'publicationStatus: needs-permission',
+    '---',
+    '# Needs Permission',
+    'Sensitive-ish source body that has not been approved for public publication.',
+  ].join('\n'));
+  await fs.writeFile(path.join(fixtureRoot, 'source-extracts', 'SRC - Approved Public.md'), [
+    '---',
+    'status: verified',
+    'pilotReviewStatus: approved-for-pilot',
+    'publicationStatus: approved-public',
+    '---',
+    '# Approved Public',
+    'Approved public excerpt.',
+  ].join('\n'));
+
+  await importObsidianSources(fixtureRoot, {
+    generatedDir: path.join(fixtureRoot, 'generated'),
+    publicAssetsDir: path.join(fixtureRoot, 'assets'),
+    publicGeneratedDir: path.join(fixtureRoot, 'public-generated'),
+  });
+
+  const privateSources = JSON.parse(await fs.readFile(path.join(fixtureRoot, 'generated/source-documents.json'), 'utf8'));
+  const publicSources = JSON.parse(await fs.readFile(path.join(fixtureRoot, 'public-generated/source-documents.json'), 'utf8'));
+
+  expect(privateSources.find((source: any) => source.id === 'src-needs-permission')?.body).toContain('not been approved');
+  expect(publicSources.find((source: any) => source.id === 'src-needs-permission')?.body).toBe('');
+  expect(publicSources.find((source: any) => source.id === 'src-approved-public')?.body).toContain('Approved public excerpt');
+});
+
+it('omits source body from pregenerated public fallback when publication is not approved', async () => {
+  const outputRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'beredskapsboka-pregenerated-redaction-'));
+  const generatedDir = path.join(outputRoot, 'generated');
+  const publicGeneratedDir = path.join(outputRoot, 'public-generated');
+  const publicAssetsDir = path.join(outputRoot, 'assets');
+  await fs.mkdir(generatedDir, { recursive: true });
+  await fs.mkdir(publicAssetsDir, { recursive: true });
+  await fs.writeFile(path.join(generatedDir, 'source-documents.json'), JSON.stringify([
+    {
+      id: 'src-known',
+      title: 'SRC - Known',
+      sourcePath: 'source-extracts/SRC - Known.md',
+      sourceType: 'source-extract',
+      status: 'verified',
+      pilotReviewStatus: 'approved-for-pilot',
+      publicationStatus: 'needs-permission',
+      body: 'Known source body must stay private to generated content.',
+      warnings: [],
+    },
+  ]));
+  await fs.writeFile(path.join(generatedDir, 'manifest.json'), JSON.stringify({
+    contentVersion: '2026-06-04T22:25:38.764Z',
+    generatedAt: '2026-06-04T22:25:38.764Z',
+    sourceSnapshotGeneratedAt: '2026-06-04T22:25:38.764Z',
+    usedPregeneratedFallback: false,
+    sourceCount: 1,
+    actionCardCount: 0,
+    checklistCount: 0,
+    trainingPathCount: 0,
+    protectionMeasureCount: 0,
+    glossaryCount: 0,
+    faqCount: 0,
+    copiedAssetCount: 0,
+  }));
+
+  await importObsidianSources(path.join(outputRoot, 'missing-vault'), {
+    generatedDir,
+    publicAssetsDir,
+    publicGeneratedDir,
+    allowPregenerated: true,
+  });
+
+  const publicSources = JSON.parse(await fs.readFile(path.join(publicGeneratedDir, 'source-documents.json'), 'utf8'));
+  expect(publicSources[0].body).toBe('');
+});
