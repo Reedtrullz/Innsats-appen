@@ -6,6 +6,7 @@ Beredskapsboka is a privacy-preserving offline/PWA MVP. Dependency updates must 
 
 - Review dependency updates at least monthly and before each planned production release.
 - Apply security patches sooner when `npm audit --audit-level=high` reports high/critical issues or when a vendor advisory affects runtime PWA/offline behavior.
+- Track non-release-blocking moderate advisories explicitly instead of hiding them. Current snapshot: `docs/release/dependency-advisory-snapshot.md` records GHSA-qx2v-qp2m-jg93 through Next/PostCSS with no fix available; revisit when Next publishes a patched dependency tree.
 - Keep Node pinned to the CI/runtime major in `.github/workflows/ci.yml` and `package.json` engines. Current policy target: Node 22.
 
 ## Allowed routine updates
