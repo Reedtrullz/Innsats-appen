@@ -127,3 +127,34 @@ it('includes blocked task count in generated task progress summaries', () => {
   expect(item?.notes).toContain('• Run iPhone Safari');
   expect(item?.notes).toContain('• Run update-after-offline');
 });
+
+it('treats active workplans with blocked child tasks as blocked release items', () => {
+  const blockedSnapshot: WorkplansSnapshot = {
+    generatedAt: '2026-06-06T01:25:09.000Z',
+    sourceCount: 1,
+    workplans: [
+      {
+        id: 'pilot-device-evidence',
+        title: 'Pilot Device Evidence',
+        sourcePath: '.hermes/plans/pilot-device-evidence.md',
+        sourceType: 'hermes-plan',
+        summary: 'Collect real-device evidence.',
+        stage: 'release',
+        risk: 'high',
+        status: 'active',
+        taskCount: 2,
+        updatedAt: '2026-06-06T01:25:09.000Z',
+        tasks: [
+          { id: 'pilot-device-evidence-task-1', title: 'Run iPhone Safari', status: 'blocked', stage: 'release', risk: 'high' },
+          { id: 'pilot-device-evidence-task-2', title: 'Run Android Chrome', status: 'blocked', stage: 'release', risk: 'high' },
+        ],
+      },
+    ],
+  };
+
+  const merged = mergeSyncedWorkplansIntoPlan(defaultReleasePlan, blockedSnapshot);
+  expect(merged.items.find((item) => item.id === 'workplan-pilot-device-evidence')).toMatchObject({
+    status: 'blocked',
+    risk: 'high',
+  });
+});

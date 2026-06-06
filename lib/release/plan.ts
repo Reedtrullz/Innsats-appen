@@ -69,6 +69,7 @@ function releaseItemId(workplanId: string) {
 function statusFromWorkplan(workplan: Workplan): WorkStatus {
   if (workplan.status === 'completed') return 'completed';
   if (workplan.status === 'blocked') return 'blocked';
+  if (workplan.tasks.some((task) => task.status === 'blocked')) return 'blocked';
   if (workplan.status === 'active') return 'in-progress';
   return 'needs-work';
 }
