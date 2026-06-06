@@ -26,6 +26,8 @@ Må fortsatt være blokkert før bredere pilot dersom evidence mangler:
 - Task 387: install-to-home-screen.
 - Task 388: low-connectivity.
 - Task 389: update-after-offline.
+- Source governance strict gate: `npm run report:source-governance:strict` must pass, or every remaining referenced unverified/not-approved source must have explicit pilot owner acceptance recorded. Current audit still reports 57 referenced source blockers, so this is not pilot-go evidence.
+- Intended staging DNS: `staging.innsats.reidar.tech` must either resolve publicly or pilot runbooks must explicitly use the verified fallback `staging.198.23.137.16.nip.io` until DNS is created.
 
 ## Faser
 
