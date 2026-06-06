@@ -34,3 +34,18 @@ iPhone Safari works on a physical device; if no device is available, status rema
 ## Privacy / Personvern
 
 No persondata, patientdata, names, IDs, private/skjermede locations, sensitive samband details or official operational plans are entered or captured. The app remains local/offline decision support, not an official command system.
+
+## Execution attempt / status (2026-06-06T00:47:31Z)
+
+Status: blocked — not executed.
+
+Discovery performed from the controller Mac before any manual-device evidence was claimed:
+
+- Staging build available: `https://staging.198.23.137.16.nip.io` with `/api/health.version` = `d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f`.
+- iOS discovery found a paired iPhone entry, but it was offline/unavailable to automation; no iPhone Safari run was performed.
+- Android discovery found no connected Android device and `adb` was not available.
+- No BrowserStack, Sauce Labs, LambdaTest, Appium, or equivalent real-device-cloud credentials/tools were present in the execution environment.
+- Desktop Chromium/Playwright/browser emulation was intentionally not accepted as pass evidence for this task.
+- No persondata, patientdata, real Nødnett groups, private addresses, skjermede positions, sensitive samband or official operational plans were entered or captured.
+
+Required unblocker: connect/unlock the relevant physical device(s) or provide a real-device-cloud lab, then rerun this script and replace this blocked status with sanitized pass/fail evidence.

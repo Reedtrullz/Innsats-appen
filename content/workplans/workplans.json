@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-05T18:56:41.740Z",
+  "generatedAt": "2026-06-06T00:48:03.926Z",
   "sourceCount": 9,
   "planSourceCount": 9,
-  "planSourceHash": "sha256:60f3ebb125902a06113a826e1c3eb030e5d55ef9c4dbdf286a954f722f6b5be5",
+  "planSourceHash": "sha256:1047d21759d7e6c9cc7011803a54609a612bd07d827701e916553635ab500e02",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -860,7 +860,7 @@
         "Imported from Obsidian 20-Workplans.md backlog section with 417 active remaining tasks so repo sync will preserve it instead of erasing it."
       ],
       "taskCount": 417,
-      "updatedAt": "2026-06-04T08:52:37.587Z",
+      "updatedAt": "2026-06-06T00:48:03.926Z",
       "tasks": [
         {
           "id": "2026-06-03_162500-innsats-appen-remaining-expansion-backlog-workplan-task-1",
@@ -4885,7 +4885,7 @@
           "stage": "verify",
           "risk": "high",
           "evidence": [
-            "Blocked awaiting physical iPhone Safari or real-device cloud-lab execution. Repo contains task-385 manual script and browser compatibility matrix; Chromium/Playwright evidence is not a pass for this task."
+            "Still blocked after 2026-06-06T00:47:31Z discovery: staging SHA d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f is available, but the paired iPhone was offline/unavailable and no real-device cloud lab credentials/tools were present. Desktop Chromium/Playwright evidence is not a pass for this task. See docs/manual-tests/task-385-iphone-safari-real-device.md."
           ],
           "sourceHeading": "Task 385: Run real-device testing on iPhone Safari."
         },
@@ -4896,7 +4896,7 @@
           "stage": "verify",
           "risk": "high",
           "evidence": [
-            "Blocked awaiting physical Android Chrome or real-device cloud-lab execution. Repo contains task-386 manual script and browser compatibility matrix; desktop Chromium evidence is not a pass for this task."
+            "Still blocked after 2026-06-06T00:47:31Z discovery: staging SHA d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f is available, but no Android device, adb, Appium, or real-device cloud lab credentials/tools were present. Desktop Chromium evidence is not a pass for this task. See docs/manual-tests/task-386-android-chrome-real-device.md."
           ],
           "sourceHeading": "Task 386: Run real-device testing on Android Chrome."
         },
@@ -4907,7 +4907,7 @@
           "stage": "verify",
           "risk": "high",
           "evidence": [
-            "Blocked awaiting OS-level install-to-home-screen execution on a physical device or real-device lab. Repo contains task-387 manual script and manifest/service-worker tests; automated checks are not a pass for this task."
+            "Still blocked after 2026-06-06T00:47:31Z discovery: staging SHA d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f is available, but no physical/real-device-lab OS-level install-to-home-screen run was possible. Manifest/service-worker tests are not a pass for this task. See docs/manual-tests/task-387-install-to-home-screen.md."
           ],
           "sourceHeading": "Task 387: Run install-to-home-screen testing."
         },
@@ -4918,7 +4918,7 @@
           "stage": "verify",
           "risk": "high",
           "evidence": [
-            "Blocked awaiting weak-network/cellular/network-lab execution. Repo contains task-388 manual script and Playwright offline coverage; offline emulation alone is not a pass for this task."
+            "Still blocked after 2026-06-06T00:47:31Z discovery: staging SHA d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f is available, but no weak-network/cellular/network-lab real-device setup was available. Playwright offline coverage is not a pass for this task. See docs/manual-tests/task-388-low-connectivity.md."
           ],
           "sourceHeading": "Task 388: Run low-connectivity testing."
         },
@@ -4929,7 +4929,7 @@
           "stage": "verify",
           "risk": "high",
           "evidence": [
-            "Blocked awaiting two-build update-after-offline execution on physical device or staged deployment. Repo contains task-389 manual script and service-worker/update tests; no staged/physical run has been captured."
+            "Still blocked after 2026-06-06T00:47:31Z discovery: Build B staging candidate d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f is available, but no Build A/Build B physical-device or real-device-lab update-after-offline run was captured. Service-worker/update tests are not a pass for this task. See docs/manual-tests/task-389-update-after-offline.md."
           ],
           "sourceHeading": "Task 389: Run update-after-offline testing."
         },
