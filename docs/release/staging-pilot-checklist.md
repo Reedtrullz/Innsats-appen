@@ -42,6 +42,7 @@ Current production comparison point: verify the live SHA with `https://innsats.r
 - Staging health endpoint returns the exact SHA from the staging deploy run.
 - Manual smoke on staging covers `/nytt`, `/release`, `/data-pa-enheten`, `/oppdrag`, `/feltmodus` and privacy reset.
 - Rollback command/owner is documented for the staging and production targets.
+- Rollback drill evidence is tracked in `docs/release/rollback-drill-evidence.md`; `Status: not-run` remains a pilot caveat.
 - Real-device evidence for iPhone Safari, Android Chrome, install-to-home-screen, low-connectivity and update-after-offline is attached before final pilot pass.
 
 ## Rollback
