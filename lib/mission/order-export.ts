@@ -1,3 +1,5 @@
+import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+
 export type FivePointOrderTemplateId =
   | 'lagleder-lagforer'
   | 'fig-leder'
@@ -252,12 +254,16 @@ function generatedAt(input: { generatedAt?: string }) {
   return input.generatedAt ?? new Date().toISOString();
 }
 
+function assertExportPayloadSafe(value: unknown, context: string) {
+  assertNoSensitiveOperationalTextInValue(value, context);
+}
+
 function buildFivePointOrderExport(input: FivePointOrderInput) {
   if (input.readbackConfirmed !== true) {
     throw new Error('readbackConfirmed must be true before exporting a 5-punktsordre');
   }
   const template = selectedFivePointOrderTemplate(input.templateId);
-  return {
+  const order = {
     title: '5-punktsordre',
     template: {
       id: template.id,
@@ -288,6 +294,8 @@ function buildFivePointOrderExport(input: FivePointOrderInput) {
       'PDF-klar HTML er bare for nettleserens Skriv ut > Lagre som PDF. Ikke offisiell innsending.',
     ],
   };
+  assertExportPayloadSafe({ points: order.points, notes: order.notes }, 'five-point-order');
+  return order;
 }
 
 export function exportFivePointOrderMarkdown(input: FivePointOrderInput) {
@@ -382,7 +390,7 @@ function buildCommsPlanExport(input: CommsPlanInput) {
   const template = selectedCommsPlanTemplate(input.templateId);
   const primaryChannel = clean(input.primaryChannel) || clean(input.kanalTalegruppe);
   const legacyContactReference = clean(input.telefonIssi);
-  return {
+  const plan = {
     title: 'Sambandsplan',
     localOnly: true,
     template: {
@@ -415,6 +423,8 @@ function buildCommsPlanExport(input: CommsPlanInput) {
       'PDF-klar HTML er bare for nettleserens Skriv ut > Lagre som PDF. Ikke offisiell innsending.',
     ],
   };
+  assertExportPayloadSafe({ fields: plan.fields, notes: plan.notes }, 'sambandsplan');
+  return plan;
 }
 
 export function exportCommsPlanMarkdown(input: CommsPlanInput) {

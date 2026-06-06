@@ -70,3 +70,20 @@ it('accepts only external context signals, not action-card-shaped payloads', () 
   expect(guardExternalContextSignals([{ ...validSignal, rawRef: 'https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=63.4&lon=10.4' }]).ok).toBe(false);
   expect(guardExternalContextSignals([{ ...validSignal, rawRef: 'met:locationforecast?lat=63.4' }]).ok).toBe(false);
 });
+
+it('bounds external context signal array size and public string payloads', () => {
+  expect(guardExternalContextSignals(Array.from({ length: 50 }, () => validSignal)).ok).toBe(true);
+  const tooMany = guardExternalContextSignals(Array.from({ length: 51 }, () => validSignal));
+  expect(tooMany.ok).toBe(false);
+  if (!tooMany.ok) expect(tooMany.error).toMatch(/at most 50/i);
+
+  for (const signal of [
+    { ...validSignal, title: 'x'.repeat(501) },
+    { ...validSignal, summary: 'ok\u0001bad' },
+    { ...validSignal, kind: 'weather\u0007' },
+  ]) {
+    const result = guardExternalContextSignals([signal]);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toMatch(/string|control|characters/i);
+  }
+});

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T04:50:42.223Z",
-  "sourceCount": 10,
-  "planSourceCount": 10,
-  "planSourceHash": "sha256:9303cfa33df10772842adea556a8b3b66451244ce06a5dabb1b288818d82b127",
+  "generatedAt": "2026-06-06T05:20:24.244Z",
+  "sourceCount": 11,
+  "planSourceCount": 11,
+  "planSourceHash": "sha256:6e9f256a4638fb3028ae07a03d53b19b6a4b3923d81c104ed655a92208e30d5a",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6633,6 +6633,76 @@
             "Not executed yet: local HEAD has not been pushed, exact-SHA GitHub Actions/deploy has not completed, and production /api/health.version has not been verified against this HEAD."
           ],
           "sourceHeading": "Task 21: Push, wait for exact CI/deploy, and verify live only when prerequisites are met [PARENT-DIRECT]"
+        }
+      ]
+    },
+    {
+      "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan",
+      "title": "Comprehensive App Review And Hardening Implementation Plan",
+      "sourcePath": ".hermes/plans/2026-06-06_051912-comprehensive-app-review-and-hardening-plan.md",
+      "sourceType": "hermes-plan",
+      "summary": "Review what Beredskapsboka/Innsats-appen currently does, identify what it still needs for credible field/pilot use, implement safe high-value hardening improvements, and finish with a deep self-review.",
+      "stage": "verify",
+      "risk": "high",
+      "status": "active",
+      "taskCount": 7,
+      "updatedAt": "2026-06-06T05:20:24.244Z",
+      "tasks": [
+        {
+          "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-1",
+          "title": "Make release readiness impossible to label as Ready while pilot blockers exist",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "sourceHeading": "Task 1: Make release readiness impossible to label as Ready while pilot blockers exist"
+        },
+        {
+          "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-2",
+          "title": "Cache training detail routes for offline navigation",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 2: Cache training detail routes for offline navigation"
+        },
+        {
+          "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-3",
+          "title": "Recursively reject sensitive free text in generated/public artifacts",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 3: Recursively reject sensitive free text in generated/public artifacts"
+        },
+        {
+          "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-4",
+          "title": "Block sensitive operational text at order/comms export time",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 4: Block sensitive operational text at order/comms export time"
+        },
+        {
+          "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-5",
+          "title": "Bound public context API signal payloads",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 5: Bound public context API signal payloads"
+        },
+        {
+          "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-6",
+          "title": "Sync workplan artifacts and document remaining blockers honestly",
+          "status": "planned",
+          "stage": "idea",
+          "risk": "high",
+          "sourceHeading": "Task 6: Sync workplan artifacts and document remaining blockers honestly"
+        },
+        {
+          "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-7",
+          "title": "Deep self-review and gates",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "sourceHeading": "Task 7: Deep self-review and gates"
         }
       ]
     }

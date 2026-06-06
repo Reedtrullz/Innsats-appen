@@ -18,6 +18,7 @@ import {
 } from '@/lib/content/schemas';
 import { WorkplansSnapshotSchema } from '@/lib/workplans/schemas';
 import { containsSensitiveStructuredKey } from '@/lib/content/source-policy';
+import { detectSensitiveOperationalText } from '@/lib/privacy/sensitive-text';
 import { buildContentCoverageReport as buildCoverageReport } from '@/lib/content/coverage-report';
 import { competenceCodes, equipmentTerms, roles, scenarios } from '@/lib/content/taxonomy';
 
@@ -156,6 +157,68 @@ function validateRestrictedShelterLocationSurfaces(errors: string[], graph: Grap
     publicGraph: graph.publicGraph,
   })) {
     if (items !== undefined) validateRestrictedShelterLocationText(errors, items, key);
+  }
+}
+
+function looksLikeGenericPolicyWarning(value: string) {
+  return /\b(?:ikke|ingen|uten|aldri|nei|skal ikke|må ikke|unngå)\b/i.test(value) && !/[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}|\+47\s*(?:\d[\s.-]?){8}|\d{2}[.,]\d{3,}|\b\d{1,5}\s*[A-Za-z]?\b/u.test(value);
+}
+
+function shouldIgnoreSensitiveOperationalText(value: string, currentPath: string, kind: string) {
+  const normalized = value.trim().toLowerCase();
+  if ((kind === 'shielded-location' || kind === 'private-location') && /(?:^|\.)aliases\[\d+\]$/.test(currentPath) && /^(?:skjermet lokasjon|skjermet adresse|private data|privat adresse)$/.test(normalized)) return true;
+  if ((kind === 'shielded-location' || kind === 'private-location') && looksLikeGenericPolicyWarning(value)) return true;
+  return false;
+}
+
+function validateSensitiveOperationalText(errors: string[], value: unknown, currentPath: string, seen = new WeakSet<object>()) {
+  if (typeof value === 'string') {
+    const match = detectSensitiveOperationalText(value);
+    if (match && !shouldIgnoreSensitiveOperationalText(value, currentPath, match.kind)) errors.push(`${currentPath} contains sensitive operational text (${match.kind})`);
+    return;
+  }
+  if (Array.isArray(value)) {
+    if (seen.has(value)) return;
+    seen.add(value);
+    value.forEach((item, index) => validateSensitiveOperationalText(errors, item, `${currentPath}[${index}]`, seen));
+    return;
+  }
+  if (!value || typeof value !== 'object') return;
+  if (seen.has(value)) return;
+  seen.add(value);
+  for (const [key, child] of Object.entries(value)) {
+    validateSensitiveOperationalText(errors, child, `${currentPath}.${key}`, seen);
+  }
+}
+
+function sourceSurfaceForSensitiveValidation(source: any) {
+  if (source?.publicationStatus === 'approved-public') return source;
+  const { body: _body, ...withoutBody } = source ?? {};
+  return withoutBody;
+}
+
+function validateSensitiveOperationalTextSurfaces(errors: string[], graph: GraphInput) {
+  const generatedSources = (graph.sources ?? []).map(sourceSurfaceForSensitiveValidation);
+  for (const [key, items] of Object.entries({
+    sources: generatedSources,
+    actionCards: graph.actionCards,
+    checklists: graph.checklists,
+    trainingPaths: graph.trainingPaths,
+    protectionMeasures: graph.protectionMeasures,
+    glossary: graph.glossary,
+    faq: graph.faq,
+    equipmentTaxonomy: graph.equipmentTaxonomy,
+    exportTemplates: graph.exportTemplates,
+    imageMetadata: graph.imageMetadata,
+    localOverlays: graph.localOverlays,
+    changelog: graph.changelog,
+    mustRead: graph.mustRead,
+    workplans: graph.workplans,
+    manifest: graph.manifest,
+    searchIndex: graph.searchIndex,
+    publicGraph: graph.publicGraph,
+  })) {
+    if (items !== undefined) validateSensitiveOperationalText(errors, items, key);
   }
 }
 
@@ -494,6 +557,7 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
   const sensitiveKeys = containsSensitiveStructuredKey(graph);
   sensitiveKeys.forEach((key) => errors.push(`generated content exposes sensitive structured key ${key}`));
   validateRestrictedShelterLocationSurfaces(errors, graph);
+  validateSensitiveOperationalTextSurfaces(errors, graph);
   validateGeneratedArtifacts(errors, graph);
   return errors;
 }

@@ -150,14 +150,16 @@ async function fetchGeneratedJson(cache, url) {
 }
 
 async function discoverGeneratedRoutes(cache) {
-  const [cards, sources, images] = await Promise.all([
+  const [cards, sources, trainingPaths, images] = await Promise.all([
     fetchGeneratedJson(cache, '/generated-content/action-cards.json'),
     fetchGeneratedJson(cache, '/generated-content/source-documents.json'),
+    fetchGeneratedJson(cache, '/generated-content/training-paths.json'),
     fetchGeneratedJson(cache, '/generated-content/image-metadata.json'),
   ]);
   return [
     ...cards.map((card) => card && card.slug ? `/kort/${encodeURIComponent(card.slug)}` : null),
     ...sources.map((source) => source && source.id ? `/kilder/${encodeURIComponent(source.id)}` : null),
+    ...trainingPaths.map((trainingPath) => trainingPath && trainingPath.slug ? `/laering/${encodeURIComponent(trainingPath.slug)}` : null),
     ...images.map((image) => image && image.publicPath && image.approvedForPublication === true ? image.publicPath : null),
   ].filter(Boolean);
 }

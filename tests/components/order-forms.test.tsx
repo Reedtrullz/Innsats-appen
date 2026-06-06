@@ -78,6 +78,20 @@ it('clears stale 5-punktsordre export preview when order text changes', async ()
   expect(screen.queryByText(/Situasjon første/i)).not.toBeInTheDocument();
 });
 
+it('blocks 5-punktsordre preview when sensitive text is entered', async () => {
+  render(<FivePointOrderForm contentVersion="test-content-ui" />);
+
+  for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
+    await userEvent.type(screen.getByLabelText(new RegExp(label, 'i')), `${label} tekst`);
+  }
+  await userEvent.type(screen.getByLabelText(/Notes/i), 'Pasient Ola Nordmann skal følges opp');
+  await userEvent.click(screen.getByLabelText(/tilbakelesing\/forstått er bekreftet/i));
+  await userEvent.click(screen.getByRole('button', { name: /Eksporter Markdown/i }));
+
+  expect(await screen.findByText(/Eksport blokkert/i)).toBeInTheDocument();
+  expect(screen.queryByText(/# 5-punktsordre/i)).not.toBeInTheDocument();
+});
+
 it('requires expanded sambandsplan fields and renders Markdown/JSON/PDF-ready previews', async () => {
   render(<CommsPlanForm contentVersion="test-content-ui-comms" />);
   expect(screen.getByText(/lagres bare lokalt/i)).toBeInTheDocument();
@@ -156,6 +170,22 @@ it('clears stale sambandsplan export preview when fields change', async () => {
 
   expect(screen.queryByText(/# Sambandsplan/i)).not.toBeInTheDocument();
   expect(screen.queryByText(/Primær første/i)).not.toBeInTheDocument();
+});
+
+it('blocks sambandsplan preview when sensitive contact text is entered', async () => {
+  render(<CommsPlanForm contentVersion="test-content-ui-comms" />);
+  await userEvent.type(screen.getByLabelText(/Primær kanal\/talegruppe/i), 'Primær etter lokal plan');
+  await userEvent.type(screen.getByLabelText(/Fallback kanal\/kontaktmetode/i), 'Fallback etter lokal plan');
+  await userEvent.type(screen.getByLabelText(/Kallesignal/i), 'FIG Leder');
+  await userEvent.type(screen.getByLabelText(/IL-KO kontakt/i), '+47 99999999');
+  await userEvent.type(screen.getByLabelText(/Distrikt\/beredskapsvakt kontakt/i), 'Distrikt kontaktpunkt');
+  await userEvent.type(screen.getByLabelText(/Innsjekkingsintervall/i), '30 min');
+  await userEvent.type(screen.getByLabelText(/Prosedyre ved bortfall av samband/i), 'Fallback først');
+  await userEvent.type(screen.getByLabelText(/Batteri-\/ladestatus/i), 'Fulladet');
+  await userEvent.click(screen.getByRole('button', { name: /Eksporter Markdown/i }));
+
+  expect(await screen.findByText(/Eksport blokkert/i)).toBeInTheDocument();
+  expect(screen.queryByText(/# Sambandsplan/i)).not.toBeInTheDocument();
 });
 
 it('mounts order and comms forms in the mission route', () => {

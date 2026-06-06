@@ -97,6 +97,49 @@ it('blocks private shelter structured fields and location patterns from generate
   expect(joined).toContain('protectionMeasures[1].dataWarnings[0] appears to publish restricted shelter location details');
 });
 
+it('rejects sensitive free text anywhere in generated or public generated artifacts', async () => {
+  const errors = await validateContentGraph({
+    sources: [
+      knownSource,
+      { ...knownSource, id: 'src-public-sensitive', title: 'Public sensitive source', sourcePath: 'source-extracts/SRC - Public Sensitive.md', publicationStatus: 'approved-public', body: 'Pasient Ola Nordmann skal følges opp' },
+      { ...knownSource, id: 'src-private-raw', title: 'Private raw source', sourcePath: 'source-extracts/SRC - Private Raw.md', publicationStatus: 'needs-permission', body: 'Dersom materiell feiler, kontakt beredskap.siv@dsb.no.' },
+    ],
+    actionCards: [{ slug: 'sensitive-card', title: 'Sensitive card', phase: 'under', roles: ['lagforer'], scenarios: ['generelt'], priority: 'high', steps: ['Pasient Ola Nordmann skal følges opp'], sourceIds: ['src-known'], warning: 'Kildevarsel' }],
+    checklists: [],
+    trainingPaths: [],
+    protectionMeasures: [],
+    glossary: [],
+    faq: [],
+    equipmentTaxonomy: [],
+    exportTemplates: [],
+    imageMetadata: [],
+    localOverlays: [],
+    changelog: [],
+    mustRead: [],
+    publicGraph: {
+      sources: [knownSource],
+      actionCards: [],
+      checklists: [],
+      trainingPaths: [],
+      protectionMeasures: [],
+      glossary: [],
+      faq: [],
+      equipmentTaxonomy: [],
+      exportTemplates: [],
+      imageMetadata: [],
+      localOverlays: [],
+      changelog: [],
+      mustRead: [{ id: 'public-sensitive', title: 'Sensitive public notice', body: 'Ring +47 99999999 for privat adresse', severity: 'warning', changedAt: '2026-06-03' }],
+    },
+  } as any);
+  const joined = errors.join('\n');
+
+  expect(joined).toContain('sources[1].body contains sensitive operational text (patient-reference)');
+  expect(joined).toContain('actionCards[0].steps[0] contains sensitive operational text (patient-reference)');
+  expect(joined).toContain('publicGraph.mustRead[0].body contains sensitive operational text (contact-reference)');
+  expect(joined).not.toContain('sources[2].body contains sensitive operational text');
+});
+
 it('does not treat a generic shelter policy warning plus unrelated address as a restricted shelter location leak', async () => {
   const errors = await validateContentGraph({
     sources: [

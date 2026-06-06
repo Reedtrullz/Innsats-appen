@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import manifest from '@/app/manifest';
-import { GENERATED_CONTENT_ROUTES, STATIC_APP_SHELL_ROUTES } from '@/lib/offline/static-app-shell';
+import { GENERATED_CONTENT_ROUTES, GENERATED_ROUTE_DISCOVERY_ENDPOINTS, STATIC_APP_SHELL_ROUTES } from '@/lib/offline/static-app-shell';
 import {
   GENERATED_CONTENT_STALE_MS,
   SW_CACHE_VERSION,
@@ -30,6 +30,7 @@ describe('service worker metadata helpers', () => {
     expect(GENERATED_CONTENT_ROUTES.every((route) => route.startsWith('/generated-content/'))).toBe(true);
     expect(staticAppShell.some((route) => /^\/api\//.test(route))).toBe(false);
     expect(staticAppShell.some((route) => /^\/content\//.test(route))).toBe(false);
+    expect(GENERATED_ROUTE_DISCOVERY_ENDPOINTS).toContain('/generated-content/training-paths.json');
   });
 
   it('treats app-local map package assets as offline cacheable runtime assets', () => {

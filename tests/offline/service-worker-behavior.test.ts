@@ -28,6 +28,9 @@ describe('service worker offline behavior', () => {
       if (url === '/generated-content/source-documents.json') {
         return Response.json([{ id: 'src-test doc' }, { title: 'invalid source without id' }]);
       }
+      if (url === '/generated-content/training-paths.json') {
+        return Response.json([{ slug: 'fig10-grunnkurs' }, { title: 'invalid training path without slug' }]);
+      }
       if (url === '/generated-content/image-metadata.json') {
         return Response.json([
           { publicPath: '/content-assets/approved-image.png', approvedForPublication: true },
@@ -70,6 +73,7 @@ describe('service worker offline behavior', () => {
     expect(cachedUrls).toEqual(expect.arrayContaining([...STATIC_APP_SHELL_ROUTES]));
     expect(cachedUrls).toContain('/kort/alpha%20beta');
     expect(cachedUrls).toContain('/kilder/src-test%20doc');
+    expect(cachedUrls).toContain('/laering/fig10-grunnkurs');
     expect(cachedUrls).toContain('/content-assets/approved-image.png');
     expect(cachedUrls).not.toContain('/content-assets/private-image.png');
     expect(cachedUrls).toContain('/generated-content/action-cards.json');

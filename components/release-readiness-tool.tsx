@@ -66,6 +66,7 @@ interface CoverageGap {
 
 interface CoverageReportSnapshot {
   generatedAt?: string;
+  fallback?: boolean;
   releaseBoard: { gaps: CoverageGap[] };
 }
 
@@ -88,6 +89,7 @@ function normalizeCoverageReportSnapshot(value: unknown): CoverageReportSnapshot
   const gaps = Array.isArray(releaseBoard.gaps) ? releaseBoard.gaps.filter(isCoverageGap) : [];
   return {
     generatedAt: typeof record.generatedAt === 'string' ? record.generatedAt : undefined,
+    fallback: record.fallback === true,
     releaseBoard: { gaps },
   };
 }
@@ -221,13 +223,17 @@ export function ReleaseReadinessTool() {
       const response = await fetch('/generated-content/content-coverage-report.json', { cache: 'no-store' });
       if (!response.ok) throw new Error(`Failed to load content coverage report: ${response.status}`);
       const snapshot = normalizeCoverageReportSnapshot(await response.json());
+      if (snapshot.fallback) throw new Error('Generated content fallback is not release evidence');
       if (cancelled) return;
       setCoverageReport(snapshot);
       setCoverageError(null);
     }
 
     loadCoverageReport().catch(() => {
-      if (!cancelled) setCoverageError('Content coverage report is unavailable. Run npm run validate:content locally.');
+      if (!cancelled) {
+        setCoverageReport(null);
+        setCoverageError('Content coverage report is unavailable. Run npm run validate:content locally before assessing pilot readiness.');
+      }
     });
 
     return () => {
@@ -255,6 +261,17 @@ export function ReleaseReadinessTool() {
   const completedItems = plan.items.filter((item) => item.status === 'completed');
   const syncedWorkplans = workplansSnapshot?.workplans ?? [];
   const coverageGaps = coverageReport?.releaseBoard?.gaps ?? [];
+  const highCoverageGaps = coverageGaps.filter((gap) => gap.severity === 'high');
+  const highCoverageGapCount = highCoverageGaps.reduce((sum, gap) => sum + gap.count, 0);
+  const pilotBlockerCoverageCount = highCoverageGaps
+    .filter((gap) => gap.id.startsWith('source-governance-'))
+    .reduce((sum, gap) => sum + gap.count, 0);
+  const effectivePilotBlockerCount = pilotBlockerCoverageCount || highCoverageGapCount;
+  const hasCoverageReport = coverageReport !== null;
+  const hasHighCoverageGaps = highCoverageGaps.length > 0;
+  const hasPilotBlockingCoverageGaps = !hasCoverageReport || hasHighCoverageGaps;
+  const readinessLabel = !hasCoverageReport ? 'Dekning ukjent' : hasHighCoverageGaps ? 'Ikke pilotklar' : summary.score >= 80 ? 'Ready' : summary.score >= 55 ? 'Close' : 'Needs work';
+  const readinessTone = hasPilotBlockingCoverageGaps ? 'text-red-700' : 'text-blue-600';
   const attentionItems = activeItems
     .filter((item) => item.status === 'blocked' || item.risk !== 'low')
     .slice(0, 4);
@@ -322,7 +339,9 @@ export function ReleaseReadinessTool() {
                 <div className="grid h-36 w-36 place-items-center rounded-full bg-white text-center shadow-inner">
                   <div>
                     <p className="text-4xl font-black">{summary.score}%</p>
-                    <p className="text-base font-black text-blue-600">{summary.score >= 80 ? 'Ready' : summary.score >= 55 ? 'Close' : 'Needs work'}</p>
+                    <p className={`text-base font-black ${readinessTone}`}>{readinessLabel}</p>
+                    {hasHighCoverageGaps ? <p className="mt-1 rounded-full bg-red-100 px-2 py-1 text-xs font-black text-red-700">{effectivePilotBlockerCount} pilot blocker{effectivePilotBlockerCount === 1 ? '' : 's'}</p> : null}
+                    {!hasCoverageReport ? <p className="mt-1 rounded-full bg-red-100 px-2 py-1 text-xs font-black text-red-700">Dekning ikke verifisert</p> : null}
                   </div>
                 </div>
               </div>
@@ -395,7 +414,8 @@ export function ReleaseReadinessTool() {
                   const progress = workstreamProgress(plan, stage.id);
                   const next = stageItems.find((item) => item.status !== 'completed') ?? stageItems[0];
                   const owner = next?.owner ?? 'AR';
-                  const atRisk = stageItems.some((item) => item.status === 'blocked' || item.risk === 'high');
+                  const atRisk = hasPilotBlockingCoverageGaps || stageItems.some((item) => item.status === 'blocked' || item.risk === 'high');
+                  const stageRiskLabel = hasPilotBlockingCoverageGaps ? 'Pilot blockers' : atRisk ? 'At Risk' : 'On Track';
                   return (
                     <article key={stage.id} className="grid grid-cols-1 gap-3 px-3 py-4 md:grid-cols-[minmax(10rem,1fr)_8rem_minmax(11rem,1fr)_7rem_8rem] md:items-center">
                       <div className="flex items-center gap-4">
@@ -416,7 +436,7 @@ export function ReleaseReadinessTool() {
                         <p className="text-sm font-semibold text-slate-500">{stage.description}</p>
                       </div>
                       <span className={`inline-grid h-11 w-11 place-items-center rounded-full text-sm font-black ${ownerColor(owner)}`}>{owner}</span>
-                      <p className={`font-black ${atRisk ? 'text-orange-600' : 'text-emerald-600'}`}>{atRisk ? 'At Risk' : 'On Track'}</p>
+                      <p className={`font-black ${hasPilotBlockingCoverageGaps ? 'text-red-700' : atRisk ? 'text-orange-600' : 'text-emerald-600'}`}>{stageRiskLabel}</p>
                     </article>
                   );
                 })}
@@ -518,7 +538,9 @@ export function ReleaseReadinessTool() {
             <section>
               <h2 className="text-2xl font-black">Needs Attention</h2>
               <div className="mt-3 divide-y divide-slate-200 border-t border-slate-200">
-                {attentionItems.length === 0 ? <p className="py-6 text-sm font-semibold text-slate-500">No active risks on the board.</p> : null}
+                {hasHighCoverageGaps ? <p className="py-6 text-sm font-semibold text-red-700">Pilot blockers from content coverage must be resolved or explicitly accepted before pilot-go.</p> : null}
+                {!hasCoverageReport ? <p className="py-6 text-sm font-semibold text-red-700">Content coverage report is missing or fallback-only; pilot readiness is not verified.</p> : null}
+                {hasCoverageReport && !hasHighCoverageGaps && attentionItems.length === 0 ? <p className="py-6 text-sm font-semibold text-slate-500">No active risks on the board.</p> : null}
                 {attentionItems.map((item) => {
                   const tone = attentionTone(item);
                   return (
@@ -551,7 +573,7 @@ export function ReleaseReadinessTool() {
               <h2 className="text-2xl font-black">Content coverage gaps</h2>
               <p className="mt-1 text-sm font-semibold text-slate-600">{coverageReport?.generatedAt ? `Report: ${coverageReport.generatedAt}` : coverageError ?? 'Waiting for generated coverage report.'}</p>
               <div className="mt-3 space-y-3">
-                {coverageGaps.length === 0 ? <p className="rounded-xl bg-white p-3 text-sm font-semibold text-slate-600">No release-board content coverage gaps reported.</p> : null}
+                {hasCoverageReport && coverageGaps.length === 0 ? <p className="rounded-xl bg-white p-3 text-sm font-semibold text-slate-600">No release-board content coverage gaps reported.</p> : null}
                 {coverageGaps.map((gap) => (
                   <article key={gap.id} className="rounded-xl bg-white p-3">
                     <div className="flex items-start justify-between gap-3">

@@ -31,6 +31,8 @@ interface FivePointOrderFormProps {
   contentVersion?: string;
 }
 
+const EXPORT_BLOCKED_MESSAGE = 'Eksport blokkert: Fjern persondata, pasientdata, kontaktopplysninger eller skjermet informasjon før lokal eksport.';
+
 function buildInput(form: FormData, contentVersion: string): FivePointOrderInput {
   return {
     templateId: value(form, 'templateId') as FivePointOrderTemplateId,
@@ -49,6 +51,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
   const [templateId, setTemplateId] = useState<FivePointOrderTemplateId>('lagleder-lagforer');
   const [readbackConfirmed, setReadbackConfirmed] = useState(false);
   const [preview, setPreview] = useState<ExportPreview | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
   const template = selectedTemplate(templateId);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -59,20 +62,23 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
 
     const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
     const format = (submitter?.value as ExportFormat | undefined) ?? 'markdown';
-    appendLocalAuditEntry('export-created', { exportKind: `five-point-order-${format}`, templateId: input.templateId, readbackConfirmed: input.readbackConfirmed });
-    if (format === 'json') {
-      setPreview({ format, text: exportFivePointOrderJson(input) });
-      return;
+    try {
+      const nextPreview = format === 'json'
+        ? { format, text: exportFivePointOrderJson(input) }
+        : format === 'pdf'
+          ? { format, text: exportFivePointOrderPdfReadyHtml(input) }
+          : { format: 'markdown' as const, text: exportFivePointOrderMarkdown(input) };
+      appendLocalAuditEntry('export-created', { exportKind: `five-point-order-${format}`, templateId: input.templateId, readbackConfirmed: input.readbackConfirmed });
+      setExportError(null);
+      setPreview(nextPreview);
+    } catch {
+      setPreview(null);
+      setExportError(EXPORT_BLOCKED_MESSAGE);
     }
-    if (format === 'pdf') {
-      setPreview({ format, text: exportFivePointOrderPdfReadyHtml(input) });
-      return;
-    }
-    setPreview({ format: 'markdown', text: exportFivePointOrderMarkdown(input) });
   }
 
   return (
-    <form onSubmit={onSubmit} onChange={() => setPreview(null)} className="space-y-4 rounded-3xl bg-white p-5 shadow-sm">
+    <form onSubmit={onSubmit} onChange={() => { setPreview(null); setExportError(null); }} className="space-y-4 rounded-3xl bg-white p-5 shadow-sm">
       <div>
         <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Lokal ordre</p>
         <h2 className="text-2xl font-black">5-punktsordre</h2>
@@ -89,6 +95,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
           onChange={(event) => {
             setTemplateId(event.currentTarget.value as FivePointOrderTemplateId);
             setPreview(null);
+            setExportError(null);
           }}
           className="mt-1 min-h-12 w-full rounded-2xl border px-3"
         >
@@ -126,6 +133,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
           onChange={(event) => {
             setReadbackConfirmed(event.currentTarget.checked);
             setPreview(null);
+            setExportError(null);
           }}
           className="mt-1 h-5 w-5"
         />
@@ -139,6 +147,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
       </div>
 
       {!readbackConfirmed ? <p className="rounded-2xl bg-slate-100 p-3 text-sm font-semibold text-slate-700">Bekreft tilbakelesing/forstått for å åpne lokal eksport.</p> : null}
+      {exportError ? <p role="status" className="rounded-2xl bg-red-50 p-3 text-sm font-bold text-red-950">{exportError}</p> : null}
       {preview ? <pre className="whitespace-pre-wrap rounded-2xl bg-slate-100 p-3 text-sm">{preview.text}</pre> : null}
     </form>
   );

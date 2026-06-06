@@ -122,6 +122,25 @@ it('refuses 5-punktsordre exports when readback is missing or false', () => {
   }
 });
 
+it('refuses 5-punktsordre exports containing sensitive operational text', () => {
+  const input = {
+    templateId: 'lagleder-lagforer' as const,
+    situasjon: 'Status',
+    oppdrag: 'Oppdrag',
+    utforelse: 'Utførelse',
+    administrasjonForsyning: 'Administrasjon',
+    ledelseSamband: 'Ledelse',
+    notes: 'Pasient Ola Nordmann skal følges opp',
+    readbackConfirmed: true,
+    generatedAt: '2026-06-03T15:00:00.000Z',
+    contentVersion: 'test-content-v3',
+  };
+
+  for (const exporter of [exportFivePointOrderMarkdown, exportFivePointOrderJson, exportFivePointOrderPdfReadyHtml]) {
+    expect(() => exporter(input)).toThrow(/patient-reference|pasientdata|persondata/i);
+  }
+});
+
 it('defines generic role templates for sambandsplan without sensitive Nødnett details', () => {
   expect(COMMS_PLAN_ROLE_TEMPLATES.map((template) => template.id)).toEqual([
     'lagleder-lagforer',
@@ -215,6 +234,26 @@ it('exports stable sambandsplan JSON with metadata and fields', () => {
   });
   expect(parsed.localOnly).toBe(true);
   expect(JSON.stringify(parsed)).not.toMatch(/subscriber|hemmelig|gradert/i);
+});
+
+it('refuses sambandsplan exports containing sensitive operational text', () => {
+  const input = {
+    templateId: 'fig-leder' as const,
+    primaryChannel: 'Primær etter lokal plan',
+    fallbackChannel: 'Fallback kontaktmetode etter lokal plan',
+    kallesignal: 'FIG Leder',
+    ilKoContact: '+47 99999999',
+    districtContact: 'Beredskapsvakt kontaktpunkt',
+    checkInInterval: '15 min',
+    lostCommsProcedure: 'Bruk fallback og meld når reetablert',
+    batteryStatus: 'Reservebatterier medfølger',
+    generatedAt: '2026-06-03T17:00:00.000Z',
+    contentVersion: 'test-content-comms-json',
+  };
+
+  for (const exporter of [exportCommsPlanMarkdown, exportCommsPlanJson, exportCommsPlanPdfReadyHtml]) {
+    expect(() => exporter(input)).toThrow(/contact-reference|persondata/i);
+  }
 });
 
 it('exports PDF-ready sambandsplan HTML that escapes text and labels browser print-to-PDF', () => {

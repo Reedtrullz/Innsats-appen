@@ -26,6 +26,8 @@ interface CommsPlanFormProps {
   contentVersion?: string;
 }
 
+const EXPORT_BLOCKED_MESSAGE = 'Eksport blokkert: Fjern persondata, pasientdata, kontaktopplysninger eller skjermet informasjon før lokal eksport.';
+
 function selectedTemplate(templateId: CommsPlanTemplateId) {
   return COMMS_PLAN_ROLE_TEMPLATES.find((template) => template.id === templateId) ?? COMMS_PLAN_ROLE_TEMPLATES[0];
 }
@@ -49,6 +51,7 @@ function buildInput(form: FormData, contentVersion: string): CommsPlanInput {
 export function CommsPlanForm({ contentVersion = 'local-mvp' }: CommsPlanFormProps) {
   const [templateId, setTemplateId] = useState<CommsPlanTemplateId>('lagleder-lagforer');
   const [preview, setPreview] = useState<ExportPreview | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
   const template = selectedTemplate(templateId);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -57,19 +60,22 @@ export function CommsPlanForm({ contentVersion = 'local-mvp' }: CommsPlanFormPro
     const input = buildInput(form, contentVersion);
     const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
     const format = (submitter?.value as ExportFormat | undefined) ?? 'markdown';
-    if (format === 'json') {
-      setPreview({ format, text: exportCommsPlanJson(input) });
-      return;
+    try {
+      const nextPreview = format === 'json'
+        ? { format, text: exportCommsPlanJson(input) }
+        : format === 'pdf'
+          ? { format, text: exportCommsPlanPdfReadyHtml(input) }
+          : { format: 'markdown' as const, text: exportCommsPlanMarkdown(input) };
+      setExportError(null);
+      setPreview(nextPreview);
+    } catch {
+      setPreview(null);
+      setExportError(EXPORT_BLOCKED_MESSAGE);
     }
-    if (format === 'pdf') {
-      setPreview({ format, text: exportCommsPlanPdfReadyHtml(input) });
-      return;
-    }
-    setPreview({ format: 'markdown', text: exportCommsPlanMarkdown(input) });
   }
 
   return (
-    <form onSubmit={onSubmit} onChange={() => setPreview(null)} className="space-y-4 rounded-3xl bg-white p-5 shadow-sm">
+    <form onSubmit={onSubmit} onChange={() => { setPreview(null); setExportError(null); }} className="space-y-4 rounded-3xl bg-white p-5 shadow-sm">
       <div>
         <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Lokal samband</p>
         <h2 className="text-2xl font-black">Sambandsplan</h2>
@@ -86,6 +92,7 @@ export function CommsPlanForm({ contentVersion = 'local-mvp' }: CommsPlanFormPro
           onChange={(event) => {
             setTemplateId(event.currentTarget.value as CommsPlanTemplateId);
             setPreview(null);
+            setExportError(null);
           }}
           className="mt-1 min-h-12 w-full rounded-2xl border px-3"
         >
@@ -126,6 +133,7 @@ export function CommsPlanForm({ contentVersion = 'local-mvp' }: CommsPlanFormPro
         <button type="submit" name="format" value="pdf" className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white">{preview?.format === 'pdf' ? 'Oppdater utskrift' : 'Lag PDF-klar HTML'}</button>
       </div>
 
+      {exportError ? <p role="status" className="rounded-2xl bg-red-50 p-3 text-sm font-bold text-red-950">{exportError}</p> : null}
       {preview ? <pre className="whitespace-pre-wrap rounded-2xl bg-slate-100 p-3 text-sm">{preview.text}</pre> : null}
     </form>
   );

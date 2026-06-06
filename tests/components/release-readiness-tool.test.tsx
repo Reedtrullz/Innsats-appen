@@ -142,8 +142,40 @@ it('highlights source governance release gaps as pilot blockers', async () => {
 
   expect(await screen.findByRole('heading', { name: 'Content coverage gaps' })).toBeInTheDocument();
   expect(await screen.findByText('Sources referenced by pilot content are not approved')).toBeInTheDocument();
-  expect(screen.getByText(/Pilot blocker/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/Pilot blocker/i).length).toBeGreaterThan(0);
   expect(screen.getByText(/57 referenced sources/i)).toBeInTheDocument();
+});
+
+it('prevents a ready label when high coverage gaps still block pilot readiness', async () => {
+  globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url.includes('content-coverage-report')) {
+      return {
+        ok: true,
+        json: async () => ({
+          releaseBoard: {
+            gaps: [
+              {
+                id: 'source-governance-pilot-blockers',
+                title: 'Sources referenced by pilot content are not approved',
+                count: 57,
+                severity: 'high',
+                detail: '57 referenced sources are not verified, pilot-approved, and public-approved.',
+              },
+            ],
+          },
+        }),
+      } as Partial<Response> as Response;
+    }
+    return { ok: true, json: async () => ({ generatedAt: '2026-06-06T01:25:09.000Z', sourceCount: 0, workplans: [] }) } as Partial<Response> as Response;
+  });
+
+  render(<ReleaseReadinessTool />);
+
+  expect(await screen.findByText(/Ikke pilotklar/i)).toBeInTheDocument();
+  expect(screen.getByText(/57 pilot blocker/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/Pilot blockers/i).length).toBeGreaterThan(0);
+  expect(screen.queryByText(/No active risks on the board/i)).not.toBeInTheDocument();
 });
 
 it('ignores malformed content coverage report gaps instead of crashing', async () => {
@@ -159,6 +191,24 @@ it('ignores malformed content coverage report gaps instead of crashing', async (
 
   expect(await screen.findByRole('heading', { name: /Innsats-app pilot/i })).toBeInTheDocument();
   expect(await screen.findByText(/No release-board content coverage gaps reported/i)).toBeInTheDocument();
+});
+
+it('treats generated content fallback coverage reports as unknown, not clean release evidence', async () => {
+  globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url.includes('content-coverage-report')) {
+      return { ok: true, json: async () => ({ generatedAt: null, releaseBoard: { gaps: [] }, fallback: true }) } as Partial<Response> as Response;
+    }
+    return { ok: true, json: async () => ({ generatedAt: '2026-06-04T12:00:00.000Z', sourceCount: 0, workplans: [] }) } as Partial<Response> as Response;
+  });
+
+  render(<ReleaseReadinessTool />);
+
+  expect(await screen.findByText(/Dekning ukjent/i)).toBeInTheDocument();
+  expect(await screen.findByText(/Content coverage report is unavailable/i)).toBeInTheDocument();
+  expect(screen.getByText(/Dekning ikke verifisert/i)).toBeInTheDocument();
+  expect(screen.queryByText(/No release-board content coverage gaps reported/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/^Ready$/i)).not.toBeInTheDocument();
 });
 
 it('renders release controls with mobile-safe touch targets', () => {

@@ -5,6 +5,8 @@ const SOURCES = new Set(['kartverket', 'met', 'nve']);
 const SEVERITIES = new Set(['info', 'yellow', 'orange', 'red', 'unknown']);
 const STALENESS = new Set(['fresh', 'stale', 'unavailable']);
 const RAW_REF_PATTERN = /^[a-z]+:[a-z0-9-]+$/;
+const MAX_CONTEXT_SIGNAL_COUNT = 50;
+const MAX_CONTEXT_SIGNAL_STRING_LENGTH = 500;
 const ALLOWED_SIGNAL_KEYS = new Set([
   'source',
   'kind',
@@ -88,12 +90,28 @@ function isOptionalIsoDateTime(value: unknown) {
   return value === null || isIsoDateTime(value);
 }
 
+function guardContextSignalString(field: string, value: string): GuardResult<string> {
+  if (value.length > MAX_CONTEXT_SIGNAL_STRING_LENGTH) {
+    return { ok: false, status: 400, error: `Context signal string field ${field} must be at most ${MAX_CONTEXT_SIGNAL_STRING_LENGTH} characters` };
+  }
+  if (/[\u0000-\u001F\u007F]/.test(value)) {
+    return { ok: false, status: 400, error: `Context signal string field ${field} must not contain control characters` };
+  }
+  return { ok: true, value };
+}
+
 export function guardExternalContextSignals(value: unknown): GuardResult<ExternalContextSignal[]> {
   if (!Array.isArray(value)) return { ok: false, status: 400, error: 'Context signals must be an array' };
+  if (value.length > MAX_CONTEXT_SIGNAL_COUNT) return { ok: false, status: 400, error: `Context signals must contain at most ${MAX_CONTEXT_SIGNAL_COUNT} items` };
   for (const signal of value) {
     if (!isRecord(signal)) return { ok: false, status: 400, error: 'Context signal must be an object' };
     for (const key of Object.keys(signal)) {
       if (!ALLOWED_SIGNAL_KEYS.has(key)) return { ok: false, status: 400, error: `Unknown context signal field rejected: ${key}` };
+      const fieldValue = signal[key];
+      if (typeof fieldValue === 'string') {
+        const guardedString = guardContextSignalString(key, fieldValue);
+        if (!guardedString.ok) return guardedString;
+      }
     }
     if ('steps' in signal || 'sourceIds' in signal) return { ok: false, status: 400, error: 'Action-card-shaped payload rejected' };
     if ('rawPayload' in signal || 'raw' in signal || 'fullRaw' in signal) return { ok: false, status: 400, error: 'Full raw upstream payload rejected' };

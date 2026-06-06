@@ -53,6 +53,7 @@ export const GENERATED_CONTENT_ROUTES = [
 export const GENERATED_ROUTE_DISCOVERY_ENDPOINTS = [
   '/generated-content/action-cards.json',
   '/generated-content/source-documents.json',
+  '/generated-content/training-paths.json',
   '/generated-content/image-metadata.json',
 ] as const;
 
