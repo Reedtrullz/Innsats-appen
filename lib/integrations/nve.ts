@@ -53,18 +53,37 @@ export function normalizeNveDateRange(start: string, end: string) {
 
 function parseNveDate(value: unknown): string | null {
   if (!value) return null;
-  const raw = String(value);
-  const match = raw.match(/(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{2}:\d{2}:\d{2}))?/);
-  if (!match) return raw;
-  return `${match[3]}-${match[2]}-${match[1]}T${match[4] ?? '00:00:00'}Z`;
+  const raw = String(value).trim();
+  if (!raw) return null;
+  const match = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/);
+  if (!match) return null;
+  const [, dayRaw, monthRaw, yearRaw, hourRaw = '00', minuteRaw = '00', secondRaw = '00'] = match;
+  const year = Number(yearRaw);
+  const month = Number(monthRaw);
+  const day = Number(dayRaw);
+  const hour = Number(hourRaw);
+  const minute = Number(minuteRaw);
+  const second = Number(secondRaw);
+  if (month < 1 || month > 12) return null;
+  const lastDayOfMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  if (day < 1 || day > lastDayOfMonth) return null;
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59 || second < 0 || second > 59) return null;
+  return `${yearRaw}-${monthRaw}-${dayRaw}T${hourRaw}:${minuteRaw}:${secondRaw}Z`;
 }
 
 function severity(level: unknown): ExternalContextSignal['severity'] {
-  const n = Number(level);
-  if (n >= 4) return 'red';
+  let n: number | null = null;
+  if (typeof level === 'number' && Number.isFinite(level) && Number.isInteger(level)) {
+    n = level;
+  } else if (typeof level === 'string') {
+    const trimmed = level.trim();
+    if (/^-?\d+$/.test(trimmed)) n = Number(trimmed);
+  }
+  if (n === null) return 'unknown';
+  if (n === 4) return 'red';
   if (n === 3) return 'orange';
   if (n === 2) return 'yellow';
-  if (n >= 0) return 'info';
+  if (n === 0 || n === 1) return 'info';
   return 'unknown';
 }
 

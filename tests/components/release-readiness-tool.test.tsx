@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it, vi } from 'vitest';
 import { ReleaseReadinessTool } from '@/components/release-readiness-tool';
@@ -87,6 +87,113 @@ it('describes workplans as generated local artifacts without backend sync', asyn
   await waitFor(() => {
     expect(localStorage.getItem('beredskapsboka-release-readiness-v1') ?? '').toContain('workplan-pilot-workplan');
   });
+});
+
+it('keeps a generated blocked workplan blocked over stale local completed status', async () => {
+  localStorage.setItem('beredskapsboka-release-readiness-v1', JSON.stringify({
+    stages: { idea: 'ready', scope: 'ready', build: 'ready', verify: 'ready', release: 'ready' },
+    items: [
+      {
+        id: 'workplan-pilot-workplan',
+        title: 'Pilot Workplan',
+        owner: 'Local',
+        stage: 'release',
+        status: 'completed',
+        risk: 'low',
+        notes: 'Stale local status from an older generated artifact.',
+        completedAt: '2026-06-01T12:00:00.000Z',
+      },
+    ],
+  }));
+  globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url.includes('content-coverage-report')) {
+      return { ok: true, json: async () => ({ releaseBoard: { gaps: [] } }) } as Partial<Response> as Response;
+    }
+    return {
+      ok: true,
+      json: async () => ({
+        generatedAt: '2026-06-04T12:00:00.000Z',
+        sourceCount: 1,
+        workplans: [
+          {
+            id: 'pilot-workplan',
+            title: 'Pilot Workplan',
+            sourcePath: '.hermes/plans/pilot-workplan.md',
+            sourceType: 'hermes-plan',
+            summary: 'Blocked generated workplan must override stale local completion.',
+            stage: 'verify',
+            risk: 'high',
+            status: 'active',
+            taskCount: 1,
+            updatedAt: '2026-06-04T12:00:00.000Z',
+            tasks: [
+              { id: 'pilot-workplan-task-1', title: 'Resolve launch blocker', status: 'blocked', stage: 'verify', risk: 'high' },
+            ],
+          },
+        ],
+      }),
+    } as Partial<Response> as Response;
+  });
+
+  render(<ReleaseReadinessTool />);
+
+  const activeHeading = await screen.findByRole('heading', { name: 'Active work' });
+  const activeColumn = activeHeading.closest('div')?.parentElement?.parentElement;
+  expect(activeColumn).not.toBeNull();
+  await waitFor(() => {
+    const activeArticle = within(activeColumn!).getByRole('heading', { name: 'Pilot Workplan' }).closest('article');
+    expect(activeArticle).not.toBeNull();
+    expect(within(activeArticle!).getByRole('combobox', { name: /Status/i })).toHaveValue('blocked');
+  });
+  await waitFor(() => {
+    const stored = localStorage.getItem('beredskapsboka-release-readiness-v1') ?? '';
+    expect(stored).toContain('\"id\":\"workplan-pilot-workplan\"');
+    expect(stored).toContain('\"status\":\"blocked\"');
+    expect(stored).not.toContain('Stale local status from an older generated artifact.');
+  });
+  expect(screen.getByText(/Open: Resolve launch blocker/i)).toBeInTheDocument();
+});
+
+it('prevents a ready label when ordinary blocked release work remains despite clean coverage', async () => {
+  localStorage.setItem('beredskapsboka-release-readiness-v1', JSON.stringify({
+    stages: { idea: 'ready', scope: 'ready', build: 'ready', verify: 'ready', release: 'ready' },
+    items: [
+      ...Array.from({ length: 9 }, (_, index) => ({
+        id: `completed-${index}`,
+        title: `Completed item ${index}`,
+        owner: 'AR',
+        stage: 'build',
+        status: 'completed',
+        risk: 'low',
+        notes: 'Done.',
+        completedAt: '2026-06-01T12:00:00.000Z',
+      })),
+      {
+        id: 'manual-release-blocker',
+        title: 'Resolve release blocker',
+        owner: 'TS',
+        stage: 'release',
+        status: 'blocked',
+        risk: 'medium',
+        notes: 'Must be cleared before pilot.',
+      },
+    ],
+  }));
+  globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url.includes('content-coverage-report')) {
+      return { ok: true, json: async () => ({ releaseBoard: { gaps: [] } }) } as Partial<Response> as Response;
+    }
+    return { ok: true, json: async () => ({ generatedAt: '2026-06-04T12:00:00.000Z', sourceCount: 0, workplans: [] }) } as Partial<Response> as Response;
+  });
+
+  render(<ReleaseReadinessTool />);
+
+  expect(await screen.findByText(/Ikke pilotklar/i)).toBeInTheDocument();
+  expect(screen.getByText(/1 blokkert release\/workplan/i)).toBeInTheDocument();
+  expect(screen.getByText(/Blokkert release-\/workplan-arbeid må løses før pilot/i)).toBeInTheDocument();
+  expect(screen.queryByText(/^Ready$/i)).not.toBeInTheDocument();
 });
 
 it('shows content coverage gaps on the release board', async () => {

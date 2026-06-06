@@ -71,6 +71,20 @@ it('accepts only external context signals, not action-card-shaped payloads', () 
   expect(guardExternalContextSignals([{ ...validSignal, rawRef: 'met:locationforecast?lat=63.4' }]).ok).toBe(false);
 });
 
+it('requires strict ISO datetimes with explicit timezone and supported severities', () => {
+  expect(guardExternalContextSignals([{ ...validSignal, fetchedAt: '2026-06-02T20:00:00Z' }]).ok).toBe(true);
+  expect(guardExternalContextSignals([{ ...validSignal, validFrom: '2026-06-02T20:00:00+02:00', validTo: '2026-06-02T21:00:00+02:00' }]).ok).toBe(true);
+
+  for (const signal of [
+    { ...validSignal, fetchedAt: '2026-06-02T20:00:00' },
+    { ...validSignal, validFrom: '2026-02-30T00:00:00Z' },
+    { ...validSignal, validTo: '2026-06-02T25:00:00Z' },
+    { ...validSignal, severity: 'critical' },
+  ]) {
+    expect(guardExternalContextSignals([signal]).ok).toBe(false);
+  }
+});
+
 it('bounds external context signal array size and public string payloads', () => {
   expect(guardExternalContextSignals(Array.from({ length: 50 }, () => validSignal)).ok).toBe(true);
   const tooMany = guardExternalContextSignals(Array.from({ length: 51 }, () => validSignal));

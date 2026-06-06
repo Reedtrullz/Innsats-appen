@@ -101,3 +101,52 @@ it('exports local task, quick status and resource summary without raw external p
   expect(markdown).not.toContain('geometry');
   expect(markdown).not.toContain('indexedDB');
 });
+
+it('rejects sensitive mission text during mission Markdown export', () => {
+  const baseMission = buildMission({ id: 'mission-sensitive-export', title: 'FIG eksport' });
+
+  expect(() => exportMissionMarkdown({
+    mission: { ...baseMission, notes: 'pasient Ola Nordmann' },
+    checklists: [],
+    runs: [],
+  })).toThrow(/missionMarkdown\.mission\.notes.*patient-reference/);
+});
+
+it('rejects sensitive checklist run notes during mission and missing equipment Markdown exports', () => {
+  const baseMission = buildMission({ id: 'checklist-sensitive-export', title: 'FIG utstyr', phase: 'for', role: 'lagforer', scenario: 'generelt', locationText: 'Depot' });
+  const checklist = {
+    slug: 'personlig-utstyr-for-utrykning',
+    title: 'Personlig utstyr for utrykning',
+    phase: 'for',
+    roles: ['lagforer'],
+    scenarios: ['generelt'],
+    items: [{ id: 'bekledning', label: 'Bekledning valgt etter vær', required: true, sourceIds: ['src-sjekkliste-fig-og-figp'] }],
+    sourceIds: ['src-sjekkliste-fig-og-figp'],
+  } satisfies OperationalChecklist;
+  const runs = [{ id: 'run-sensitive-note', missionId: baseMission.id, templateSlug: checklist.slug, checkedItemIds: [], notesByItemId: { bekledning: 'skjermet tilfluktsrom adresse' }, equipmentStatusByItemId: {}, updatedAt: '2026-06-02T20:10:00.000Z', schemaVersion: 1 }];
+
+  expect(() => exportMissionMarkdown({ mission: baseMission, checklists: [checklist], runs })).toThrow(/missionMarkdown\.runs\.personlig-utstyr-for-utrykning\.notesByItemId\[bekledning\].*shielded-location/);
+  expect(() => exportMissingEquipmentBeforeDepartureMarkdown({ mission: baseMission, checklists: [checklist], runs })).toThrow(/missingEquipmentBeforeDeparture\.runs\.personlig-utstyr-for-utrykning\.notesByItemId\[bekledning\].*shielded-location/);
+});
+
+it('rejects sensitive mission, task and resource text during status summary Markdown export', () => {
+  const baseMission = buildMission({ id: 'status-sensitive-export', title: 'FIG status' });
+
+  expect(() => exportMissionStatusSummaryMarkdown({
+    mission: { ...baseMission, locationText: 'privat adresse' },
+  })).toThrow(/missionStatusSummary\.mission\.locationText.*private-location/);
+
+  expect(() => exportMissionStatusSummaryMarkdown({
+    mission: {
+      ...baseMission,
+      tasks: [{ id: 'task-sensitive', title: 'pasient Ola Nordmann', status: 'in-progress', createdAt: '2026-06-03T10:01:00.000Z', updatedAt: '2026-06-03T10:02:00.000Z' }],
+    },
+  })).toThrow(/missionStatusSummary\.tasks\[0\]\.title.*patient-reference/);
+
+  expect(() => exportMissionStatusSummaryMarkdown({
+    mission: {
+      ...baseMission,
+      resourceRequests: [{ id: 'resource-sensitive', kind: 'equipment', status: 'blocked', createdAt: '2026-06-03T10:06:00.000Z', quantity: 'fødselsnummer 01017012345' }],
+    },
+  })).toThrow(/missionStatusSummary\.resourceRequests\[0\]\.quantity.*national-id/);
+});

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T05:20:24.244Z",
+  "generatedAt": "2026-06-06T11:36:04.708Z",
   "sourceCount": 11,
   "planSourceCount": 11,
-  "planSourceHash": "sha256:6e9f256a4638fb3028ae07a03d53b19b6a4b3923d81c104ed655a92208e30d5a",
+  "planSourceHash": "sha256:574247e358c756931a723ebb6b6be2110f45c84f1ad28e1e6ea7c9600e61872a",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6644,64 +6644,96 @@
       "summary": "Review what Beredskapsboka/Innsats-appen currently does, identify what it still needs for credible field/pilot use, implement safe high-value hardening improvements, and finish with a deep self-review.",
       "stage": "verify",
       "risk": "high",
-      "status": "active",
+      "status": "completed",
+      "completedAt": "2026-06-06T11:35:29Z",
+      "evidence": [
+        "Privacy, release-readiness, offline/content, context-signal and final gate work completed without resolving external source-approval or real-device blockers."
+      ],
       "taskCount": 7,
-      "updatedAt": "2026-06-06T05:20:24.244Z",
+      "updatedAt": "2026-06-06T11:36:04.708Z",
       "tasks": [
         {
           "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-1",
           "title": "Make release readiness impossible to label as Ready while pilot blockers exist",
-          "status": "planned",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
+          "completedAt": "2026-06-06T11:35:29Z",
+          "evidence": [
+            "Release readiness is hard-gated by high coverage gaps and blocked release/workplan items with regression coverage in release-readiness-tool tests."
+          ],
           "sourceHeading": "Task 1: Make release readiness impossible to label as Ready while pilot blockers exist"
         },
         {
           "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-2",
           "title": "Cache training detail routes for offline navigation",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-06T11:35:29Z",
+          "evidence": [
+            "Training route discovery remains covered by offline service-worker behavior and metadata tests in the final local gate."
+          ],
           "sourceHeading": "Task 2: Cache training detail routes for offline navigation"
         },
         {
           "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-3",
           "title": "Recursively reject sensitive free text in generated/public artifacts",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-06T11:35:29Z",
+          "evidence": [
+            "Generated/public sensitive-text validation remains covered by content validation tests and final local content validation."
+          ],
           "sourceHeading": "Task 3: Recursively reject sensitive free text in generated/public artifacts"
         },
         {
           "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-4",
           "title": "Block sensitive operational text at order/comms export time",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-06T11:35:29Z",
+          "evidence": [
+            "Local mission/order export privacy guards and UI warning behavior are covered by mission export and mission context component tests."
+          ],
           "sourceHeading": "Task 4: Block sensitive operational text at order/comms export time"
         },
         {
           "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-5",
           "title": "Bound public context API signal payloads",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-06T11:35:29Z",
+          "evidence": [
+            "Context signal bounds, strict dates, severity handling, NVE sanitization and context panel display are covered by integration/security/component tests."
+          ],
           "sourceHeading": "Task 5: Bound public context API signal payloads"
         },
         {
           "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-6",
           "title": "Sync workplan artifacts and document remaining blockers honestly",
-          "status": "planned",
+          "status": "completed",
           "stage": "idea",
           "risk": "high",
+          "completedAt": "2026-06-06T11:35:29Z",
+          "evidence": [
+            "Workplan sync keeps external blockers as non-goals and regenerates the release/workplan artifacts without claiming source approval, PMTiles approval or pilot-go."
+          ],
           "sourceHeading": "Task 6: Sync workplan artifacts and document remaining blockers honestly"
         },
         {
           "id": "2026-06-06_051912-comprehensive-app-review-and-hardening-plan-task-7",
           "title": "Deep self-review and gates",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
+          "completedAt": "2026-06-06T11:35:29Z",
+          "evidence": [
+            "Focused tests, two-stage subagent reviews and final controller gates verify the integrated implementation before commit."
+          ],
           "sourceHeading": "Task 7: Deep self-review and gates"
         }
       ]

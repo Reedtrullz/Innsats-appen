@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it, vi } from 'vitest';
 import type { ReactElement } from 'react';
 import { MissionContextPanel } from '@/components/mission-context-panel';
+import { LocalMissionControls } from '@/components/mission/local-mission-controls';
 import { archiveMission, clearLocalMissionData, listArchivedMissions, listMissions, saveChecklistRun, saveMission } from '@/lib/mission/local-store';
 import { EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY } from '@/lib/integrations/source-settings';
 import { readLocalAuditLog } from '@/lib/privacy/local-profile';
@@ -208,6 +209,73 @@ it('lets users generate a local task/status/resource markdown export from the mi
   await waitFor(() => {
     expect(preview.value).toContain('Ny eksportoppgave');
   });
+});
+
+it('shows a local status privacy warning instead of rendering a preview when status export text is sensitive', async () => {
+  const sensitiveMission = {
+    ...mission({ id: 'local-status-export-sensitive', title: 'Sensitive status export UI' }),
+    notes: 'pasient Ola Nordmann',
+  };
+
+  render(<LocalMissionControls mission={sensitiveMission} displaySignals={[]} onMissionChange={vi.fn(async () => undefined)} />);
+
+  await userEvent.click(screen.getByRole('button', { name: /Lag lokal statusrapport/i }));
+
+  const alert = await screen.findByRole('alert', { name: /lokal status personvern/i });
+  expect(alert).toHaveTextContent(/persondata|pasientdata|skjermet/i);
+  expect(alert).not.toHaveTextContent(/Ola Nordmann/i);
+  expect(document.body).not.toHaveTextContent(/Ola Nordmann/i);
+  expect(screen.queryByLabelText(/Lokal oppdragsstatus i Markdown/i)).not.toBeInTheDocument();
+  expect(readLocalAuditLog().some((entry) => entry.details?.exportKind === 'status-summary')).toBe(false);
+});
+
+it('does not render a stale local status preview after mission or signal content changes to sensitive text', async () => {
+  const safeMission = mission({
+    id: 'local-status-stale-preview',
+    title: 'Trygt statusoppdrag',
+    locationText: 'Trygt område',
+    notes: 'Gammel trygg eksportmarkør',
+    tasks: [{ id: 'task-stale-safe', title: 'Trygg oppgave', status: 'in-progress', createdAt: '2026-06-04T08:01:00.000Z', updatedAt: '2026-06-04T08:01:00.000Z' }],
+  });
+  const safeSignals: MissionContext['externalSignals'] = [{
+    source: 'met',
+    kind: 'weather',
+    severity: 'yellow',
+    title: 'Trygt værvarsel',
+    summary: 'Trygt lokalt sammendrag',
+    validFrom: null,
+    validTo: null,
+    fetchedAt: '2026-06-04T08:00:00.000Z',
+    staleness: 'fresh',
+    rawRef: 'met:trygt-varsel',
+  }];
+  const sensitiveMission = {
+    ...safeMission,
+    title: 'pasient Ola Nordmann',
+    locationText: 'skjermet tilfluktsrom adresse',
+    notes: 'fødselsnummer 01017012345',
+    tasks: [{ ...safeMission.tasks[0], title: 'pasient Ola Nordmann' }],
+    statusLog: [{ id: 'status-sensitive-corrupt', message: 'pasient Ola Nordmann' as MissionContext['statusLog'][number]['message'], createdAt: '2026-06-04T08:02:00.000Z' }],
+  };
+  const sensitiveSignals: MissionContext['externalSignals'] = [{
+    ...safeSignals[0],
+    title: 'pasient Ola Nordmann',
+    summary: 'skjermet tilfluktsrom adresse',
+  }];
+
+  const { rerender } = render(<LocalMissionControls mission={safeMission} displaySignals={safeSignals} onMissionChange={vi.fn(async () => undefined)} />);
+  await userEvent.click(screen.getByRole('button', { name: /Lag lokal statusrapport/i }));
+  const preview = await screen.findByLabelText(/Lokal oppdragsstatus i Markdown/i) as HTMLTextAreaElement;
+  expect(preview.value).toContain('Gammel trygg eksportmarkør');
+
+  rerender(<LocalMissionControls mission={sensitiveMission} displaySignals={sensitiveSignals} onMissionChange={vi.fn(async () => undefined)} />);
+
+  expect(document.body).not.toHaveTextContent(/Gammel trygg eksportmarkør/i);
+  expect(document.body).not.toHaveTextContent(/Ola Nordmann|01017012345|tilfluktsrom adresse/i);
+  const alert = await screen.findByRole('alert', { name: /lokal status personvern/i });
+  expect(alert).toHaveTextContent(/persondata|pasientdata|skjermet/i);
+  expect(screen.queryByLabelText(/Lokal oppdragsstatus i Markdown/i)).not.toBeInTheDocument();
+  expect(document.body).not.toHaveTextContent(/Ola Nordmann|01017012345|tilfluktsrom adresse/i);
 });
 
 it('lets users generate local MBK equipment readiness Markdown and JSON exports from the mission UI', async () => {

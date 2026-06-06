@@ -1,4 +1,5 @@
 import type { OperationalChecklist } from '@/lib/content/schemas';
+import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
 import { EXPORT_SENSITIVITY_WARNING } from './order-export';
 import type { ChecklistRun, MissionContext } from './schemas';
 
@@ -18,7 +19,37 @@ function joinDefined(parts: Array<string | undefined>) {
   return parts.filter((part) => part && part.trim().length > 0).join(' — ');
 }
 
+function assertMissionMarkdownTextSafe(mission: MissionContext, runs: ChecklistRun[]) {
+  assertNoSensitiveOperationalTextInValue({ title: mission.title, locationText: mission.locationText, notes: mission.notes }, 'missionMarkdown.mission');
+  for (const run of runs) {
+    for (const [itemId, note] of Object.entries(run.notesByItemId)) {
+      assertNoSensitiveOperationalTextInValue(note, `missionMarkdown.runs.${run.templateSlug}.notesByItemId[${itemId}]`);
+    }
+  }
+}
+
+function assertMissionStatusSummaryTextSafe(mission: MissionContext) {
+  assertNoSensitiveOperationalTextInValue({ title: mission.title, locationText: mission.locationText, notes: mission.notes }, 'missionStatusSummary.mission');
+  mission.externalSignals.forEach((signal, index) => {
+    assertNoSensitiveOperationalTextInValue({ title: signal.title, summary: signal.summary }, `missionStatusSummary.externalSignals[${index}]`);
+  });
+  mission.tasks.forEach((task, index) => {
+    assertNoSensitiveOperationalTextInValue({ title: task.title, notes: task.notes }, `missionStatusSummary.tasks[${index}]`);
+  });
+  mission.statusLog.forEach((status, index) => {
+    assertNoSensitiveOperationalTextInValue({ message: status.message, note: status.note }, `missionStatusSummary.statusLog[${index}]`);
+  });
+  mission.resourceRequests.forEach((request, index) => {
+    assertNoSensitiveOperationalTextInValue({ status: request.status, quantity: request.quantity, note: request.note }, `missionStatusSummary.resourceRequests[${index}]`);
+  });
+}
+
+function assertMissingEquipmentTextSafe(mission: MissionContext) {
+  assertNoSensitiveOperationalTextInValue({ title: mission.title, locationText: mission.locationText }, 'missingEquipmentBeforeDeparture.mission');
+}
+
 export function exportMissionMarkdown({ mission, checklists, runs }: { mission: MissionContext; checklists: OperationalChecklist[]; runs: ChecklistRun[] }) {
+  assertMissionMarkdownTextSafe(mission, runs);
   const lines: string[] = [];
   lines.push(`# ${mission.title}`);
   lines.push('');
@@ -43,6 +74,7 @@ export function exportMissionMarkdown({ mission, checklists, runs }: { mission: 
 }
 
 export function exportMissionStatusSummaryMarkdown({ mission }: { mission: MissionContext }) {
+  assertMissionStatusSummaryTextSafe(mission);
   const lines: string[] = [];
   const openTasks = mission.tasks.filter((task) => task.status !== 'done');
   lines.push('# Lokal oppdragsstatus');
@@ -108,12 +140,14 @@ function isBeforeDepartureEquipmentControlItem(checklistSlug: string, itemId: st
   return BEFORE_DEPARTURE_EQUIPMENT_ITEM_IDS_BY_CHECKLIST[checklistSlug]?.has(itemId) ?? false;
 }
 
-function noteSuffix(note: string | undefined) {
+function noteSuffix(note: string | undefined, context: string) {
+  assertNoSensitiveOperationalTextInValue(note, context);
   const trimmed = note?.trim();
   return trimmed ? ` — ${trimmed}` : '';
 }
 
 export function exportMissingEquipmentBeforeDepartureMarkdown({ mission, checklists, runs }: { mission: MissionContext; checklists: OperationalChecklist[]; runs: ChecklistRun[] }) {
+  assertMissingEquipmentTextSafe(mission);
   const relevantChecklists = checklists.filter((checklist) => BEFORE_DEPARTURE_EQUIPMENT_CHECKLISTS.has(checklist.slug));
   const lines: string[] = [];
   lines.push('# Manglende utstyr før avreise');
@@ -137,7 +171,7 @@ export function exportMissingEquipmentBeforeDepartureMarkdown({ mission, checkli
     lines.push(`Kilder: ${(checklist.sourceIds ?? []).join(', ')}`);
     for (const item of missingItems) {
       missingCount += 1;
-      lines.push(`- [ ] ${item.label}${noteSuffix(run?.notesByItemId[item.id])}`);
+      lines.push(`- [ ] ${item.label}${noteSuffix(run?.notesByItemId[item.id], `missingEquipmentBeforeDeparture.runs.${checklist.slug}.notesByItemId[${item.id}]`)}`);
     }
   }
 

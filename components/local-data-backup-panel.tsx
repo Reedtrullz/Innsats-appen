@@ -127,7 +127,7 @@ export function LocalDataBackupPanel({
         <p className="text-sm font-bold uppercase tracking-wide text-emerald-700">Manuell lokal backup</p>
         <h2 className="text-2xl font-black">Eksport/import av lokale appdata</h2>
         <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">
-          Backup og import er kun manuell JSON på denne enheten. Ingen opplasting, ingen cloud, ingen synk, ingen konto og ingen offisiell kommandosystem-kobling. Backupfilen kan inneholde lokale profilfelt, PIN-hash/salt, auditlogg og operasjonelle notater fra denne nettleseren. Ikke inkluder eller del persondata, pasientdata, private lokasjoner eller skjermet operativ informasjon.
+          Backup og import er kun manuell JSON på denne enheten. Ingen opplasting, ingen cloud, ingen synk, ingen konto og ingen offisiell kommandosystem-kobling. Backupfilen inneholder lokal oppdrags-/sjekklistetilstand og allowlistede appinnstillinger fra denne nettleseren. Lokale profilfelt, kallesignal, kompetansepåminnelser og PIN-hash/salt eksporteres ikke. Ikke inkluder eller del persondata, pasientdata, private lokasjoner eller skjermet operativ informasjon.
         </p>
       </div>
 

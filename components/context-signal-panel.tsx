@@ -4,6 +4,13 @@ export function markStoredContextSignalsStale(signals: ExternalContextSignal[]):
   return signals.map((signal) => ({ ...signal, staleness: signal.staleness === 'unavailable' ? 'unavailable' : 'stale' }));
 }
 
+function validityLabel(signal: ExternalContextSignal) {
+  if (!signal.validFrom && !signal.validTo) return 'Gyldighet: ikke oppgitt';
+  if (signal.validFrom && signal.validTo) return `Gyldighet: ${signal.validFrom} – ${signal.validTo}`;
+  if (signal.validFrom) return `Gyldig fra: ${signal.validFrom}`;
+  return `Gyldig til: ${signal.validTo}`;
+}
+
 export function ContextSignalPanel({ signals, unavailableSources = [] }: { signals: ExternalContextSignal[]; unavailableSources?: string[] }) {
   const hasStaleSignals = signals.some((signal) => signal.staleness === 'stale');
   return (
@@ -21,9 +28,11 @@ export function ContextSignalPanel({ signals, unavailableSources = [] }: { signa
               <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold">{signal.source}</span>
               <span className="rounded-full bg-sky-100 px-2 py-1 text-xs font-bold">{signal.kind}</span>
               <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold">{signal.staleness}</span>
+              <span className="rounded-full bg-red-50 px-2 py-1 text-xs font-bold text-red-900">Alvorlighet: {signal.severity}</span>
             </div>
             <h3 className="mt-2 font-black">{signal.title}</h3>
             <p className="text-sm text-slate-700">{signal.summary}</p>
+            <p className="mt-2 text-xs font-semibold text-slate-600">{validityLabel(signal)}</p>
           </article>
         ))}
       </div>

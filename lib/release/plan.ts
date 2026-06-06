@@ -97,9 +97,14 @@ function planCompletedAt(workplan: Workplan, existing?: ReleaseItem, status?: Wo
   return existing?.completedAt ?? workplan.completedAt;
 }
 
+function mergedWorkplanStatus(generatedStatus: WorkStatus, existing?: ReleaseItem) {
+  if (generatedStatus === 'blocked' || generatedStatus === 'completed') return generatedStatus;
+  return existing?.status ?? generatedStatus;
+}
+
 export function releaseItemFromWorkplan(workplan: Workplan, existing?: ReleaseItem): ReleaseItem {
   const generatedStatus = statusFromWorkplan(workplan);
-  const status = existing?.status ?? generatedStatus;
+  const status = mergedWorkplanStatus(generatedStatus, existing);
   const completedAt = planCompletedAt(workplan, existing, status);
   return {
     id: releaseItemId(workplan.id),

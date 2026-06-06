@@ -38,6 +38,24 @@ it('shows an unavailable-source empty state when no context signals exist', () =
   expect(within(panel).getByText(/nve.*utilgjengelig eller avslått lokalt/i)).toBeInTheDocument();
 });
 
+it('shows severity and validity without exposing raw upstream references', () => {
+  render(<ContextSignalPanel signals={[{
+    ...freshSignal,
+    severity: 'orange',
+    validFrom: '2026-06-02T07:00:00Z',
+    validTo: '2026-06-03T07:00:00Z',
+    upstreamId: 'nve:5001:secret-warning-id',
+    rawRef: 'nve:flood-warning',
+  }]} />);
+
+  const panel = screen.getByRole('region', { name: /offentlig kontekst/i });
+  expect(within(panel).getByText(/alvorlighet:\s*orange/i)).toBeInTheDocument();
+  expect(within(panel).getByText(/gyldighet: 2026-06-02T07:00:00Z .* 2026-06-03T07:00:00Z/i)).toBeInTheDocument();
+  expect(within(panel).queryByText(/secret-warning-id/i)).not.toBeInTheDocument();
+  expect(within(panel).queryByText(/nve:flood-warning/i)).not.toBeInTheDocument();
+  expect(within(panel).queryByText(/abc123/i)).not.toBeInTheDocument();
+});
+
 it('marks last successful local mission signals stale after a failed refresh', () => {
   const staleSignals = markStoredContextSignalsStale([freshSignal]);
   expect(staleSignals[0]?.staleness).toBe('stale');

@@ -172,6 +172,14 @@ function firstOpenTask(workplan: WorkplansSnapshot['workplans'][number]) {
   return workplan.tasks.find((task) => task.status !== 'completed');
 }
 
+function isBlockedSyncedWorkplan(workplan: WorkplansSnapshot['workplans'][number]) {
+  return workplan.status === 'blocked' || workplan.tasks.some((task) => task.status === 'blocked');
+}
+
+function workplanReleaseItemId(workplanId: string) {
+  return `workplan-${workplanId}`;
+}
+
 export function ReleaseReadinessTool() {
   const [plan, setPlan] = useState<ReleasePlan>(defaultReleasePlan);
   const [hydrated, setHydrated] = useState(false);
@@ -260,6 +268,13 @@ export function ReleaseReadinessTool() {
   const activeItems = plan.items.filter((item) => item.status !== 'completed');
   const completedItems = plan.items.filter((item) => item.status === 'completed');
   const syncedWorkplans = workplansSnapshot?.workplans ?? [];
+  const blockedActiveItems = activeItems.filter((item) => item.status === 'blocked');
+  const blockedReleaseWorkItemIds = new Set([
+    ...blockedActiveItems.map((item) => item.id),
+    ...syncedWorkplans.filter(isBlockedSyncedWorkplan).map((workplan) => workplanReleaseItemId(workplan.id)),
+  ]);
+  const blockedReleaseWorkCount = blockedReleaseWorkItemIds.size;
+  const hasBlockedReleaseWork = blockedReleaseWorkCount > 0;
   const coverageGaps = coverageReport?.releaseBoard?.gaps ?? [];
   const highCoverageGaps = coverageGaps.filter((gap) => gap.severity === 'high');
   const highCoverageGapCount = highCoverageGaps.reduce((sum, gap) => sum + gap.count, 0);
@@ -270,8 +285,9 @@ export function ReleaseReadinessTool() {
   const hasCoverageReport = coverageReport !== null;
   const hasHighCoverageGaps = highCoverageGaps.length > 0;
   const hasPilotBlockingCoverageGaps = !hasCoverageReport || hasHighCoverageGaps;
-  const readinessLabel = !hasCoverageReport ? 'Dekning ukjent' : hasHighCoverageGaps ? 'Ikke pilotklar' : summary.score >= 80 ? 'Ready' : summary.score >= 55 ? 'Close' : 'Needs work';
-  const readinessTone = hasPilotBlockingCoverageGaps ? 'text-red-700' : 'text-blue-600';
+  const hasPilotBlockingReadiness = hasPilotBlockingCoverageGaps || hasBlockedReleaseWork;
+  const readinessLabel = !hasCoverageReport ? 'Dekning ukjent' : hasHighCoverageGaps || hasBlockedReleaseWork ? 'Ikke pilotklar' : summary.score >= 80 ? 'Ready' : summary.score >= 55 ? 'Close' : 'Needs work';
+  const readinessTone = hasPilotBlockingReadiness ? 'text-red-700' : 'text-blue-600';
   const attentionItems = activeItems
     .filter((item) => item.status === 'blocked' || item.risk !== 'low')
     .slice(0, 4);
@@ -341,6 +357,7 @@ export function ReleaseReadinessTool() {
                     <p className="text-4xl font-black">{summary.score}%</p>
                     <p className={`text-base font-black ${readinessTone}`}>{readinessLabel}</p>
                     {hasHighCoverageGaps ? <p className="mt-1 rounded-full bg-red-100 px-2 py-1 text-xs font-black text-red-700">{effectivePilotBlockerCount} pilot blocker{effectivePilotBlockerCount === 1 ? '' : 's'}</p> : null}
+                    {hasBlockedReleaseWork ? <p className="mt-1 rounded-full bg-red-100 px-2 py-1 text-xs font-black text-red-700">{blockedReleaseWorkCount} blokkert release/workplan</p> : null}
                     {!hasCoverageReport ? <p className="mt-1 rounded-full bg-red-100 px-2 py-1 text-xs font-black text-red-700">Dekning ikke verifisert</p> : null}
                   </div>
                 </div>
@@ -540,7 +557,8 @@ export function ReleaseReadinessTool() {
               <div className="mt-3 divide-y divide-slate-200 border-t border-slate-200">
                 {hasHighCoverageGaps ? <p className="py-6 text-sm font-semibold text-red-700">Pilot blockers from content coverage must be resolved or explicitly accepted before pilot-go.</p> : null}
                 {!hasCoverageReport ? <p className="py-6 text-sm font-semibold text-red-700">Content coverage report is missing or fallback-only; pilot readiness is not verified.</p> : null}
-                {hasCoverageReport && !hasHighCoverageGaps && attentionItems.length === 0 ? <p className="py-6 text-sm font-semibold text-slate-500">No active risks on the board.</p> : null}
+                {hasCoverageReport && !hasHighCoverageGaps && hasBlockedReleaseWork ? <p className="py-6 text-sm font-semibold text-red-700">Blokkert release-/workplan-arbeid må løses før pilot.</p> : null}
+                {hasCoverageReport && !hasHighCoverageGaps && !hasBlockedReleaseWork && attentionItems.length === 0 ? <p className="py-6 text-sm font-semibold text-slate-500">No active risks on the board.</p> : null}
                 {attentionItems.map((item) => {
                   const tone = attentionTone(item);
                   return (

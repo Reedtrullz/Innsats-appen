@@ -18,7 +18,7 @@ import {
   storageQuotaStatus,
 } from '@/lib/local-data/local-data';
 import type { ChecklistRun, MissionContext } from '@/lib/mission/schemas';
-import { LOCAL_PROFILE_STORAGE_KEY } from '@/lib/privacy/local-profile';
+import { LOCAL_COMPETENCE_REMINDERS_STORAGE_KEY, LOCAL_PROFILE_STORAGE_KEY } from '@/lib/privacy/local-profile';
 import { buildMission } from '../helpers/mission-fixtures';
 
 const baseMission = buildMission({
@@ -80,7 +80,8 @@ it('documents the raw idb local database decision against Dexie and SQLite WASM/
 it('exposes schema/export versions and allowlisted localStorage keys', () => {
   expect(LOCAL_DATA_SCHEMA_VERSION).toBe(1);
   expect(LOCAL_DATA_EXPORT_VERSION).toBe(1);
-  expect(LOCAL_DATA_STORE_KEYS).toContain(LOCAL_PROFILE_STORAGE_KEY);
+  expect(LOCAL_DATA_STORE_KEYS).not.toContain(LOCAL_PROFILE_STORAGE_KEY);
+  expect(LOCAL_DATA_STORE_KEYS).not.toContain(LOCAL_COMPETENCE_REMINDERS_STORAGE_KEY);
   expect(LOCAL_DATA_STORE_KEYS).toContain(FIELD_MODE_STORAGE_KEY);
 });
 
@@ -129,14 +130,14 @@ it('rejects future versions and dangerous import fields while stripping non-dang
     kind: LOCAL_DATA_EXPORT_KIND,
     exportVersion: 1,
     schemaVersion: 1,
-    localStorage: { [LOCAL_PROFILE_STORAGE_KEY]: JSON.stringify({ patientName: 'Nope' }) },
+    localStorage: { [FIELD_MODE_STORAGE_KEY]: JSON.stringify({ patientName: 'Nope' }) },
     indexedDb: { missions: [], checklistRuns: [] },
   }))).toThrow(/dangerous field/i);
   expect(() => parseLocalDataImport(JSON.stringify({
     kind: LOCAL_DATA_EXPORT_KIND,
     exportVersion: 1,
     schemaVersion: 1,
-    localStorage: { [LOCAL_PROFILE_STORAGE_KEY]: JSON.stringify({ apiToken: 'Nope' }) },
+    localStorage: { [FIELD_MODE_STORAGE_KEY]: JSON.stringify({ apiToken: 'Nope' }) },
     indexedDb: { missions: [], checklistRuns: [] },
   }))).toThrow(/dangerous field/i);
 
@@ -144,10 +145,15 @@ it('rejects future versions and dangerous import fields while stripping non-dang
     kind: LOCAL_DATA_EXPORT_KIND,
     exportVersion: 1,
     schemaVersion: 1,
-    localStorage: { [LOCAL_PROFILE_STORAGE_KEY]: JSON.stringify({ schemaVersion: 1, profileEnabled: false }), 'beredskapsboka-unknown': 'drop' },
+    localStorage: {
+      [FIELD_MODE_STORAGE_KEY]: JSON.stringify({ enabled: true }),
+      [LOCAL_PROFILE_STORAGE_KEY]: JSON.stringify({ schemaVersion: 1, profileEnabled: false, displayName: 'ALFA' }),
+      [LOCAL_COMPETENCE_REMINDERS_STORAGE_KEY]: JSON.stringify([{ id: 'reminder-1', label: 'Pumpe', enabled: true }]),
+      'beredskapsboka-unknown': 'drop',
+    },
     indexedDb: { missions: [], checklistRuns: [] },
   }));
-  expect(Object.keys(parsed.localStorage)).toEqual([LOCAL_PROFILE_STORAGE_KEY]);
+  expect(parsed.localStorage).toEqual({ [FIELD_MODE_STORAGE_KEY]: JSON.stringify({ enabled: true }) });
 });
 
 it('rejects imported local data with high-confidence sensitive mission text before replacing stored data', async () => {
@@ -172,6 +178,8 @@ it('rejects imported local data with high-confidence sensitive mission text befo
 it('reads only known localStorage keys for backup', () => {
   const storage = new MemoryStorage();
   storage.setItem(FIELD_MODE_STORAGE_KEY, '{"enabled":true}');
+  storage.setItem(LOCAL_PROFILE_STORAGE_KEY, '{"schemaVersion":1,"profileEnabled":true,"displayName":"ALFA"}');
+  storage.setItem(LOCAL_COMPETENCE_REMINDERS_STORAGE_KEY, '[{"id":"reminder-1","label":"Pumpe"}]');
   storage.setItem('random-third-party-key', 'must not export');
 
   expect(readKnownLocalStorage(storage)).toEqual({ [FIELD_MODE_STORAGE_KEY]: '{"enabled":true}' });
@@ -236,13 +244,12 @@ it('rolls back localStorage if import storage writes fail before DB replacement'
       super.setItem(key, value);
     }
   }
-  const storage = new FailingStorage(LOCAL_PROFILE_STORAGE_KEY);
+  const storage = new FailingStorage(FIELD_MODE_STORAGE_KEY);
   storage.values.set(FIELD_MODE_STORAGE_KEY, '{"enabled":false}');
   storage.values.set(LOCAL_PROFILE_STORAGE_KEY, '{"schemaVersion":1,"profileEnabled":true}');
   const exportData = buildLocalDataExport({
     localStorage: {
       [FIELD_MODE_STORAGE_KEY]: '{"enabled":true}',
-      [LOCAL_PROFILE_STORAGE_KEY]: '{"schemaVersion":1,"profileEnabled":false}',
     },
     missions: [baseMission],
     checklistRuns: [baseRun],

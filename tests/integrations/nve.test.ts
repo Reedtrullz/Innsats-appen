@@ -1,4 +1,5 @@
 import { GET } from '@/app/api/context/hazards/route';
+import { guardExternalContextSignals } from '@/lib/integrations/route-guards';
 import { fetchNveHazardSignals, getNveAvalancheSourceStatus, refreshNveSourceHealth } from '@/lib/integrations/nve';
 
 function nveFetchFixture() {
@@ -33,10 +34,53 @@ it('maps NVE flood and landslide warnings as context signals, not action cards',
   expect(signals.map((signal) => signal.rawRef)).toEqual(expect.arrayContaining(['nve:flood-warning', 'nve:landslide-warning']));
 });
 
+it('normalizes invalid NVE dates to null and malformed activity levels to unknown', async () => {
+  const signals = await fetchNveHazardSignals({
+    municipality: '5001',
+    start: '2026-06-02',
+    end: '2026-06-03',
+    fetchImpl: async (url) => {
+      if (!url.includes('/api/Warning/Municipality/5001/1/2026-06-02/2026-06-03')) {
+        return new Response(JSON.stringify({ error: `unexpected url ${url}` }), { status: 404 });
+      }
+      if (url.includes('/flood/')) {
+        return new Response(JSON.stringify([
+          { EventId: 'xxx', ActivityLevel: '', DangerTypeName: 'Flomfare', MainText: 'Ugyldig dato og tomt nivå', ValidFrom: '30/02/2026 07:00:00', ValidTo: '03/06/2026 25:00:00' },
+          { EventId: 'xxx', ActivityLevel: 2.5, DangerTypeName: 'Flomfare', MainText: 'Ikke-heltallsnivå', ValidFrom: '02/06/2026 07:00:00', ValidTo: '03/06/2026 07:00:00' },
+          { EventId: 'xxx', ActivityLevel: 5, DangerTypeName: 'Flomfare', MainText: 'For høyt nivå', ValidFrom: '02/06/2026 07:00:00', ValidTo: '03/06/2026 07:00:00' },
+          { EventId: 'xxx', ActivityLevel: '3', DangerTypeName: 'Flomfare', MainText: 'Gyldig dato og tekstnivå', ValidFrom: '02/06/2026 07:00:00', ValidTo: '03/06/2026 07:00:00' },
+        ]));
+      }
+      if (url.includes('/landslide/')) {
+        return new Response(JSON.stringify([
+          { EventId: 'xxx', DangerTypeName: 'Jordskredfare', MainText: 'Manglende nivå', ValidFrom: 'ikke en dato', ValidTo: null },
+          { EventId: 'xxx', ActivityLevel: 999, DangerTypeName: 'Jordskredfare', MainText: 'Ekstremt høyt ukjent nivå', ValidFrom: '02/06/2026 07:00:00', ValidTo: '03/06/2026 07:00:00' },
+        ]));
+      }
+      return new Response(JSON.stringify({ error: 'unknown NVE endpoint' }), { status: 404 });
+    },
+  });
+
+  expect(guardExternalContextSignals(signals).ok).toBe(true);
+  expect(signals).toHaveLength(6);
+  expect(signals.filter((signal) => signal.severity === 'unknown')).toHaveLength(5);
+  expect(signals.find((signal) => signal.summary === 'Ikke-heltallsnivå')?.severity).toBe('unknown');
+  expect(signals.find((signal) => signal.summary === 'For høyt nivå')?.severity).toBe('unknown');
+  expect(signals.find((signal) => signal.summary === 'Ekstremt høyt ukjent nivå')?.severity).toBe('unknown');
+  expect(signals.find((signal) => signal.summary === 'Gyldig dato og tekstnivå')?.severity).toBe('orange');
+  expect(signals.find((signal) => signal.summary === 'Gyldig dato og tekstnivå')?.validFrom).toBe('2026-06-02T07:00:00Z');
+  expect(signals.find((signal) => signal.summary === 'Ugyldig dato og tomt nivå')?.validFrom).toBeNull();
+  expect(signals.find((signal) => signal.summary === 'Ugyldig dato og tomt nivå')?.validTo).toBeNull();
+  expect(signals.find((signal) => signal.summary === 'Manglende nivå')?.validFrom).toBeNull();
+  expect(signals.find((signal) => signal.summary === 'Manglende nivå')?.validTo).toBeNull();
+  expect(signals.every((signal) => !signal.upstreamId?.includes('30/02/2026') && !signal.upstreamId?.includes('ikke en dato'))).toBe(true);
+});
+
 it('rejects malformed hazard route queries', async () => {
   for (const query of ['url=https://evil.example', 'municipality=abc', 'municipality=0000', 'municipality=5001&municipality=5002', 'municipality=5001&start=bad-date', 'municipality=5001&start=2026-99-99', 'municipality=5001&start=2026-06-04&end=2026-06-03', 'municipality=5001&start=2026-06-02&end=2026-06-20', 'municipality=5001&start=2030-01-01']) {
     const response = await GET(new Request(`http://localhost/api/context/hazards?${query}`));
     expect(response.status).toBe(400);
+    expect(response.headers.get('Cache-Control')).toBe('private, no-store');
   }
 });
 

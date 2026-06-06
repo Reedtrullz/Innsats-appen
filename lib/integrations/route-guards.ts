@@ -83,7 +83,27 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isIsoDateTime(value: unknown) {
-  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(value) && !Number.isNaN(Date.parse(value));
+  if (typeof value !== 'string') return false;
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:\d{2})$/);
+  if (!match) return false;
+  const [, yearRaw, monthRaw, dayRaw, hourRaw, minuteRaw, secondRaw, timezoneRaw] = match;
+  const year = Number(yearRaw);
+  const month = Number(monthRaw);
+  const day = Number(dayRaw);
+  const hour = Number(hourRaw);
+  const minute = Number(minuteRaw);
+  const second = Number(secondRaw);
+  if (month < 1 || month > 12) return false;
+  const lastDayOfMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  if (day < 1 || day > lastDayOfMonth) return false;
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59 || second < 0 || second > 59) return false;
+  if (timezoneRaw !== 'Z') {
+    const [offsetHourRaw, offsetMinuteRaw] = timezoneRaw.slice(1).split(':');
+    const offsetHour = Number(offsetHourRaw);
+    const offsetMinute = Number(offsetMinuteRaw);
+    if (offsetHour < 0 || offsetHour > 23 || offsetMinute < 0 || offsetMinute > 59) return false;
+  }
+  return !Number.isNaN(Date.parse(value));
 }
 
 function isOptionalIsoDateTime(value: unknown) {

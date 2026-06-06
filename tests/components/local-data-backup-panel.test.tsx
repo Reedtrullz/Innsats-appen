@@ -14,7 +14,8 @@ it('shows quota fallback and generates an explicit local-only JSON backup', asyn
   render(<LocalDataBackupPanel buildExport={buildExport} estimateQuota={async () => { throw new Error('quota unavailable'); }} />);
 
   await waitFor(() => expect(screen.getByTestId('local-data-quota')).toHaveTextContent(/Lagringskvote er ukjent/i));
-  expect(screen.getByText(/PIN-hash\/salt/i)).toBeInTheDocument();
+  expect(screen.getByText(/lokal oppdrags-\/sjekklistetilstand og allowlistede appinnstillinger/i)).toBeInTheDocument();
+  expect(screen.getByText(/Lokale profilfelt, kallesignal, kompetansepåminnelser og PIN-hash\/salt eksporteres ikke/i)).toBeInTheDocument();
 
   await user.click(screen.getByRole('button', { name: /Lag lokal JSON-backup/i }));
 
