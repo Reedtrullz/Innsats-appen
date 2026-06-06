@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T13:04:11.373Z",
+  "generatedAt": "2026-06-06T13:19:36.207Z",
   "sourceCount": 12,
   "planSourceCount": 12,
-  "planSourceHash": "sha256:654158ab3c047b7740d5e09d077f826a8682d6e28a1dcfccabb03d5e75cf368c",
+  "planSourceHash": "sha256:892b184fbd81822012c59080ab3dd08ee59592f5808697c3d5f1bae67aaa9497",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6752,69 +6752,97 @@
         "Created from the 2026-06-06 comprehensive review of Beredskapsboka/Innsats-appen. Local HEAD 055f62dd32b6c5da4752ac6623e302e749922f57 passed npm run check:ci but is not pushed/deployed; production remains 4cad45b358edf4c8044a46391f3ace7c93d3995b. Pilot readiness remains blocked by 55 source-governance blockers, physical-device evidence, rollback/governance decisions, and exact-SHA deploy verification."
       ],
       "taskCount": 13,
-      "updatedAt": "2026-06-06T12:23:58.382Z",
+      "updatedAt": "2026-06-06T13:19:36.207Z",
       "tasks": [
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-1",
           "title": "Add explicit no-store cache headers to /api/health",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-06T13:18:45Z",
+          "evidence": [
+            "Commit e20ee55 added no-store Cache-Control to /api/health; focused health Vitest passed and spec/quality reviews approved."
+          ],
           "sourceHeading": "Task 1: Add explicit no-store cache headers to /api/health"
         },
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-2",
           "title": "Reject sensitive checklist item notes before local persistence",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-06T13:18:45Z",
+          "evidence": [
+            "Commits ba10018 and 2567d0c block sensitive checklist notes before persistence, keep unsafe drafts out of checkbox/equipment persistence, and pass 6 checklist Vitest tests plus typecheck; spec/quality reviews approved."
+          ],
           "sourceHeading": "Task 2: Reject sensitive checklist item notes before local persistence"
         },
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-3",
           "title": "Detect sensitive GeoJSON import text before truncation",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-06T13:18:45Z",
+          "evidence": [
+            "Commit 9f20c67 detects sensitive GeoJSON import text before truncation; offline-map panel Vitest passed with 44 tests and spec/quality reviews approved."
+          ],
           "sourceHeading": "Task 3: Detect sensitive GeoJSON import text before truncation"
         },
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-4",
           "title": "Harden manual production publish script against unverified local deploys",
-          "status": "planned",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-06T13:18:45Z",
+          "evidence": [
+            "Commits d76ef99 and 4aa8338 harden manual publish with origin/main parity, check:ci, exact CI / Deploy main-run selection, and deploy-job evidence; deploy security Vitest passed with 7 tests and bash -n passed; spec/quality reviews approved."
+          ],
           "sourceHeading": "Task 4: Harden manual production publish script against unverified local deploys"
         },
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-5",
           "title": "Correct stale 61-source workplan evidence to current 55-source count",
-          "status": "planned",
+          "status": "completed",
           "stage": "release",
           "risk": "medium",
           "owner": "AR",
+          "completedAt": "2026-06-06T13:18:45Z",
+          "evidence": [
+            "Commit eaf1cc4 synced stale source-governance evidence from 61 to 55 referenced blockers and 0 public body blockers; workplan snapshot/mirrors verified fresh."
+          ],
           "sourceHeading": "Task 5: Correct stale 61-source workplan evidence to current 55-source count"
         },
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-6",
           "title": "Run focused hardening gates and regression audit",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-06T13:18:45Z",
+          "evidence": [
+            "Focused Task 6 gate passed: 76 targeted Vitest tests, typecheck, lint, git diff --check, marker grep, production build, 10 focused Playwright production E2E tests, and final integration review approved."
+          ],
           "sourceHeading": "Task 6: Run focused hardening gates and regression audit"
         },
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-7",
           "title": "Run full local release gate on the committed tree [PARENT-DIRECT]",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-06T13:18:45Z",
+          "evidence": [
+            "Full local gate passed on committed tree at eaf1cc4: npm run check:ci (95 Vitest files / 685 tests, 37 Playwright E2E, perf budget, Lighthouse 97), npm run audit:ci high gate passed with 3 moderate no-fix advisories, stale-content passed, and strict source governance honestly remains blocked with 55 referenced blockers / 0 public body blockers."
+          ],
           "sourceHeading": "Task 7: Run full local release gate on the committed tree [PARENT-DIRECT]"
         },
         {
