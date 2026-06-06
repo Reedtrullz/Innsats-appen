@@ -221,7 +221,7 @@ async function readPregeneratedImportResult(generatedDir: string, publicGenerate
   }
   const sources = JSON.parse(await fs.readFile(sourcePath, 'utf8')).map((source: unknown) => normalizeSourceDocument(source));
   if (sources.length === 0) throw new Error(`Pregenerated ${sourcePath} must contain at least one source document`);
-  await writeJson(path.join(publicGeneratedDir, 'source-documents.json'), sources.map((source: SourceDocument) => ({ ...source, body: source.body.slice(0, 12000) })));
+  await writeJson(path.join(publicGeneratedDir, 'source-documents.json'), publicSourceDocuments(sources));
   const copiedAssets = (await pathExists(publicAssetsDir)) ? (await fs.readdir(publicAssetsDir)).sort() : [];
   const previous = await readManifest(generatedDir);
   const previousSnapshot = await readSourceSnapshotMetadata(generatedDir);
@@ -258,6 +258,15 @@ async function readPregeneratedImportResult(generatedDir: string, publicGenerate
 async function writeJson(filePath: string, value: unknown) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
+function publicSourceDocument(source: SourceDocument) {
+  const body = source.publicationStatus === 'approved-public' ? source.body.slice(0, 12000) : '';
+  return { ...source, body };
+}
+
+function publicSourceDocuments(sources: SourceDocument[]) {
+  return sources.map(publicSourceDocument);
 }
 
 function extractAssetRefs(markdown: string): string[] {
@@ -361,7 +370,7 @@ export async function importObsidianSources(basePath = DEFAULT_SOURCE_PATH, opti
   }
 
   await writeJson(path.join(generatedDir, 'source-documents.json'), sources);
-  await writeJson(path.join(publicGeneratedDir, 'source-documents.json'), sources.map((source) => ({ ...source, body: source.body.slice(0, 12000) })));
+  await writeJson(path.join(publicGeneratedDir, 'source-documents.json'), publicSourceDocuments(sources));
   const previousRawManifest = await readManifest(generatedDir);
   const previousSnapshot = await readSourceSnapshotMetadata(generatedDir);
   const previous = manifestWithDefaults(previousRawManifest, now);
