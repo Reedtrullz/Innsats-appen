@@ -97,32 +97,70 @@ it('does not flag unreferenced draft sources as pilot-blocking operational usage
 });
 
 it('reports public source document bodies that are exposed without publication approval', () => {
+  type SourceDocumentFixture = Parameters<typeof buildSourceGovernanceReport>[0]['sources'][number] & {
+    body?: string;
+  };
+  type ReportWithPublicBodyFindings = ReturnType<typeof buildSourceGovernanceReport> & {
+    summary: ReturnType<typeof buildSourceGovernanceReport>['summary'] & {
+      publicBodyBlockingSourceCount: number;
+    };
+    findings: ReturnType<typeof buildSourceGovernanceReport>['findings'] & {
+      publicBodyBlockingSources: Array<{
+        sourceId: string;
+        reason: string;
+        referencedBy: string[];
+      }>;
+    };
+  };
+
+  // This fixture models public/generated-content/source-documents.json: any non-approved body
+  // present here is already a public exposure, independent of cards/checklists/training paths.
+  const publicSourceDocuments: SourceDocumentFixture[] = [
+    {
+      id: 'src-body-needs-permission',
+      title: 'Body Needs Permission',
+      status: 'verified',
+      reviewRisk: 'high',
+      warnings: [],
+      pilotReviewStatus: 'approved-for-pilot',
+      publicationStatus: 'needs-permission',
+      body: 'This body must not be public.',
+    },
+    {
+      id: 'src-approved-public-with-body',
+      title: 'Approved Public With Body',
+      status: 'verified',
+      reviewRisk: 'low',
+      warnings: [],
+      pilotReviewStatus: 'approved-for-pilot',
+      publicationStatus: 'approved-public',
+      body: 'Approved public body.',
+    },
+  ];
   const report = buildSourceGovernanceReport({
-    sources: [
-      ...sources,
-      {
-        id: 'src-body-needs-permission',
-        title: 'Body Needs Permission',
-        status: 'verified',
-        reviewRisk: 'high',
-        warnings: [],
-        pilotReviewStatus: 'approved-for-pilot',
-        publicationStatus: 'needs-permission',
-        body: 'This body must not be public.',
-      },
-    ],
-    cards,
-    checklists,
-    trainingPaths,
-  });
+    sources: publicSourceDocuments,
+    cards: [],
+    checklists: [],
+    trainingPaths: [],
+  }) as ReportWithPublicBodyFindings;
 
   expect(report.summary.publicBodyBlockingSourceCount).toBe(1);
   expect(report.findings.publicBodyBlockingSources).toEqual([
     expect.objectContaining({
       sourceId: 'src-body-needs-permission',
       reason: 'public body is present while publication status is needs-permission',
+      referencedBy: [],
     }),
   ]);
+  expect(report.findings.publicBodyBlockingSources.map((finding) => finding.sourceId)).not.toContain(
+    'src-approved-public-with-body',
+  );
+  expect(JSON.stringify(report.findings.publicBodyBlockingSources)).not.toContain(
+    'This body must not be public.',
+  );
+  expect(JSON.stringify(report.findings.publicBodyBlockingSources)).not.toContain(
+    'Approved public body.',
+  );
 });
 
 it('exposes source governance npm scripts', () => {
