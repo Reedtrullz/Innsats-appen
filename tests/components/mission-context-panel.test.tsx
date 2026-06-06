@@ -98,6 +98,15 @@ it('wires Hurtiglogg composer and log overview into the active mission dashboard
   expect(screen.getByRole('region', { name: /loggoversikt/i })).toHaveTextContent('Dashboard loggoversikt entry');
 });
 
+it('discloses the outbound boundary for public context lookups in mission creation', async () => {
+  await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} actionCards={[]} />);
+
+  const text = document.body.textContent ?? '';
+  expect(text).toContain('MET/Kartverket/NVE');
+  expect(text).toContain('posisjon eller søketekst sendes til offentlige API-er');
+  expect(text).toContain('oppdragsnotater og privat tekst forblir lokalt');
+});
+
 it('stores the checklist that matches the selected mission scenario and phase', async () => {
   await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} />);
 
