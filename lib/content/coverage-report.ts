@@ -123,7 +123,7 @@ function addReleaseGap(gaps: ReleaseCoverageGap[], id: string, title: string, co
 
 export function buildContentCoverageReport(graph: ContentCoverageGraph, generatedAt = new Date().toISOString()): ContentCoverageReport {
   const sources = graph.sources ?? [];
-  const publicSources = graph.publicSources ?? graph.publicGraph?.sources ?? sources;
+  const publicSources = graph.publicSources ?? graph.publicGraph?.sources ?? [];
   const actionCards = graph.actionCards ?? [];
   const checklists = graph.checklists ?? [];
   const trainingPaths = graph.trainingPaths ?? [];

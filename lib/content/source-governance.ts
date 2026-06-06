@@ -16,7 +16,9 @@ type ChecklistItemLike = {
 };
 
 type ReferencingItem = {
-  slug: string;
+  slug?: string;
+  id?: string;
+  term?: string;
   title?: string;
   sourceIds?: string[];
   items?: ChecklistItemLike[];
@@ -28,6 +30,8 @@ export type BuildSourceGovernanceReportInput = {
   cards: ReferencingItem[];
   checklists: ReferencingItem[];
   trainingPaths: ReferencingItem[];
+  protectionMeasures?: ReferencingItem[];
+  glossary?: ReferencingItem[];
 };
 
 export type SourceGovernanceFinding = {
@@ -68,17 +72,25 @@ function addReferences(references: Map<string, string[]>, sourceIds: string[] | 
   }
 }
 
+function referenceKey(item: ReferencingItem) {
+  return item.slug ?? item.term ?? item.id ?? 'unknown';
+}
+
 function sourceReferences(input: BuildSourceGovernanceReportInput) {
   const references = new Map<string, string[]>();
 
-  for (const card of input.cards) addReferences(references, card.sourceIds, `card:${card.slug}`);
+  for (const card of input.cards) addReferences(references, card.sourceIds, `card:${referenceKey(card)}`);
 
   for (const checklist of input.checklists) {
-    addReferences(references, checklist.sourceIds, `checklist:${checklist.slug}`);
-    for (const item of checklist.items ?? []) addReferences(references, item.sourceIds, `checklist:${checklist.slug}:item:${item.id}`);
+    addReferences(references, checklist.sourceIds, `checklist:${referenceKey(checklist)}`);
+    for (const item of checklist.items ?? []) addReferences(references, item.sourceIds, `checklist:${referenceKey(checklist)}:item:${item.id}`);
   }
 
-  for (const trainingPath of input.trainingPaths) addReferences(references, trainingPath.sourceIds, `training:${trainingPath.slug}`);
+  for (const trainingPath of input.trainingPaths) addReferences(references, trainingPath.sourceIds, `training:${referenceKey(trainingPath)}`);
+
+  for (const protection of input.protectionMeasures ?? []) addReferences(references, protection.sourceIds, `protection:${referenceKey(protection)}`);
+
+  for (const glossary of input.glossary ?? []) addReferences(references, glossary.sourceIds, `glossary:${referenceKey(glossary)}`);
 
   return references;
 }

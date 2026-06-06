@@ -72,6 +72,50 @@ it('reports referenced sources that are not pilot/public approved, including che
   ]);
 });
 
+it('includes protection measures and glossary sourceIds in referenced pilot blockers', () => {
+  const report = buildSourceGovernanceReport({
+    sources: [
+      ...sources,
+      {
+        id: 'src-protection-only',
+        title: 'Protection-only source',
+        status: 'unverified',
+        reviewRisk: 'high',
+        warnings: [],
+        pilotReviewStatus: 'not-reviewed',
+        publicationStatus: 'needs-permission',
+      },
+      {
+        id: 'src-glossary-only',
+        title: 'Glossary-only source',
+        status: 'verified',
+        reviewRisk: 'medium',
+        warnings: [],
+        pilotReviewStatus: 'approved-for-pilot',
+        publicationStatus: 'needs-permission',
+      },
+    ],
+    cards: [],
+    checklists: [],
+    trainingPaths: [],
+    protectionMeasures: [{ slug: 'shelter-readiness', title: 'Shelter readiness', sourceIds: ['src-protection-only'] }],
+    glossary: [{ term: 'beredskapsvakt', sourceIds: ['src-glossary-only'] }],
+  });
+
+  expect(report.summary.referencedSourceCount).toBe(2);
+  expect(report.summary.pilotBlockingReferencedSourceCount).toBe(2);
+  expect(report.findings.pilotBlockingReferencedSources).toEqual([
+    expect.objectContaining({
+      sourceId: 'src-protection-only',
+      referencedBy: ['protection:shelter-readiness'],
+    }),
+    expect.objectContaining({
+      sourceId: 'src-glossary-only',
+      referencedBy: ['glossary:beredskapsvakt'],
+    }),
+  ]);
+});
+
 it('does not flag unreferenced draft sources as pilot-blocking operational usage', () => {
   const report = buildSourceGovernanceReport({
     sources: [

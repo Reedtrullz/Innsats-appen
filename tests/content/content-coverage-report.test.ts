@@ -92,4 +92,29 @@ describe('content coverage source-governance release board gaps', () => {
 
     expect(report.releaseBoard.gaps.some((candidate) => candidate.id === 'source-governance-publication-blockers')).toBe(false);
   });
+
+  it('does not use private source bodies for publication blockers when no public snapshot is supplied', () => {
+    const privateBody = 'Private-only body must not be treated as a public publication exposure.';
+    const report = buildContentCoverageReport({
+      sources: [
+        {
+          id: 'src-private-only-no-public-snapshot',
+          title: 'Private source with no public snapshot',
+          status: 'verified',
+          pilotReviewStatus: 'approved-for-pilot',
+          publicationStatus: 'needs-permission',
+          body: privateBody,
+        },
+      ],
+      actionCards: [],
+      checklists: [],
+      trainingPaths: [],
+      protectionMeasures: [],
+      glossary: [],
+    } as any, '2026-06-06T00:00:00.000Z');
+
+    expect(report.releaseBoard.gaps.some((candidate) => candidate.id === 'source-governance-publication-blockers')).toBe(false);
+    expect(JSON.stringify(report)).not.toContain(privateBody);
+    expect(JSON.stringify(report.releaseBoard.gaps)).not.toContain(privateBody);
+  });
 });
