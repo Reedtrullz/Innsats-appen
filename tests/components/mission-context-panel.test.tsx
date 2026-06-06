@@ -1273,8 +1273,8 @@ it('lets users save structured lessons and feedback before locally completing an
     expect(archived[0]?.archivedAt).toBeTruthy();
     expect(archived[0]?.lessonsLearned?.improvements).toContain('sambandstest');
   });
-  expect(screen.getByRole('heading', { name: /Ingen aktiv lokal tavle/i })).toBeInTheDocument();
-  expect(screen.getByText(/FIG arkiverbar innsats/)).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { name: /Ingen aktiv lokal tavle/i })).toBeInTheDocument();
+  expect(await screen.findByText(/FIG arkiverbar innsats/)).toBeInTheDocument();
 });
 
 it('supports local archive search, deleting one archived mission and clearing the archive without deleting active missions', async () => {
