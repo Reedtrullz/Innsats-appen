@@ -315,7 +315,8 @@ it('documents the source-governance remediation queue without leaking source bod
   expect(queue).toContain('# Source governance remediation queue');
   expect(queue).toContain('| Source ID | Current blocker | Referenced by | Required next action | Owner evidence |');
   expect(queue).toContain('src-5-punktsordre');
-  expect(queue).toContain('strict report currently lists 55 referenced blockers');
+  expect(queue).toContain('strict report now lists 0 referenced blockers and 0 public-body blockers');
+  expect(queue).toContain('docs/source-governance-open-web-research-2026-06-06.md');
   expect(policy).toContain('docs/source-governance-remediation-queue.md');
   expect(queue).not.toContain('src-deep-research');
   for (const forbidden of ['# 5-punktsordre', 'Known source body', '/Users/', 'body":', '"owner"', '"reviewer"']) {
@@ -332,17 +333,18 @@ it('exposes source governance npm scripts', () => {
   );
 });
 
-it('keeps strict source-governance output as complete JSON while exiting with gate failure', () => {
+it('keeps strict source-governance output as complete JSON when the gate is clean', () => {
   const result = spawnSync('npx', ['tsx', 'scripts/report-source-governance.ts', '--strict'], {
     cwd: process.cwd(),
     encoding: 'utf8',
     maxBuffer: 1024 * 1024 * 10,
   });
 
-  expect(result.status).toBe(2);
-  expect(result.stderr).toContain('Source governance strict gate failed:');
+  expect(result.status).toBe(0);
+  expect(result.stderr).toBe('');
   const report = JSON.parse(result.stdout) as ReturnType<typeof buildSourceGovernanceReport>;
-  expect(report.summary.pilotBlockingReferencedSourceCount).toBeGreaterThan(0);
+  expect(report.summary.pilotBlockingReferencedSourceCount).toBe(0);
+  expect(report.summary.publicBodyBlockingSourceCount).toBe(0);
   expect(JSON.stringify(report)).not.toContain('"body"');
   expect(JSON.stringify(report)).not.toContain('"owner"');
   expect(JSON.stringify(report)).not.toContain('"reviewer"');

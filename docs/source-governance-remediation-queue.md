@@ -4,10 +4,11 @@ Generated from `npm run report:source-governance:strict` during the 2026-06-06 a
 
 ## Current strict status
 
-The strict report currently lists 55 referenced blockers. This queue intentionally uses source IDs, titles, governance statuses, reference labels/slugs, and owner-evidence metadata only; it does not include raw source bodies, local file paths, credentials, private evidence values, or material from source-extracts.
-Rows show the first five references for readability; rerun `npm run report:source-governance:strict` for the full reference list before removing references.
+2026-06-06 open-web research update: the strict report now lists 0 referenced blockers and 0 public-body blockers after applying `docs/source-governance-open-web-research-2026-06-06.md`, updating Obsidian source governance metadata, and dereferencing sources that could not be safely/publicly approved.
 
-Task 10 has started with a privacy-safe Batch A owner-review packet at `docs/source-governance-batch-a-owner-review.md`. That packet lists all 21 Batch A sources and all 277 referenced labels/slugs that need source-owner approval, replacement, or removal. It is not approval evidence by itself.
+This queue is retained as the historical remediation queue from the audit. It intentionally uses source IDs, titles, governance statuses, reference labels/slugs, and owner-evidence metadata only; it does not include raw source bodies, local file paths, credentials, private evidence values, or material from source-extracts. Rerun `npm run report:source-governance:strict` for the current source-governance state.
+
+Task 10 started with a privacy-safe Batch A owner-review packet at `docs/source-governance-batch-a-owner-review.md`. The open-web research packet supersedes the pending owner-review blocker for public-pilot gate purposes, under the user's instruction that exact public documents or public information equivalents can be approved or used as replacements.
 
 Deep-research sources have been removed from pilot/public references in Task 10; if they reappear here, treat that as a regression and replace or remove the reference before pilot.
 

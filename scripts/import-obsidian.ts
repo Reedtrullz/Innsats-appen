@@ -175,7 +175,7 @@ function sourceReviewMetadata(data: Record<string, unknown>, status: SourceDocum
 
 function normalizeSourceDocument(source: unknown): SourceDocument {
   const draft = source as Record<string, unknown>;
-  const status = mapStatus(draft.status ?? draft.source_status);
+  const status = mapStatus(draft.source_status ?? draft.status);
   return SourceDocumentSchema.parse({
     ...draft,
     status,

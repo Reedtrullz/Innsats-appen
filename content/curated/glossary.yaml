@@ -14,7 +14,7 @@
 - term: MFE
   definition: Mobil forsterkningsenhet som kan støtte distrikter ved større hendelser.
   synonyms: [mobil forsterkningsenhet, forsterkningsenhet, nasjonal støtte, støtteanmodning]
-  sourceIds: [src-mobile-forsterkningsenheter-mfe]
+  sourceIds: [src-grunnopplaering-mfe-10-mannskap]
 - term: RADIAC
   definition: Radiologisk måletjeneste for måling, dosekontroll og rapportering.
   synonyms: [radiacmåling, stråling, dose, dosimeter, doserate]
@@ -47,7 +47,7 @@
   definition: Beredskapsvakt/vakthavende dekker vaktfunksjon, mottak av varsler og første oppfølging.
   aliases: [vakt]
   synonyms: [vakthavende, varselmottak]
-  sourceIds: [src-opplaeringsplan-for-beredskapsvakt, src-tiltakskort-01-vaktbytte]
+  sourceIds: [src-opplaeringsplan-for-beredskapsvakt]
 - term: pumpe
   definition: Pumpe og lensepumpe brukes ved flom, vannforsyning, slangeutlegg og vannskade.
   aliases: [lensepumpe]
@@ -67,7 +67,7 @@
   definition: Materiellberedskapskontroll/MBK dekker materiellkontroll, etterkontroll, klargjøring og service etter bruk.
   aliases: [materiellberedskap]
   synonyms: [materiellkontroll, etterkontroll, klargjøring, karantene, service, vask]
-  sourceIds: [src-mobile-forsterkningsenheter-mfe, src-opplaering-materiellansvarlig-fig]
+  sourceIds: [src-sjekkliste-mobil-forsterkningsenhet-mfe, src-opplaering-materiellansvarlig-fig]
 - term: tilfluktsrom
   definition: Beskyttelsestiltak der bare offentlig/godkjent informasjon skal brukes i MVP.
   synonyms: [sivile beskyttelsestiltak, offentlig tilfluktsrom]

@@ -108,7 +108,7 @@
     - Ikke send ressurs uten tydelig oppdragsforståelse og kontaktpunkt.
   reporting:
     - Loggfør anmodning, tidspunkt, beslutning og ressursstatus.
-  sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-mobile-forsterkningsenheter-mfe]
+  sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-grunnopplaering-mfe-10-mannskap]
   competenceRequired: []
   competenceRationale: Anmodning og mottak av MFE er leder-/beredskapsvaktprosess; selve MFE-oppgaven utføres av trent MFE-personell.
   warning: Kontroller mot gjeldende distriktets tiltakskort.
@@ -688,7 +688,7 @@
     - Ikke send eller motta MFE uten tydelig kontaktpunkt, oppdragsforståelse og sikkerhetsbrief.
   reporting:
     - Loggfør anmodning, beslutning, ankomst, oppdrag, avvik og avslutning lokalt.
-  sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-tiltakskort-06-oppsettende-mfe-distrikt, src-mobile-forsterkningsenheter-mfe, src-sjekkliste-mobil-forsterkningsenhet-mfe]
+  sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-tiltakskort-06-oppsettende-mfe-distrikt, src-grunnopplaering-mfe-10-mannskap, src-sjekkliste-mobil-forsterkningsenhet-mfe]
   competenceRequired: [MFE10]
   equipmentRequired: [samband, kjoretoy]
   warning: Følg gjeldende tiltakskort og distriktets ordre; appen sender ingen offisiell anmodning.
