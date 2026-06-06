@@ -6,6 +6,9 @@ Generated from `npm run report:source-governance:strict` during the 2026-06-06 a
 
 The strict report currently lists 55 referenced blockers. This queue intentionally uses source IDs, titles, governance statuses, reference labels/slugs, and owner-evidence metadata only; it does not include raw source bodies, local file paths, credentials, private evidence values, or material from source-extracts.
 Rows show the first five references for readability; rerun `npm run report:source-governance:strict` for the full reference list before removing references.
+
+Task 10 has started with a privacy-safe Batch A owner-review packet at `docs/source-governance-batch-a-owner-review.md`. That packet lists all 21 Batch A sources and all 277 referenced labels/slugs that need source-owner approval, replacement, or removal. It is not approval evidence by itself.
+
 Deep-research sources have been removed from pilot/public references in Task 10; if they reappear here, treat that as a regression and replace or remove the reference before pilot.
 
 ## Rules

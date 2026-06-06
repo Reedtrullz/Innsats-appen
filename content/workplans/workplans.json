@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T14:11:39.171Z",
+  "generatedAt": "2026-06-06T14:33:31.678Z",
   "sourceCount": 12,
   "planSourceCount": 12,
-  "planSourceHash": "sha256:4e5935abb1be88fd9c767bfe04b58fe813fab9ef6ef045200da830f049df083f",
+  "planSourceHash": "sha256:30b084def6f81a326e4221a57788f3494bd21e69eb32c1148cadb21149c87e22",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6752,7 +6752,7 @@
         "Audit hardening tasks 1-9 are implemented, reviewed, pushed, and live-verified through 72d5d33836c10789aa05d84e93e52dfbfd4e96b2 before this ledger update. Pilot readiness remains blocked by 55 source-governance blockers, physical-device evidence, and rollback/governance decisions; do not call the project pilot-ready until Tasks 10-13 have real evidence."
       ],
       "taskCount": 13,
-      "updatedAt": "2026-06-06T14:11:39.171Z",
+      "updatedAt": "2026-06-06T14:33:31.678Z",
       "tasks": [
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-1",
@@ -6879,7 +6879,7 @@
           "risk": "high",
           "owner": "AR",
           "evidence": [
-            "Blocked until source-owner review/approval or replacement/removal decisions are available. The strict gate currently reports 55 referenced blockers."
+            "Task 10 started at 2026-06-06T14:32:13Z by generating docs/source-governance-batch-a-owner-review.md: a privacy-safe Batch A owner-review packet covering 21 sources / 277 referenced labels. Actual strict-gate closure remains blocked until source-owner review/approval or replacement/removal decisions are available. The strict gate currently reports 55 referenced blockers."
           ],
           "sourceHeading": "Task 10: Review/approve or replace source-governance blockers in batches [PARENT-DIRECT]"
         },
