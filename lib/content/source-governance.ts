@@ -144,7 +144,7 @@ function toFinding(source: SourceLike, reason: string, referencedBy: string[]): 
 export function buildSourceGovernanceReport(input: BuildSourceGovernanceReportInput): SourceGovernanceReport {
   const references = sourceReferences(input);
   const referencedSources = input.sources.filter((source) => references.has(source.id));
-  const publicSources = input.publicSources ?? input.sources;
+  const publicSources = input.publicSources ?? [];
   const pilotBlockingReferencedSources = referencedSources.flatMap((source) => {
     const reason = pilotBlockingReason(source);
     if (!reason) return [];

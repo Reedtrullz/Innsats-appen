@@ -183,6 +183,7 @@ it('reports public source document bodies that are exposed without publication a
   ];
   const report = buildSourceGovernanceReport({
     sources: publicSourceDocuments,
+    publicSources: publicSourceDocuments,
     cards: [],
     checklists: [],
     trainingPaths: [],
@@ -205,6 +206,30 @@ it('reports public source document bodies that are exposed without publication a
   expect(JSON.stringify(report.findings.publicBodyBlockingSources)).not.toContain(
     'Approved public body.',
   );
+});
+
+it('does not treat private source bodies as public exposure when no public snapshot is supplied', () => {
+  const report = buildSourceGovernanceReport({
+    sources: [
+      {
+        id: 'private-body',
+        title: 'Private Body',
+        status: 'verified',
+        reviewRisk: 'high',
+        warnings: [],
+        pilotReviewStatus: 'approved-for-pilot',
+        publicationStatus: 'needs-permission',
+        body: 'Raw private source body must not be serialized.',
+      },
+    ],
+    cards: [],
+    checklists: [],
+    trainingPaths: [],
+  });
+
+  expect(report.summary.publicBodyBlockingSourceCount).toBe(0);
+  expect(report.findings.publicBodyBlockingSources).toEqual([]);
+  expect(JSON.stringify(report)).not.toContain('Raw private source body must not be serialized.');
 });
 
 it('does not treat private generated source bodies as public exposure when public snapshot is redacted', () => {
