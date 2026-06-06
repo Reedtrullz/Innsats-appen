@@ -316,10 +316,15 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
   const archiveSearchRequestRef = useRef(0);
 
   useEffect(() => {
+    let active = true;
     listMissions().then((storedMissions) => {
+      if (!active) return;
       latestMissionsRef.current = storedMissions;
       setMissions(storedMissions);
     });
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
