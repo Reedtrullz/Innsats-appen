@@ -25,6 +25,17 @@ Evidence fields must include:
 - Pass/fail result and notes.
 - Confirmation that no persondata, patient data, real Nødnett groups, private addresses, or skjermede positions were entered.
 
+## Exact SHA evidence packet (ready, not executed)
+
+- Tested URL: https://staging.198.23.137.16.nip.io (replace with the exact pilot/staging URL used during the manual run).
+- Expected `/api/health.version`: d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f (replace with the candidate SHA before rerun).
+- Observed `/api/health.version`: blocked — no physical/lab run observed it.
+- Device/browser/OS: blocked — physical device installed PWA / standalone launch; no browser automation accepted.
+- Network condition: blocked — OS-level install-to-home-screen run on physical iOS/Android device or real-device lab was not available.
+- Sanitized screenshot/log path: blocked — no sanitized physical/lab evidence captured.
+- Result: blocked | pass | fail — blocked because OS-level install-to-home-screen run on physical iOS/Android device or real-device lab was not available.
+- Privacy note: no persondata/patientdata/private location entered.
+
 ## Steps / Steg
 
 1. On iOS Safari: Share -> Add to Home Screen; on Android Chrome: install prompt/menu.

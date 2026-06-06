@@ -20,6 +20,27 @@ Record pass/fail, device/browser, network state, screenshots or video paths, con
 - Pass/fail result and notes.
 - Confirmation that no persondata, patient data, real Nødnett groups, private addresses, or skjermede positions were entered.
 
+## Exact SHA evidence packet (ready, not executed)
+
+- Tested URL: https://staging.198.23.137.16.nip.io (replace with the exact pilot/staging URL used during the manual run).
+- Expected `/api/health.version`: d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f (replace with the candidate SHA before rerun).
+- Observed `/api/health.version`: blocked — no physical/lab run observed it.
+- Device/browser/OS: blocked — physical device or real-device lab across Build A and Build B; no Playwright-only update pass accepted.
+- Network condition: blocked — Build A/Build B real-device update path or real-device lab was not available.
+- Sanitized screenshot/log path: blocked — no sanitized physical/lab evidence captured.
+- Result: blocked | pass | fail — blocked because Build A/Build B real-device update path or real-device lab was not available.
+- Privacy note: no persondata/patientdata/private location entered.
+
+### Update-after-offline Build A / Build B evidence
+
+- Build A tested URL: blocked — fill with the exact URL used to prime the old build before going offline.
+- Build A expected `/api/health.version`: blocked — fill with the old build SHA before the drill.
+- Build A observed `/api/health.version`: blocked — no physical/lab run observed Build A.
+- Build B tested URL: https://staging.198.23.137.16.nip.io (replace with the exact upgraded build URL during the drill).
+- Build B expected `/api/health.version`: d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f (replace with the upgraded candidate SHA before rerun).
+- Build B observed `/api/health.version`: blocked — no physical/lab run observed Build B.
+- Update/cache observation: blocked — no real-device offline-then-reconnect update activation, cache-version change, or local-data retention observation captured.
+
 ## Steps / Steg
 
 1. Prime Build A online and create local mission/checklist state.

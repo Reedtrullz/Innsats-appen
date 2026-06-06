@@ -19,6 +19,17 @@ Record pass/fail, device/browser, network state, screenshots or video paths, con
 - Pass/fail result and notes.
 - Confirmation that no persondata, patient data, real Nødnett groups, private addresses, or skjermede positions were entered.
 
+## Exact SHA evidence packet (ready, not executed)
+
+- Tested URL: https://staging.198.23.137.16.nip.io (replace with the exact pilot/staging URL used during the manual run).
+- Expected `/api/health.version`: d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f (replace with the candidate SHA before rerun).
+- Observed `/api/health.version`: blocked — no physical/lab run observed it.
+- Device/browser/OS: blocked — physical Android / Chrome; no Chromium emulation accepted.
+- Network condition: blocked — physical Android Chrome or real-device lab was not available.
+- Sanitized screenshot/log path: blocked — no sanitized physical/lab evidence captured.
+- Result: blocked | pass | fail — blocked because physical Android Chrome or real-device lab was not available.
+- Privacy note: no persondata/patientdata/private location entered.
+
 ## Steps / Steg
 
 1. Use a physical Android device or real-device lab; desktop Chromium emulation is not enough.

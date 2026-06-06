@@ -17,6 +17,29 @@ const manualDocs = [
   ['389', 'docs/manual-tests/task-389-update-after-offline.md', /update-after-offline|Ny offline-versjon|cache/i],
 ] as const;
 
+const realDeviceEvidenceDocs = manualDocs.filter(([task]) => ['385', '386', '387', '388', '389'].includes(task));
+
+const requiredRealDeviceEvidenceFields = [
+  '- Tested URL:',
+  '- Expected `/api/health.version`:',
+  '- Observed `/api/health.version`:',
+  '- Device/browser/OS:',
+  '- Network condition:',
+  '- Sanitized screenshot/log path:',
+  '- Result: blocked | pass | fail',
+  '- Privacy note: no persondata/patientdata/private location entered.',
+] as const;
+
+const requiredTask389UpdateEvidenceFields = [
+  '- Build A tested URL:',
+  '- Build A expected `/api/health.version`:',
+  '- Build A observed `/api/health.version`:',
+  '- Build B tested URL:',
+  '- Build B expected `/api/health.version`:',
+  '- Build B observed `/api/health.version`:',
+  '- Update/cache observation:',
+] as const;
+
 function read(relativePath: string) {
   return fs.readFileSync(path.join(process.cwd(), relativePath), 'utf8');
 }
@@ -56,6 +79,22 @@ describe('Group 13 manual and real-device test scripts', () => {
       expect(content, `Task ${task} script must include expected results`).toMatch(/Expected result|Forventet resultat/i);
       expect(content, `Task ${task} script must include privacy boundary`).toMatch(/persondata|pasientdata|privacy|personvern/i);
       expect(content, `Task ${task} script must include evidence requirements`).toMatch(/Evidence|Bevis|Dokumentasjon/i);
+    }
+  });
+
+  it('keeps real-device evidence packets ready but blocked until physical or lab evidence exists', () => {
+    for (const [task, docPath] of realDeviceEvidenceDocs) {
+      const content = read(docPath);
+      for (const field of requiredRealDeviceEvidenceFields) {
+        expect(content, `Task ${task} missing evidence field ${field}`).toContain(field);
+      }
+      expect(content, `Task ${task} must remain blocked until real-device evidence exists`).toMatch(/Result: blocked/i);
+      expect(content, `Task ${task} must reject Chromium\/Playwright pass evidence`).toMatch(/Chromium|Playwright|emulation/i);
+    }
+
+    const updateAfterOffline = read('docs/manual-tests/task-389-update-after-offline.md');
+    for (const field of requiredTask389UpdateEvidenceFields) {
+      expect(updateAfterOffline, `Task 389 missing update evidence field ${field}`).toContain(field);
     }
   });
 });
