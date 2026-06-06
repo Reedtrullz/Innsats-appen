@@ -6,6 +6,7 @@ it('reports a healthy deployment identity', async () => {
   try {
     const response = await GET();
     expect(response.status).toBe(200);
+    expect(response.headers.get('cache-control')).toContain('no-store');
     const body = await response.json();
     expect(body).toMatchObject({
       status: 'healthy',
