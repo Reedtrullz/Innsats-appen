@@ -29,6 +29,7 @@ Må fortsatt være blokkert før bredere pilot dersom evidence mangler:
 - Task 388: low-connectivity.
 - Task 389: update-after-offline.
 - Source governance strict gate: `npm run report:source-governance:strict` must pass, or every remaining referenced unverified/not-approved source must have explicit pilot owner acceptance recorded. Current audit still reports 55 referenced source blockers, so this is not pilot-go evidence.
+- Pilot map scope is schematic/local overlay only until an approved app-local PMTiles package, license/provenance note, attribution, cache-size decision and real-device offline evidence exist. The absence of PMTiles cache controls is intentional when `approvedLocalMapPackageManifests` is empty.
 - Intended staging DNS: `staging.innsats.reidar.tech` must either resolve publicly or pilot runbooks must explicitly use the verified fallback `staging.198.23.137.16.nip.io` until DNS is created.
 
 ## Faser
