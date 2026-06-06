@@ -15,7 +15,7 @@ if [[ -s "$HOME/.nvm/nvm.sh" ]]; then
   nvm use 22 >/dev/null
 fi
 
-for cmd in git npm ansible-playbook ansible-galaxy gh docker; do
+for cmd in git npm node ansible-playbook ansible-galaxy gh docker; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     echo "Missing required command: $cmd" >&2
     exit 1
@@ -46,13 +46,30 @@ echo "Running full local release gate before manual production publish..."
 npm run check:ci
 
 echo "Verifying exact-SHA GitHub Actions success before manual production publish..."
-CI_RUN_FILTER='.[] | select(.workflowName == "CI / Deploy" and .headSha == "'"$SHA"'" and .status == "completed" and .conclusion == "success") | .databaseId'
-CI_RUN_ID="$(gh run list --commit "$SHA" --limit 10 --json databaseId,status,conclusion,headSha,workflowName --jq "$CI_RUN_FILTER" | head -n1)"
+CI_RUNS_JSON="$(gh run list --commit "$SHA" --limit 50 --json databaseId,status,conclusion,headSha,workflowName,event,headBranch)"
+CI_RUN_ID="$(SHA="$SHA" CI_RUNS_JSON="$CI_RUNS_JSON" node <<'NODE'
+const runs = JSON.parse(process.env.CI_RUNS_JSON || '[]');
+const run = runs.find((candidate) =>
+  candidate.workflowName === 'CI / Deploy'
+  && candidate.headSha === process.env.SHA
+  && candidate.headBranch === 'main'
+  && (candidate.event === 'push' || candidate.event === 'workflow_dispatch')
+  && candidate.status === 'completed'
+  && candidate.conclusion === 'success'
+);
+if (run?.databaseId) process.stdout.write(String(run.databaseId));
+NODE
+)"
 if [[ -z "$CI_RUN_ID" ]]; then
-  echo "No completed successful CI / Deploy run found for $SHA. Do not manually deploy unverified code." >&2
+  echo "No completed successful main-branch CI / Deploy run found for $SHA. Do not manually deploy unverified code." >&2
   exit 1
 fi
-echo "Verified CI / Deploy run ${CI_RUN_ID} for ${SHA}."
+DEPLOY_JOB_ID="$(gh run view "$CI_RUN_ID" --json jobs --jq '.jobs[] | select(.name == "Deploy to VPS with Ansible" and .conclusion == "success") | .databaseId' | head -n1)"
+if [[ -z "$DEPLOY_JOB_ID" ]]; then
+  echo "CI / Deploy run $CI_RUN_ID did not include a successful Deploy to VPS with Ansible job. Do not manually deploy unverified code." >&2
+  exit 1
+fi
+echo "Verified CI / Deploy run ${CI_RUN_ID} with deploy job ${DEPLOY_JOB_ID} for ${SHA}."
 
 echo "Installing Ansible collection requirements..."
 ansible-galaxy collection install -r deploy/requirements.yml
