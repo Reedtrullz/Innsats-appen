@@ -102,6 +102,7 @@ it('uses pregenerated source documents when explicitly allowed and source extrac
       sourcePath: 'source-extracts/SRC - Known.md',
       sourceType: 'source-extract',
       status: 'verified',
+      publicationStatus: 'approved-public',
       body: 'Known source body',
       warnings: [],
     },
