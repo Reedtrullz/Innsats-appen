@@ -268,6 +268,20 @@ it('does not treat private generated source bodies as public exposure when publi
   expect(JSON.stringify(report)).not.toContain('This private generated body is intentionally preserved.');
 });
 
+it('documents the source-governance remediation queue without leaking source bodies or local paths', () => {
+  const queue = fs.readFileSync('docs/source-governance-remediation-queue.md', 'utf8');
+  const policy = fs.readFileSync('docs/source-publication-policy.md', 'utf8');
+
+  expect(queue).toContain('# Source governance remediation queue');
+  expect(queue).toContain('| Source ID | Current blocker | Referenced by | Required next action | Owner evidence |');
+  expect(queue).toContain('src-5-punktsordre');
+  expect(queue).toContain('strict report currently lists 61 referenced blockers');
+  expect(policy).toContain('docs/source-governance-remediation-queue.md');
+  for (const forbidden of ['# 5-punktsordre', 'Known source body', '/Users/', 'body":', '"owner"', '"reviewer"']) {
+    expect(queue).not.toContain(forbidden);
+  }
+});
+
 it('exposes source governance npm scripts', () => {
   const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8')) as { scripts: Record<string, string> };
 
