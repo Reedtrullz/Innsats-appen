@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T13:19:36.207Z",
+  "generatedAt": "2026-06-06T14:11:39.171Z",
   "sourceCount": 12,
   "planSourceCount": 12,
-  "planSourceHash": "sha256:892b184fbd81822012c59080ab3dd08ee59592f5808697c3d5f1bae67aaa9497",
+  "planSourceHash": "sha256:4e5935abb1be88fd9c767bfe04b58fe813fab9ef6ef045200da830f049df083f",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6749,10 +6749,10 @@
       "status": "active",
       "owner": "AR",
       "evidence": [
-        "Created from the 2026-06-06 comprehensive review of Beredskapsboka/Innsats-appen. Local HEAD 055f62dd32b6c5da4752ac6623e302e749922f57 passed npm run check:ci but is not pushed/deployed; production remains 4cad45b358edf4c8044a46391f3ace7c93d3995b. Pilot readiness remains blocked by 55 source-governance blockers, physical-device evidence, rollback/governance decisions, and exact-SHA deploy verification."
+        "Audit hardening tasks 1-9 are implemented, reviewed, pushed, and live-verified through 72d5d33836c10789aa05d84e93e52dfbfd4e96b2 before this ledger update. Pilot readiness remains blocked by 55 source-governance blockers, physical-device evidence, and rollback/governance decisions; do not call the project pilot-ready until Tasks 10-13 have real evidence."
       ],
       "taskCount": 13,
-      "updatedAt": "2026-06-06T13:19:36.207Z",
+      "updatedAt": "2026-06-06T14:11:39.171Z",
       "tasks": [
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-1",
@@ -6848,19 +6848,27 @@
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-8",
           "title": "Push and verify exact-SHA production deployment [PARENT-DIRECT]",
-          "status": "planned",
+          "status": "completed",
           "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-06T14:10:54Z",
+          "evidence": [
+            "Exact-SHA deployment was verified for 72d5d33836c10789aa05d84e93e52dfbfd4e96b2 before this ledger update. GitHub Actions run 27064109045 completed with conclusion=success for headSha 72d5d33836c10789aa05d84e93e52dfbfd4e96b2; jobs Automatic checks, Build and push GHCR image, and Deploy to VPS with Ansible all completed successfully. Live https://innsats.reidar.tech/api/health returned status=healthy, nodeEnv=production, version=72d5d33836c10789aa05d84e93e52dfbfd4e96b2, and Cache-Control including no-store. Hydrated live route smoke covered /release (55 pilot blockers, generated workplans loaded), /kart, /data-pa-enheten, and /oppdrag. This docs/workplan ledger commit must still be exact-SHA verified after push before reporting the final deployed SHA."
+          ],
           "sourceHeading": "Task 8: Push and verify exact-SHA production deployment [PARENT-DIRECT]"
         },
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-9",
           "title": "Generate a source-governance review packet for the 55 referenced blockers",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-06T14:10:54Z",
+          "evidence": [
+            "Commit ef6c658 added docs/source-governance-remediation-queue.md batch order for all 55 referenced blockers. validate:content passed; strict source-governance report still honestly exits 2 with 55 referenced blockers; spec and quality reviews approved after removing a stale temporary /tmp report reference. The packet contains source IDs, titles, governance statuses, reference counts/labels, and owner-evidence metadata only, not raw source bodies or private evidence."
+          ],
           "sourceHeading": "Task 9: Generate a source-governance review packet for the 55 referenced blockers"
         },
         {

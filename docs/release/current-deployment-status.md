@@ -18,6 +18,26 @@ gh run list --commit "$(git rev-parse origin/main)" --limit 5 \
 
 The health response must return `status=healthy`, `nodeEnv=production`, and `version` equal to the SHA being claimed. The matching GitHub Actions run must be `completed/success` for the same `headSha` before a change is described as deployed.
 
+## Audit hardening deployment checkpoint — 2026-06-06
+
+The latest audit-hardening application/documentation checkpoint verified before this ledger update was:
+
+- Verified SHA: `72d5d33836c10789aa05d84e93e52dfbfd4e96b2`
+- GitHub Actions run: https://github.com/Reedtrullz/Innsats-appen/actions/runs/27064109045
+- Workflow: `CI / Deploy`
+- Run result: `status=completed`, `conclusion=success`, `headSha=72d5d33836c10789aa05d84e93e52dfbfd4e96b2`
+- Successful jobs: `Automatic checks`, `Build and push GHCR image`, `Deploy to VPS with Ansible`
+- Live health at 2026-06-06T14:10:16Z returned `status=healthy`, `nodeEnv=production`, `version=72d5d33836c10789aa05d84e93e52dfbfd4e96b2`, and `Cache-Control: private, no-store, no-cache, max-age=0`.
+
+Live browser smoke on the same deployment checked:
+
+- `/release`: hydrated release board showed `Ikke pilotklar`, `55 pilot blockers`, and loaded 12 generated workplans from `/generated-content/workplans.json`.
+- `/kart`: rendered the schematic/offline map surface and local marker/layer controls; no approved PMTiles packages were claimed.
+- `/data-pa-enheten`: rendered local-only backup/import privacy copy.
+- `/oppdrag`: rendered the local mission surface and local archive boundary copy.
+
+This file is still not the source of truth for the current live SHA. If this documentation/workplan ledger commit is pushed, verify that new exact SHA with the commands above before reporting the final deployed version.
+
 ## Last audited application-code baseline
 
 The last non-doc audit/remediation baseline was:
