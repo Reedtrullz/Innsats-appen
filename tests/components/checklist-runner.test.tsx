@@ -103,3 +103,19 @@ it('hydrates and persists equipment status for equipment and MBK checklists', as
 
   await waitFor(async () => expect((await getChecklistRun('mission-3:mbk-kjoretoy'))?.equipmentStatusByItemId['status-kontrollert']).toBe('needs-service'));
 });
+
+it('blocks sensitive local checklist notes before they are persisted', async () => {
+  const user = userEvent.setup();
+  render(<ChecklistRunner checklist={checklist} missionId="mission-sensitive-note" />);
+
+  const checkbox = screen.getByRole('checkbox', { name: /Kontroller ventilasjon/i });
+  await waitFor(() => expect(checkbox).toBeEnabled());
+
+  const notes = screen.getByLabelText(/Lokal note for Kontroller ventilasjon/i);
+  await user.type(notes, '01017000027');
+  fireEvent.blur(notes);
+
+  expect(await screen.findByRole('alert')).toHaveTextContent(/notat|persondata|pasientdata|identifikator|kontakt|private/i);
+  expect((await getChecklistRun('mission-sensitive-note:tilfluktsrom-teknisk-status'))?.notesByItemId.ventilasjon).toBeUndefined();
+  expect(notes).toHaveValue('');
+});

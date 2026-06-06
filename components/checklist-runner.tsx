@@ -5,6 +5,7 @@ import type { OperationalChecklist } from '@/lib/content/schemas';
 import { getChecklistRun, saveChecklistRun } from '@/lib/mission/local-store';
 import { equipmentStatusLabels, equipmentStatuses } from '@/lib/mission/equipment-readiness';
 import type { EquipmentStatus } from '@/lib/mission/schemas';
+import { assertNoSensitiveOperationalText } from '@/lib/privacy/sensitive-text';
 
 export function ChecklistRunner({ checklist, missionId }: { checklist: OperationalChecklist; missionId: string }) {
   const runId = `${missionId}:${checklist.slug}`;
@@ -16,8 +17,10 @@ function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: Oper
   const [notesByItemId, setNotesByItemId] = useState<Record<string, string>>({});
   const [equipmentStatusByItemId, setEquipmentStatusByItemId] = useState<Record<string, EquipmentStatus>>({});
   const [hydrated, setHydrated] = useState(false);
+  const [notePrivacyError, setNotePrivacyError] = useState<string | null>(null);
   const checkedRef = useRef<Set<string>>(new Set());
   const notesByItemIdRef = useRef<Record<string, string>>({});
+  const persistedNotesByItemIdRef = useRef<Record<string, string>>({});
   const equipmentStatusByItemIdRef = useRef<Record<string, EquipmentStatus>>({});
   const writeQueueRef = useRef<Promise<void>>(Promise.resolve());
   const sourceIds = useMemo(() => [...new Set([...(checklist.sourceIds ?? []), ...checklist.items.flatMap((item) => item.sourceIds ?? [])])], [checklist]);
@@ -35,6 +38,7 @@ function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: Oper
       const nextEquipmentStatusByItemId = run?.equipmentStatusByItemId ?? {};
       checkedRef.current = nextChecked;
       notesByItemIdRef.current = nextNotesByItemId;
+      persistedNotesByItemIdRef.current = nextNotesByItemId;
       equipmentStatusByItemIdRef.current = nextEquipmentStatusByItemId;
       setChecked(nextChecked);
       setNotesByItemId(nextNotesByItemId);
@@ -74,16 +78,43 @@ function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: Oper
   }
 
   function updateNote(itemId: string, note: string) {
+    setNotePrivacyError(null);
     const nextNotesByItemId = { ...notesByItemIdRef.current, [itemId]: note };
     notesByItemIdRef.current = nextNotesByItemId;
     setNotesByItemId(nextNotesByItemId);
   }
 
+  function restorePersistedNotes() {
+    notesByItemIdRef.current = persistedNotesByItemIdRef.current;
+    setNotesByItemId(persistedNotesByItemIdRef.current);
+  }
+
+  function assertChecklistNoteSafe(note: string) {
+    const normalized = note.replace(/[\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!normalized) return '';
+    assertNoSensitiveOperationalText(normalized, 'checklistRunner.note');
+    return note;
+  }
+
   async function persistNoteOnBlur(itemId: string, note: string) {
-    const nextNotesByItemId = notesByItemIdRef.current[itemId] === note ? notesByItemIdRef.current : { ...notesByItemIdRef.current, [itemId]: note };
+    let safeNote = '';
+    try {
+      safeNote = assertChecklistNoteSafe(note);
+    } catch {
+      setNotePrivacyError('Notatet kan ikke lagres lokalt fordi det kan inneholde persondata, pasientdata, identifikator, kontaktinformasjon eller private opplysninger.');
+      restorePersistedNotes();
+      return;
+    }
+    setNotePrivacyError(null);
+    const nextNotesByItemId = safeNote
+      ? notesByItemIdRef.current[itemId] === safeNote
+        ? notesByItemIdRef.current
+        : { ...notesByItemIdRef.current, [itemId]: safeNote }
+      : Object.fromEntries(Object.entries(notesByItemIdRef.current).filter(([nextItemId]) => nextItemId !== itemId));
     notesByItemIdRef.current = nextNotesByItemId;
     setNotesByItemId(nextNotesByItemId);
     await persist(checkedRef.current, nextNotesByItemId, equipmentStatusByItemIdRef.current);
+    persistedNotesByItemIdRef.current = nextNotesByItemId;
   }
 
   async function updateEquipmentStatus(itemId: string, status: EquipmentStatus) {
@@ -108,6 +139,7 @@ function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: Oper
       {requiredItems.length > 0 ? <p className="mt-2 text-sm font-semibold text-slate-700">Påkrevd: {requiredDone}/{requiredItems.length} kontrollert</p> : null}
       {!hydrated ? <p className="mt-2 text-sm font-semibold text-slate-600">Laster lokal sjekklistestatus før redigering.</p> : null}
       {checklist.warning ? <p className="mt-2 text-sm font-semibold text-amber-900">{checklist.warning}</p> : null}
+      {notePrivacyError ? <p role="alert" className="mt-2 rounded-xl border border-rose-200 bg-rose-50 p-2 text-sm font-semibold text-rose-900">{notePrivacyError}</p> : null}
       <ul className="mt-3 space-y-3">
         {checklist.items.map((item) => (
           <li key={item.id} className={`rounded-2xl border p-3 ${item.required ? 'border-amber-300 bg-amber-50/60' : 'border-slate-200'}`}>
