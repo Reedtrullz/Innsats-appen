@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T12:23:58.382Z",
+  "generatedAt": "2026-06-06T13:04:11.373Z",
   "sourceCount": 12,
   "planSourceCount": 12,
-  "planSourceHash": "sha256:f0b510170439e717c90cd259aa1f3f5554082c5fb6d345dbcdd540723ea34dc0",
+  "planSourceHash": "sha256:654158ab3c047b7740d5e09d077f826a8682d6e28a1dcfccabb03d5e75cf368c",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6042,7 +6042,7 @@
         "Written from the 2026-06-05 comprehensive project review. Current verified baseline was HEAD b85f4ad1e241419a097bdd290d61cb8944abb235, live health matched HEAD, npm run check:ci passed after clearing stale .next, and remaining blockers were pilot evidence, source governance, privacy hardening, staging/GitHub governance, context API backpressure, map-package scope, and release closeout."
       ],
       "taskCount": 25,
-      "updatedAt": "2026-06-06T03:08:13.914Z",
+      "updatedAt": "2026-06-06T13:04:11.373Z",
       "tasks": [
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-1",
@@ -6160,7 +6160,7 @@
           "risk": "high",
           "owner": "AR",
           "evidence": [
-            "Blocked on manual source approval/replacement: strict source-governance report still lists 61 referenced blockers."
+            "Blocked on manual source approval/replacement: strict source-governance report currently lists 55 referenced blockers and 0 public source-body blockers; rerun npm run report:source-governance:strict for the current source IDs before approval/removal work."
           ],
           "sourceHeading": "Task 10: Review and classify pilot-scope source documents [PARENT-DIRECT]"
         },
