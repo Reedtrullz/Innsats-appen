@@ -74,7 +74,7 @@ function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: Oper
     else next.add(itemId);
     checkedRef.current = next;
     setChecked(next);
-    await persist(next, notesByItemIdRef.current, equipmentStatusByItemIdRef.current);
+    await persist(next, persistedNotesByItemIdRef.current, equipmentStatusByItemIdRef.current);
   }
 
   function updateNote(itemId: string, note: string) {
@@ -106,22 +106,27 @@ function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: Oper
       return;
     }
     setNotePrivacyError(null);
-    const nextNotesByItemId = safeNote
+    const nextPersistedNotesByItemId = safeNote
+      ? persistedNotesByItemIdRef.current[itemId] === safeNote
+        ? persistedNotesByItemIdRef.current
+        : { ...persistedNotesByItemIdRef.current, [itemId]: safeNote }
+      : Object.fromEntries(Object.entries(persistedNotesByItemIdRef.current).filter(([nextItemId]) => nextItemId !== itemId));
+    const nextDraftNotesByItemId = safeNote
       ? notesByItemIdRef.current[itemId] === safeNote
         ? notesByItemIdRef.current
         : { ...notesByItemIdRef.current, [itemId]: safeNote }
       : Object.fromEntries(Object.entries(notesByItemIdRef.current).filter(([nextItemId]) => nextItemId !== itemId));
-    notesByItemIdRef.current = nextNotesByItemId;
-    setNotesByItemId(nextNotesByItemId);
-    await persist(checkedRef.current, nextNotesByItemId, equipmentStatusByItemIdRef.current);
-    persistedNotesByItemIdRef.current = nextNotesByItemId;
+    persistedNotesByItemIdRef.current = nextPersistedNotesByItemId;
+    notesByItemIdRef.current = nextDraftNotesByItemId;
+    setNotesByItemId(nextDraftNotesByItemId);
+    await persist(checkedRef.current, nextPersistedNotesByItemId, equipmentStatusByItemIdRef.current);
   }
 
   async function updateEquipmentStatus(itemId: string, status: EquipmentStatus) {
     const nextEquipmentStatusByItemId = { ...equipmentStatusByItemIdRef.current, [itemId]: status };
     equipmentStatusByItemIdRef.current = nextEquipmentStatusByItemId;
     setEquipmentStatusByItemId(nextEquipmentStatusByItemId);
-    await persist(checkedRef.current, notesByItemIdRef.current, nextEquipmentStatusByItemId);
+    await persist(checkedRef.current, persistedNotesByItemIdRef.current, nextEquipmentStatusByItemId);
   }
 
   return (

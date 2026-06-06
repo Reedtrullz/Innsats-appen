@@ -119,3 +119,46 @@ it('blocks sensitive local checklist notes before they are persisted', async () 
   expect((await getChecklistRun('mission-sensitive-note:tilfluktsrom-teknisk-status'))?.notesByItemId.ventilasjon).toBeUndefined();
   expect(notes).toHaveValue('');
 });
+
+it('does not persist an unsafe note draft through checkbox persistence before blur validation', async () => {
+  const user = userEvent.setup();
+  render(<ChecklistRunner checklist={checklist} missionId="mission-sensitive-draft-toggle" />);
+
+  const checkbox = screen.getByRole('checkbox', { name: /Kontroller ventilasjon/i });
+  await waitFor(() => expect(checkbox).toBeEnabled());
+
+  const notes = screen.getByLabelText(/Lokal note for Kontroller ventilasjon/i);
+  await user.type(notes, '01017000027');
+  expect(notes).toHaveFocus();
+  fireEvent.click(checkbox);
+
+  await waitFor(async () => expect((await getChecklistRun('mission-sensitive-draft-toggle:tilfluktsrom-teknisk-status'))?.checkedItemIds).toContain('ventilasjon'));
+  const run = await getChecklistRun('mission-sensitive-draft-toggle:tilfluktsrom-teknisk-status');
+  expect(run?.notesByItemId.ventilasjon).toBeUndefined();
+});
+
+it('restores the previous safe checklist note when an unsafe edit is blocked', async () => {
+  await saveChecklistRun({
+    id: 'mission-sensitive-existing:tilfluktsrom-teknisk-status',
+    missionId: 'mission-sensitive-existing',
+    templateSlug: 'tilfluktsrom-teknisk-status',
+    checkedItemIds: [],
+    notesByItemId: { ventilasjon: 'Tidligere trygg note' },
+    updatedAt: '2026-06-06T10:00:00.000Z',
+    schemaVersion: 1,
+  });
+
+  const user = userEvent.setup();
+  render(<ChecklistRunner checklist={checklist} missionId="mission-sensitive-existing" />);
+
+  const notes = screen.getByLabelText(/Lokal note for Kontroller ventilasjon/i);
+  await waitFor(() => expect(notes).toHaveValue('Tidligere trygg note'));
+
+  await user.clear(notes);
+  await user.type(notes, '01017000027');
+  fireEvent.blur(notes);
+
+  expect(await screen.findByRole('alert')).toHaveTextContent(/notat|persondata|pasientdata|identifikator|kontakt|private/i);
+  await waitFor(() => expect(notes).toHaveValue('Tidligere trygg note'));
+  expect((await getChecklistRun('mission-sensitive-existing:tilfluktsrom-teknisk-status'))?.notesByItemId.ventilasjon).toBe('Tidligere trygg note');
+});
