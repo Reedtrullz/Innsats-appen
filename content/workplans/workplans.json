@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T00:48:03.926Z",
-  "sourceCount": 9,
-  "planSourceCount": 9,
-  "planSourceHash": "sha256:1047d21759d7e6c9cc7011803a54609a612bd07d827701e916553635ab500e02",
+  "generatedAt": "2026-06-06T01:39:02.281Z",
+  "sourceCount": 10,
+  "planSourceCount": 10,
+  "planSourceHash": "sha256:b24180bef25d0e371b17b3ed0614bd25d8f7e140a19b87300639b877cc700553",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6268,6 +6268,213 @@
           "risk": "high",
           "owner": "AR",
           "sourceHeading": "Task 25: Close this workplan ledger, push, wait for exact CI/deploy, and verify live"
+        }
+      ]
+    },
+    {
+      "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan",
+      "title": "Remaining Pilot Readiness Gap Closure Implementation Plan",
+      "sourcePath": ".hermes/plans/2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan.md",
+      "sourceType": "hermes-plan",
+      "summary": "Close the remaining gap between a technically healthy Innsats/Beredskapsboka MVP and an honestly pilot-ready release by fixing public source publication, making release governance visible, reconciling stale workplan truth, and preserving external evidence blockers until real proof exists.",
+      "stage": "scope",
+      "risk": "high",
+      "status": "active",
+      "owner": "AR",
+      "evidence": [
+        "Written from the 2026-06-06 comprehensive review of /Users/reidar/Projectos/Beredskapsboka. Local HEAD d6e573b2da38dad5868adb4e725c393b40b35084 passed npm run check:ci, but origin/main/live were b85f4ad1e241419a097bdd290d61cb8944abb235 and pilot readiness remained blocked by source governance, public source body publication, real-device evidence, staging DNS, and stale workplan/release-board truth."
+      ],
+      "taskCount": 21,
+      "updatedAt": "2026-06-06T01:39:02.281Z",
+      "tasks": [
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-1",
+          "title": "Add RED tests for public source-body redaction",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 1: Add RED tests for public source-body redaction"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-2",
+          "title": "Implement public source-body redaction helper",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 2: Implement public source-body redaction helper"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-3",
+          "title": "Add strict source-governance public-body findings",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 3: Add strict source-governance public-body findings"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-4",
+          "title": "Implement public-body governance findings",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 4: Implement public-body governance findings"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-5",
+          "title": "Make content coverage release-board gaps include governance blockers",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 5: Make content coverage release-board gaps include governance blockers"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-6",
+          "title": "Make release plan status account for blocked child tasks",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 6: Make release plan status account for blocked child tasks"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-7",
+          "title": "Show source-governance gaps on the release UI",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 7: Show source-governance gaps on the release UI"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-8",
+          "title": "Reconcile stale Pilot Readiness remediation workplan ledger [PARENT-DIRECT]",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 8: Reconcile stale Pilot Readiness remediation workplan ledger [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-9",
+          "title": "Create source-governance remediation queue",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 9: Create source-governance remediation queue"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-10",
+          "title": "Replace or remove deep-research pilot references [PARENT-DIRECT]",
+          "status": "planned",
+          "stage": "scope",
+          "risk": "high",
+          "owner": "content-owner",
+          "sourceHeading": "Task 10: Replace or remove deep-research pilot references [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-11",
+          "title": "Add context API outbound-disclosure copy",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 11: Add context API outbound-disclosure copy"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-12",
+          "title": "Standardize staging hostname until DNS is fixed",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 12: Standardize staging hostname until DNS is fixed"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-13",
+          "title": "Document deployment governance manual blockers [PARENT-DIRECT]",
+          "status": "planned",
+          "stage": "scope",
+          "risk": "high",
+          "owner": "repo-owner",
+          "sourceHeading": "Task 13: Document deployment governance manual blockers [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-14",
+          "title": "Add rollback drill evidence template",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 14: Add rollback drill evidence template"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-15",
+          "title": "Keep schematic-only map scope explicit for pilot",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 15: Keep schematic-only map scope explicit for pilot"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-16",
+          "title": "Prepare real-device evidence pack without marking it complete",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "owner": "pilot-owner",
+          "sourceHeading": "Task 16: Prepare real-device evidence pack without marking it complete"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-17",
+          "title": "Make Playwright webServer fail loudly on wrong Node",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 17: Make Playwright webServer fail loudly on wrong Node"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-18",
+          "title": "Track moderate dependency advisory explicitly",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 18: Track moderate dependency advisory explicitly"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-19",
+          "title": "Run post-implementation audit and focused re-reviews",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 19: Run post-implementation audit and focused re-reviews"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-20",
+          "title": "Close current workplan ledger only after honest blockers are resolved or explicitly kept open",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 20: Close current workplan ledger only after honest blockers are resolved or explicitly kept open"
+        },
+        {
+          "id": "2026-06-06_032509-remaining-pilot-readiness-gap-closure-plan-task-21",
+          "title": "Push, wait for exact CI/deploy, and verify live only when prerequisites are met [PARENT-DIRECT]",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "owner": "repo-owner",
+          "sourceHeading": "Task 21: Push, wait for exact CI/deploy, and verify live only when prerequisites are met [PARENT-DIRECT]"
         }
       ]
     }
