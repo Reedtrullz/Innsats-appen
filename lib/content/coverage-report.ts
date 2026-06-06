@@ -113,6 +113,10 @@ function isPilotApprovedSource(source: any) {
   return source?.status === 'verified' && normalizedPilotReviewStatus(source) === 'approved-for-pilot' && normalizedPublicationStatus(source) === 'approved-public';
 }
 
+function isAcceptedUnreferencedSource(source: any) {
+  return normalizedPilotReviewStatus(source) === 'rejected-for-pilot';
+}
+
 function hasPublicBodyWithoutApproval(source: any) {
   return normalizedPublicationStatus(source) !== 'approved-public' && String(source?.body ?? '').trim().length > 0;
 }
@@ -134,7 +138,9 @@ export function buildContentCoverageReport(graph: ContentCoverageGraph, generate
     for (const item of collection) collectRefs(item).forEach((id) => referencedSourceIds.add(id));
   }
   const sourceById = new Map(sources.map((source) => [String(source.id), source]));
-  const sourcesWithoutReferences = sorted(sources.map((source) => String(source.id)).filter((id) => !referencedSourceIds.has(id)));
+  const sourcesWithoutReferences = sorted(sources
+    .filter((source) => !referencedSourceIds.has(String(source.id)) && !isAcceptedUnreferencedSource(source))
+    .map((source) => String(source.id)));
   const cardsWithoutSources = sorted(actionCards.filter((card) => collectRefs(card).length === 0).map((card) => String(card.slug ?? 'card')));
   const highRiskCards = actionCards.filter((card) => cardIsHighRisk(card, sourceById));
   const highRiskCardsWithoutWarnings = sorted(highRiskCards.filter((card) => !String(card.warning ?? '').trim()).map((card) => String(card.slug ?? 'card')));
