@@ -61,6 +61,17 @@ export type SourceGovernanceReport = {
   };
 };
 
+export function sourceGovernanceStrictBlockerCount(report: SourceGovernanceReport) {
+  return report.findings.pilotBlockingReferencedSources.length + report.findings.publicBodyBlockingSources.length;
+}
+
+export function sourceGovernanceStrictFailureMessage(report: SourceGovernanceReport) {
+  const pilot = report.findings.pilotBlockingReferencedSources.length;
+  const publicBodies = report.findings.publicBodyBlockingSources.length;
+  if (pilot + publicBodies === 0) return undefined;
+  return `Source governance strict gate failed: ${pilot} referenced sources are not verified, pilot-approved, and public-approved; ${publicBodies} public source bodies are exposed without approved-public publication status.`;
+}
+
 function addReferences(references: Map<string, string[]>, sourceIds: string[] | undefined, label: string) {
   for (const sourceId of sourceIds ?? []) {
     const existing = references.get(sourceId);

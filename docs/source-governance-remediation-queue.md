@@ -5,6 +5,7 @@ Generated from `npm run report:source-governance:strict` during the 2026-06-06 a
 ## Current strict status
 
 The strict report currently lists 61 referenced blockers. This queue intentionally uses source IDs and reference labels only; it does not include raw source bodies, local file paths, owners, or reviewers.
+Rows show the first five references for readability; rerun `npm run report:source-governance:strict` for the full reference list before removing references.
 
 ## Rules
 

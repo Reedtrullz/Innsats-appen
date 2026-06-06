@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { buildSourceGovernanceReport } from '@/lib/content/source-governance';
+import { buildSourceGovernanceReport, sourceGovernanceStrictFailureMessage } from '@/lib/content/source-governance';
 
 const rootDir = process.cwd();
 const generatedDir = path.join(rootDir, 'content', 'generated');
@@ -33,9 +33,8 @@ const report = buildSourceGovernanceReport({
 
 console.log(JSON.stringify(report, null, 2));
 
-if (strict && report.findings.pilotBlockingReferencedSources.length > 0) {
-  console.error(
-    `Source governance strict gate failed: ${report.findings.pilotBlockingReferencedSources.length} referenced sources are not verified, pilot-approved, and public-approved.`,
-  );
+const strictFailure = sourceGovernanceStrictFailureMessage(report);
+if (strict && strictFailure) {
+  console.error(strictFailure);
   process.exitCode = 2;
 }

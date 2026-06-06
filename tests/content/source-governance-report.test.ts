@@ -1,7 +1,11 @@
 import fs from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { expect, it } from 'vitest';
-import { buildSourceGovernanceReport } from '@/lib/content/source-governance';
+import {
+  buildSourceGovernanceReport,
+  sourceGovernanceStrictBlockerCount,
+  sourceGovernanceStrictFailureMessage,
+} from '@/lib/content/source-governance';
 
 const sources = [
   {
@@ -266,6 +270,42 @@ it('does not treat private generated source bodies as public exposure when publi
   expect(report.summary.publicBodyBlockingSourceCount).toBe(0);
   expect(report.findings.publicBodyBlockingSources).toEqual([]);
   expect(JSON.stringify(report)).not.toContain('This private generated body is intentionally preserved.');
+});
+
+it('treats public source body blockers as strict gate failures even when pilot references are approved', () => {
+  const report = buildSourceGovernanceReport({
+    sources: [
+      {
+        id: 'src-approved-ref',
+        title: 'Approved Ref',
+        status: 'verified',
+        reviewRisk: 'low',
+        warnings: [],
+        pilotReviewStatus: 'approved-for-pilot',
+        publicationStatus: 'approved-public',
+      },
+    ],
+    publicSources: [
+      {
+        id: 'src-public-body-needs-permission',
+        title: 'Public body',
+        status: 'verified',
+        reviewRisk: 'low',
+        warnings: [],
+        pilotReviewStatus: 'approved-for-pilot',
+        publicationStatus: 'needs-permission',
+        body: 'Visible but not approved.',
+      },
+    ],
+    cards: [{ slug: 'approved-card', sourceIds: ['src-approved-ref'] }],
+    checklists: [],
+    trainingPaths: [],
+  });
+
+  expect(report.summary.pilotBlockingReferencedSourceCount).toBe(0);
+  expect(report.summary.publicBodyBlockingSourceCount).toBe(1);
+  expect(sourceGovernanceStrictBlockerCount(report)).toBe(1);
+  expect(sourceGovernanceStrictFailureMessage(report)).toMatch(/public source bodies/i);
 });
 
 it('documents the source-governance remediation queue without leaking source bodies or local paths', () => {
