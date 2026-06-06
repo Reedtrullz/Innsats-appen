@@ -599,6 +599,28 @@ it('shows a privacy alert when GeoJSON import text is blocked after sanitization
   expect(screen.getByTestId('operations-map-status')).not.toHaveTextContent(/Ingen støttede skjematiske GeoJSON-objekter/i);
 });
 
+it('shows a privacy alert when sensitive GeoJSON text appears beyond the display truncation boundary', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  await renderOfflineMapPanel();
+
+  const longSafePrefix = `${'Trygg import '.repeat(16)} `;
+  fireEvent.change(screen.getByRole('textbox', { name: /Importer GeoJSON/i }), { target: { value: JSON.stringify({
+    type: 'FeatureCollection',
+    coordinateSystem: SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
+    features: [
+      { type: 'Feature', geometry: { type: 'Point', coordinates: [22, 33] }, properties: { itemType: 'marker', kind: 'observation', label: `${longSafePrefix}01017000027` } },
+    ],
+  }) } });
+
+  await user.click(screen.getByRole('button', { name: /Importer GeoJSON lokalt/i }));
+
+  expect(await screen.findByRole('alert')).toHaveTextContent(/persondata|pasientdata|identifikator|kontakt|private/i);
+  expect(screen.getByTestId('operations-map-status')).not.toHaveTextContent(/Ingen støttede skjematiske GeoJSON-objekter/i);
+  expect(readMissionMapState().markers).toHaveLength(0);
+});
+
 it('imports safe GeoJSON features while alerting about privacy-rejected import text', async () => {
   const user = userEvent.setup();
   await saveMission(activeMission);

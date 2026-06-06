@@ -51,7 +51,6 @@ import {
   operationItemsForRender,
   parseCoordinateText,
   resetMissionMapState,
-  sanitizeMapText,
   subscribeMissionMapState,
   updateMissionMapDrawing,
   updateMissionMapMarker,
@@ -127,9 +126,18 @@ function isImportMapTextValue(value: unknown): value is string | number | null |
   return value === undefined || value === null || typeof value === 'string' || typeof value === 'number';
 }
 
-function importMapTextHasBlockedValue(value: unknown, maxLength = 120) {
+function normalizeImportMapTextForDetection(value: string | number | null | undefined) {
+  return String(value ?? '')
+    .replace(/[<>]/g, '')
+    .replace(/[\r\n\t]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function importMapTextHasBlockedValue(value: unknown, _maxLength?: number) {
+  void _maxLength;
   if (!isImportMapTextValue(value)) return true;
-  return Boolean(detectSensitiveOperationalText(sanitizeMapText(value, maxLength)));
+  return Boolean(detectSensitiveOperationalText(normalizeImportMapTextForDetection(value)));
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
