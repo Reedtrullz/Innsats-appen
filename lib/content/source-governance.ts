@@ -6,6 +6,7 @@ type SourceLike = {
   warnings?: string[];
   pilotReviewStatus?: string;
   publicationStatus?: string;
+  body?: string;
 };
 
 type ChecklistItemLike = {
@@ -23,6 +24,7 @@ type ReferencingItem = {
 
 export type BuildSourceGovernanceReportInput = {
   sources: SourceLike[];
+  publicSources?: SourceLike[];
   cards: ReferencingItem[];
   checklists: ReferencingItem[];
   trainingPaths: ReferencingItem[];
@@ -46,10 +48,12 @@ export type SourceGovernanceReport = {
     referencedSourceCount: number;
     pilotApprovedReferencedSourceCount: number;
     pilotBlockingReferencedSourceCount: number;
+    publicBodyBlockingSourceCount: number;
   };
   findings: {
     pilotBlockingReferencedSources: SourceGovernanceFinding[];
     highRiskPilotBlockingReferencedSources: SourceGovernanceFinding[];
+    publicBodyBlockingSources: SourceGovernanceFinding[];
   };
 };
 
@@ -107,6 +111,10 @@ function isPilotApproved(source: SourceLike) {
   return source.status === 'verified' && normalizedPilotReviewStatus(source) === 'approved-for-pilot' && normalizedPublicationStatus(source) === 'approved-public';
 }
 
+function hasPublicBodyWithoutApproval(source: SourceLike) {
+  return normalizedPublicationStatus(source) !== 'approved-public' && String(source.body ?? '').trim().length > 0;
+}
+
 function toFinding(source: SourceLike, reason: string, referencedBy: string[]): SourceGovernanceFinding {
   return {
     sourceId: source.id,
@@ -124,10 +132,21 @@ function toFinding(source: SourceLike, reason: string, referencedBy: string[]): 
 export function buildSourceGovernanceReport(input: BuildSourceGovernanceReportInput): SourceGovernanceReport {
   const references = sourceReferences(input);
   const referencedSources = input.sources.filter((source) => references.has(source.id));
+  const publicSources = input.publicSources ?? input.sources;
   const pilotBlockingReferencedSources = referencedSources.flatMap((source) => {
     const reason = pilotBlockingReason(source);
     if (!reason) return [];
     return [toFinding(source, reason, references.get(source.id) ?? [])];
+  });
+  const publicBodyBlockingSources = publicSources.flatMap((source) => {
+    if (!hasPublicBodyWithoutApproval(source)) return [];
+    return [
+      toFinding(
+        source,
+        `public body is present while publication status is ${normalizedPublicationStatus(source)}`,
+        references.get(source.id) ?? [],
+      ),
+    ];
   });
 
   return {
@@ -136,10 +155,12 @@ export function buildSourceGovernanceReport(input: BuildSourceGovernanceReportIn
       referencedSourceCount: referencedSources.length,
       pilotApprovedReferencedSourceCount: referencedSources.filter(isPilotApproved).length,
       pilotBlockingReferencedSourceCount: pilotBlockingReferencedSources.length,
+      publicBodyBlockingSourceCount: publicBodyBlockingSources.length,
     },
     findings: {
       pilotBlockingReferencedSources,
       highRiskPilotBlockingReferencedSources: pilotBlockingReferencedSources.filter((source) => source.reviewRisk === 'high'),
+      publicBodyBlockingSources,
     },
   };
 }

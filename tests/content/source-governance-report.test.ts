@@ -163,6 +163,42 @@ it('reports public source document bodies that are exposed without publication a
   );
 });
 
+it('does not treat private generated source bodies as public exposure when public snapshot is redacted', () => {
+  const report = buildSourceGovernanceReport({
+    sources: [
+      {
+        id: 'src-private-body-needs-permission',
+        title: 'Private Body Needs Permission',
+        status: 'verified',
+        reviewRisk: 'high',
+        warnings: [],
+        pilotReviewStatus: 'approved-for-pilot',
+        publicationStatus: 'needs-permission',
+        body: 'This private generated body is intentionally preserved.',
+      },
+    ],
+    publicSources: [
+      {
+        id: 'src-private-body-needs-permission',
+        title: 'Private Body Needs Permission',
+        status: 'verified',
+        reviewRisk: 'high',
+        warnings: [],
+        pilotReviewStatus: 'approved-for-pilot',
+        publicationStatus: 'needs-permission',
+        body: '',
+      },
+    ],
+    cards: [],
+    checklists: [],
+    trainingPaths: [],
+  });
+
+  expect(report.summary.publicBodyBlockingSourceCount).toBe(0);
+  expect(report.findings.publicBodyBlockingSources).toEqual([]);
+  expect(JSON.stringify(report)).not.toContain('This private generated body is intentionally preserved.');
+});
+
 it('exposes source governance npm scripts', () => {
   const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8')) as { scripts: Record<string, string> };
 
