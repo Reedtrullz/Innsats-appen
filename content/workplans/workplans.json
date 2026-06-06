@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T11:36:04.708Z",
-  "sourceCount": 11,
-  "planSourceCount": 11,
-  "planSourceHash": "sha256:574247e358c756931a723ebb6b6be2110f45c84f1ad28e1e6ea7c9600e61872a",
+  "generatedAt": "2026-06-06T12:23:58.382Z",
+  "sourceCount": 12,
+  "planSourceCount": 12,
+  "planSourceHash": "sha256:f0b510170439e717c90cd259aa1f3f5554082c5fb6d345dbcdd540723ea34dc0",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6735,6 +6735,153 @@
             "Focused tests, two-stage subagent reviews and final controller gates verify the integrated implementation before commit."
           ],
           "sourceHeading": "Task 7: Deep self-review and gates"
+        }
+      ]
+    },
+    {
+      "id": "2026-06-06_141032-audit-findings-implementation-plan",
+      "title": "Audit Findings Implementation Plan",
+      "sourcePath": ".hermes/plans/2026-06-06_141032-audit-findings-implementation-plan.md",
+      "sourceType": "hermes-plan",
+      "summary": "Turn the audit findings into a concrete next implementation sequence: fix the small pre-push safety gaps, sync the workplan ledger truthfully, deploy only after exact-SHA verification, then close or explicitly block the remaining pilot-readiness evidence gates.",
+      "stage": "verify",
+      "risk": "high",
+      "status": "active",
+      "owner": "AR",
+      "evidence": [
+        "Created from the 2026-06-06 comprehensive review of Beredskapsboka/Innsats-appen. Local HEAD 055f62dd32b6c5da4752ac6623e302e749922f57 passed npm run check:ci but is not pushed/deployed; production remains 4cad45b358edf4c8044a46391f3ace7c93d3995b. Pilot readiness remains blocked by 55 source-governance blockers, physical-device evidence, rollback/governance decisions, and exact-SHA deploy verification."
+      ],
+      "taskCount": 13,
+      "updatedAt": "2026-06-06T12:23:58.382Z",
+      "tasks": [
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-1",
+          "title": "Add explicit no-store cache headers to /api/health",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 1: Add explicit no-store cache headers to /api/health"
+        },
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-2",
+          "title": "Reject sensitive checklist item notes before local persistence",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 2: Reject sensitive checklist item notes before local persistence"
+        },
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-3",
+          "title": "Detect sensitive GeoJSON import text before truncation",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 3: Detect sensitive GeoJSON import text before truncation"
+        },
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-4",
+          "title": "Harden manual production publish script against unverified local deploys",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 4: Harden manual production publish script against unverified local deploys"
+        },
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-5",
+          "title": "Correct stale 61-source workplan evidence to current 55-source count",
+          "status": "planned",
+          "stage": "release",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 5: Correct stale 61-source workplan evidence to current 55-source count"
+        },
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-6",
+          "title": "Run focused hardening gates and regression audit",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 6: Run focused hardening gates and regression audit"
+        },
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-7",
+          "title": "Run full local release gate on the committed tree [PARENT-DIRECT]",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 7: Run full local release gate on the committed tree [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-8",
+          "title": "Push and verify exact-SHA production deployment [PARENT-DIRECT]",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 8: Push and verify exact-SHA production deployment [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-9",
+          "title": "Generate a source-governance review packet for the 55 referenced blockers",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 9: Generate a source-governance review packet for the 55 referenced blockers"
+        },
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-10",
+          "title": "Review/approve or replace source-governance blockers in batches [PARENT-DIRECT]",
+          "status": "blocked",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "evidence": [
+            "Blocked until source-owner review/approval or replacement/removal decisions are available. The strict gate currently reports 55 referenced blockers."
+          ],
+          "sourceHeading": "Task 10: Review/approve or replace source-governance blockers in batches [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-11",
+          "title": "Run physical/real-device evidence tasks 385-389 [PARENT-DIRECT]",
+          "status": "blocked",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "evidence": [
+            "Blocked until physical devices or a real-device cloud lab are available. Chromium/Playwright evidence is supporting evidence only and cannot complete these tasks."
+          ],
+          "sourceHeading": "Task 11: Run physical/real-device evidence tasks 385-389 [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-12",
+          "title": "Close deployment governance and rollback evidence [PARENT-DIRECT]",
+          "status": "blocked",
+          "stage": "release",
+          "risk": "high",
+          "owner": "AR",
+          "evidence": [
+            "Blocked on owner decisions and/or staging rollback drill. Do not mark complete until the external governance evidence exists."
+          ],
+          "sourceHeading": "Task 12: Close deployment governance and rollback evidence [PARENT-DIRECT]"
+        },
+        {
+          "id": "2026-06-06_141032-audit-findings-implementation-plan-task-13",
+          "title": "Final pilot-readiness closeout [PARENT-DIRECT]",
+          "status": "blocked",
+          "stage": "release",
+          "risk": "high",
+          "owner": "AR",
+          "evidence": [
+            "Blocked until Tasks 8, 10, 11, and 12 have real passing evidence. This task must remain blocked if any source, device, rollback, governance, CI/deploy, or live verification gate remains unresolved."
+          ],
+          "sourceHeading": "Task 13: Final pilot-readiness closeout [PARENT-DIRECT]"
         }
       ]
     }
