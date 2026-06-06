@@ -13,7 +13,7 @@ const cards = [
     steps: ['Klargjøring', 'Drift', 'Rapportering', 'Avslutning'],
     safety: ['Bruk bare godkjent informasjon'],
     reporting: ['Rapporter status'],
-    sourceIds: ['src-deep-research-tilfluktsrom'],
+    sourceIds: ['src-operativt-konsept-for-sivilforsvaret'],
     competenceRequired: [],
     warning: 'bruk bare godkjent informasjon',
   },
@@ -39,8 +39,8 @@ const checklists = [
     phase: 'for',
     roles: ['leder'],
     scenarios: ['tilfluktsrom'],
-    items: [{ id: 'ventilasjon', label: 'Kontroller ventilasjon', required: true, sourceIds: ['src-deep-research-tilfluktsrom'] }],
-    sourceIds: ['src-deep-research-tilfluktsrom'],
+    items: [{ id: 'ventilasjon', label: 'Kontroller ventilasjon', required: true, sourceIds: ['src-operativt-konsept-for-sivilforsvaret'] }],
+    sourceIds: ['src-operativt-konsept-for-sivilforsvaret'],
     warning: 'Ingen private/skjermede lokasjonslister.',
   },
   {
@@ -64,7 +64,7 @@ const measures = [
     readinessChecks: ['ventilasjon', 'nødstrøm', 'vann'],
     operationalSteps: ['avklar ansvar', 'klargjør rom', 'drift', 'rapporter status', 'avslutt'],
     dataWarnings: ['Bruk bare godkjent informasjon.'],
-    sourceIds: ['src-deep-research-tilfluktsrom'],
+    sourceIds: ['src-operativt-konsept-for-sivilforsvaret'],
   },
   {
     slug: 'skjermet-tilfluktsromliste',

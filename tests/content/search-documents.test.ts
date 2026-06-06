@@ -33,6 +33,73 @@ it('builds routeable search documents with operational metadata', () => {
   });
 });
 
+it('does not publish rejected source docs or unapproved source bodies into search documents', () => {
+  const docs = buildSearchDocuments({
+    cards: [] as ActionCard[],
+    sources: [
+      {
+        id: 'src-rejected',
+        title: 'SRC - Rejected deep research',
+        sourcePath: 'source-extracts/SRC - Rejected.md',
+        sourceType: 'source-extract',
+        status: 'unverified',
+        verifiedAt: '2026-06-04',
+        reviewAfter: '2026-07-04',
+        owner: 'content-team',
+        reviewer: 'fag',
+        reviewRisk: 'high',
+        pilotReviewStatus: 'rejected-for-pilot',
+        publicationStatus: 'needs-permission',
+        body: 'Rejected deep research body must stay private',
+        warnings: ['Do not use for pilot'],
+      },
+      {
+        id: 'src-needs-permission',
+        title: 'SRC - Needs permission',
+        sourcePath: 'source-extracts/SRC - Needs Permission.md',
+        sourceType: 'source-extract',
+        status: 'verified',
+        verifiedAt: '2026-06-04',
+        owner: 'content-team',
+        reviewer: 'fag',
+        reviewRisk: 'low',
+        pilotReviewStatus: 'approved-for-pilot',
+        publicationStatus: 'needs-permission',
+        body: 'Private source body must not be searchable',
+        warnings: ['Public warning only'],
+      },
+      {
+        id: 'src-approved',
+        title: 'SRC - Approved',
+        sourcePath: 'source-extracts/SRC - Approved.md',
+        sourceType: 'source-extract',
+        status: 'verified',
+        verifiedAt: '2026-06-04',
+        owner: 'content-team',
+        reviewer: 'fag',
+        reviewRisk: 'low',
+        pilotReviewStatus: 'approved-for-pilot',
+        publicationStatus: 'approved-public',
+        body: 'Approved public body is searchable',
+        warnings: [],
+      },
+    ] as SourceDocument[],
+    glossary: [] as GlossaryTerm[],
+    training: [] as TrainingPath[],
+    protection: [] as ProtectionMeasure[],
+    faq: [] as FAQEntry[],
+  });
+
+  expect(docs.find((doc) => doc.id === 'kilde:src-rejected')).toBeUndefined();
+  expect(JSON.stringify(docs)).not.toContain('Rejected deep research body must stay private');
+  expect(docs.find((doc) => doc.id === 'kilde:src-needs-permission')).toMatchObject({
+    type: 'kilde',
+    body: 'Public warning only',
+  });
+  expect(JSON.stringify(docs)).not.toContain('Private source body must not be searchable');
+  expect(docs.find((doc) => doc.id === 'kilde:src-approved')?.body).toContain('Approved public body is searchable');
+});
+
 it('prefers problem source statuses over verified sources for cards', () => {
   const docs = buildSearchDocuments({
     cards: [{ slug: 'flom-pumpe-start', title: 'Flom og pumpeutlegg', phase: 'under', roles: ['lagforer'], scenarios: ['flom'], priority: 'high', steps: ['Start pumpe'], safety: [], reporting: [], sourceIds: ['src-verified', 'src-unverified'], competenceRequired: [], equipmentRequired: ['pumpe'] }] as ActionCard[],

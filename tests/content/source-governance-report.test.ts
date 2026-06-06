@@ -315,8 +315,9 @@ it('documents the source-governance remediation queue without leaking source bod
   expect(queue).toContain('# Source governance remediation queue');
   expect(queue).toContain('| Source ID | Current blocker | Referenced by | Required next action | Owner evidence |');
   expect(queue).toContain('src-5-punktsordre');
-  expect(queue).toContain('strict report currently lists 61 referenced blockers');
+  expect(queue).toContain('strict report currently lists 55 referenced blockers');
   expect(policy).toContain('docs/source-governance-remediation-queue.md');
+  expect(queue).not.toContain('src-deep-research');
   for (const forbidden of ['# 5-punktsordre', 'Known source body', '/Users/', 'body":', '"owner"', '"reviewer"']) {
     expect(queue).not.toContain(forbidden);
   }

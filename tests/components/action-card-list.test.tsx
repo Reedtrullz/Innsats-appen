@@ -4,7 +4,7 @@ import { ActionCardList } from '@/components/action-card-list';
 import type { ActionCard } from '@/lib/content/schemas';
 
 const cards = [
-  { slug: 'tilfluktsrom-klargjoring', title: 'Klargjør tilfluktsrom', phase: 'for', roles: ['leder'], scenarios: ['tilfluktsrom'], priority: 'high', steps: ['ventilasjon'], safety: [], reporting: [], sourceIds: ['src-deep-research-tilfluktsrom'], competenceRequired: [], warning: 'bruk bare godkjent informasjon' },
+  { slug: 'tilfluktsrom-klargjoring', title: 'Klargjør tilfluktsrom', phase: 'for', roles: ['leder'], scenarios: ['tilfluktsrom'], priority: 'high', steps: ['ventilasjon'], safety: [], reporting: [], sourceIds: ['src-operativt-konsept-for-sivilforsvaret'], competenceRequired: [], warning: 'bruk bare godkjent informasjon' },
   { slug: 'radiac-dosekontroll', title: 'RADIAC dosekontroll', phase: 'under', roles: ['rad'], scenarios: ['radiac-nedfall'], priority: 'medium', steps: ['dosimeter'], safety: [], reporting: [], sourceIds: ['src-rad'], competenceRequired: ['RAD10'], warning: 'kontroller ordre' },
 ] as ActionCard[];
 

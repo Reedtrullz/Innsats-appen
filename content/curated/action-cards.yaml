@@ -51,11 +51,11 @@
     - Ikke publiser private eller skjermede tilfluktsromdata i appen.
   reporting:
     - Rapporter åpning, kapasitet, teknisk status, avvik og behov.
-  sourceIds: [src-deep-research-tilfluktsrom]
+  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
   competenceRequired: []
   competenceRationale: Tilfluktsromstøtte varierer lokalt og må styres av ansvarlig myndighet, eier og lokal opplæring.
   equipmentRequired: [ventilasjon, nodstrom, vann, sanitaer, belysning, samband]
-  warning: Researchbasert støtte, ikke offisiell ordre eller fullstendig oversikt. Bruk bare godkjent informasjon.
+  warning: Ikke kildegodkjent for pilot; ikke offisiell ordre eller fullstendig oversikt. Bruk bare godkjent informasjon.
 
 - slug: cbrne-startkort
   title: Startkort CBRN/CBRNE
@@ -274,7 +274,7 @@
     - Stans tiltak som går utenfor gitt ordre eller trygg gjennomføring, og be om avklaring.
   reporting:
     - Meld vesentlige endringer, beslutning og behov tilbake i kommandolinjen.
-  sourceIds: [src-enhetlig-ledelsessystem-els, src-deep-research-leder-og-lagforer]
+  sourceIds: [src-enhetlig-ledelsessystem-els]
   competenceRequired: [FIG20]
   equipmentRequired: [samband]
   warning: Enkel beslutningsstøtte; bruk gjeldende ordre, ELS-prinsipper og lokal kommandolinje.
@@ -312,7 +312,7 @@
     - Hold arbeidsro og sikker avstand; stopp intervjuønsker som forstyrrer innsats eller personvern.
   reporting:
     - Meld mediehenvendelser og eventuelle avvik til leder/innsatsledelse.
-  sourceIds: [src-deep-research-generelt-sivilforsvaret, src-operativt-konsept-for-sivilforsvaret]
+  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
   competenceRequired: [FIG10]
   warning: Generisk offentlig veiledning; følg lokal informasjonslinje og ikke del sensitive opplysninger.
 
@@ -330,7 +330,7 @@
     - Varsle leder hvis oppgaven krever kompetanse, myndighet eller utstyr laget ikke har.
   reporting:
     - Meld rolleuklarhet, etiske dilemmaer og avvik gjennom kommandolinjen.
-  sourceIds: [src-operativt-konsept-for-sivilforsvaret, src-deep-research-generelt-sivilforsvaret]
+  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
   competenceRequired: [FIG10]
   warning: Påminnelse om rollegrenser; erstatter ikke tjenesteplikt, lokale instrukser eller lovpålagte krav.
 
@@ -367,7 +367,7 @@
     - Ikke utsett mannskap for fare for å gi hjelp; trekk ut hvis området ikke er sikkert.
   reporting:
     - Meld 113-varsling, antall berørte og ressursbehov til leder uten personidentifiserende detaljer.
-  sourceIds: [src-tiltakskort-04-alvorlig-ulykke-dod-og-mental-forstehjelp, src-deep-research-forstehjelp]
+  sourceIds: [src-tiltakskort-04-alvorlig-ulykke-dod-og-mental-forstehjelp]
   competenceRequired: [FIG10]
   equipmentRequired: [samband]
   warning: Førstehjelpspåminnelse; følg 113, helsepersonell og lokal beredskapsordre.
@@ -422,7 +422,7 @@
     - Trekk ut ved skiftende vind, røykeksponering, tap av retrettvei eller uklart oppdrag.
   reporting:
     - Rapporter sektorstatus, mannskapsstatus, vannbehov og observerte fareendringer.
-  sourceIds: [src-deep-research-brann, src-tiltakskort-under-innsats]
+  sourceIds: [src-tiltakskort-under-innsats]
   competenceRequired: [FIG10]
   equipmentRequired: [verneutstyr, samband, vann]
   warning: Generisk støtte for Sivilforsvaret; følg brannvesenets innsatsledelse og lokal ordre.
@@ -441,7 +441,7 @@
     - Stans ved fare fra trafikk, røyk, varme, elektrisk anlegg eller ustabil vannvei.
   reporting:
     - Meld kapasitet, avbrudd, vannmangel og materiellbehov til leder.
-  sourceIds: [src-deep-research-brann, src-eksempler-pa-utlegg-fra-pumpe]
+  sourceIds: [src-tiltakskort-under-innsats, src-eksempler-pa-utlegg-fra-pumpe]
   competenceRequired: [FIG10]
   equipmentRequired: [pumpe, slangeutlegg, samband]
   warning: Ikke brannteknisk taktikk; utfør bare støtteoppgaver gitt av innsatsledelse.
@@ -460,7 +460,7 @@
     - Stans søk ved tap av samband, farlig terreng, mørke/ vær eller uklar lagstatus.
   reporting:
     - Rapporter dekningsgrad, funn, mangler, posisjon og behov til KO/leder.
-  sourceIds: [src-deep-research-sok-og-redning, src-tiltakskort-under-innsats]
+  sourceIds: [src-vedlegg-c-operative-forhold, src-tiltakskort-under-innsats]
   competenceRequired: [FIG10]
   equipmentRequired: [personlig-utrustning, samband]
   warning: Lokal/offline søksstøtte; ikke lagre personsensitiv informasjon eller operative søksplaner for videre deling.
@@ -479,7 +479,7 @@
     - Ikke kryss inn i ny sektor uten ordre når det kan skape dobbeltarbeid eller risiko.
   reporting:
     - Rapporter teigstatus, dekningsgrad, hindringer og lokale posisjonsreferanser.
-  sourceIds: [src-deep-research-sok-og-redning, src-vedlegg-c-operative-forhold]
+  sourceIds: [src-vedlegg-c-operative-forhold]
   competenceRequired: [FIG10]
   equipmentRequired: [samband]
   warning: Bruk kun som lokal huskeliste; søksledelse og KO bestemmer sektor, metode og prioritet.
@@ -574,10 +574,10 @@
     - Ikke lagre private rom, skjermede lokasjoner eller ikke-offentlige lister i appen.
   reporting:
     - Rapporter klargjøringsstatus, åpning, tekniske avvik og ressursbehov til ansvarlig myndighet.
-  sourceIds: [src-deep-research-tilfluktsrom]
+  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
   competenceRationale: Tilfluktsromstøtte varierer lokalt og må styres av ansvarlig myndighet og lokal opplæring.
   equipmentRequired: [ventilasjon, nodstrom, vann, sanitaer, belysning, samband]
-  warning: Public/offline støtte; ikke publiser eller lagre private/skjermede lokasjonsdata.
+  warning: Ikke kildegodkjent for pilot; public/offline støtte uten private eller skjermede lokasjonsdata.
 
 - slug: cbrne-soneinndeling
   title: CBRNE soneinndeling

@@ -21,7 +21,7 @@
   scenarios: [tilfluktsrom]
   competenceCodes: []
   equipmentTerms: [ventilasjon, nodstrom, vann, sanitaer, belysning]
-  sourceIds: [src-deep-research-tilfluktsrom]
+  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
   updatedAt: 2026-06-03
   status: approved
   mustRead: true

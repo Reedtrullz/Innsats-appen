@@ -21,6 +21,6 @@
   body: Ikke legg private/skjermede tilfluktsromdata i appen. Bruk bare offentlig eller eksplisitt godkjent informasjon.
   severity: warning
   changedAt: 2026-06-03
-  sourceIds: [src-deep-research-tilfluktsrom]
+  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
   linkedCardSlugs: [tilfluktsrom-klargjoring]
   changelogEntryId: group-1c-content-governance

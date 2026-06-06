@@ -94,8 +94,8 @@ test('serves shell and generated content offline with stale label', async ({ pag
 
     await page.locator('a[href="/kort/tilfluktsrom-klargjoring"]').first().click();
     await expect(page.getByRole('heading', { name: /Klargjør offentlig tilfluktsrom/i })).toBeVisible();
-    await page.locator('a[href="/kilder/src-deep-research-tilfluktsrom#excerpt"]').first().click();
-    await expect(page.getByRole('heading', { name: /SRC - Deep Research Tilfluktsrom/i })).toBeVisible();
+    await page.locator('a[href="/kilder/src-operativt-konsept-for-sivilforsvaret#excerpt"]').first().click();
+    await expect(page.getByRole('heading', { name: /SRC - Operativt konsept for Sivilforsvaret/i })).toBeVisible();
 
     await page.goto('/kort/tilfluktsrom-klargjoring', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: /Tilfluktsrom/i }).first()).toBeVisible();

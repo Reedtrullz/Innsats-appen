@@ -228,12 +228,23 @@ function validateGeneratedArtifacts(errors: string[], graph: GraphInput) {
 
   const docs = Array.isArray(graph.searchIndex?.documents) ? graph.searchIndex.documents : undefined;
   if (docs) {
-    compareIdSets(errors, 'search index source document ids', (graph.sources ?? []).map((source) => `kilde:${source.id}`), docs.filter((doc: any) => String(doc?.id ?? '').startsWith('kilde:')).map((doc: any) => String(doc.id)));
+    const searchableSources = (graph.sources ?? []).filter((source) => source.pilotReviewStatus !== 'rejected-for-pilot');
+    const sourceDocs = docs.filter((doc: any) => String(doc?.id ?? '').startsWith('kilde:'));
+    compareIdSets(errors, 'search index source document ids', searchableSources.map((source) => `kilde:${source.id}`), sourceDocs.map((doc: any) => String(doc.id)));
     compareIdSets(errors, 'search index FAQ document ids', publicFaq.map((entry: any) => `faq:${entry.id}`), docs.filter((doc: any) => String(doc?.id ?? '').startsWith('faq:')).map((doc: any) => String(doc.id)));
-    const expectedDocCount = counts.sourceCount + counts.actionCardCount + counts.glossaryCount + counts.trainingPathCount + counts.protectionMeasureCount + publicFaq.length;
+    const expectedDocCount = searchableSources.length + counts.actionCardCount + counts.glossaryCount + counts.trainingPathCount + counts.protectionMeasureCount + publicFaq.length;
     if (docs.length !== expectedDocCount) errors.push(`search index document count ${docs.length} does not match generated count ${expectedDocCount}`);
+    const sourceById = new Map((graph.sources ?? []).map((source) => [String(source.id), source]));
     for (const doc of docs) {
       if (String(doc?.id ?? '').startsWith('kilde:') && !String(doc?.href ?? '').startsWith('/kilder/')) errors.push(`search index source document ${doc.id} has invalid href ${doc.href}`);
+      if (String(doc?.id ?? '').startsWith('kilde:')) {
+        const sourceId = String(doc.id).replace(/^kilde:/, '');
+        const source = sourceById.get(sourceId);
+        const body = String(source?.body ?? '').trim();
+        if (source?.publicationStatus !== 'approved-public' && body.length > 0 && String(doc?.body ?? '').includes(body.slice(0, Math.min(80, body.length)))) {
+          errors.push(`search index source document ${doc.id} exposes non-public source body`);
+        }
+      }
     }
   }
   if (publicGraph?.searchIndex && graph.searchIndex && !sameJson(graph.searchIndex, publicGraph.searchIndex)) errors.push('public generated search-index does not mirror content generated search-index');

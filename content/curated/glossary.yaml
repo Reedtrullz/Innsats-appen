@@ -42,7 +42,7 @@
   definition: Innsatsleder/IL er et samvirkebegrep som ofte brukes sammen med politi, brann, helse og stab.
   aliases: [IL]
   synonyms: [innsatsledelse, politi, brann, helse, stab]
-  sourceIds: [src-5-punktsordre, src-deep-research-leder-og-lagforer]
+  sourceIds: [src-5-punktsordre, src-enhetlig-ledelsessystem-els]
 - term: beredskapsvakt
   definition: Beredskapsvakt/vakthavende dekker vaktfunksjon, mottak av varsler og første oppfølging.
   aliases: [vakt]
@@ -57,7 +57,7 @@
   definition: Søketermer for skadde og førstehjelp peker til livreddende tiltak; ikke registrer pasientdata i appen.
   aliases: [skadet]
   synonyms: [samleplass, førstehjelp, "113", livreddende førstehjelp, pasient]
-  sourceIds: [src-deep-research-forstehjelp, src-livreddende-tiltak-ved-rn-hendelse]
+  sourceIds: [src-tiltakskort-04-alvorlig-ulykke-dod-og-mental-forstehjelp, src-livreddende-tiltak-ved-rn-hendelse]
 - term: psykososial
   definition: Psykososial oppfølging dekker defuse/defusing, debrief, EFOK, kollegastøtte og psykisk førstehjelp.
   aliases: [EFOK]
@@ -71,7 +71,7 @@
 - term: tilfluktsrom
   definition: Beskyttelsestiltak der bare offentlig/godkjent informasjon skal brukes i MVP.
   synonyms: [sivile beskyttelsestiltak, offentlig tilfluktsrom]
-  sourceIds: [src-deep-research-tilfluktsrom]
+  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
 - term: FIG10
   definition: Grunnkurs for FIG/FIGP-mannskap.
   synonyms: [grunnkurs, mannskap, opplæring]

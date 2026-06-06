@@ -36,7 +36,7 @@
       id: beslutningsstotte-og-ordre
     - kind: action-card
       id: tilfluktsrom-klargjoring
-  sourceIds: [src-5-punktsordre, src-deep-research-tilfluktsrom]
+  sourceIds: [src-5-punktsordre, src-operativt-konsept-for-sivilforsvaret]
   mustRead: true
 
 - id: radiac-jod-faq-presisering

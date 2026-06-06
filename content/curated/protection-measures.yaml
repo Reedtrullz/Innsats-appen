@@ -8,7 +8,7 @@
   dataWarnings:
     - Bruk bare offentlig eller eksplisitt godkjent informasjon.
     - Ingen åpen publisering av private/skjermede tilfluktsromdata.
-  sourceIds: [src-deep-research-tilfluktsrom]
+  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
 
 - slug: sivil-beskyttelse-generelt
   title: Sivile beskyttelsestiltak
@@ -19,4 +19,4 @@
   operationalSteps: [avklar myndighetsråd, formidle godkjent informasjon, støtt publikum, rapporter behov]
   dataWarnings:
     - Ekstern kontekst må aldri bli operativ sannhet uten ordre.
-  sourceIds: [src-deep-research-generelt-sivilforsvaret]
+  sourceIds: [src-operativt-konsept-for-sivilforsvaret]

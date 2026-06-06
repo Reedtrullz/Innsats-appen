@@ -45,31 +45,31 @@
   category: tilfluktsrom
   aliases: [luft, lufting, ventilasjonsutstyr]
   approvedForPublicUse: true
-  sourceIds: [src-deep-research-tilfluktsrom]
+  sourceIds: [src-sjekkliste-fig-og-figp]
 - id: nodstrom
   label: Nødstrøm
   category: tilfluktsrom
   aliases: [reservekraft, strømberedskap i tilfluktsrom]
   approvedForPublicUse: true
-  sourceIds: [src-deep-research-tilfluktsrom]
+  sourceIds: [src-sjekkliste-fig-og-figp]
 - id: vann
   label: Vann
   category: tilfluktsrom
   aliases: [drikkevann, vannforsyning]
   approvedForPublicUse: true
-  sourceIds: [src-deep-research-tilfluktsrom]
+  sourceIds: [src-sjekkliste-fig-og-figp]
 - id: sanitaer
   label: Sanitær
   category: tilfluktsrom
   aliases: [toalett, hygiene, sanitærutstyr]
   approvedForPublicUse: true
-  sourceIds: [src-deep-research-tilfluktsrom]
+  sourceIds: [src-sjekkliste-fig-og-figp]
 - id: belysning
   label: Belysning
   category: logistikk
   aliases: [lys, arbeidslys, lyskaster, områdebelysning]
   approvedForPublicUse: true
-  sourceIds: [src-deep-research-tilfluktsrom, src-sjekkliste-fig-og-figp]
+  sourceIds: [src-sjekkliste-fig-og-figp]
 - id: renseutstyr
   label: Renseutstyr
   category: cbrn

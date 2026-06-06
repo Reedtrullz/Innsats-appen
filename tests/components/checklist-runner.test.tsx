@@ -7,7 +7,7 @@ import type { OperationalChecklist } from '@/lib/content/schemas';
 
 afterEach(async () => clearLocalMissionData());
 
-const checklist = { slug: 'tilfluktsrom-teknisk-status', title: 'Tilfluktsrom teknisk status', phase: 'for', roles: ['beredskapsvakt'], scenarios: ['tilfluktsrom'], sourceIds: ['src-deep-research-tilfluktsrom'], warning: 'bruk bare godkjent informasjon', items: [{ id: 'ventilasjon', label: 'Kontroller ventilasjon', required: true, sourceIds: ['src-deep-research-tilfluktsrom'] }] } as OperationalChecklist;
+const checklist = { slug: 'tilfluktsrom-teknisk-status', title: 'Tilfluktsrom teknisk status', phase: 'for', roles: ['beredskapsvakt'], scenarios: ['tilfluktsrom'], sourceIds: ['src-operativt-konsept-for-sivilforsvaret'], warning: 'bruk bare godkjent informasjon', items: [{ id: 'ventilasjon', label: 'Kontroller ventilasjon', required: true, sourceIds: ['src-operativt-konsept-for-sivilforsvaret'] }] } as OperationalChecklist;
 
 const equipmentChecklist = {
   slug: 'mbk-kjoretoy',
@@ -28,7 +28,7 @@ it('renders required items, source links, and persists checked state with local 
   await waitFor(() => expect(checkbox).toBeEnabled());
   expect(screen.getByText('0/1 fullført')).toBeInTheDocument();
   expect(screen.getByText(/Påkrevd: 0\/1 kontrollert/i)).toBeInTheDocument();
-  expect(screen.getAllByText(/src-deep-research-tilfluktsrom/i).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/src-operativt-konsept-for-sivilforsvaret/i).length).toBeGreaterThan(0);
   await userEvent.click(checkbox);
   expect(screen.getByText('1/1 fullført')).toBeInTheDocument();
   await waitFor(async () => expect((await getChecklistRun('mission-1:tilfluktsrom-teknisk-status'))?.checkedItemIds).toContain('ventilasjon'));

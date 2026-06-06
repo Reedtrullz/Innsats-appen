@@ -28,7 +28,7 @@ const checklists = [
     phase: 'for',
     roles: ['beredskapsvakt'],
     scenarios: ['tilfluktsrom'],
-    sourceIds: ['src-deep-research-tilfluktsrom'],
+    sourceIds: ['src-operativt-konsept-for-sivilforsvaret'],
     items: [],
   },
   {

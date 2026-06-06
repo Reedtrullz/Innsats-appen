@@ -230,6 +230,43 @@ it('curated YAML includes required starter slugs', () => {
   }
 });
 
+it('curated pilot/public content does not cite rejected-for-pilot deep-research sources', () => {
+  const sources = readYaml('content/generated/source-documents.json');
+  const rejectedSourceIds = new Set(
+    sources
+      .filter((source) => source.pilotReviewStatus === 'rejected-for-pilot')
+      .map((source) => source.id),
+  );
+  const files = [
+    'content/curated/action-cards.yaml',
+    'content/curated/checklists.yaml',
+    'content/curated/protection-measures.yaml',
+    'content/curated/glossary.yaml',
+    'content/curated/faq.yaml',
+    'content/curated/must-read.yaml',
+    'content/curated/changelog.yaml',
+    'content/curated/equipment-taxonomy.yaml',
+  ];
+  const rejectedReferences: string[] = [];
+
+  const collect = (file: string, label: string, item: any) => {
+    for (const sourceId of item.sourceIds ?? []) {
+      if (rejectedSourceIds.has(sourceId)) rejectedReferences.push(`${file}:${label}:${sourceId}`);
+    }
+  };
+
+  for (const file of files) {
+    const records = readYaml(file);
+    for (const record of records) {
+      const label = record.slug ?? record.id ?? record.term ?? record.title ?? 'unknown';
+      collect(file, label, record);
+      for (const item of record.items ?? []) collect(file, `${label}:item:${item.id ?? item.label}`, item);
+    }
+  }
+
+  expect(rejectedReferences).toEqual([]);
+});
+
 it('taxonomy includes Group 5A competence codes with Norwegian labels', () => {
   for (const [code, labelPattern] of Object.entries(group5ACompetenceLabels)) {
     expect(competenceCodes, `missing competence code ${code}`).toContain(code);

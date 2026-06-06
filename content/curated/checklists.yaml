@@ -7,20 +7,20 @@
     - id: ansvar
       label: Avklar ansvar med kommune/eier/DSB-linje
       required: true
-      sourceIds: [src-deep-research-tilfluktsrom]
+      sourceIds: [src-operativt-konsept-for-sivilforsvaret]
     - id: ventilasjon
       label: Kontroller ventilasjon og luftinntak
       required: true
-      sourceIds: [src-deep-research-tilfluktsrom]
+      sourceIds: [src-operativt-konsept-for-sivilforsvaret]
     - id: nodstrom
       label: Kontroller nødstrøm, vann, sanitær og belysning
       required: true
-      sourceIds: [src-deep-research-tilfluktsrom]
+      sourceIds: [src-operativt-konsept-for-sivilforsvaret]
     - id: samband
       label: Avklar samband og rapporteringslinje
       required: true
       sourceIds: [src-kommunikasjons-og-sambandsdiagram]
-  sourceIds: [src-deep-research-tilfluktsrom]
+  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
   warning: Bruk bare godkjent informasjon. Ingen private/skjermede lokasjonslister.
 
 - slug: fig-for-innsats
@@ -415,7 +415,7 @@
     - id: status-kontrollert
       label: Teltmateriell kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
       required: true
-      sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom]
+      sourceIds: [src-sjekkliste-fig-og-figp, src-operativt-konsept-for-sivilforsvaret]
     - id: mangler-skade-forbruk-notert-lokalt
       label: Mangler, skade eller forbruk er notert lokalt uten persondata eller utstyrsidentifikatorer
       required: true
@@ -428,7 +428,7 @@
       label: Klar eller ikke klar er rapportert i lokal MBK-status
       required: true
       sourceIds: [src-sjekkliste-fig-og-figp]
-  sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom, src-renhold-etter-branninnsats]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-operativt-konsept-for-sivilforsvaret, src-renhold-etter-branninnsats]
   warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller skjermet operativ informasjon.
 
 - slug: mbk-varmeapparat
@@ -441,7 +441,7 @@
     - id: status-kontrollert
       label: Varmeapparat kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
       required: true
-      sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom]
+      sourceIds: [src-sjekkliste-fig-og-figp, src-operativt-konsept-for-sivilforsvaret]
     - id: mangler-skade-forbruk-notert-lokalt
       label: Mangler, skade eller forbruk er notert lokalt uten persondata eller utstyrsidentifikatorer
       required: true
@@ -454,7 +454,7 @@
       label: Klar eller ikke klar er rapportert i lokal MBK-status
       required: true
       sourceIds: [src-sjekkliste-fig-og-figp]
-  sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom, src-tiltakskort-etter-innsats]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-operativt-konsept-for-sivilforsvaret, src-tiltakskort-etter-innsats]
   warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller skjermet operativ informasjon.
 
 - slug: mbk-pumpe
@@ -493,7 +493,7 @@
     - id: status-kontrollert
       label: Aggregat eller generator kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
       required: true
-      sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom]
+      sourceIds: [src-sjekkliste-fig-og-figp, src-operativt-konsept-for-sivilforsvaret]
     - id: mangler-skade-forbruk-notert-lokalt
       label: Mangler, skade eller forbruk er notert lokalt uten persondata eller utstyrsidentifikatorer
       required: true
@@ -506,7 +506,7 @@
       label: Klar eller ikke klar er rapportert i lokal MBK-status
       required: true
       sourceIds: [src-sjekkliste-fig-og-figp]
-  sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom, src-tiltakskort-etter-innsats]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-operativt-konsept-for-sivilforsvaret, src-tiltakskort-etter-innsats]
   warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller skjermet operativ informasjon.
 
 - slug: mbk-belysning
@@ -519,7 +519,7 @@
     - id: status-kontrollert
       label: Belysning kontrollert som klar, mangler, skadet, forbrukt, trenger vask, trenger service eller karantene
       required: true
-      sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom]
+      sourceIds: [src-sjekkliste-fig-og-figp, src-operativt-konsept-for-sivilforsvaret]
     - id: mangler-skade-forbruk-notert-lokalt
       label: Mangler, skade eller forbruk er notert lokalt uten persondata eller utstyrsidentifikatorer
       required: true
@@ -532,7 +532,7 @@
       label: Klar eller ikke klar er rapportert i lokal MBK-status
       required: true
       sourceIds: [src-sjekkliste-fig-og-figp]
-  sourceIds: [src-sjekkliste-fig-og-figp, src-deep-research-tilfluktsrom, src-tiltakskort-etter-innsats]
+  sourceIds: [src-sjekkliste-fig-og-figp, src-operativt-konsept-for-sivilforsvaret, src-tiltakskort-etter-innsats]
   warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller skjermet operativ informasjon.
 
 - slug: mbk-samband

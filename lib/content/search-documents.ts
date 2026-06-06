@@ -15,7 +15,7 @@ export interface BuildSearchDocumentsInput {
 const PROBLEM_SOURCE_STATUSES = ['expired', 'draft', 'unverified', 'historical'] as const;
 
 function joinSearchText(parts: Array<string | string[] | undefined>) {
-  return parts.flatMap((part) => (Array.isArray(part) ? part : [part ?? ''])).join(' ');
+  return parts.flatMap((part) => (Array.isArray(part) ? part : [part ?? ''])).join(' ').trim();
 }
 
 function sourceSearchStatus(source: SourceDocument): SourceDocument['status'] {
@@ -61,15 +61,20 @@ export function buildSearchDocuments({
       sourceStatus: sourceStatusFor(card.sourceIds, sourcesById),
       sourceIds: card.sourceIds,
     })),
-    ...sources.map<SearchDocument>((source) => ({
-      id: `kilde:${source.id}`,
-      title: source.title,
-      body: `${source.body.slice(0, 5000)} ${source.warnings.join(' ')}`,
-      type: 'kilde',
-      href: `/kilder/${source.id}`,
-      sourceStatus: sourceSearchStatus(source),
-      sourceIds: [source.id],
-    })),
+    ...sources
+      .filter((source) => source.pilotReviewStatus !== 'rejected-for-pilot')
+      .map<SearchDocument>((source) => ({
+        id: `kilde:${source.id}`,
+        title: source.title,
+        body: joinSearchText([
+          source.publicationStatus === 'approved-public' ? source.body.slice(0, 5000) : '',
+          source.warnings,
+        ]),
+        type: 'kilde',
+        href: `/kilder/${source.id}`,
+        sourceStatus: sourceSearchStatus(source),
+        sourceIds: [source.id],
+      })),
     ...glossary.map<SearchDocument>((term) => ({
       id: `ord:${term.term.toLowerCase()}`,
       title: term.term,
