@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T01:39:02.281Z",
+  "generatedAt": "2026-06-06T03:08:13.914Z",
   "sourceCount": 10,
   "planSourceCount": 10,
-  "planSourceHash": "sha256:b24180bef25d0e371b17b3ed0614bd25d8f7e140a19b87300639b877cc700553",
+  "planSourceHash": "sha256:26d18630fe7b9d9c49670c32caeba7bbe4b5a71c591b151a3bf888dec492b88b",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6042,213 +6042,282 @@
         "Written from the 2026-06-05 comprehensive project review. Current verified baseline was HEAD b85f4ad1e241419a097bdd290d61cb8944abb235, live health matched HEAD, npm run check:ci passed after clearing stale .next, and remaining blockers were pilot evidence, source governance, privacy hardening, staging/GitHub governance, context API backpressure, map-package scope, and release closeout."
       ],
       "taskCount": 25,
-      "updatedAt": "2026-06-05T18:56:41.740Z",
+      "updatedAt": "2026-06-06T03:08:13.914Z",
       "tasks": [
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-1",
           "title": "Add RED tests for high-confidence persondata detection",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "RED privacy tests were added and committed earlier in this remediation run; source plan reconciled 2026-06-06."
+          ],
           "sourceHeading": "Task 1: Add RED tests for high-confidence persondata detection"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-2",
           "title": "Implement high-confidence privacy detectors",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "High-confidence privacy detectors were implemented and affected privacy/mission tests passed earlier in this remediation run."
+          ],
           "sourceHeading": "Task 2: Implement high-confidence privacy detectors"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-3",
           "title": "Add RED tests for map label/note privacy leaks",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Map label/note privacy RED tests were added and committed earlier in this remediation run."
+          ],
           "sourceHeading": "Task 3: Add RED tests for map label/note privacy leaks"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-4",
           "title": "Enforce privacy guards in map create/import/export helpers",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Map create/import/export privacy guards were implemented and affected map privacy tests passed earlier in this remediation run."
+          ],
           "sourceHeading": "Task 4: Enforce privacy guards in map create/import/export helpers"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-5",
           "title": "Surface map privacy errors in the UI",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Map privacy errors were surfaced in the UI and affected component tests passed earlier in this remediation run."
+          ],
           "sourceHeading": "Task 5: Surface map privacy errors in the UI"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-6",
           "title": "Add source-governance report helper tests",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Source-governance report helper tests exist and pass; strict report currently details unresolved blockers."
+          ],
           "sourceHeading": "Task 6: Add source-governance report helper tests"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-7",
           "title": "Implement source-governance report helper",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Source-governance report helper exists in lib/content/source-governance.ts and was locally verified."
+          ],
           "sourceHeading": "Task 7: Implement source-governance report helper"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-8",
           "title": "Add source-governance CLI and npm scripts",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Source-governance CLI and npm scripts exist; strict report exits with blocker status and parseable JSON."
+          ],
           "sourceHeading": "Task 8: Add source-governance CLI and npm scripts"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-9",
           "title": "Add pilot source-review ledger fields and docs",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Pilot source-review ledger fields and publication policy docs were added; generated source schemas include pilot/publication status."
+          ],
           "sourceHeading": "Task 9: Add pilot source-review ledger fields and docs"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-10",
           "title": "Review and classify pilot-scope source documents [PARENT-DIRECT]",
-          "status": "planned",
+          "status": "blocked",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Blocked on manual source approval/replacement: strict source-governance report still lists 61 referenced blockers."
+          ],
           "sourceHeading": "Task 10: Review and classify pilot-scope source documents [PARENT-DIRECT]"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-11",
           "title": "Add production CI validation for map packages",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
+          "evidence": [
+            "Map package validation is wired into tests/CI and npm run validate:maps passed earlier in this remediation run."
+          ],
           "sourceHeading": "Task 11: Add production CI validation for map packages"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-12",
           "title": "Add staging workflow exact-SHA and host-key tests",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Staging workflow exact-SHA/host-key tests were added and committed earlier in this remediation run."
+          ],
           "sourceHeading": "Task 12: Add staging workflow exact-SHA and host-key tests"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-13",
           "title": "Harden staging workflow verification",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Staging workflow verification hardening was implemented; actual staging execution remains blocked separately."
+          ],
           "sourceHeading": "Task 13: Harden staging workflow verification"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-14",
           "title": "Configure and verify GitHub deployment governance [PARENT-DIRECT]",
-          "status": "planned",
+          "status": "blocked",
           "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Manual GitHub deployment governance/secrets remain unresolved; do not claim environment governance complete."
+          ],
           "sourceHeading": "Task 14: Configure and verify GitHub deployment governance [PARENT-DIRECT]"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-15",
           "title": "Add monitoring health JSON assertions",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "medium",
           "owner": "AR",
+          "evidence": [
+            "Monitoring health JSON assertions were added and verified earlier in this remediation run."
+          ],
           "sourceHeading": "Task 15: Add monitoring health JSON assertions"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-16",
           "title": "Add context API backpressure tests",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "medium",
           "owner": "AR",
+          "evidence": [
+            "Context API backpressure RED tests were added and committed earlier in this remediation run."
+          ],
           "sourceHeading": "Task 16: Add context API backpressure tests"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-17",
           "title": "Implement context API rate limiter and wire routes",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
+          "evidence": [
+            "Context API rate limiter was implemented and affected context route tests passed earlier in this remediation run."
+          ],
           "sourceHeading": "Task 17: Implement context API rate limiter and wire routes"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-18",
           "title": "Add PMTiles/schematic map UI scope tests",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "medium",
           "owner": "AR",
+          "evidence": [
+            "PMTiles/schematic scope tests were added and verified in this remediation run."
+          ],
           "sourceHeading": "Task 18: Add PMTiles/schematic map UI scope tests"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-19",
           "title": "Implement PMTiles/schematic map UI separation",
-          "status": "planned",
+          "status": "completed",
           "stage": "build",
           "risk": "medium",
           "owner": "AR",
+          "evidence": [
+            "PMTiles/schematic UI separation was implemented; final gate passed at commit bd39443 before this ledger reconciliation."
+          ],
           "sourceHeading": "Task 19: Implement PMTiles/schematic map UI separation"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-20",
           "title": "Align manifest start URL with pilot install expectations",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "medium",
           "owner": "AR",
+          "evidence": [
+            "Manifest start_url/display expectations were aligned and reviewed; app/manifest.ts already uses / and standalone."
+          ],
           "sourceHeading": "Task 20: Align manifest start URL with pilot install expectations"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-21",
           "title": "Add real-device evidence capture checklist updates",
-          "status": "planned",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Real-device evidence checklist docs were updated and reviewed at commit 71e5fcf; actual device execution remains Task 23."
+          ],
           "sourceHeading": "Task 21: Add real-device evidence capture checklist updates"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-22",
           "title": "Execute staging run and smoke staging [PARENT-DIRECT]",
-          "status": "planned",
+          "status": "blocked",
           "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Blocked on staging prerequisite secrets/host-key/DNS governance; no exact-SHA staging run has completed."
+          ],
           "sourceHeading": "Task 22: Execute staging run and smoke staging [PARENT-DIRECT]"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-23",
           "title": "Execute real-device tasks 385-389 and update ledger [PARENT-DIRECT]",
-          "status": "planned",
+          "status": "blocked",
           "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Blocked on physical-device execution for manual tasks 385-389; no real-device evidence pack exists yet."
+          ],
           "sourceHeading": "Task 23: Execute real-device tasks 385-389 and update ledger [PARENT-DIRECT]"
         },
         {
@@ -6258,15 +6327,21 @@
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Post-implementation audit for this reconciled plan has not been run yet."
+          ],
           "sourceHeading": "Task 24: Run post-implementation audit and focused re-reviews"
         },
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-25",
           "title": "Close this workplan ledger, push, wait for exact CI/deploy, and verify live",
-          "status": "planned",
+          "status": "blocked",
           "stage": "release",
           "risk": "high",
           "owner": "AR",
+          "evidence": [
+            "Blocked until source-governance, staging, real-device evidence, CI/deploy, and live exact-SHA verification complete."
+          ],
           "sourceHeading": "Task 25: Close this workplan ledger, push, wait for exact CI/deploy, and verify live"
         }
       ]
