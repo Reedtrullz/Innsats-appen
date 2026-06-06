@@ -2,6 +2,8 @@ import { phases, roles, scenarios } from './taxonomy';
 
 export interface ContentCoverageGraph {
   sources?: any[];
+  publicSources?: any[];
+  publicGraph?: { sources?: any[] };
   actionCards?: any[];
   checklists?: any[];
   trainingPaths?: any[];
@@ -99,12 +101,29 @@ function cardIsHighRisk(card: any, sourceById: Map<string, any>) {
   return card?.priority === 'high' || collectRefs(card).some((sourceId) => isHighRiskSource(sourceById.get(sourceId)));
 }
 
+function normalizedPilotReviewStatus(source: any) {
+  return source?.pilotReviewStatus ?? 'not-reviewed';
+}
+
+function normalizedPublicationStatus(source: any) {
+  return source?.publicationStatus ?? 'needs-permission';
+}
+
+function isPilotApprovedSource(source: any) {
+  return source?.status === 'verified' && normalizedPilotReviewStatus(source) === 'approved-for-pilot' && normalizedPublicationStatus(source) === 'approved-public';
+}
+
+function hasPublicBodyWithoutApproval(source: any) {
+  return normalizedPublicationStatus(source) !== 'approved-public' && String(source?.body ?? '').trim().length > 0;
+}
+
 function addReleaseGap(gaps: ReleaseCoverageGap[], id: string, title: string, count: number, severity: ReleaseCoverageGap['severity'], detail: string) {
   if (count > 0) gaps.push({ id, title, count, severity, detail });
 }
 
 export function buildContentCoverageReport(graph: ContentCoverageGraph, generatedAt = new Date().toISOString()): ContentCoverageReport {
   const sources = graph.sources ?? [];
+  const publicSources = graph.publicSources ?? graph.publicGraph?.sources ?? sources;
   const actionCards = graph.actionCards ?? [];
   const checklists = graph.checklists ?? [];
   const trainingPaths = graph.trainingPaths ?? [];
@@ -172,12 +191,20 @@ export function buildContentCoverageReport(graph: ContentCoverageGraph, generate
     if (referencedSourceIds.has(String(source.id))) bySourceStatus[status].referencedSourceCount += 1;
   }
 
+  const sourceGovernancePilotBlockers = sorted(referencedSourceIds).filter((sourceId) => {
+    const source = sourceById.get(sourceId);
+    return source && !isPilotApprovedSource(source);
+  });
+  const sourceGovernancePublicationBlockers = sorted(new Set(publicSources.filter(hasPublicBodyWithoutApproval).map((source) => String(source.id))));
+
   const gaps: ReleaseCoverageGap[] = [];
   addReleaseGap(gaps, 'content-orphan-sources', 'Sources without linked content', sourcesWithoutReferences.length, 'medium', `${sourcesWithoutReferences.length} sources are not linked from cards, checklists, training, protection measures, or glossary.`);
   addReleaseGap(gaps, 'content-cards-without-sources', 'Cards without linked sources', cardsWithoutSources.length, 'high', `${cardsWithoutSources.length} cards have no sourceIds.`);
   addReleaseGap(gaps, 'content-high-risk-card-warnings', 'High-risk cards missing warnings', highRiskCardsWithoutWarnings.length, 'high', `${highRiskCardsWithoutWarnings.length} high-risk cards lack visible warning copy.`);
   addReleaseGap(gaps, 'content-high-risk-card-competence', 'High-risk cards missing competence or rationale', highRiskCardsWithoutCompetenceOrRationale.length, 'medium', `${highRiskCardsWithoutCompetenceOrRationale.length} high-risk cards lack competence requirements or explicit rationale.`);
   addReleaseGap(gaps, 'content-glossary-undefined', 'Glossary references not defined', referencedButUndefined.length, 'medium', `${referencedButUndefined.length} glossary references are not defined.`);
+  addReleaseGap(gaps, 'source-governance-pilot-blockers', 'Referenced sources blocked by source governance', sourceGovernancePilotBlockers.length, 'high', `${sourceGovernancePilotBlockers.length} referenced sources are not verified, approved for pilot, and approved for public publication. Run npm run report:source-governance:strict for details.`);
+  addReleaseGap(gaps, 'source-governance-publication-blockers', 'Public source bodies without publication approval', sourceGovernancePublicationBlockers.length, 'high', `${sourceGovernancePublicationBlockers.length} public source documents include body text without approved-public publication status.`);
 
   return {
     generatedAt,
