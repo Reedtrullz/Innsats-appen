@@ -34,7 +34,7 @@ Staging caveats found during execution:
 - Until DNS/TLS is fixed for `staging.innsats.reidar.tech`, use workflow input `staging_domain=staging.198.23.137.16.nip.io` for public staging verification, or fix the intended hostname and rerun the same workflow against `staging.innsats.reidar.tech`.
 - `STAGING_SSH_PRIVATE_KEY` was updated to the VPS Actions deploy key accepted by `deploy@198.23.137.16`; the accepted public fingerprint is `SHA256:CNW/GT2ZuBVAjFC2WArkx49ZlWyHb/Lpyj+DESObU4w`.
 
-Current production comparison point: verify the live SHA with `https://innsats.reidar.tech/api/health` before comparing staging. The last audited application-code baseline is SHA `1a26acbfc6f72152e14906d3ecc04d424275aee4`; the last documented deployed snapshot before this docs refresh is SHA `1750a377362c44734dd802be8095ad317957f1c9`, verified by GitHub Actions run `27030600338`. See `docs/release/current-deployment-status.md`.
+Current production comparison point: verify the live SHA with `https://innsats.reidar.tech/api/health` before comparing staging. At the latest controller check (`2026-06-06T16:40:28Z`), production health returned SHA `8f85c01ddd08e0714b97644f4e5537f23a29c403`; the local source-governance commit `e2017a94ba8a933c5be972969bfd2cdd7e1dbacb` was still local/ahead of `origin/main` and not deployed. See `docs/release/current-deployment-status.md` for the exact-SHA verification procedure and older deployment history.
 
 ## Gates before broader pilot
 
@@ -42,7 +42,7 @@ Current production comparison point: verify the live SHA with `https://innsats.r
 - Staging health endpoint returns the exact SHA from the staging deploy run.
 - Manual smoke on staging covers `/nytt`, `/release`, `/data-pa-enheten`, `/oppdrag`, `/feltmodus` and privacy reset.
 - Rollback command/owner is documented for the staging and production targets.
-- Rollback drill evidence is tracked in `docs/release/rollback-drill-evidence.md`; `Status: not-run` remains a pilot caveat.
+- Rollback drill evidence is tracked in `docs/release/rollback-drill-evidence.md`; current `Status: pass-staging-drill` proves the staging rescue path only. Production rollback and owner governance decisions remain pilot caveats until explicitly accepted or separately proven.
 - Real-device evidence for iPhone Safari, Android Chrome, install-to-home-screen, low-connectivity and update-after-offline is attached before final pilot pass.
 
 ## Rollback

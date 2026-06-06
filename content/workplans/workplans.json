@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T14:33:31.678Z",
+  "generatedAt": "2026-06-06T16:44:34.421Z",
   "sourceCount": 12,
   "planSourceCount": 12,
-  "planSourceHash": "sha256:30b084def6f81a326e4221a57788f3494bd21e69eb32c1148cadb21149c87e22",
+  "planSourceHash": "sha256:1153d7b9e7fe0881a0f30fc8b84c632137760c620cb886ece08e1741e2fbda19",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6749,10 +6749,10 @@
       "status": "active",
       "owner": "AR",
       "evidence": [
-        "Audit hardening tasks 1-9 are implemented, reviewed, pushed, and live-verified through 72d5d33836c10789aa05d84e93e52dfbfd4e96b2 before this ledger update. Pilot readiness remains blocked by 55 source-governance blockers, physical-device evidence, and rollback/governance decisions; do not call the project pilot-ready until Tasks 10-13 have real evidence."
+        "Audit hardening tasks 1-10 are implemented and locally verified through e2017a94ba8a933c5be972969bfd2cdd7e1dbacb; strict source governance now reports 53/53 referenced sources approved and 0 pilot blockers. Pilot readiness remains blocked by physical/real-device evidence tasks 385-389 and owner governance decisions; a staging rollback drill passed, but production rollback/governance acceptance is not complete. Do not call the project pilot-ready until Tasks 11-13 have real evidence or explicit owner-accepted caveats."
       ],
       "taskCount": 13,
-      "updatedAt": "2026-06-06T14:33:31.678Z",
+      "updatedAt": "2026-06-06T16:44:34.421Z",
       "tasks": [
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-1",
@@ -6874,12 +6874,13 @@
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-10",
           "title": "Review/approve or replace source-governance blockers in batches [PARENT-DIRECT]",
-          "status": "blocked",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
+          "completedAt": "2026-06-06T16:12:06Z",
           "evidence": [
-            "Task 10 started at 2026-06-06T14:32:13Z by generating docs/source-governance-batch-a-owner-review.md: a privacy-safe Batch A owner-review packet covering 21 sources / 277 referenced labels. Actual strict-gate closure remains blocked until source-owner review/approval or replacement/removal decisions are available. The strict gate currently reports 55 referenced blockers."
+            "Commit e2017a94ba8a933c5be972969bfd2cdd7e1dbacb completed the open-web source-governance pass: created docs/source-governance-open-web-research-2026-06-06.md, updated docs/source-governance-remediation-queue.md, updated generated source governance metadata, fixed importer source_status precedence, and dereferenced two sources that were not safe/publicly approvable. npm run --silent report:source-governance:strict now passes with referencedSourceCount=53, pilotApprovedReferencedSourceCount=53, pilotBlockingReferencedSourceCount=0, and publicBodyBlockingSourceCount=0."
           ],
           "sourceHeading": "Task 10: Review/approve or replace source-governance blockers in batches [PARENT-DIRECT]"
         },
@@ -6891,7 +6892,7 @@
           "risk": "high",
           "owner": "AR",
           "evidence": [
-            "Blocked until physical devices or a real-device cloud lab are available. Chromium/Playwright evidence is supporting evidence only and cannot complete these tasks."
+            "Blocked after controller discovery at 2026-06-06T16:41:26Z. Production health was available at SHA 8f85c01ddd08e0714b97644f4e5537f23a29c403, staging health at SHA d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f, and local candidate e2017a94ba8a933c5be972969bfd2cdd7e1dbacb was not deployed. xcrun xctrace list devices showed ReePhone (26.4.2) offline; idevice_id, ios_webkit_debug_proxy, appium, and adb were unavailable; no real-device-cloud environment indicators were present. Chromium/Playwright evidence remains supporting evidence only and cannot complete these tasks."
           ],
           "sourceHeading": "Task 11: Run physical/real-device evidence tasks 385-389 [PARENT-DIRECT]"
         },
@@ -6903,7 +6904,7 @@
           "risk": "high",
           "owner": "AR",
           "evidence": [
-            "Blocked on owner decisions and/or staging rollback drill. Do not mark complete until the external governance evidence exists."
+            "Partially addressed. Current GitHub governance was rechecked at 2026-06-06T16:40:28Z: branch protection requires strict Automatic checks, admin enforcement is disabled, PR review requirements are not configured, staging/production environments have no protection rules, deploy secret names are repo-scoped, and workflow environment bindings are present. A staging rollback drill passed on 2026-06-06T16:26:39Z-16:27:14Z by forcing a nonexistent GHCR candidate and verifying rollback to staging SHA d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f. The task remains blocked because owner decisions for admin direct pushes, PR reviews, environment protection rules, repo-vs-environment-scoped secrets, staging DNS/TLS posture, and production rollback acceptance are not recorded."
           ],
           "sourceHeading": "Task 12: Close deployment governance and rollback evidence [PARENT-DIRECT]"
         },
@@ -6915,7 +6916,7 @@
           "risk": "high",
           "owner": "AR",
           "evidence": [
-            "Blocked until Tasks 8, 10, 11, and 12 have real passing evidence. This task must remain blocked if any source, device, rollback, governance, CI/deploy, or live verification gate remains unresolved."
+            "Blocked until Task 11 real-device evidence and Task 12 owner-governance decisions have real passing evidence or explicit owner-accepted caveats. Strict source governance is now passing, and a staging rollback drill passed, but those are insufficient for pilot-ready without device/governance closure plus exact-SHA CI/deploy/live verification."
           ],
           "sourceHeading": "Task 13: Final pilot-readiness closeout [PARENT-DIRECT]"
         }

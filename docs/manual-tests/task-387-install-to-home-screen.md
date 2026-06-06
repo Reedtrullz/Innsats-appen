@@ -67,3 +67,21 @@ Discovery performed from the controller Mac before any manual-device evidence wa
 - No persondata, patientdata, real Nødnett groups, private addresses, skjermede positions, sensitive samband or official operational plans were entered or captured.
 
 Required unblocker: connect/unlock the iOS/Android physical device(s) capable of OS-level install-to-home-screen testing or provide a real-device-cloud lab, then rerun this script and replace this blocked status with sanitized pass/fail evidence.
+
+## Execution attempt / status (2026-06-06T16:41:26Z)
+
+Status: blocked — not executed.
+
+Fresh discovery performed from the controller Mac before any physical-device evidence was claimed:
+
+- Production build available: `https://innsats.reidar.tech` with `/api/health.version` = `8f85c01ddd08e0714b97644f4e5537f23a29c403`.
+- Staging build available: `https://staging.198.23.137.16.nip.io` with `/api/health.version` = `d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f`.
+- Local release candidate at discovery time was `e2017a94ba8a933c5be972969bfd2cdd7e1dbacb`, ahead of `origin/main`; it was not claimed as deployed or device-tested.
+- iOS discovery via `xcrun xctrace list devices` found `ReePhone (26.4.2)` offline/unavailable to automation; no OS-level install-to-home-screen run was performed.
+- `idevice_id`, `ios_webkit_debug_proxy`, and `appium` were not installed.
+- Android discovery found no connected Android device and `adb` was not available.
+- No BrowserStack, Sauce Labs, LambdaTest, Appium, Device Farm, or equivalent real-device-cloud environment indicators were present.
+- Desktop Chromium/Playwright/browser automation cannot prove OS-level installed-PWA launch and was intentionally not accepted as pass evidence for this task.
+- No persondata, patientdata, real Nødnett groups, private addresses, skjermede positions, sensitive samband or official operational plans were entered or captured.
+
+Required unblocker remains unchanged: connect/unlock an iOS/Android physical device capable of OS-level install-to-home-screen testing or provide a real-device-cloud lab, then rerun this script and replace this blocked status with sanitized pass/fail evidence.

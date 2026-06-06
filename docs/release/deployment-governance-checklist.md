@@ -1,7 +1,7 @@
 # Deployment governance checklist
 
 Status: manual-owner-decision-required
-Last checked: 2026-06-06T04:14:34Z with `gh api` and `gh secret list`.
+Last checked: 2026-06-06T16:40:28Z with `gh api`, `gh secret list`, and workflow-file inspection. State unchanged from the previous check: governance still requires explicit owner decisions before pilot-go.
 
 ## Current status
 
@@ -36,6 +36,13 @@ gh api repos/Reedtrullz/Innsats-appen/environments --jq '.environments[] | {name
 gh secret list --repo Reedtrullz/Innsats-appen
 gh secret list --repo Reedtrullz/Innsats-appen --env staging
 gh secret list --repo Reedtrullz/Innsats-appen --env production
+python3 - <<'PY'
+from pathlib import Path
+for p in sorted(Path('.github/workflows').glob('*.yml')):
+    for i, line in enumerate(p.read_text().splitlines(), 1):
+        if 'environment:' in line or 'name: production' in line or 'name: staging' in line:
+            print(f'{p}:{i}: {line}')
+PY
 ```
 
 Observed output summary:
@@ -46,6 +53,7 @@ Observed output summary:
 - Environments: `production` and `staging`; both returned `protection_rules=[]`.
 - Repo secrets listed by name: `STAGING_SSH_PRIVATE_KEY`, `VPS_SSH_PRIVATE_KEY`.
 - Environment secret lists for `staging` and `production`: empty output with successful command status.
+- Workflow `environment:` bindings are present: `.github/workflows/ci.yml` deploy job uses `name: production`, and `.github/workflows/staging.yml` deploy job uses `name: staging`.
 
 ## Pilot go/no-go requirement
 
