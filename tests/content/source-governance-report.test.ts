@@ -96,6 +96,35 @@ it('does not flag unreferenced draft sources as pilot-blocking operational usage
   ).not.toContain('src-draft');
 });
 
+it('reports public source document bodies that are exposed without publication approval', () => {
+  const report = buildSourceGovernanceReport({
+    sources: [
+      ...sources,
+      {
+        id: 'src-body-needs-permission',
+        title: 'Body Needs Permission',
+        status: 'verified',
+        reviewRisk: 'high',
+        warnings: [],
+        pilotReviewStatus: 'approved-for-pilot',
+        publicationStatus: 'needs-permission',
+        body: 'This body must not be public.',
+      },
+    ],
+    cards,
+    checklists,
+    trainingPaths,
+  });
+
+  expect(report.summary.publicBodyBlockingSourceCount).toBe(1);
+  expect(report.findings.publicBodyBlockingSources).toEqual([
+    expect.objectContaining({
+      sourceId: 'src-body-needs-permission',
+      reason: 'public body is present while publication status is needs-permission',
+    }),
+  ]);
+});
+
 it('exposes source governance npm scripts', () => {
   const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8')) as { scripts: Record<string, string> };
 
