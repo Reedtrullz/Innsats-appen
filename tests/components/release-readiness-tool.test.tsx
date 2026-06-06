@@ -114,6 +114,38 @@ it('shows content coverage gaps on the release board', async () => {
   expect(screen.getByText(/2 sources need linking/i)).toBeInTheDocument();
 });
 
+it('highlights source governance release gaps as pilot blockers', async () => {
+  globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url.includes('content-coverage-report')) {
+      return {
+        ok: true,
+        json: async () => ({
+          releaseBoard: {
+            gaps: [
+              {
+                id: 'source-governance-pilot-blockers',
+                title: 'Sources referenced by pilot content are not approved',
+                count: 57,
+                severity: 'high',
+                detail: '57 referenced sources are not verified, pilot-approved, and public-approved.',
+              },
+            ],
+          },
+        }),
+      } as Partial<Response> as Response;
+    }
+    return { ok: true, json: async () => ({ generatedAt: '2026-06-06T01:25:09.000Z', sourceCount: 0, workplans: [] }) } as Partial<Response> as Response;
+  });
+
+  render(<ReleaseReadinessTool />);
+
+  expect(await screen.findByRole('heading', { name: 'Content coverage gaps' })).toBeInTheDocument();
+  expect(await screen.findByText('Sources referenced by pilot content are not approved')).toBeInTheDocument();
+  expect(screen.getByText(/Pilot blocker/i)).toBeInTheDocument();
+  expect(screen.getByText(/57 referenced sources/i)).toBeInTheDocument();
+});
+
 it('ignores malformed content coverage report gaps instead of crashing', async () => {
   globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
     const url = String(input);

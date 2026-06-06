@@ -92,6 +92,13 @@ function normalizeCoverageReportSnapshot(value: unknown): CoverageReportSnapshot
   };
 }
 
+function coverageGapBadge(gap: { id?: string; severity?: string }) {
+  if (gap.severity === 'high' && String(gap.id ?? '').startsWith('source-governance-')) return 'Pilot blocker';
+  if (gap.severity === 'high') return 'High';
+  if (gap.severity === 'medium') return 'Medium';
+  return 'Low';
+}
+
 function newId() {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return crypto.randomUUID();
   return `release-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -549,7 +556,10 @@ export function ReleaseReadinessTool() {
                   <article key={gap.id} className="rounded-xl bg-white p-3">
                     <div className="flex items-start justify-between gap-3">
                       <h3 className="font-black">{gap.title}</h3>
-                      <span className={`rounded-full px-2 py-1 text-xs font-black ${gap.severity === 'high' ? 'bg-red-100 text-red-700' : gap.severity === 'medium' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-700'}`}>{gap.count}</span>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        <span className={`rounded-full px-2 py-1 text-xs font-black ${gap.severity === 'high' ? 'bg-red-100 text-red-700' : gap.severity === 'medium' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-700'}`}>{gap.count}</span>
+                        <span className={`rounded-full px-2 py-1 text-xs font-black ${gap.severity === 'high' ? 'bg-red-100 text-red-700' : gap.severity === 'medium' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-700'}`}>{coverageGapBadge(gap)}</span>
+                      </div>
                     </div>
                     <p className="mt-2 text-sm font-semibold text-slate-600">{gap.detail}</p>
                   </article>
