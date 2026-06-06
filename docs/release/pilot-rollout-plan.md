@@ -47,6 +47,7 @@ Before pilot, verify:
 - Production deploy uses a GitHub `production` environment.
 - Staging deploy uses a GitHub `staging` environment.
 - Direct production pushes remain an owner-managed exception: branch protection currently does not enforce admins, so any direct push must have owner sign-off and must still wait for exact-SHA CI/deploy verification before being called live.
+- Deployment governance checklist: `docs/release/deployment-governance-checklist.md` records current branch protection, environment protection and secret-scope decisions that must be accepted or tightened before pilot-go.
 
 Verified 2026-06-05:
 
