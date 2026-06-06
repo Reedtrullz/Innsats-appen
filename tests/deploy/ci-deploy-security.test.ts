@@ -100,3 +100,20 @@ describe('staging deploy verification', () => {
     expect(step).toMatch(/health\.version\s*===\s*process\.env\.EXPECTED_SHA/);
   });
 });
+
+describe('manual production publish script safety', () => {
+  it('requires origin/main parity and the full local CI gate before deploy', () => {
+    const script = readWorkflow('deploy/publish-and-deploy.sh');
+
+    expect(script).toMatch(/git fetch origin main/);
+    expect(script).toMatch(/git rev-parse origin\/main/);
+    expect(script).toMatch(/HEAD is not origin\/main/);
+    expect(script).toMatch(/npm run check:ci/);
+    expect(script).toMatch(/gh run list --commit "\$SHA"/);
+    expect(script).toMatch(/workflowName == "CI \/ Deploy"/);
+    expect(script).toMatch(/status == "completed"/);
+    expect(script).toMatch(/conclusion == "success"/);
+    expect(script.indexOf('npm run check:ci')).toBeLessThan(script.indexOf('docker buildx build'));
+    expect(script.indexOf('gh run list --commit "$SHA"')).toBeLessThan(script.indexOf('docker buildx build'));
+  });
+});

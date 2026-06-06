@@ -32,8 +32,27 @@ if [[ -n "$(git status --porcelain)" ]]; then
   exit 1
 fi
 
-echo "Building generated content locally from Obsidian/curated sources..."
-npm run build:content
+echo "Verifying local HEAD matches origin/main before manual production publish..."
+git fetch origin main >/dev/null
+ORIGIN_MAIN_SHA="$(git rev-parse origin/main)"
+if [[ "$SHA" != "$ORIGIN_MAIN_SHA" ]]; then
+  echo "HEAD is not origin/main. Push the candidate, wait for exact-SHA CI/deploy, or use the GitHub Actions deploy path instead." >&2
+  echo "HEAD:        $SHA" >&2
+  echo "origin/main: $ORIGIN_MAIN_SHA" >&2
+  exit 1
+fi
+
+echo "Running full local release gate before manual production publish..."
+npm run check:ci
+
+echo "Verifying exact-SHA GitHub Actions success before manual production publish..."
+CI_RUN_FILTER='.[] | select(.workflowName == "CI / Deploy" and .headSha == "'"$SHA"'" and .status == "completed" and .conclusion == "success") | .databaseId'
+CI_RUN_ID="$(gh run list --commit "$SHA" --limit 10 --json databaseId,status,conclusion,headSha,workflowName --jq "$CI_RUN_FILTER" | head -n1)"
+if [[ -z "$CI_RUN_ID" ]]; then
+  echo "No completed successful CI / Deploy run found for $SHA. Do not manually deploy unverified code." >&2
+  exit 1
+fi
+echo "Verified CI / Deploy run ${CI_RUN_ID} for ${SHA}."
 
 echo "Installing Ansible collection requirements..."
 ansible-galaxy collection install -r deploy/requirements.yml
