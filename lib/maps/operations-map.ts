@@ -99,13 +99,16 @@ function getBrowserLocalStorage(): Storage | undefined {
   }
 }
 
-export function sanitizeMapText(value: unknown, maxLength = 120) {
+function normalizeMapText(value: unknown) {
   return String(value ?? '')
     .replace(/[<>]/g, '')
     .replace(/[\r\n\t]+/g, ' ')
     .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, maxLength);
+    .trim();
+}
+
+export function sanitizeMapText(value: unknown, maxLength = 120) {
+  return normalizeMapText(value).slice(0, maxLength);
 }
 
 function isMapTextInput(value: unknown): value is string | number | null | undefined {
@@ -118,16 +121,16 @@ function unsupportedMapTextError(context: string) {
 
 function safeMapText(value: unknown, context: string, maxLength = 120) {
   if (!isMapTextInput(value)) throw unsupportedMapTextError(context);
-  const sanitized = sanitizeMapText(value, maxLength);
-  assertNoSensitiveOperationalText(sanitized, context);
-  return sanitized;
+  const normalized = normalizeMapText(value);
+  assertNoSensitiveOperationalText(normalized, context);
+  return normalized.slice(0, maxLength);
 }
 
 function trySafeMapText(value: unknown, context: string, maxLength = 120) {
   void context;
   if (!isMapTextInput(value)) return null;
-  const sanitized = sanitizeMapText(value, maxLength);
-  return detectSensitiveOperationalText(sanitized) ? null : sanitized;
+  const normalized = normalizeMapText(value);
+  return detectSensitiveOperationalText(normalized) ? null : normalized.slice(0, maxLength);
 }
 
 function strictCoordinate(value: unknown): number | null {

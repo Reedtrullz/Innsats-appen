@@ -178,6 +178,15 @@ it('rejects sensitive text in local map markers and drawings before storage', ()
   expect(() => createMissionMapDrawing({ kind: 'sector', label: 'pasient Ola Nordmann', coordinates: '0,0 10,0 10,10' }, now)).toThrow(/persondata|pasientdata/i);
 });
 
+it('checks sensitive map text before truncating long labels and notes', () => {
+  const longLabelWithLateFnr = `${'A'.repeat(130)} 01017000027`;
+  const longNoteWithLateContact = `${'N'.repeat(250)} kontakt ola.nordmann@example.com`;
+  expect(() => createMissionMapMarker({ kind: 'observation', label: longLabelWithLateFnr, x: 10, y: 20 }, now)).toThrow(/persondata|identifikator|pasientdata|private/i);
+  expect(() => createMissionMapMarker({ kind: 'observation', label: 'Obs', note: longNoteWithLateContact, x: 10, y: 20 }, now)).toThrow(/persondata|kontakt|private/i);
+  expect(normalizeMissionMapState({ markers: [{ id: 'unsafe-long', itemType: 'marker', kind: 'observation', label: longLabelWithLateFnr, point: { x: 10, y: 20 }, createdAt: now.toISOString() }], drawings: [] })).toEqual({ markers: [], drawings: [] });
+  expect(() => buildGeoJsonExport({ markers: [{ id: 'unsafe-export', itemType: 'marker', kind: 'observation', label: longLabelWithLateFnr, point: { x: 10, y: 20 }, createdAt: now.toISOString() }], drawings: [] })).toThrow(/persondata|identifikator|private/i);
+});
+
 it('rejects sensitive text in map object update patches', () => {
   const state: MissionMapState = {
     markers: [createMissionMapMarker({ kind: 'observation', missionId: 'mission-a', label: 'Obs', x: 10, y: 20 }, now)],
