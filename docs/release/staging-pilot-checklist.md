@@ -10,8 +10,10 @@ Required GitHub environment/secret configuration before the workflow can run:
 - `STAGING_SSH_HOST_KEY` variable containing the pinned SSH known_hosts entry for `STAGING_HOST`.
 - `STAGING_HOST` variable, defaulting to `198.23.137.16` only if the repo environment does not override it.
 - `STAGING_USER` variable, defaulting to `deploy`.
-- `STAGING_DOMAIN` variable or workflow input, default `staging.innsats.reidar.tech`.
+- `STAGING_DOMAIN` variable or workflow input, default `staging.198.23.137.16.nip.io`.
 - `STAGING_PORT` variable or workflow input, default `3007`.
+
+Current canonical staging verification host is `https://staging.198.23.137.16.nip.io` until `staging.innsats.reidar.tech` has public DNS/TLS pointing at the staging app. Any evidence using another host must state the host and exact `/api/health.version` SHA.
 
 Staging was executed for SHA `d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f` at `2026-06-06T00:40:47Z`.
 
@@ -28,8 +30,8 @@ Successful staging evidence:
 
 Staging caveats found during execution:
 
-- `staging.innsats.reidar.tech` does not currently resolve in public DNS. Earlier staging runs therefore failed public verification with `Name or service not known` after the VPS-local container was healthy.
-- Until DNS is created for `staging.innsats.reidar.tech`, use workflow input `staging_domain=staging.198.23.137.16.nip.io` for public staging verification, or create the intended DNS record and rerun the same workflow against `staging.innsats.reidar.tech`.
+- `staging.innsats.reidar.tech` does not currently have working public DNS/TLS for staging verification. Earlier staging runs therefore failed public verification after the VPS-local container was healthy.
+- Until DNS/TLS is fixed for `staging.innsats.reidar.tech`, use workflow input `staging_domain=staging.198.23.137.16.nip.io` for public staging verification, or fix the intended hostname and rerun the same workflow against `staging.innsats.reidar.tech`.
 - `STAGING_SSH_PRIVATE_KEY` was updated to the VPS Actions deploy key accepted by `deploy@198.23.137.16`; the accepted public fingerprint is `SHA256:CNW/GT2ZuBVAjFC2WArkx49ZlWyHb/Lpyj+DESObU4w`.
 
 Current production comparison point: verify the live SHA with `https://innsats.reidar.tech/api/health` before comparing staging. The last audited application-code baseline is SHA `1a26acbfc6f72152e14906d3ecc04d424275aee4`; the last documented deployed snapshot before this docs refresh is SHA `1750a377362c44734dd802be8095ad317957f1c9`, verified by GitHub Actions run `27030600338`. See `docs/release/current-deployment-status.md`.

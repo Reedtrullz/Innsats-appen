@@ -15,6 +15,8 @@ Produksjon er deploy-verifisert. Repo-dokumenter hardkoder ikke permanent "curre
 
 Dette er en teknisk deploy-/CI-godkjent baseline, ikke en bredere pilot-go.
 
+Current canonical staging verification host is `https://staging.198.23.137.16.nip.io` until `staging.innsats.reidar.tech` has public DNS/TLS pointing at the staging app. Any evidence using another host must state the host and exact `/api/health.version` SHA.
+
 ## Go/no-go
 
 Go/no-go holdes etter staging smoke, manual device evidence, supportkanal og personvernkontroll. Go krever at pilotdistrikt har avtalt team-/kanalalias for kontakt og at feil kan rapporteres uten persondata.
@@ -26,7 +28,7 @@ Må fortsatt være blokkert før bredere pilot dersom evidence mangler:
 - Task 387: install-to-home-screen.
 - Task 388: low-connectivity.
 - Task 389: update-after-offline.
-- Source governance strict gate: `npm run report:source-governance:strict` must pass, or every remaining referenced unverified/not-approved source must have explicit pilot owner acceptance recorded. Current audit still reports 57 referenced source blockers, so this is not pilot-go evidence.
+- Source governance strict gate: `npm run report:source-governance:strict` must pass, or every remaining referenced unverified/not-approved source must have explicit pilot owner acceptance recorded. Current audit still reports 55 referenced source blockers, so this is not pilot-go evidence.
 - Intended staging DNS: `staging.innsats.reidar.tech` must either resolve publicly or pilot runbooks must explicitly use the verified fallback `staging.198.23.137.16.nip.io` until DNS is created.
 
 ## Faser

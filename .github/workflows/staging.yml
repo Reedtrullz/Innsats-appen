@@ -9,7 +9,7 @@ on:
       staging_domain:
         description: Public staging domain to verify after deploy
         required: true
-        default: staging.innsats.reidar.tech
+        default: staging.198.23.137.16.nip.io
       staging_port:
         description: Host port bound on the VPS for the staging container
         required: true
@@ -110,11 +110,11 @@ jobs:
     timeout-minutes: 20
     environment:
       name: staging
-      url: https://${{ inputs.staging_domain || vars.STAGING_DOMAIN || 'staging.innsats.reidar.tech' }}
+      url: https://${{ inputs.staging_domain || vars.STAGING_DOMAIN || 'staging.198.23.137.16.nip.io' }}
     env:
       STAGING_HOST: ${{ vars.STAGING_HOST || '198.23.137.16' }}
       STAGING_USER: ${{ vars.STAGING_USER || 'deploy' }}
-      STAGING_DOMAIN: ${{ inputs.staging_domain || vars.STAGING_DOMAIN || 'staging.innsats.reidar.tech' }}
+      STAGING_DOMAIN: ${{ inputs.staging_domain || vars.STAGING_DOMAIN || 'staging.198.23.137.16.nip.io' }}
       STAGING_PORT: ${{ inputs.staging_port || vars.STAGING_PORT || '3007' }}
       STAGING_SSH_HOST_KEY: ${{ vars.STAGING_SSH_HOST_KEY }}
     steps:
