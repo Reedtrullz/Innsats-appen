@@ -1,6 +1,6 @@
 # Deployment status and verification notes
 
-Updated: 2026-06-05T17:52:52Z
+Updated: 2026-06-07T11:53:07Z
 
 ## How to verify the current production SHA
 
@@ -31,7 +31,7 @@ The latest audit-hardening application/documentation checkpoint verified before 
 
 Live browser smoke on the same deployment checked:
 
-- `/release`: hydrated release board showed `Ikke pilotklar`, `55 pilot blockers`, and loaded 12 generated workplans from `/generated-content/workplans.json`.
+- `/release`: hydrated release board showed `Ikke pilotklar` with then-current pilot blockers and loaded 12 generated workplans from `/generated-content/workplans.json`. That live-smoke snapshot is historical; use the generated workplan artifact and local gates below for current candidate truth.
 - `/kart`: rendered the schematic/offline map surface and local marker/layer controls; no approved PMTiles packages were claimed.
 - `/data-pa-enheten`: rendered local-only backup/import privacy copy.
 - `/oppdrag`: rendered the local mission surface and local archive boundary copy.
@@ -63,7 +63,7 @@ Future docs-only commits may supersede the deployed snapshot SHA while leaving t
 
 ## Local validation performed for the operational map/log/Feltmodus release closeout
 
-Before pilot approval, run `npm run report:source-governance` and resolve every referenced unverified, draft, historical, or expired source. `npm run report:source-governance:strict` is intentionally expected to fail until pilot-scope sources are verified.
+Before pilot approval and after every content change, run `npm run report:source-governance:strict` as a regression gate. Strict source-governance gate PASS for the current local candidate: `sourceCount=61`, `referencedSourceCount=53`, `pilotApprovedReferencedSourceCount=53`, `pilotBlockingReferencedSourceCount=0`, and `publicBodyBlockingSourceCount=0`. This removes the stale source-governance blocker only; it does not prove device, staging, DNS, support-owner, CI/deploy, or live exact-SHA readiness.
 
 Before pushing the release closeout, this local gate passed under Node 22:
 

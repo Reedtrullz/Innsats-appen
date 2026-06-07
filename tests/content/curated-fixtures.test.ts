@@ -267,6 +267,27 @@ it('curated pilot/public content does not cite rejected-for-pilot deep-research 
   expect(rejectedReferences).toEqual([]);
 });
 
+it('keeps pilot-approved tilfluktsrom cards free of stale source-approval warnings', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const sources = readYaml('content/generated/source-documents.json');
+  const source = sources.find((item) => item.id === 'src-operativt-konsept-for-sivilforsvaret');
+  const tilfluktsromCardSlugs = ['tilfluktsrom-klargjoring', 'tilfluktsrom-offentlig-beredskap'];
+
+  expect(source?.pilotReviewStatus).toBe('approved-for-pilot');
+
+  for (const slug of tilfluktsromCardSlugs) {
+    const card = cards.find((item) => item.slug === slug);
+    const warning = card?.warning ?? '';
+    const cardBoundaryText = [warning, ...(card?.safety ?? []), ...(card?.steps ?? [])].join('\n');
+
+    expect(card, `missing tilfluktsrom action card ${slug}`).toBeTruthy();
+    expect(card?.sourceIds).toContain('src-operativt-konsept-for-sivilforsvaret');
+    expect(warning, `${slug} must not carry stale source approval warning`).not.toMatch(/Ikke kildegodkjent for pilot/i);
+    expect(cardBoundaryText, `${slug} must keep private/sheltered-location caveats`).toMatch(/private|skjermede?|skjermet/i);
+    expect(cardBoundaryText, `${slug} must keep official-authority/order caveats`).toMatch(/ikke offisiell ordre|ikke.*fullstendig oversikt|ansvarlig myndighet|ordre/i);
+  }
+});
+
 it('taxonomy includes Group 5A competence codes with Norwegian labels', () => {
   for (const [code, labelPattern] of Object.entries(group5ACompetenceLabels)) {
     expect(competenceCodes, `missing competence code ${code}`).toContain(code);

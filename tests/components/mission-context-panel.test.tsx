@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within, type RenderResult } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within, type RenderResult } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it, vi } from 'vitest';
 import type { ReactElement } from 'react';
@@ -18,8 +18,10 @@ vi.mock('next/navigation', () => ({
 }));
 
 afterEach(async () => {
-  localStorage.clear();
-  await clearLocalMissionData();
+  await act(async () => {
+    localStorage.clear();
+    await clearLocalMissionData();
+  });
 });
 
 const checklists = [

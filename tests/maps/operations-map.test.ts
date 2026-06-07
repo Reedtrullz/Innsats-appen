@@ -20,8 +20,10 @@ import {
   mergeMissionMapState,
   normalizeMissionMapState,
   operationItemsForRender,
+  purgeMissionMapObjects,
   readMissionMapState,
   resetMissionMapState,
+  retainMissionMapObjects,
   deleteMissionMapObject,
   updateMissionMapDrawing,
   updateMissionMapMarker,
@@ -115,6 +117,29 @@ it('deletes drawings only inside the active mission', () => {
   const next = deleteMissionMapObject(state, 'mission-a', 'a');
 
   expect(next.drawings.map((drawing) => drawing.id)).toEqual(['b']);
+});
+
+it('purges mission-scoped map objects by mission id while deliberately preserving legacy unscoped objects', () => {
+  const state = normalizeMissionMapState({
+    markers: [
+      { id: 'marker-a', missionId: 'mission-a', itemType: 'marker', kind: 'hazard', label: 'A marker', point: { x: 10, y: 20 }, createdAt: now.toISOString() },
+      { id: 'marker-b', missionId: 'mission-b', itemType: 'marker', kind: 'resource', label: 'B marker', point: { x: 20, y: 30 }, createdAt: now.toISOString() },
+      { id: 'legacy-marker', itemType: 'marker', kind: 'observation', label: 'Legacy marker', point: { x: 30, y: 40 }, createdAt: now.toISOString() },
+    ],
+    drawings: [
+      { id: 'drawing-a', missionId: 'mission-a', itemType: 'drawing', kind: 'sector', label: 'A sector', points: [{ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 3, y: 1 }], createdAt: now.toISOString() },
+      { id: 'drawing-b', missionId: 'mission-b', itemType: 'drawing', kind: 'sector', label: 'B sector', points: [{ x: 10, y: 10 }, { x: 20, y: 20 }, { x: 30, y: 10 }], createdAt: now.toISOString() },
+      { id: 'legacy-drawing', itemType: 'drawing', kind: 'sector', label: 'Legacy sector', points: [{ x: 40, y: 40 }, { x: 50, y: 50 }, { x: 60, y: 40 }], createdAt: now.toISOString() },
+    ],
+  });
+
+  const purged = purgeMissionMapObjects(state, ['mission-a']);
+  expect(purged.markers.map((marker) => marker.id)).toEqual(['marker-b', 'legacy-marker']);
+  expect(purged.drawings.map((drawing) => drawing.id)).toEqual(['drawing-b', 'legacy-drawing']);
+
+  const retained = retainMissionMapObjects(state, ['mission-b']);
+  expect(retained.markers.map((marker) => marker.id)).toEqual(['marker-b', 'legacy-marker']);
+  expect(retained.drawings.map((drawing) => drawing.id)).toEqual(['drawing-b', 'legacy-drawing']);
 });
 
 it('filters layers and caps rendered local operations', () => {

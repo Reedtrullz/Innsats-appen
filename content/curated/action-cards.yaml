@@ -55,7 +55,7 @@
   competenceRequired: []
   competenceRationale: Tilfluktsromstøtte varierer lokalt og må styres av ansvarlig myndighet, eier og lokal opplæring.
   equipmentRequired: [ventilasjon, nodstrom, vann, sanitaer, belysning, samband]
-  warning: Ikke kildegodkjent for pilot; ikke offisiell ordre eller fullstendig oversikt. Bruk bare godkjent informasjon.
+  warning: Ikke offisiell ordre eller fullstendig oversikt. Bruk bare godkjent informasjon; ikke publiser private eller skjermede tilfluktsromdata.
 
 - slug: cbrne-startkort
   title: Startkort CBRN/CBRNE
@@ -577,7 +577,7 @@
   sourceIds: [src-operativt-konsept-for-sivilforsvaret]
   competenceRationale: Tilfluktsromstøtte varierer lokalt og må styres av ansvarlig myndighet og lokal opplæring.
   equipmentRequired: [ventilasjon, nodstrom, vann, sanitaer, belysning, samband]
-  warning: Ikke kildegodkjent for pilot; public/offline støtte uten private eller skjermede lokasjonsdata.
+  warning: Ikke offisiell ordre eller fullstendig oversikt; lokal/offline beslutningsstøtte uten private eller skjermede lokasjonsdata. Ansvarlig myndighet og gjeldende ordre styrer.
 
 - slug: cbrne-soneinndeling
   title: CBRNE soneinndeling

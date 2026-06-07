@@ -35,19 +35,43 @@ const requiredDocs: Array<[string, string, RegExp[]]> = [
 ];
 
 describe('Group 14 rollout and maintenance documentation', () => {
-  it('documents the current verified production deployment and remaining evidence blockers', () => {
+  it('keeps source-governance release truth in sync with the strict-clean local gate', () => {
+    const rollout = read('docs/release/pilot-rollout-plan.md');
     const status = read('docs/release/current-deployment-status.md');
-    expect(status).toMatch(/1a26acbfc6f72152e14906d3ecc04d424275aee4/);
-    expect(status).toMatch(/1750a377362c44734dd802be8095ad317957f1c9/);
-    expect(status).toMatch(/27030600338/);
-    expect(status).toMatch(/status=healthy|\"status\":\"healthy\"/);
-    expect(status).toMatch(/Automatic checks/);
-    expect(status).toMatch(/Build and push GHCR image/);
-    expect(status).toMatch(/Deploy to VPS with Ansible/);
-    expect(status).toMatch(/Completed tasks: 23\/23/);
-    expect(status).toMatch(/iPhone Safari real-device/);
-    expect(status).toMatch(/Android Chrome real-device/);
+    const workplans = JSON.parse(read('content/workplans/workplans.json')) as {
+      workplans: Array<{ id: string; tasks: Array<{ id: string; status: string; evidence?: string[] }> }>;
+    };
+    const pilotPlan = workplans.workplans.find((plan) => plan.id === '2026-06-05_184316-pilot-readiness-remediation-plan');
+    const task10 = pilotPlan?.tasks.find((task) => task.id === '2026-06-05_184316-pilot-readiness-remediation-plan-task-10');
+    const sourceGovernanceTruth = [rollout, status, JSON.stringify(task10)].join('\n');
+
+    expect(task10, 'pilot readiness task 10 must exist in generated workplans').toBeTruthy();
+    expect(task10?.status).toBe('completed');
+    expect(sourceGovernanceTruth).not.toMatch(/55 referenced source blockers|55 pilot blockers/i);
+    expect(sourceGovernanceTruth).not.toMatch(/strict[^\n.]*source-governance[^\n.]*expected to fail/i);
+    expect(sourceGovernanceTruth).not.toMatch(/strict source-governance report currently lists 55/i);
+    expect(sourceGovernanceTruth).toMatch(/sourceCount=61|61 sources/i);
+    expect(sourceGovernanceTruth).toMatch(/referencedSourceCount=53|53 referenced/i);
+    expect(sourceGovernanceTruth).toMatch(/pilotApprovedReferencedSourceCount=53|53 pilot-approved|53 approved/i);
+    expect(sourceGovernanceTruth).toMatch(/pilotBlockingReferencedSourceCount=0|0 (?:pilot )?(?:referenced )?blockers/i);
+    expect(sourceGovernanceTruth).toMatch(/strict (?:source-governance )?gate (?:PASS|pass)/i);
+  });
+
+  it('documents resilient production verification invariants and separate pilot-go blockers', () => {
+    const status = read('docs/release/current-deployment-status.md');
+
+    expect(status).toMatch(/Do not treat this markdown file as the source of the current live SHA/i);
+    expect(status).toContain('curl -fsS https://innsats.reidar.tech/api/health');
+    expect(status).toContain('gh run list --commit');
+    expect(status).toMatch(/health response[\s\S]*status=healthy[\s\S]*version[\s\S]*SHA being claimed/i);
+    expect(status).toMatch(/GitHub Actions run[\s\S]*completed\/success[\s\S]*same `headSha`/i);
+    expect(status).toMatch(/Broader pilot\/go evidence remains separate from deployment health/i);
     expect(status).toMatch(/A healthy deployed app is not the same as field pilot approval/i);
+    expect(status).toMatch(/iPhone Safari real-device/i);
+    expect(status).toMatch(/Android Chrome real-device/i);
+    expect(status).toMatch(/Install-to-home-screen|standalone PWA launch/i);
+    expect(status).toMatch(/Low-connectivity/i);
+    expect(status).toMatch(/offline-update behavior/i);
   });
 
   it.each(requiredDocs)('covers task %s in %s', (_task, relativePath, matchers) => {

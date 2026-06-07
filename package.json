@@ -12,7 +12,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "npm run build:content && npm run build:app",
-    "build:app": "next build",
+    "clean:next": "tsx scripts/clean-next-build.ts",
+    "build:app": "npm run clean:next && next build",
     "perf:budget": "tsx scripts/performance-budget.ts",
     "perf:lighthouse": "tsx scripts/lighthouse-mobile-budget.ts",
     "start": "mkdir -p .next/standalone/.next && rm -rf .next/standalone/public .next/standalone/.next/static && cp -R public .next/standalone/public && cp -R .next/static .next/standalone/.next/static && cd .next/standalone && node server.js",

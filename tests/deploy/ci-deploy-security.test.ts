@@ -1,8 +1,9 @@
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { cleanNextBuild } from '../../scripts/clean-next-build';
 
 function readWorkflow(path: string) {
   return readFileSync(path, 'utf8');
@@ -23,6 +24,122 @@ const generatedArtifactPaths = [
   'content/generated/source-snapshot-metadata.json',
   'content/workplans/workplans.json',
 ] as const;
+const pinnedRunnerImage = 'ubuntu-24.04';
+const pinnedAnsibleVersion = '12.3.0';
+const pinnedCommunityDockerVersion = '5.2.1';
+const fullShaPattern = /^[a-f0-9]{40}$/;
+
+function workflowPaths() {
+  return readdirSync('.github/workflows')
+    .filter((fileName) => fileName.endsWith('.yml') || fileName.endsWith('.yaml'))
+    .sort()
+    .map((fileName) => `.github/workflows/${fileName}`);
+}
+
+function externalActionUses(workflowPath: string) {
+  return readWorkflow(workflowPath)
+    .split('\n')
+    .map((line, index) => ({
+      lineNumber: index + 1,
+      ref: /^\s*uses:\s*([^\s#]+)/.exec(line)?.[1],
+    }))
+    .filter((entry): entry is { lineNumber: number; ref: string } => Boolean(entry.ref))
+    .filter((entry) => !entry.ref.startsWith('./') && !entry.ref.startsWith('../'));
+}
+
+function actionRefUsesFullSha(ref: string) {
+  const refIndex = ref.lastIndexOf('@');
+  if (refIndex <= 0) return false;
+  return fullShaPattern.test(ref.slice(refIndex + 1));
+}
+
+describe('GitHub Actions supply-chain pinning', () => {
+  it('pins every third-party workflow action to a full commit SHA', () => {
+    const mutableActionRefs = workflowPaths().flatMap((workflowPath) => externalActionUses(workflowPath)
+      .filter((entry) => !actionRefUsesFullSha(entry.ref))
+      .map((entry) => `${workflowPath}:${entry.lineNumber}: ${entry.ref}`));
+
+    expect(mutableActionRefs).toEqual([]);
+  });
+
+  it('uses explicit GitHub-hosted runner images instead of ubuntu-latest', () => {
+    const mutableRunners = workflowPaths().flatMap((workflowPath) => readWorkflow(workflowPath)
+      .split('\n')
+      .map((line, index) => ({ lineNumber: index + 1, line }))
+      .filter(({ line }) => /^\s*runs-on:\s*ubuntu-latest\s*$/.test(line))
+      .map(({ lineNumber }) => `${workflowPath}:${lineNumber}`));
+
+    expect(mutableRunners).toEqual([]);
+    for (const workflowPath of workflowPaths()) {
+      expect(readWorkflow(workflowPath)).toContain(`runs-on: ${pinnedRunnerImage}`);
+    }
+  });
+
+  it('pins Ansible deploy toolchain versions and documents the update cadence', () => {
+    for (const workflowPath of ['.github/workflows/ci.yml', '.github/workflows/staging.yml']) {
+      const workflow = readWorkflow(workflowPath);
+      expect(workflow).toContain('python3 -m venv .ansible-venv');
+      expect(workflow).toContain(`python -m pip install ansible==${pinnedAnsibleVersion}`);
+      expect(workflow).toContain('echo "$PWD/.ansible-venv/bin" >> "$GITHUB_PATH"');
+      expect(workflow).not.toMatch(/python3 -m pip install ansible\s*$/m);
+    }
+
+    const requirements = readWorkflow('deploy/requirements.yml');
+    expect(requirements).toContain(`version: "${pinnedCommunityDockerVersion}"`);
+    expect(requirements).not.toMatch(/version:\s*["']?>=/);
+
+    const dependencyPolicy = readWorkflow('docs/quarterly-dependency-review.md');
+    expect(dependencyPolicy).toContain(`ansible==${pinnedAnsibleVersion}`);
+    expect(dependencyPolicy).toContain(`community.docker ${pinnedCommunityDockerVersion}`);
+    expect(dependencyPolicy).toContain('GitHub Actions commit SHA pins');
+  });
+});
+
+describe('production Next build cleanup', () => {
+  it('removes a stale .next/server tree before a production build', () => {
+    const root = mkdtempSync(join(tmpdir(), 'beredskapsboka-next-clean-'));
+
+    try {
+      writeFixtureFile(root, '.next/server/app/kort/page.js', 'stale app route artifact\n');
+      writeFixtureFile(root, '.next/server/chunks/deep/stale.js', 'stale server chunk\n');
+      writeFixtureFile(root, '.next/cache/previous-build', 'stale build cache\n');
+
+      expect(existsSync(join(root, '.next/server/app/kort/page.js'))).toBe(true);
+
+      cleanNextBuild(root);
+
+      expect(existsSync(join(root, '.next/server'))).toBe(false);
+      expect(existsSync(join(root, '.next'))).toBe(false);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('tolerates a missing .next directory', () => {
+    const root = mkdtempSync(join(tmpdir(), 'beredskapsboka-next-clean-missing-'));
+
+    try {
+      expect(() => cleanNextBuild(root)).not.toThrow();
+      expect(existsSync(join(root, '.next'))).toBe(false);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('requires package production builds to clean .next before next build', () => {
+    const { scripts } = readPackageJson();
+    const cleanNext = scripts['clean:next'];
+    const buildApp = scripts['build:app'];
+    const checkCi = scripts['check:ci'];
+
+    expect(cleanNext).toBe('tsx scripts/clean-next-build.ts');
+    expect(buildApp).toContain('npm run clean:next');
+    expect(buildApp).toContain('next build');
+    expect(buildApp.indexOf('npm run clean:next')).toBeLessThan(buildApp.indexOf('next build'));
+    expect(checkCi).toContain('npm run build:app');
+    expect(checkCi).not.toContain('next build');
+  });
+});
 
 function writeFixtureFile(root: string, relativePath: string, content: string) {
   const filePath = join(root, relativePath);

@@ -35,7 +35,29 @@ describe('service worker offline behavior', () => {
         return Response.json([
           { publicPath: '/content-assets/approved-image.png', approvedForPublication: true },
           { publicPath: '/content-assets/private-image.png', approvedForPublication: false },
+          { publicPath: 'https://evil.example/approved-remote.png', approvedForPublication: true },
+          { publicPath: '//evil.example/protocol-relative.png', approvedForPublication: true },
+          { publicPath: '/api/context/weather', approvedForPublication: true },
+          { publicPath: '/content-assets/query-image.png?v=1', approvedForPublication: true },
         ]);
+      }
+      if (url === '/kort/alpha%20beta') {
+        return new Response('<script src="/_next/static/chunks/generated-card-alpha.js"></script>', {
+          status: 200,
+          headers: { 'content-type': 'text/html; charset=utf-8' },
+        });
+      }
+      if (url === '/kilder/src-test%20doc') {
+        return new Response('<link rel="stylesheet" href="https://example.test/_next/static/css/generated-source.css?v=src"><script src="/_next/static/chunks/generated-card-alpha.js"></script>', {
+          status: 200,
+          headers: { 'content-type': 'text/html' },
+        });
+      }
+      if (url === '/laering/fig10-grunnkurs') {
+        return new Response('<script src="../_next/static/chunks/generated-training.js"></script>', {
+          status: 200,
+          headers: { 'content-type': 'text/html' },
+        });
       }
       return new Response('ok', { status: 200, headers: { 'content-type': 'text/plain' } });
     });
@@ -76,6 +98,13 @@ describe('service worker offline behavior', () => {
     expect(cachedUrls).toContain('/laering/fig10-grunnkurs');
     expect(cachedUrls).toContain('/content-assets/approved-image.png');
     expect(cachedUrls).not.toContain('/content-assets/private-image.png');
+    expect(cachedUrls).not.toContain('https://evil.example/approved-remote.png');
+    expect(cachedUrls).not.toContain('/api/context/weather');
+    expect(cachedUrls).not.toContain('/content-assets/query-image.png?v=1');
+    expect(cachedUrls).toContain('/_next/static/chunks/generated-card-alpha.js');
+    expect(fetchMock.mock.calls.filter(([request]) => request === '/_next/static/chunks/generated-card-alpha.js')).toHaveLength(1);
+    expect(cachedUrls).toContain('/_next/static/css/generated-source.css?v=src');
+    expect(cachedUrls).toContain('/_next/static/chunks/generated-training.js');
     expect(cachedUrls).toContain('/generated-content/action-cards.json');
     expect(cachedUrls).toContain('/generated-content/source-documents.json');
     for (const endpoint of GENERATED_ROUTE_DISCOVERY_ENDPOINTS) {

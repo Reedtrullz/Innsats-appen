@@ -1,4 +1,6 @@
 import { openDB, type DBSchema } from 'idb';
+import { purgeStoredMissionMapObjects, resetMissionMapState, retainStoredMissionMapObjects } from '@/lib/maps/operations-map';
+import { readSelectedActiveMissionId, saveSelectedActiveMissionId } from './active-mission-selection';
 import { ChecklistRunSchema, MissionContextSchema, type ChecklistRun, type ChecklistRunInput, type MissionContext, type ExternalContextSignal } from './schemas';
 
 interface BeredskapsbokaDb extends DBSchema {
@@ -67,6 +69,52 @@ function db() {
       }
     },
   });
+}
+
+function clearActiveMissionIfDeleted(missionIds: Iterable<string>): void {
+  try {
+    const deletedMissionIds = new Set(missionIds);
+    const selectedId = readSelectedActiveMissionId();
+    if (selectedId && deletedMissionIds.has(selectedId)) saveSelectedActiveMissionId(null);
+  } catch {
+    // Sidecar cleanup must not make successful IDB deletion fail.
+  }
+}
+
+function purgeSidecarsForDeletedMissions(missionIds: Iterable<string>): void {
+  const ids = [...missionIds];
+  if (ids.length === 0) return;
+  try {
+    purgeStoredMissionMapObjects(ids);
+  } catch {
+    // Sidecar cleanup must not make successful IDB deletion fail.
+  }
+  clearActiveMissionIfDeleted(ids);
+}
+
+function retainSidecarsForMissions(missionIds: Iterable<string>): void {
+  const ids = [...missionIds];
+  try {
+    retainStoredMissionMapObjects(ids);
+  } catch {
+    // Sidecar cleanup must not make successful IDB replacement fail.
+  }
+  try {
+    const retainedMissionIds = new Set(ids);
+    const selectedId = readSelectedActiveMissionId();
+    if (selectedId && !retainedMissionIds.has(selectedId)) saveSelectedActiveMissionId(null);
+  } catch {
+    // Sidecar cleanup must not make successful IDB replacement fail.
+  }
+}
+
+function assertChecklistRunsReferenceKnownMissions(missions: MissionContext[], checklistRuns: ChecklistRun[]): void {
+  const missionIds = new Set(missions.map((mission) => mission.id));
+  for (const run of checklistRuns) {
+    if (!missionIds.has(run.missionId)) {
+      throw new Error(`Local import rejected: checklist run ${run.id} references missing mission ${run.missionId}.`);
+    }
+  }
 }
 
 export async function saveMission(input: MissionContext): Promise<MissionContext> {
@@ -152,6 +200,7 @@ export async function deleteMission(id: string): Promise<void> {
   const runs = await tx.objectStore('checklistRuns').index('by-mission').getAll(id);
   await Promise.all(runs.map((run) => tx.objectStore('checklistRuns').delete(run.id)));
   await tx.done;
+  purgeSidecarsForDeletedMissions([id]);
 }
 
 export async function deleteArchivedMission(id: string): Promise<void> {
@@ -162,7 +211,7 @@ export async function deleteArchivedMission(id: string): Promise<void> {
 
 export async function clearArchivedMissions(): Promise<void> {
   const archived = await listArchivedMissions();
-  await Promise.all(archived.map((mission) => deleteMission(mission.id)));
+  for (const mission of archived) await deleteMission(mission.id);
 }
 
 export async function saveChecklistRun(input: ChecklistRunInput): Promise<ChecklistRun> {
@@ -189,6 +238,7 @@ export async function listAllChecklistRuns(): Promise<ChecklistRun[]> {
 export async function replaceLocalMissionData(missions: MissionContext[], checklistRuns: ChecklistRun[]): Promise<{ missions: number; checklistRuns: number }> {
   const parsedMissions = missions.map(migrateStoredMissionContext);
   const parsedRuns = checklistRuns.map(migrateStoredChecklistRun);
+  assertChecklistRunsReferenceKnownMissions(parsedMissions, parsedRuns);
   const database = await db();
   const tx = database.transaction(['missions', 'checklistRuns'], 'readwrite');
   try {
@@ -204,6 +254,7 @@ export async function replaceLocalMissionData(missions: MissionContext[], checkl
     }
     throw error;
   }
+  retainSidecarsForMissions(parsedMissions.map((mission) => mission.id));
   return { missions: parsedMissions.length, checklistRuns: parsedRuns.length };
 }
 
@@ -212,4 +263,14 @@ export async function clearLocalMissionData(): Promise<void> {
   const tx = database.transaction(['missions', 'checklistRuns'], 'readwrite');
   await Promise.all([tx.objectStore('missions').clear(), tx.objectStore('checklistRuns').clear()]);
   await tx.done;
+  try {
+    resetMissionMapState();
+  } catch {
+    // Sidecar cleanup must not make successful IDB reset fail.
+  }
+  try {
+    saveSelectedActiveMissionId(null);
+  } catch {
+    // Sidecar cleanup must not make successful IDB reset fail.
+  }
 }

@@ -4,8 +4,10 @@
 
 1. Kjør `npm audit --audit-level=high`.
 2. Kontroller at package.json bruker eksakte versjoner, ikke carets.
-3. Les teknisk gjeld for kjente moderate advisories.
-4. Oppdater én avhengighet om gangen med `npm run check:ci`.
+3. Kontroller at GitHub Actions commit SHA pins fortsatt peker på ønskede upstream-versjoner før de oppdateres. Bruk upstream taggen kun til å slå opp ny SHA, aldri som workflow-pin.
+4. Kontroller deploy-toolchain-pinner: `ansible==12.3.0`, `community.docker 5.2.1` i `deploy/requirements.yml`, og eksplisitt runner-image `ubuntu-24.04`.
+5. Les teknisk gjeld for kjente moderate advisories.
+6. Oppdater én avhengighet eller pin om gangen med `npm run check:ci`.
 
 Dette er beslutningsstøtte for vedlikehold, ikke et offisielt endringssystem.
 

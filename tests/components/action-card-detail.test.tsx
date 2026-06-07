@@ -19,8 +19,8 @@ const testSource = (overrides: Partial<SourceDocument>): SourceDocument => ({
 });
 
 it('shows source-backed tilfluktsrom warnings', () => {
-  const card = { slug: 'tilfluktsrom-klargjoring', title: 'Klargjør offentlig tilfluktsrom', phase: 'for', roles: ['leder'], scenarios: ['tilfluktsrom'], priority: 'high', steps: ['Bruk bare godkjent informasjon'], safety: ['Ikke publiser private data'], reporting: ['Rapporter status'], sourceIds: ['src-operativt-konsept-for-sivilforsvaret'], competenceRequired: [], warning: 'Ikke kildegodkjent for pilot; ikke offisiell ordre' } as ActionCard;
-  const sources = [testSource({ id: 'src-operativt-konsept-for-sivilforsvaret', title: 'SRC - Operativt konsept for Sivilforsvaret', status: 'unverified', body: 'Tilfluktsrom', warnings: ['Ingen private/skjermede data'] })];
+  const card = { slug: 'tilfluktsrom-klargjoring', title: 'Klargjør offentlig tilfluktsrom', phase: 'for', roles: ['leder'], scenarios: ['tilfluktsrom'], priority: 'high', steps: ['Bruk bare godkjent informasjon'], safety: ['Ikke publiser private data'], reporting: ['Rapporter status'], sourceIds: ['src-operativt-konsept-for-sivilforsvaret'], competenceRequired: [], warning: 'Ikke offisiell ordre eller fullstendig oversikt; ikke publiser private eller skjermede data' } as ActionCard;
+  const sources = [testSource({ id: 'src-operativt-konsept-for-sivilforsvaret', title: 'SRC - Operativt konsept for Sivilforsvaret', status: 'verified', pilotReviewStatus: 'approved-for-pilot', publicationStatus: 'approved-public', body: 'Tilfluktsrom', warnings: ['Ingen private/skjermede data'] })];
   render(<ActionCardDetail card={card} sources={sources} />);
   expect(screen.getByRole('heading', { name: /Klargjør offentlig tilfluktsrom/i })).toBeInTheDocument();
   expect(screen.getByText(/SRC - Operativt konsept for Sivilforsvaret/i)).toBeInTheDocument();
@@ -28,13 +28,15 @@ it('shows source-backed tilfluktsrom warnings', () => {
   expect(screen.getByText(/ikke offisiell ordre/i)).toBeInTheDocument();
 });
 
-it('keeps card-level pilot warning visible even when the linked source is verified but high risk', () => {
-  const card = { slug: 'tilfluktsrom-klargjoring', title: 'Klargjør offentlig tilfluktsrom', phase: 'for', roles: ['leder'], scenarios: ['tilfluktsrom'], priority: 'high', steps: ['Bruk bare godkjent informasjon'], safety: ['Ikke publiser private data'], reporting: ['Rapporter status'], sourceIds: ['src-operativt-konsept-for-sivilforsvaret'], competenceRequired: [], warning: 'Ikke kildegodkjent for pilot; ikke offisiell ordre eller fullstendig oversikt' } as ActionCard;
-  const sources = [testSource({ id: 'src-operativt-konsept-for-sivilforsvaret', title: 'SRC - Operativt konsept for Sivilforsvaret', status: 'verified', reviewRisk: 'high', verifiedAt: '2026-06-06', body: 'Tilfluktsrom' })];
+it('keeps card-level safety warning visible when the linked source is pilot-approved but high risk', () => {
+  const card = { slug: 'tilfluktsrom-klargjoring', title: 'Klargjør offentlig tilfluktsrom', phase: 'for', roles: ['leder'], scenarios: ['tilfluktsrom'], priority: 'high', steps: ['Bruk bare godkjent informasjon'], safety: ['Ikke publiser private data'], reporting: ['Rapporter status'], sourceIds: ['src-operativt-konsept-for-sivilforsvaret'], competenceRequired: [], warning: 'Ikke offisiell ordre eller fullstendig oversikt; ikke publiser private eller skjermede data' } as ActionCard;
+  const sources = [testSource({ id: 'src-operativt-konsept-for-sivilforsvaret', title: 'SRC - Operativt konsept for Sivilforsvaret', status: 'verified', pilotReviewStatus: 'approved-for-pilot', publicationStatus: 'approved-public', reviewRisk: 'high', verifiedAt: '2026-06-06', body: 'Tilfluktsrom' })];
 
   render(<ActionCardDetail card={card} sources={sources} />);
 
-  expect(screen.getByText(/Ikke kildegodkjent for pilot/i)).toBeInTheDocument();
+  expect(screen.getByText(/Ikke offisiell ordre eller fullstendig oversikt/i)).toBeInTheDocument();
+  expect(screen.getByText(/private eller skjermede data/i)).toBeInTheDocument();
+  expect(screen.queryByText(/Ikke kildegodkjent for pilot/i)).not.toBeInTheDocument();
   const sourceLink = screen.getByRole('link', { name: /SRC - Operativt konsept for Sivilforsvaret/i });
   expect(sourceLink).toHaveTextContent(/·\s*verified/i);
   expect(sourceLink).toHaveTextContent(/Høy kilde-risiko/i);

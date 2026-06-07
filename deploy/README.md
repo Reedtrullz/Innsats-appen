@@ -78,9 +78,13 @@ The workflow compares fresh `ssh-keyscan` output to `VPS_SSH_HOST_KEY` before wr
 
 ### Local/VPS prerequisites
 
-Install the collection locally:
+GitHub Actions deploy jobs install the pinned deploy toolchain (`ansible==12.3.0` and `community.docker 5.2.1`) inside an `.ansible-venv` on the runner before executing the playbook. For local/manual deploy work, use matching versions in a Python 3.11+ virtual environment so collection behavior does not drift from CI and PEP 668 system Python protections are respected:
 
 ```bash
+python3 -m venv .ansible-venv
+. .ansible-venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install ansible==12.3.0
 ansible-galaxy collection install -r deploy/requirements.yml
 ```
 

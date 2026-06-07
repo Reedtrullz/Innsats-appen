@@ -21,6 +21,8 @@ Current canonical staging verification host is `https://staging.198.23.137.16.ni
 
 Go/no-go holdes etter staging smoke, manual device evidence, supportkanal og personvernkontroll. Go krever at pilotdistrikt har avtalt team-/kanalalias for kontakt og at feil kan rapporteres uten persondata.
 
+Source governance is currently a local strict-clean regression gate, not a remaining source blocker: strict source-governance gate PASS for the current local candidate. `npm run --silent report:source-governance:strict` reports `sourceCount=61`, `referencedSourceCount=53`, `pilotApprovedReferencedSourceCount=53`, `pilotBlockingReferencedSourceCount=0`, and `publicBodyBlockingSourceCount=0`. Re-run it before pilot-go and after every content change, but do not treat this source-gate pass as proof that physical-device, DNS, staging-owner, support, or manual evidence blockers are resolved.
+
 Må fortsatt være blokkert før bredere pilot dersom evidence mangler:
 
 - Task 385: iPhone Safari real-device.
@@ -28,7 +30,6 @@ Må fortsatt være blokkert før bredere pilot dersom evidence mangler:
 - Task 387: install-to-home-screen.
 - Task 388: low-connectivity.
 - Task 389: update-after-offline.
-- Source governance strict gate: `npm run report:source-governance:strict` must pass, or every remaining referenced unverified/not-approved source must have explicit pilot owner acceptance recorded. Current audit still reports 55 referenced source blockers, so this is not pilot-go evidence.
 - Pilot map scope is schematic/local overlay only until an approved app-local PMTiles package, license/provenance note, attribution, cache-size decision and real-device offline evidence exist. The absence of PMTiles cache controls is intentional when `approvedLocalMapPackageManifests` is empty.
 - Intended staging DNS: `staging.innsats.reidar.tech` must either resolve publicly or pilot runbooks must explicitly use the verified fallback `staging.198.23.137.16.nip.io` until DNS is created.
 

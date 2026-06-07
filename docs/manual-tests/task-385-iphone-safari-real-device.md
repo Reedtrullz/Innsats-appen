@@ -10,6 +10,8 @@
 
 Record pass/fail, device/browser, network state, screenshots or video paths, console/errors if available, and privacy notes. Screenshots must not contain sensitive or personal information.
 
+For the remaining owner-run physical iPhone observations, use the plain-language checklist in `docs/manual-tests/task-385-user-manual-instructions.md`.
+
 ## Evidence required
 
 - Device/browser/OS version.
@@ -119,7 +121,7 @@ Continuation run after the iPhone was reconnected:
 - New console caveat: direct route navigation recorded Safari console `Fetch API cannot load ...?_rsc=... due to access control checks` events for some Next RSC prefetches; routes still rendered, UI-link navigation did not record the same errors, and manual same-origin fetches succeeded. Treat as follow-up investigation, not a completed failure verdict.
 - Privacy note: no persondata, patientdata, real Nødnett groups, private addresses, skjermede positions, sensitive samband or official operational plans were entered or captured. Only sanitized exercise strings were used.
 
-Required unblocker for a final `pass` remains hardware offline/low-connectivity evidence plus manual Safari interaction observations, or owner-accepted caveats.
+Required unblocker for a final `pass` remains manual Safari interaction observations, or owner-accepted caveats. Use `task-385-user-manual-instructions.md` for the owner-run checklist: keyboard, Safari toolbar back/forward, physical rotation/orientation/safe-area, physical re-check of the deployed `/kart` action-row fix, optional home-screen/standalone launch note, and optional current-SHA Airplane Mode re-check.
 
 ## Execution attempt / status (2026-06-07T00:46:47Z)
 

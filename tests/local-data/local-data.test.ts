@@ -1,11 +1,16 @@
 import { expect, it, vi } from 'vitest';
-import { FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY } from '@/lib/field-mode/field-mode';
+import { FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY, FIELD_FEEDBACK_STORAGE_KEY } from '@/lib/field-mode/field-mode';
+import { EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY } from '@/lib/integrations/source-settings';
+import { ACTIVE_MISSION_STORAGE_KEY } from '@/lib/mission/active-mission-selection';
+import { OFFLINE_MAP_CACHE_STORAGE_KEY } from '@/lib/maps/offline-map';
+import { OPERATIONS_MAP_STORAGE_KEY } from '@/lib/maps/operations-map';
 import {
   LOCAL_DATA_EXPORT_KIND,
   LOCAL_DATA_EXPORT_VERSION,
   LOCAL_DATA_SCHEMA_VERSION,
   LOCAL_DATA_STORE_KEYS,
   LOCAL_DATABASE_DECISION,
+  RELEASE_READINESS_STORAGE_KEY,
   MAX_LOCAL_IMPORT_CHECKLIST_RUNS,
   MAX_LOCAL_IMPORT_MISSIONS,
   applyLocalDataImport,
@@ -18,7 +23,8 @@ import {
   storageQuotaStatus,
 } from '@/lib/local-data/local-data';
 import type { ChecklistRun, MissionContext } from '@/lib/mission/schemas';
-import { LOCAL_COMPETENCE_REMINDERS_STORAGE_KEY, LOCAL_PROFILE_STORAGE_KEY } from '@/lib/privacy/local-profile';
+import { LOCAL_AUDIT_LOG_STORAGE_KEY, LOCAL_COMPETENCE_REMINDERS_STORAGE_KEY, LOCAL_PROFILE_STORAGE_KEY, LOCAL_RETENTION_STORAGE_KEY } from '@/lib/privacy/local-profile';
+import { defaultReleasePlan } from '@/lib/release/plan';
 import { buildMission } from '../helpers/mission-fixtures';
 
 const baseMission = buildMission({
@@ -83,6 +89,7 @@ it('exposes schema/export versions and allowlisted localStorage keys', () => {
   expect(LOCAL_DATA_STORE_KEYS).not.toContain(LOCAL_PROFILE_STORAGE_KEY);
   expect(LOCAL_DATA_STORE_KEYS).not.toContain(LOCAL_COMPETENCE_REMINDERS_STORAGE_KEY);
   expect(LOCAL_DATA_STORE_KEYS).toContain(FIELD_MODE_STORAGE_KEY);
+  expect(LOCAL_DATA_STORE_KEYS).toContain(ACTIVE_MISSION_STORAGE_KEY);
 });
 
 it('migrates legacy v0 export shapes and stored mission records to current v1', () => {
@@ -104,7 +111,7 @@ it('migrates legacy v0 export shapes and stored mission records to current v1', 
   const migrated = migrateLocalDataExport(legacy);
   expect(migrated.kind).toBe(LOCAL_DATA_EXPORT_KIND);
   expect(migrated.schemaVersion).toBe(1);
-  expect(migrated.localStorage).toEqual({ [FIELD_MODE_STORAGE_KEY]: JSON.stringify({ enabled: true, unknown: 'ignored by field-mode reader' }) });
+  expect(migrated.localStorage).toEqual({ [FIELD_MODE_STORAGE_KEY]: JSON.stringify({ enabled: true, gloveMode: false, theme: 'day', outdoorReadabilityReviewed: false }) });
   expect(migrated.indexedDb.missions[0].schemaVersion).toBe(1);
   expect(JSON.stringify(migrated.indexedDb.missions[0])).not.toContain('geometry');
   expect(migrated.indexedDb.checklistRuns[0].schemaVersion).toBe(1);
@@ -153,7 +160,7 @@ it('rejects future versions and dangerous import fields while stripping non-dang
     },
     indexedDb: { missions: [], checklistRuns: [] },
   }));
-  expect(parsed.localStorage).toEqual({ [FIELD_MODE_STORAGE_KEY]: JSON.stringify({ enabled: true }) });
+  expect(parsed.localStorage).toEqual({ [FIELD_MODE_STORAGE_KEY]: JSON.stringify({ enabled: true, gloveMode: false, theme: 'day', outdoorReadabilityReviewed: false }) });
 });
 
 it('rejects imported local data with high-confidence sensitive mission text before replacing stored data', async () => {
@@ -173,6 +180,119 @@ it('rejects imported local data with high-confidence sensitive mission text befo
     replaceMissionData,
   })).rejects.toThrow(/persondata|pasientdata|skjermet/i);
   expect(replaceMissionData).not.toHaveBeenCalled();
+});
+
+it('rejects orphan checklist runs before replacing stored data', async () => {
+  const orphanedExport = buildLocalDataExport({
+    missions: [baseMission],
+    checklistRuns: [{ ...baseRun, id: 'run-orphaned', missionId: 'missing-mission' }],
+  });
+  const replaceMissionData = vi.fn(async () => ({ missions: 1, checklistRuns: 1 }));
+
+  expect(() => parseLocalDataImport(JSON.stringify(orphanedExport))).toThrow(/checklist run.*missing-mission/i);
+  await expect(applyLocalDataImport(JSON.stringify(orphanedExport), {
+    confirmLocalOnly: true,
+    confirmReplaceExistingLocalData: true,
+    storage: new MemoryStorage(),
+    replaceMissionData,
+  })).rejects.toThrow(/checklist run.*missing-mission/i);
+  expect(replaceMissionData).not.toHaveBeenCalled();
+});
+
+it('normalizes allowed localStorage import values before writing', async () => {
+  const storage = new MemoryStorage();
+  const exportData = buildLocalDataExport({
+    localStorage: {
+      [FIELD_MODE_STORAGE_KEY]: JSON.stringify({ enabled: true, gloveMode: 'yes', theme: 'storm', outdoorReadabilityReviewed: true, extra: 'drop' }),
+      [FIELD_FEEDBACK_STORAGE_KEY]: JSON.stringify([{ id: 'fb-1', createdAt: '2026-06-04T12:00:00.000Z', conditions: '<regn>', observations: 'obs', blockers: 'ingen', suggestedChange: 'større knapper', extra: 'drop' }]),
+      [OPERATIONS_MAP_STORAGE_KEY]: JSON.stringify({
+        markers: [
+          { id: 'map-a', missionId: baseMission.id, itemType: 'marker', kind: 'hazard', label: 'Fare', point: { x: 10, y: 10 }, createdAt: '2026-06-04T12:00:00.000Z', extra: 'drop' },
+          { id: 'map-orphan', missionId: 'missing-mission', itemType: 'marker', kind: 'hazard', label: 'Drop', point: { x: 20, y: 20 }, createdAt: '2026-06-04T12:00:00.000Z' },
+          { id: 'map-legacy', itemType: 'marker', kind: 'observation', label: 'Legacy', point: { x: 30, y: 30 }, createdAt: '2026-06-04T12:00:00.000Z' },
+        ],
+        drawings: [],
+      }),
+      [OFFLINE_MAP_CACHE_STORAGE_KEY]: JSON.stringify({ packageId: 'ovelse-liten', title: 'tampered', estimatedSizeMb: 999, version: 3, cachedAt: '2026-06-04T12:00:00.000Z', runtimeFormat: 'evil' }),
+      [EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY]: JSON.stringify({ kartverket: false, met: 'no', nve: true, extra: 'drop' }),
+      [LOCAL_RETENTION_STORAGE_KEY]: JSON.stringify({ missionRetentionDays: 7.4, archiveRetentionDays: '45', profileRetentionDays: 'bad', auditRetentionDays: 0, updatedAt: '2026-06-04T12:00:00.000Z', extra: 'drop' }),
+      [LOCAL_AUDIT_LOG_STORAGE_KEY]: JSON.stringify([{ id: 'audit-1', type: 'local-reset', createdAt: '2026-06-04T12:00:00.000Z', details: { resetScope: 'mission-data', unknown: 'drop', backupBytes: 1200 } }]),
+      [RELEASE_READINESS_STORAGE_KEY]: JSON.stringify({
+        stages: { ...defaultReleasePlan.stages, verify: 'ready', release: 'bad-status' },
+        items: [
+          { id: 'release-item-1', title: 'Pilot item', owner: 'TS', stage: 'verify', status: 'completed', risk: 'low', notes: 'klar', completedAt: '2026-06-04T12:00:00.000Z', extra: 'drop' },
+          { id: 'release-item-bad', title: 'Bad item', owner: 'TS', stage: 'bad-stage', status: 'completed', risk: 'low', notes: 'drop' },
+        ],
+        syncedAt: '2026-06-04T12:10:00.000Z',
+        extra: 'drop',
+      }),
+      [ACTIVE_MISSION_STORAGE_KEY]: baseMission.id,
+    },
+    missions: [baseMission],
+    checklistRuns: [baseRun],
+  });
+
+  await applyLocalDataImport(JSON.stringify(exportData), {
+    confirmLocalOnly: true,
+    confirmReplaceExistingLocalData: true,
+    storage,
+    replaceMissionData: async (missions, checklistRuns) => ({ missions: missions.length, checklistRuns: checklistRuns.length }),
+  });
+
+  expect(JSON.parse(storage.getItem(FIELD_MODE_STORAGE_KEY) ?? '{}')).toEqual({ enabled: true, gloveMode: false, theme: 'day', outdoorReadabilityReviewed: true });
+  expect(JSON.parse(storage.getItem(FIELD_FEEDBACK_STORAGE_KEY) ?? '[]')).toEqual([{ id: 'fb-1', createdAt: '2026-06-04T12:00:00.000Z', conditions: '<regn>', observations: 'obs', blockers: 'ingen', suggestedChange: 'større knapper' }]);
+  expect(JSON.parse(storage.getItem(OPERATIONS_MAP_STORAGE_KEY) ?? '{}').markers.map((marker: { id: string }) => marker.id)).toEqual(['map-a', 'map-legacy']);
+  expect(JSON.parse(storage.getItem(OFFLINE_MAP_CACHE_STORAGE_KEY) ?? '{}')).toMatchObject({ packageId: 'ovelse-liten', title: 'Øvelse liten pakke', estimatedSizeMb: 6, runtimeFormat: 'schematic' });
+  expect(JSON.parse(storage.getItem(EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY) ?? '{}')).toEqual({ kartverket: false, met: true, nve: true });
+  expect(JSON.parse(storage.getItem(LOCAL_RETENTION_STORAGE_KEY) ?? '{}')).toMatchObject({ missionRetentionDays: 7, archiveRetentionDays: 45, profileRetentionDays: 365, auditRetentionDays: 1 });
+  expect(JSON.parse(storage.getItem(LOCAL_AUDIT_LOG_STORAGE_KEY) ?? '[]')).toEqual([{ id: 'audit-1', type: 'local-reset', createdAt: '2026-06-04T12:00:00.000Z', details: { resetScope: 'mission-data', backupBytes: 1200 } }]);
+  expect(JSON.parse(storage.getItem(RELEASE_READINESS_STORAGE_KEY) ?? '{}')).toEqual({
+    stages: { ...defaultReleasePlan.stages, verify: 'ready' },
+    items: [{ id: 'release-item-1', title: 'Pilot item', owner: 'TS', stage: 'verify', status: 'completed', risk: 'low', notes: 'klar', completedAt: '2026-06-04T12:00:00.000Z' }],
+    syncedAt: '2026-06-04T12:10:00.000Z',
+  });
+  expect(storage.getItem(ACTIVE_MISSION_STORAGE_KEY)).toBe(baseMission.id);
+});
+
+it('rejects malformed allowed localStorage JSON and drops active mission ids missing from imported missions', async () => {
+  expect(() => parseLocalDataImport(JSON.stringify({
+    kind: LOCAL_DATA_EXPORT_KIND,
+    exportVersion: 1,
+    schemaVersion: 1,
+    localStorage: { [FIELD_MODE_STORAGE_KEY]: '{not-json' },
+    indexedDb: { missions: [baseMission], checklistRuns: [baseRun] },
+  }))).toThrow(new RegExp(`localStorage\\.${FIELD_MODE_STORAGE_KEY}.*invalid JSON`));
+
+  const releaseParsed = parseLocalDataImport(JSON.stringify({
+    kind: LOCAL_DATA_EXPORT_KIND,
+    exportVersion: 1,
+    schemaVersion: 1,
+    localStorage: { [RELEASE_READINESS_STORAGE_KEY]: JSON.stringify({ stages: 'bad', items: [] }) },
+    indexedDb: { missions: [baseMission], checklistRuns: [baseRun] },
+  }));
+  expect(JSON.parse(releaseParsed.localStorage[RELEASE_READINESS_STORAGE_KEY] ?? '{}')).toEqual({ stages: defaultReleasePlan.stages, items: [] });
+  expect(() => parseLocalDataImport(JSON.stringify({
+    kind: LOCAL_DATA_EXPORT_KIND,
+    exportVersion: 1,
+    schemaVersion: 1,
+    localStorage: { [RELEASE_READINESS_STORAGE_KEY]: JSON.stringify({ stages: defaultReleasePlan.stages, items: 'bad' }) },
+    indexedDb: { missions: [baseMission], checklistRuns: [baseRun] },
+  }))).toThrow(/release-readiness-v1\.items must be a JSON array/i);
+
+  const parsed = parseLocalDataImport(JSON.stringify(buildLocalDataExport({
+    localStorage: {
+      [ACTIVE_MISSION_STORAGE_KEY]: 'missing-mission',
+      [OPERATIONS_MAP_STORAGE_KEY]: JSON.stringify({
+        markers: [{ id: 'orphan', missionId: 'missing-mission', itemType: 'marker', kind: 'hazard', label: 'Orphan', point: { x: 10, y: 10 }, createdAt: '2026-06-04T12:00:00.000Z' }],
+        drawings: [],
+      }),
+    },
+    missions: [baseMission],
+    checklistRuns: [baseRun],
+  })));
+
+  expect(parsed.localStorage[ACTIVE_MISSION_STORAGE_KEY]).toBeUndefined();
+  expect(JSON.parse(parsed.localStorage[OPERATIONS_MAP_STORAGE_KEY] ?? '{}')).toEqual({ markers: [], drawings: [] });
 });
 
 it('reads only known localStorage keys for backup', () => {
@@ -202,7 +322,7 @@ it('does not silently truncate exports while import parsing rejects over-cap pay
   const manyRuns = Array.from({ length: 505 }, (_, index) => ({
     ...baseRun,
     id: `run-full-backup-${index}`,
-    missionId: `mission-full-backup-${index % manyMissions.length}`,
+    missionId: `mission-full-backup-${index % MAX_LOCAL_IMPORT_MISSIONS}`,
     updatedAt: `2026-06-04T11:${String(index % 60).padStart(2, '0')}:00.000Z`,
   }));
 
@@ -339,7 +459,7 @@ it('roundtrips backup/import with injected local storage and DB writers', async 
   });
 
   expect(counts).toEqual({ localStorageKeys: 1, missions: 1, checklistRuns: 1 });
-  expect(nextStorage.getItem(FIELD_MODE_STORAGE_KEY)).toBe('{"enabled":true}');
+  expect(nextStorage.getItem(FIELD_MODE_STORAGE_KEY)).toBe(JSON.stringify({ enabled: true, gloveMode: false, theme: 'day', outdoorReadabilityReviewed: false }));
   expect(nextStorage.getItem('not-allowlisted')).toBeNull();
   expect(replaceMissionData).toHaveBeenCalledTimes(1);
   expect(importedMissions[0]).toMatchObject({ id: baseMission.id, schemaVersion: 1 });

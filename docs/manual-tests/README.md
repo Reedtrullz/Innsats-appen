@@ -14,6 +14,11 @@ Every run records build SHA, visible content version/offline cache version, URL,
 
 Collect screenshots or video only when they contain sanitized data. Store result logs using `result-log-template.md`. Do not upload or share logs that include operationally sensitive information.
 
+## Current user-run handoff
+
+- Task 385 remaining physical iPhone Safari observations are written as a non-technical user checklist in `task-385-user-manual-instructions.md`.
+- Use that checklist when asking the device owner/tester to verify keyboard behavior, Safari toolbar back/forward, orientation/safe-area, the `/kart` action-row fix, and optional home-screen/offline follow-ups.
+
 ## Real-device boundary
 
 Chromium emulation and Playwright tests are useful automated proxies, but browser compatibility rows beyond Chromium, iPhone Safari, Android Chrome, Add to Home Screen, rain/gloves/darkness/stress, low-connectivity and update-after-offline behavior require named browser/device or real-device lab evidence before they can be called passed.

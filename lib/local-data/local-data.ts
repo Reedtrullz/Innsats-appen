@@ -1,7 +1,8 @@
-import { FIELD_FEEDBACK_STORAGE_KEY, FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY } from '@/lib/field-mode/field-mode';
-import { EXTERNAL_DATA_SOURCE_SETTINGS_EVENT, EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY } from '@/lib/integrations/source-settings';
-import { OFFLINE_MAP_CACHE_EVENT, OFFLINE_MAP_CACHE_STORAGE_KEY } from '@/lib/maps/offline-map';
-import { OPERATIONS_MAP_EVENT, OPERATIONS_MAP_STORAGE_KEY } from '@/lib/maps/operations-map';
+import { FIELD_FEEDBACK_STORAGE_KEY, FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY, normalizeFieldModeSettings, parseFieldFeedbackEntries } from '@/lib/field-mode/field-mode';
+import { EXTERNAL_DATA_SOURCE_SETTINGS_EVENT, EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY, normalizeExternalDataSourceSettings } from '@/lib/integrations/source-settings';
+import { ACTIVE_MISSION_STORAGE_KEY } from '@/lib/mission/active-mission-selection';
+import { OFFLINE_MAP_CACHE_EVENT, OFFLINE_MAP_CACHE_STORAGE_KEY, normalizeCachedOfflineMapPackage } from '@/lib/maps/offline-map';
+import { OPERATIONS_MAP_EVENT, OPERATIONS_MAP_STORAGE_KEY, normalizeMissionMapState, retainMissionMapObjects } from '@/lib/maps/operations-map';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
 import {
   DB_NAME,
@@ -18,7 +19,10 @@ import type { ChecklistRun, MissionContext } from '@/lib/mission/schemas';
 import {
   LOCAL_AUDIT_LOG_STORAGE_KEY,
   LOCAL_RETENTION_STORAGE_KEY,
+  readLocalAuditLog,
+  readRetentionSettings,
 } from '@/lib/privacy/local-profile';
+import { defaultReleasePlan, type ReleaseItem, type ReleasePlan, type RiskLevel, type StageId, type StageStatus, type WorkStatus } from '@/lib/release/plan';
 
 export const LOCAL_DATA_SCHEMA_VERSION = 1;
 export const LOCAL_DATA_EXPORT_VERSION = 1;
@@ -41,6 +45,7 @@ export const LOCAL_DATA_STORE_KEYS = [
   OFFLINE_MAP_CACHE_STORAGE_KEY,
   EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY,
   RELEASE_READINESS_STORAGE_KEY,
+  ACTIVE_MISSION_STORAGE_KEY,
 ] as const;
 
 export type LocalDataStoreKey = typeof LOCAL_DATA_STORE_KEYS[number];
@@ -135,6 +140,7 @@ type NormalizeExportRecordOptions = {
 
 type SanitizeLocalStorageSnapshotOptions = {
   enforceImportLimits?: boolean;
+  importedMissionIds?: ReadonlySet<string>;
 };
 
 const dangerousImportFieldNames = new Set([
@@ -315,6 +321,141 @@ function sortedLocalStorageSnapshot(snapshot: LocalStorageSnapshot): LocalStorag
   ) as LocalStorageSnapshot;
 }
 
+function parseRequiredLocalStorageJson(value: string, key: string): unknown {
+  try {
+    return JSON.parse(value);
+  } catch {
+    throw new Error(`Local import rejected: localStorage.${key} contains invalid JSON.`);
+  }
+}
+
+function storageForValue(key: string, value: string): StorageLike {
+  return {
+    getItem: (requestedKey: string) => (requestedKey === key ? value : null),
+    setItem: () => undefined,
+    removeItem: () => undefined,
+  };
+}
+
+const RELEASE_STAGE_IDS: StageId[] = ['idea', 'scope', 'build', 'verify', 'release'];
+const RELEASE_STAGE_STATUSES: StageStatus[] = ['not-started', 'in-progress', 'ready'];
+const RELEASE_WORK_STATUSES: WorkStatus[] = ['needs-work', 'in-progress', 'blocked', 'completed'];
+const RELEASE_RISK_LEVELS: RiskLevel[] = ['low', 'medium', 'high'];
+
+function isReleaseStageId(value: unknown): value is StageId {
+  return typeof value === 'string' && RELEASE_STAGE_IDS.includes(value as StageId);
+}
+
+function isReleaseStageStatus(value: unknown): value is StageStatus {
+  return typeof value === 'string' && RELEASE_STAGE_STATUSES.includes(value as StageStatus);
+}
+
+function isReleaseWorkStatus(value: unknown): value is WorkStatus {
+  return typeof value === 'string' && RELEASE_WORK_STATUSES.includes(value as WorkStatus);
+}
+
+function isReleaseRiskLevel(value: unknown): value is RiskLevel {
+  return typeof value === 'string' && RELEASE_RISK_LEVELS.includes(value as RiskLevel);
+}
+
+function sanitizeReleaseReadinessText(value: unknown, maxLength = 500): string {
+  return String(value ?? '')
+    .normalize('NFKC')
+    .replace(/[\u0000-\u001F\u007F<>`{}[\]\\]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, maxLength);
+}
+
+function normalizeReleaseReadinessItem(value: unknown): ReleaseItem | null {
+  if (!isRecord(value)) return null;
+  const id = sanitizeReleaseReadinessText(value.id, 120);
+  const title = sanitizeReleaseReadinessText(value.title, 180);
+  if (!id || !title || !isReleaseStageId(value.stage) || !isReleaseWorkStatus(value.status) || !isReleaseRiskLevel(value.risk)) return null;
+  const owner = sanitizeReleaseReadinessText(value.owner, 80) || 'AR';
+  const notes = sanitizeReleaseReadinessText(value.notes, 2_000);
+  const completedAt = sanitizeReleaseReadinessText(value.completedAt, 40);
+  return {
+    id,
+    title,
+    owner,
+    stage: value.stage,
+    status: value.status,
+    risk: value.risk,
+    notes,
+    ...(completedAt ? { completedAt } : {}),
+  };
+}
+
+function normalizeReleaseReadinessPlan(value: unknown): ReleasePlan {
+  if (!isRecord(value)) throw new Error(`Local import rejected: localStorage.${RELEASE_READINESS_STORAGE_KEY} must be a JSON object.`);
+  const rawStages = isRecord(value.stages) ? value.stages : {};
+  const stages = Object.fromEntries(
+    RELEASE_STAGE_IDS.map((stageId) => [
+      stageId,
+      isReleaseStageStatus(rawStages[stageId]) ? rawStages[stageId] : defaultReleasePlan.stages[stageId],
+    ]),
+  ) as ReleasePlan['stages'];
+  if (!Array.isArray(value.items)) throw new Error(`Local import rejected: localStorage.${RELEASE_READINESS_STORAGE_KEY}.items must be a JSON array.`);
+  const items = value.items
+    .map(normalizeReleaseReadinessItem)
+    .filter((item): item is ReleaseItem => Boolean(item))
+    .slice(0, 100);
+  const syncedAt = sanitizeReleaseReadinessText(value.syncedAt, 40);
+  return {
+    stages,
+    items,
+    ...(syncedAt ? { syncedAt } : {}),
+  };
+}
+
+function normalizeActiveMissionStorageValue(value: string, missionIds: ReadonlySet<string> | undefined): string | undefined {
+  const missionId = value.trim();
+  if (!missionId || missionId.length > 160) return undefined;
+  if (!missionIds || missionIds.size === 0) return undefined;
+  return missionIds.has(missionId) ? missionId : undefined;
+}
+
+function normalizeAllowedLocalStorageValue(key: LocalDataStoreKey, value: string, options: SanitizeLocalStorageSnapshotOptions): string | undefined {
+  if (key === ACTIVE_MISSION_STORAGE_KEY) return normalizeActiveMissionStorageValue(value, options.importedMissionIds);
+  const parsedValue = parseRequiredLocalStorageJson(value, key);
+  if (options.enforceImportLimits) assertLocalImportDepth(parsedValue, MAX_LOCAL_IMPORT_DEPTH, `localStorage.${key}`);
+  assertNoDangerousFields(parsedValue, `localStorage.${key}`);
+  assertNoSensitiveOperationalTextInValue(parsedValue, `localStorage.${key}`);
+
+  if (key === FIELD_MODE_STORAGE_KEY) return JSON.stringify(normalizeFieldModeSettings(parsedValue));
+  if (key === FIELD_FEEDBACK_STORAGE_KEY) {
+    if (!Array.isArray(parsedValue)) throw new Error(`Local import rejected: localStorage.${key} must be a JSON array.`);
+    return JSON.stringify(parseFieldFeedbackEntries(JSON.stringify(parsedValue)));
+  }
+  if (key === OPERATIONS_MAP_STORAGE_KEY) {
+    const normalized = retainMissionMapObjects(normalizeMissionMapState(parsedValue), options.importedMissionIds ?? new Set<string>());
+    return JSON.stringify(normalized);
+  }
+  if (key === OFFLINE_MAP_CACHE_STORAGE_KEY) {
+    const normalized = normalizeCachedOfflineMapPackage(parsedValue);
+    if (!normalized) throw new Error(`Local import rejected: localStorage.${key} has invalid offline map cache data.`);
+    return JSON.stringify(normalized);
+  }
+  if (key === EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY) return JSON.stringify(normalizeExternalDataSourceSettings(parsedValue));
+  if (key === LOCAL_RETENTION_STORAGE_KEY) return JSON.stringify(readRetentionSettings(storageForValue(key, value)));
+  if (key === LOCAL_AUDIT_LOG_STORAGE_KEY) {
+    if (!Array.isArray(parsedValue)) throw new Error(`Local import rejected: localStorage.${key} must be a JSON array.`);
+    return JSON.stringify(readLocalAuditLog(storageForValue(key, value)));
+  }
+  if (key === RELEASE_READINESS_STORAGE_KEY) return JSON.stringify(normalizeReleaseReadinessPlan(parsedValue));
+  return undefined;
+}
+
+function assertChecklistRunsReferenceImportedMissions(missions: MissionContext[], checklistRuns: ChecklistRun[]): void {
+  const missionIds = new Set(missions.map((mission) => mission.id));
+  for (const run of checklistRuns) {
+    if (!missionIds.has(run.missionId)) {
+      throw new Error(`Local import rejected: checklist run ${run.id} references missing mission ${run.missionId}.`);
+    }
+  }
+}
+
 export function sanitizeLocalStorageSnapshot(input: unknown, options: SanitizeLocalStorageSnapshotOptions = {}): LocalStorageSnapshot {
   if (!isRecord(input)) return {};
   const snapshot: LocalStorageSnapshot = {};
@@ -322,19 +463,8 @@ export function sanitizeLocalStorageSnapshot(input: unknown, options: SanitizeLo
     if (!keyIsAllowed(key) || typeof value !== 'string') continue;
     if (value.length > MAX_LOCAL_STORAGE_VALUE_CHARS) throw new Error(`Local import rejected: localStorage value for ${key} is too large.`);
     assertNoSensitiveOperationalTextInValue(value, `localStorage.${key}`);
-    try {
-      const parsedValue = JSON.parse(value);
-      if (options.enforceImportLimits) assertLocalImportDepth(parsedValue, MAX_LOCAL_IMPORT_DEPTH, `localStorage.${key}`);
-      assertNoDangerousFields(parsedValue, `localStorage.${key}`);
-      assertNoSensitiveOperationalTextInValue(parsedValue, `localStorage.${key}`);
-    } catch (error) {
-      if (error instanceof SyntaxError) {
-        // Some small settings could be plain strings in older exports. Keep the exact value.
-      } else {
-        throw error;
-      }
-    }
-    snapshot[key] = value;
+    const normalizedValue = normalizeAllowedLocalStorageValue(key, value, options);
+    if (typeof normalizedValue === 'string') snapshot[key] = normalizedValue;
   }
   return sortedLocalStorageSnapshot(snapshot);
 }
@@ -414,11 +544,12 @@ function normalizeExportRecord(input: unknown, options: NormalizeExportRecordOpt
   const indexedDb = isRecord(input.indexedDb) ? input.indexedDb : {};
   const missions = normalizeMissions(exportVersion === LOCAL_DATA_EXPORT_VERSION ? indexedDb.missions : (input.missions ?? indexedDb.missions));
   const checklistRuns = normalizeChecklistRuns(exportVersion === LOCAL_DATA_EXPORT_VERSION ? indexedDb.checklistRuns : (input.checklistRuns ?? indexedDb.checklistRuns));
+  assertChecklistRunsReferenceImportedMissions(missions, checklistRuns);
   const exportedAt = typeof input.exportedAt === 'string' && input.exportedAt ? input.exportedAt : new Date(0).toISOString();
 
   return buildLocalDataExport({
     now: exportedAt,
-    localStorage: sanitizeLocalStorageSnapshot(input.localStorage, { enforceImportLimits: options.enforceImportLimits }),
+    localStorage: sanitizeLocalStorageSnapshot(input.localStorage, { enforceImportLimits: options.enforceImportLimits, importedMissionIds: new Set(missions.map((mission) => mission.id)) }),
     missions,
     checklistRuns,
   });
@@ -432,6 +563,7 @@ export function buildLocalDataExport(input: LocalDataExportInput = {}): LocalDat
   const exportedAt = typeof input.now === 'string' ? input.now : (input.now ?? new Date()).toISOString();
   const missions = normalizeMissions(input.missions ?? []);
   const checklistRuns = normalizeChecklistRuns(input.checklistRuns ?? []);
+  const localStorage = sanitizeLocalStorageSnapshot(input.localStorage ?? {}, { importedMissionIds: new Set(missions.map((mission) => mission.id)) });
   return {
     kind: LOCAL_DATA_EXPORT_KIND,
     exportVersion: LOCAL_DATA_EXPORT_VERSION,
@@ -444,7 +576,7 @@ export function buildLocalDataExport(input: LocalDataExportInput = {}): LocalDat
       dbStores: LOCAL_MISSION_STORES,
       missionRecordSchemaVersion: LOCAL_MISSION_RECORD_SCHEMA_VERSION,
     },
-    localStorage: sanitizeLocalStorageSnapshot(input.localStorage ?? {}),
+    localStorage,
     indexedDb: {
       missions,
       checklistRuns,

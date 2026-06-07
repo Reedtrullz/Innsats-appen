@@ -48,7 +48,9 @@ test('mobile user can search, open source-backed card, create mission, run check
   await page.getByLabel(/Søk lokalt/i).fill('tilfluktsrom');
   await page.getByLabel('Lokalt søk').getByRole('link', { name: /Klargjør.*tilfluktsrom/i }).click();
   await expect(page.getByRole('heading', { name: /Klargjør.*tilfluktsrom/i })).toBeVisible();
-  await expect(page.getByText(/Ikke kildegodkjent for pilot; ikke offisiell ordre eller fullstendig oversikt/i)).toBeVisible();
+  await expect(page.getByText('Ikke offisiell ordre eller fullstendig oversikt. Bruk bare godkjent informasjon; ikke publiser private eller skjermede tilfluktsromdata.')).toBeVisible();
+  await expect(page.getByText('Ikke publiser private eller skjermede tilfluktsromdata i appen.')).toBeVisible();
+  await expect(page.getByText(/Ikke kildegodkjent for pilot/i)).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Kilder' })).toBeVisible();
   const sourceLink = page.getByRole('link', { name: /SRC - Operativt konsept for Sivilforsvaret/i });
   await expect(sourceLink).toBeVisible();

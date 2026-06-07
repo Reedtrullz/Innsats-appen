@@ -264,6 +264,37 @@ export function mapStateForMission(state: MissionMapState, missionId: string): M
   };
 }
 
+function missionIdSet(missionIds: Iterable<string>): Set<string> {
+  return new Set([...missionIds].map((missionId) => sanitizeMapText(missionId, 80)).filter(Boolean));
+}
+
+export function purgeMissionMapObjects(state: MissionMapState, missionIds: Iterable<string>): MissionMapState {
+  const idsToPurge = missionIdSet(missionIds);
+  if (idsToPurge.size === 0) return normalizeMissionMapState(state);
+  return normalizeMissionMapState({
+    markers: state.markers.filter((marker) => !marker.missionId || !idsToPurge.has(marker.missionId)),
+    drawings: state.drawings.filter((drawing) => !drawing.missionId || !idsToPurge.has(drawing.missionId)),
+  });
+}
+
+export function retainMissionMapObjects(state: MissionMapState, missionIds: Iterable<string>): MissionMapState {
+  const idsToRetain = missionIdSet(missionIds);
+  return normalizeMissionMapState({
+    markers: state.markers.filter((marker) => !marker.missionId || idsToRetain.has(marker.missionId)),
+    drawings: state.drawings.filter((drawing) => !drawing.missionId || idsToRetain.has(drawing.missionId)),
+  });
+}
+
+export function purgeStoredMissionMapObjects(missionIds: Iterable<string>, storage?: Pick<Storage, 'getItem' | 'setItem'>): MissionMapState {
+  const next = purgeMissionMapObjects(readMissionMapState(storage), missionIds);
+  return writeMissionMapState(next, storage);
+}
+
+export function retainStoredMissionMapObjects(missionIds: Iterable<string>, storage?: Pick<Storage, 'getItem' | 'setItem'>): MissionMapState {
+  const next = retainMissionMapObjects(readMissionMapState(storage), missionIds);
+  return writeMissionMapState(next, storage);
+}
+
 export function updateMissionMapMarker(state: MissionMapState, missionId: string, markerId: string, patch: Partial<Pick<MissionMapMarker, 'kind' | 'label' | 'point' | 'note'>>): MissionMapState {
   const guardedPatch = { ...patch };
   if (Object.prototype.hasOwnProperty.call(guardedPatch, 'label')) guardedPatch.label = safeMapText(guardedPatch.label, 'operationsMap.marker.label');

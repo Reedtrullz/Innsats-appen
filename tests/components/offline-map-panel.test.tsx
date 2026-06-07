@@ -71,16 +71,18 @@ function mockMapPackageCache(result: { cached: number } | Promise<{ cached: numb
 const originalNavigatorStorageDescriptor = Object.getOwnPropertyDescriptor(navigator, 'storage');
 
 afterEach(async () => {
-  localStorage.clear();
-  if (originalNavigatorStorageDescriptor) {
-    Object.defineProperty(navigator, 'storage', originalNavigatorStorageDescriptor);
-  } else {
-    Reflect.deleteProperty(navigator, 'storage');
-  }
-  vi.doUnmock('@/lib/maps/offline-map-package-manifest');
-  vi.doUnmock('@/lib/maps/map-package-cache');
-  vi.resetModules();
-  await clearLocalMissionData();
+  await act(async () => {
+    localStorage.clear();
+    if (originalNavigatorStorageDescriptor) {
+      Object.defineProperty(navigator, 'storage', originalNavigatorStorageDescriptor);
+    } else {
+      Reflect.deleteProperty(navigator, 'storage');
+    }
+    vi.doUnmock('@/lib/maps/offline-map-package-manifest');
+    vi.doUnmock('@/lib/maps/map-package-cache');
+    vi.resetModules();
+    await clearLocalMissionData();
+  });
 });
 
 const activeMission: MissionContext = buildMission({

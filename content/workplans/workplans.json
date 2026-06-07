@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T17:36:24.003Z",
+  "generatedAt": "2026-06-07T11:45:29.517Z",
   "sourceCount": 12,
   "planSourceCount": 12,
-  "planSourceHash": "sha256:c9fa5b2b5ddb9db946d313eaa6c2ef6ad495dce5c0ff53d5824056b071c1954c",
+  "planSourceHash": "sha256:08e7a722af13c1bcd0ec6770c5f7f0a365ae46f762e0a3fa34933b3045bdc545",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6039,10 +6039,10 @@
       "status": "active",
       "owner": "AR",
       "evidence": [
-        "Written from the 2026-06-05 comprehensive project review. Current verified baseline was HEAD b85f4ad1e241419a097bdd290d61cb8944abb235, live health matched HEAD, npm run check:ci passed after clearing stale .next, and remaining blockers were pilot evidence, source governance, privacy hardening, staging/GitHub governance, context API backpressure, map-package scope, and release closeout."
+        "Written from the 2026-06-05 comprehensive project review. Current verified baseline was HEAD b85f4ad1e241419a097bdd290d61cb8944abb235, live health matched HEAD, npm run check:ci passed after clearing stale .next, and remaining blockers were pilot evidence, privacy hardening, staging/GitHub governance, context API backpressure, map-package scope, and release closeout. Source governance later became strict-clean and remains a regression gate."
       ],
       "taskCount": 25,
-      "updatedAt": "2026-06-06T13:04:11.373Z",
+      "updatedAt": "2026-06-07T11:45:29.517Z",
       "tasks": [
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-1",
@@ -6155,12 +6155,12 @@
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-10",
           "title": "Review and classify pilot-scope source documents [PARENT-DIRECT]",
-          "status": "blocked",
+          "status": "completed",
           "stage": "verify",
           "risk": "high",
           "owner": "AR",
           "evidence": [
-            "Blocked on manual source approval/replacement: strict source-governance report currently lists 55 referenced blockers and 0 public source-body blockers; rerun npm run report:source-governance:strict for the current source IDs before approval/removal work."
+            "Strict source-governance gate PASS for current local candidate: npm run --silent report:source-governance:strict reports sourceCount=61, referencedSourceCount=53, pilotApprovedReferencedSourceCount=53, pilotBlockingReferencedSourceCount=0, and publicBodyBlockingSourceCount=0. Keep this as a regression gate; it does not resolve separate real-device, staging/DNS, support-owner, CI/deploy, or live exact-SHA blockers."
           ],
           "sourceHeading": "Task 10: Review and classify pilot-scope source documents [PARENT-DIRECT]"
         },
@@ -6335,12 +6335,12 @@
         {
           "id": "2026-06-05_184316-pilot-readiness-remediation-plan-task-25",
           "title": "Close this workplan ledger, push, wait for exact CI/deploy, and verify live",
-          "status": "blocked",
+          "status": "active",
           "stage": "release",
           "risk": "high",
           "owner": "AR",
           "evidence": [
-            "Blocked until source-governance, staging, real-device evidence, CI/deploy, and live exact-SHA verification complete."
+            "Blocked until staging/DNS, real-device/manual evidence, support-owner/governance, CI/deploy, and live exact-SHA verification complete. Source governance is strict-clean locally and remains a regression gate, not a remaining blocker."
           ],
           "sourceHeading": "Task 25: Close this workplan ledger, push, wait for exact CI/deploy, and verify live"
         }

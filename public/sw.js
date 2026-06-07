@@ -113,7 +113,7 @@ async function precacheUrl(cache, url) {
   }
 }
 
-async function precacheHtmlAssets(cache, response, baseUrl) {
+async function precacheHtmlAssets(cache, response, baseUrl, precachedAssets) {
   if (!response || !response.ok) return;
   const contentType = response.headers.get('content-type') || '';
   if (!contentType.includes('text/html')) return;
@@ -129,13 +129,29 @@ async function precacheHtmlAssets(cache, response, baseUrl) {
     try {
       const assetUrl = new URL(match[1], baseUrl);
       if (assetUrl.origin === self.location.origin && assetUrl.pathname.startsWith('/_next/')) {
-        assets.add(`${assetUrl.pathname}${assetUrl.search}`);
+        const cacheUrl = `${assetUrl.pathname}${assetUrl.search}`;
+        if (precachedAssets && precachedAssets.has(cacheUrl)) continue;
+        if (precachedAssets) precachedAssets.add(cacheUrl);
+        assets.add(cacheUrl);
       }
     } catch (_) {
       // Ignore malformed relative URLs in generated HTML.
     }
   }
   await Promise.all([...assets].map((url) => precacheUrl(cache, url)));
+}
+
+async function precacheRoutesWithHtmlAssets(cache, urls, precachedAssets, concurrency = 8) {
+  let index = 0;
+  const workerCount = Math.max(1, Math.min(concurrency, urls.length));
+  await Promise.all(Array.from({ length: workerCount }, async () => {
+    while (index < urls.length) {
+      const url = urls[index];
+      index += 1;
+      const response = await precacheUrl(cache, url);
+      await precacheHtmlAssets(cache, response, new URL(url, self.location.origin).href, precachedAssets);
+    }
+  }));
 }
 
 async function fetchGeneratedJson(cache, url) {
@@ -146,6 +162,21 @@ async function fetchGeneratedJson(cache, url) {
     return Array.isArray(parsed) ? parsed : [];
   } catch (_) {
     return [];
+  }
+}
+
+function safeGeneratedImagePath(publicPath) {
+  if (typeof publicPath !== 'string' || !publicPath.trim()) return null;
+  try {
+    const imageUrl = new URL(publicPath, self.location.origin);
+    if (imageUrl.origin !== self.location.origin) return null;
+    if (imageUrl.search || imageUrl.hash) return null;
+    if (!imageUrl.pathname.startsWith('/content-assets/')) return null;
+    if (imageUrl.pathname.includes('\\')) return null;
+    if (imageUrl.pathname.split('/').some((segment) => segment === '.' || segment === '..')) return null;
+    return imageUrl.pathname;
+  } catch (_) {
+    return null;
   }
 }
 
@@ -160,7 +191,7 @@ async function discoverGeneratedRoutes(cache) {
     ...cards.map((card) => card && card.slug ? `/kort/${encodeURIComponent(card.slug)}` : null),
     ...sources.map((source) => source && source.id ? `/kilder/${encodeURIComponent(source.id)}` : null),
     ...trainingPaths.map((trainingPath) => trainingPath && trainingPath.slug ? `/laering/${encodeURIComponent(trainingPath.slug)}` : null),
-    ...images.map((image) => image && image.publicPath && image.approvedForPublication === true ? image.publicPath : null),
+    ...images.map((image) => image && image.approvedForPublication === true ? safeGeneratedImagePath(image.publicPath) : null),
   ].filter(Boolean);
 }
 
@@ -213,12 +244,10 @@ function cachedFallbackResponse(response, reason, generatedContent) {
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      await Promise.all(STATIC_APP_SHELL.map(async (url) => {
-        const response = await precacheUrl(cache, url);
-        await precacheHtmlAssets(cache, response, new URL(url, self.location.origin).href);
-      }));
+      const precachedHtmlAssets = new Set();
+      await precacheRoutesWithHtmlAssets(cache, STATIC_APP_SHELL, precachedHtmlAssets);
       const generatedRoutes = await discoverGeneratedRoutes(cache);
-      await Promise.all(generatedRoutes.map((url) => precacheUrl(cache, url)));
+      await precacheRoutesWithHtmlAssets(cache, generatedRoutes, precachedHtmlAssets);
     }),
   );
 });

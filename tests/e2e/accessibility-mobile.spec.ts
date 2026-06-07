@@ -72,7 +72,9 @@ test('mobile layout has no horizontal overflow and visible controls have large e
 test('warning banners remain visible in card detail', async ({ page }) => {
   await page.goto('/kort/tilfluktsrom-klargjoring');
   await expect(page.getByRole('heading', { name: /Klargjør.*tilfluktsrom/i })).toBeVisible();
-  await expect(page.getByRole('note').filter({ hasText: /Ikke kildegodkjent for pilot/i })).toBeVisible();
+  await expect(page.getByRole('note').filter({ hasText: /Ikke offisiell ordre eller fullstendig oversikt/i })).toBeVisible();
+  await expect(page.getByRole('note').filter({ hasText: /private eller skjermede tilfluktsromdata/i })).toBeVisible();
+  await expect(page.getByRole('note').filter({ hasText: /Ikke kildegodkjent for pilot/i })).toHaveCount(0);
   await expect(page.getByRole('note').filter({ hasText: /Kontroller alltid mot gjeldende offisielt planverk/i }).first()).toBeVisible();
 });
 
