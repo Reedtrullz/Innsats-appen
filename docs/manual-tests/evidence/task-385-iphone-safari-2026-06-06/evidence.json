@@ -1,0 +1,97 @@
+{
+  "generatedAt": "2026-06-06T17:31:56.428Z",
+  "url": "https://innsats.reidar.tech",
+  "missionTitle": "Hermes iPhone Safari test 1905",
+  "missionLocation": "Øvelse",
+  "markerLabel": "Hermes markør øvelse",
+  "privacy": "Only sanitized exercise mission/marker strings were entered. No persondata, patient data, private addresses, real Nødnett groups, skjermede positions, sensitive samband, or official operational plans were entered.",
+  "inspectorPage": {
+    "devtoolsFrontendUrl": "/devtools/devtools.html?ws=127.0.0.1:9222/devtools/page/2",
+    "faviconUrl": "",
+    "thumbnailUrl": "/thumb/https://innsats.reidar.tech/oppdrag",
+    "title": "Beredskapsboka",
+    "url": "https://innsats.reidar.tech/oppdrag",
+    "webSocketDebuggerUrl": "ws://127.0.0.1:9222/devtools/page/2",
+    "appId": "PID:692"
+  },
+  "targets": [
+    {
+      "targetId": "frame-8589934593",
+      "type": "frame"
+    },
+    {
+      "targetId": "page-39",
+      "type": "page"
+    }
+  ],
+  "steps": [
+    {
+      "step": "mission-and-checklist-online",
+      "href": "https://innsats.reidar.tech/oppdrag",
+      "readyState": "complete",
+      "hasMission": true,
+      "checklistNameVisible": true,
+      "ventilationChecked": true,
+      "swStatusLine": "Online · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13",
+      "excerpt": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nOPPDRAGSTAVLE\nLokale oppdrag\nLagres bare lokalt i denne nettleseren\nNytt oppdrag\nSITUASJON FØRST\nOppdrag\nHermes iPhone Safari test 1905 · Øvelse\nLokal lagring · Ikke delt\nOffline\nLokalt\nFASE\nFør\nROLLE\nMannskap\nSCENARIO\nBrann\nNESTE ANBEFALTE HANDLING\nNeste anbefalte handling\nSkill kontaminert utstyr fra skadet utstyr og fra rent materiell så tidlig som mulig.\nMerk, pakk, vask eller sett i karantene etter lokal prosedyre og lederens beskjed.\nDokumenter materiellstatus lokalt uten sensitive hendelsesdetaljer.\nÅpne sjekkliste\nAKTIV SITUASJON\nFremdrift\nFør innsats\nSJEKKLISTE\nTilfluktsrom teknisk status\nAKTIV/ANTALL\n1/18 sjekklister · 4 punkter\nOPPGAVER\n0 aktive oppgaver registrert\n5-punktsordre\nSambandsplan\nOPPDRAGSSIGNALER\n0 kritiske logger / videresendinger registrert lokalt\n1 markør og 0 sektorer/tegninger på aktivt oppdrag\nForeslå statusoppdatering manuelt. Ingenting sendes eller godkjennes automatisk.\nKART OG LOGG\nKart og logg\nKobler lokale kartobjekter, kartrefererte feltloggpunkt og kritiske observasjoner på oppdragstavlen.\nÅpne kart\nÅpne feltlogg\nMarkører\n1 markør\nTegninger/sektorer\n0"
+    },
+    {
+      "step": "map-marker-online",
+      "href": "https://innsats.reidar.tech/kart",
+      "hasMissionContext": true,
+      "hasMarker": true,
+      "hasSchematicMap": true,
+      "markerExcerpt": "MARKØRER\nLokale hendelsesmarkører\nLokale kartlag er klare.\nType\nEtikett\nX 0-100\nY 0-100\nNotat uten persondata\nLegg til lokal markør\nHendelsessted\nFare\nRessurs\nMøteplass\nIL-KO\nPumpeplass\nObservasjon\nPunkt\nLinje\nPolygon\nSektor/teig\nHendelsessted — Hermes markør øvelse (42, 58)\nLogg herfra Hermes markør øvelse\nRediger Hermes markør øvelse\nSlett Hermes markør øvelse\nKART → FELTLOGG\nOpprett logg fra synlig kartobjekt\nLagres bare på aktivt lokalt oppdrag. Bruk skjematiske 0-100 koordinater; ikke legg inn persondata eller skjermede posisjoner.\nAktivt oppdrag: Hermes iPhone Safari test 1905\nFeltlogg går til: Hermes iPhone Safari test 1905\nLoggtekst fra kartpunkt\nLogg fra nyeste synlige markør\nTEGNING\nPunkt, linje, polygon og sektor/teig\nTegnetype\nEtikett\nKoordinater\nNotat uten persondata\nLagre lokal tegning/sektor\nIngen tegning målt ennå.\nIngen synlige sektorer/tegninger.\nNullstill lokale sektorer/markører\nEKSPORT/IMPORT\nLokal SVG og GeoJSON\nLokale kartmarkører og sektorer kan røpe innsatssted, ressurser eller observasjoner. Eksporter bare sanitert øvingsdata, aldri persondata, pasientdata, private adresser eller skjermede operasjonelle posisjoner.\nLag kartbilde (SVG)\nLag GeoJSON eksport\nKartbilde SVG\nGeoJSON eksport\nImporter sanitert GeoJSON\nImporter GeoJSON lokalt\nPost-MVP vurderinger\nKML: KML-import er ikke implementert i MVP. GeoJSON med skjematiske 0-100 koordinater er eneste støttede imp"
+    },
+    {
+      "step": "map-reload-persistence-online",
+      "href": "https://innsats.reidar.tech/kart",
+      "hasMarkerAfterReload": true,
+      "hasMissionContextAfterReload": true,
+      "swStatusLine": "Online · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13"
+    },
+    {
+      "step": "mission-reload-persistence-online",
+      "href": "https://innsats.reidar.tech/oppdrag",
+      "hasMissionAfterReload": true,
+      "ventilationCheckedAfterReload": true,
+      "markerCountMention": null,
+      "swStatusLine": "Online · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13"
+    },
+    {
+      "step": "webkit-request-interception-reload",
+      "method": "Network.setInterceptionEnabled(interceptRequests=true) + Network.interceptWithError(General)",
+      "intercepted": [],
+      "protocolErrors": [],
+      "networkEnableResult": {
+        "result": {},
+        "id": 1039
+      },
+      "enableResult": {
+        "result": {},
+        "id": 1040
+      },
+      "afterReload": {
+        "href": "https://innsats.reidar.tech/oppdrag",
+        "readyState": "complete",
+        "hasMission": true,
+        "ventilationChecked": true,
+        "swStatusLine": "Online · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13",
+        "navigatorOnline": true,
+        "excerpt": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nOPPDRAGSTAVLE\nLokale oppdrag\nLagres bare lokalt i denne nettleseren\nNytt oppdrag\nSITUASJON FØRST\nOppdrag\nHermes iPhone Safari test 1905 · Øvelse\nLokal lagring · Ikke delt\nOffline\nLokalt\nFASE\nFør\nROLLE\nMannskap\nSCENARIO\nBrann\nNESTE ANBEFALTE HANDLING\nNeste anbefalte handling\nSkill kontaminert utstyr fra skadet utstyr og fra rent materiell så tidlig som mulig.\nMerk, pakk, vask eller sett i karantene etter lokal prosedyre og lederens beskjed.\nDokumenter materiellstatus lokalt uten sensitive hendelsesdetaljer.\nÅpne sjekkliste\nAKTIV SITUASJON\nFremdrift\nFør innsats\nSJEKKLISTE\nTilfluktsrom teknisk status\nAKTIV/ANTALL\n1/18 sjekklister · 4 punkter\nOPPGAVER\n0 aktive oppgaver registrert\n5-punktsordre\nSambandsplan\nOPPDRAGSSIGNALER\n0 kritiske logger / videresendinger registrert lokalt\n1 markør og 0 sektorer/tegninger på aktivt oppdrag\nForeslå statusoppdatering manuelt. Ingenting sendes eller godkjennes automatisk.\nKART OG LOGG\nKart og logg\nKobler lokale kartobjekter, kartrefererte feltloggpunkt og kritiske observasjoner på oppdragstavlen.\nÅpne kart\nÅpne feltlogg\nMarkører\n1 markør\nTegninger/sektorer\n0 tegninger\nKartkoblet logg\n0 kartkoblede logger\nKritisk\n0 kritiske observasjoner\nIngen kartkoblet feltlogg ennå. Opprett logg fra /kart eller legg til kartreferanse i feltloggen.\nOPERATIV GRENSE\nLokal"
+      }
+    }
+  ],
+  "screenshots": {
+    "oppdragOnline": "/Users/reidar/Projectos/Beredskapsboka/docs/manual-tests/evidence/task-385-iphone-safari-2026-06-06/oppdrag-online.png",
+    "mapMarkerOnline": "/Users/reidar/Projectos/Beredskapsboka/docs/manual-tests/evidence/task-385-iphone-safari-2026-06-06/map-marker-online.png",
+    "oppdragWebkitOfflineInterception": "/Users/reidar/Projectos/Beredskapsboka/docs/manual-tests/evidence/task-385-iphone-safari-2026-06-06/oppdrag-webkit-request-interception.png"
+  },
+  "healthFetchState": {
+    "done": true,
+    "text": null,
+    "error": "TypeError: Load failed"
+  },
+  "healthText": null,
+  "health": null
+}

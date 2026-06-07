@@ -1,0 +1,106 @@
+{
+  "generatedAt": "2026-06-07T00:25:46.744Z",
+  "baseUrl": "https://innsats.reidar.tech",
+  "missionTitle": "Hermes iPhone Safari test 202606070023",
+  "markerLabel": "Hermes markør øvelse 202606070023",
+  "proxyTarget": {
+    "title": "Beredskapsboka",
+    "url": "https://innsats.reidar.tech/oppdrag"
+  },
+  "checks": [
+    {
+      "name": "device-runtime health fetch",
+      "at": "2026-06-07T00:25:47.017Z",
+      "health": {
+        "status": "healthy",
+        "app": "beredskapsboka",
+        "version": "8f85c01ddd08e0714b97644f4e5537f23a29c403",
+        "nodeEnv": "production",
+        "timestamp": "2026-06-07T00:25:46.842Z"
+      }
+    },
+    {
+      "name": "service worker and cache readiness",
+      "at": "2026-06-07T00:25:47.023Z",
+      "serviceWorker": {
+        "navigatorOnline": true,
+        "ready": {
+          "scope": "https://innsats.reidar.tech/",
+          "active": true,
+          "state": "activated"
+        },
+        "registrations": [
+          {
+            "scope": "https://innsats.reidar.tech/",
+            "active": true,
+            "waiting": false,
+            "installing": false
+          }
+        ],
+        "cacheKeys": [
+          "beredskapsboka-v4"
+        ]
+      }
+    },
+    {
+      "name": "mission/checklist visible and persisted after reload",
+      "at": "2026-06-07T00:25:48.177Z",
+      "missionState": {
+        "visible": true,
+        "checked": true,
+        "db": true,
+        "missionFound": true,
+        "missionId": "e6e85dd0-56b8-4fe4-8ec2-a42cd632e972",
+        "checklistPersisted": true,
+        "matchingRuns": [
+          {
+            "templateSlug": "tilfluktsrom-teknisk-status",
+            "checkedItemIds": [
+              "ventilasjon"
+            ]
+          }
+        ]
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/oppdrag-verified-state.png",
+        "bytes": 259749,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/oppdrag",
+          "title": "Beredskapsboka",
+          "online": true
+        }
+      }
+    },
+    {
+      "name": "map marker visible after reload",
+      "at": "2026-06-07T00:25:49.601Z",
+      "markerState": {
+        "visible": true,
+        "buttons": [
+          "Logg herfra Hermes markør øvelse 202606070023 (incident-site, X 42, Y 58)",
+          "Rediger Hermes markør øvelse 202606070023 (incident-site, X 42, Y 58)",
+          "Slett Hermes markør øvelse 202606070023 (incident-site, X 42, Y 58)"
+        ],
+        "online": true
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/map-marker-verified-state.png",
+        "bytes": 294069,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 3282,
+          "href": "https://innsats.reidar.tech/kart",
+          "title": "Kart | Beredskapsboka",
+          "online": true
+        }
+      }
+    }
+  ],
+  "result": "verified-online-physical-safari-supporting"
+}

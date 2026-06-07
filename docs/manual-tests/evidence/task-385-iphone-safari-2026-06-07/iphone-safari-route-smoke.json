@@ -1,0 +1,2200 @@
+{
+  "generatedAt": "2026-06-07T00:35:15.299Z",
+  "baseUrl": "https://innsats.reidar.tech",
+  "proxyTarget": {
+    "title": "Kart | Beredskapsboka",
+    "url": "https://innsats.reidar.tech/kart"
+  },
+  "directRoutes": [
+    {
+      "name": "home",
+      "route": "/",
+      "state": {
+        "href": "https://innsats.reidar.tech/",
+        "path": "/",
+        "title": "Beredskapsboka",
+        "h1": [
+          "Beredskapsboka"
+        ],
+        "h1Count": 1,
+        "headings": [
+          {
+            "level": "H1",
+            "text": "Beredskapsboka"
+          },
+          {
+            "level": "H2",
+            "text": "Hva står du i nå?"
+          },
+          {
+            "level": "H2",
+            "text": "Kritiske snarveier"
+          },
+          {
+            "level": "H2",
+            "text": "Lokal status og grenser"
+          }
+        ],
+        "nav": [
+          {
+            "text": "Grenser",
+            "href": "/begrensninger",
+            "current": null
+          },
+          {
+            "text": "Kjente begrensninger",
+            "href": "/kjente-begrensninger",
+            "current": null
+          },
+          {
+            "text": "Data på enheten",
+            "href": "/data-pa-enheten",
+            "current": null
+          },
+          {
+            "text": "Hjem",
+            "href": "/",
+            "current": "page"
+          },
+          {
+            "text": "Søk",
+            "href": "/sok",
+            "current": null
+          },
+          {
+            "text": "Oppdrag",
+            "href": "/oppdrag",
+            "current": null
+          },
+          {
+            "text": "Kort",
+            "href": "/hurtigkort",
+            "current": null
+          },
+          {
+            "text": "Mer",
+            "href": "/mer",
+            "current": null
+          }
+        ],
+        "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nSIVILFORSVARET\nBeredskapsboka\nKildebelagt beslutningsstøtte før, under og etter innsats.\nHva står du i nå?\nStart lokalt oppdrag\nFinn tiltak raskt\nFør innsats\nAvklar risiko, kilder og første tiltak før oppstart.\nUnder innsats\nFinn operative sjekker og tiltak mens situasjonen pågår.\nEtter innsats\nStøtt debrief, oppfølging og læring etter hendelsen.\nKritiske snarveier\nDirekte til ofte brukte kort og søk ",
+        "navigatorOnline": true,
+        "standalone": false,
+        "manifest": "https://innsats.reidar.tech/manifest.webmanifest",
+        "viewport": {
+          "innerWidth": 428,
+          "innerHeight": 727,
+          "devicePixelRatio": 3,
+          "visualWidth": 428,
+          "visualHeight": 727,
+          "visualOffsetTop": 0,
+          "visualOffsetLeft": 0,
+          "orientationAngle": 0,
+          "orientationType": "portrait-primary"
+        },
+        "overflow": {
+          "htmlClientWidth": 428,
+          "htmlScrollWidth": 428,
+          "bodyClientWidth": 428,
+          "bodyScrollWidth": 428,
+          "horizontalOverflow": false
+        },
+        "activeElement": {
+          "tag": "BODY",
+          "label": "BeredskapsbokaMå leses 3MerOfflineLokaltGenerert innholdsversjon: 2026-06-06 14:"
+        }
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/route-home.png",
+        "bytes": 260786,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/",
+          "title": "Beredskapsboka",
+          "online": true
+        }
+      },
+      "events": [
+        {
+          "at": "2026-06-07T00:35:16.301Z",
+          "method": "Console.messagesCleared",
+          "params": {
+            "reason": "main-frame-navigation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "hurtigkort",
+      "route": "/hurtigkort",
+      "state": {
+        "href": "https://innsats.reidar.tech/hurtigkort",
+        "path": "/hurtigkort",
+        "title": "Beredskapsboka",
+        "h1": [
+          "Hurtigkort"
+        ],
+        "h1Count": 1,
+        "headings": [
+          {
+            "level": "H1",
+            "text": "Hurtigkort"
+          },
+          {
+            "level": "H2",
+            "text": "5-punktsordre"
+          },
+          {
+            "level": "H2",
+            "text": "Akutt 113 og livreddende førstehjelp"
+          },
+          {
+            "level": "H2",
+            "text": "Alvorlig ulykke eller død blant eget personell"
+          },
+          {
+            "level": "H2",
+            "text": "CBRNE soneinndeling"
+          },
+          {
+            "level": "H2",
+            "text": "CBRNE verneutstyr og stoppkriterier"
+          },
+          {
+            "level": "H2",
+            "text": "Etabler rens ved CBRN-hendelse"
+          },
+          {
+            "level": "H2",
+            "text": "Evakueringsstøtte"
+          },
+          {
+            "level": "H2",
+            "text": "Flom, pumpe og vannforsyning"
+          },
+          {
+            "level": "H2",
+            "text": "Klargjør offentlig tilfluktsrom"
+          },
+          {
+            "level": "H2",
+            "text": "Kontaminert eller skadet utstyr"
+          },
+          {
+            "level": "H2",
+            "text": "Ledelse, kommando og kontroll"
+          }
+        ],
+        "nav": [
+          {
+            "text": "Grenser",
+            "href": "/begrensninger",
+            "current": null
+          },
+          {
+            "text": "Kjente begrensninger",
+            "href": "/kjente-begrensninger",
+            "current": null
+          },
+          {
+            "text": "Data på enheten",
+            "href": "/data-pa-enheten",
+            "current": null
+          },
+          {
+            "text": "Hjem",
+            "href": "/",
+            "current": null
+          },
+          {
+            "text": "Søk",
+            "href": "/sok",
+            "current": null
+          },
+          {
+            "text": "Oppdrag",
+            "href": "/oppdrag",
+            "current": null
+          },
+          {
+            "text": "Kort",
+            "href": "/hurtigkort",
+            "current": "page"
+          },
+          {
+            "text": "Mer",
+            "href": "/mer",
+            "current": null
+          }
+        ],
+        "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nOPERATIV STØTTE\nHurtigkort\nKildebelagte kort med synlige advarsler. Innholdsversjon: 2026-06-06T14:44:41.137Z\nSøk lokalt i tiltak, kilder og moduler\nLokalt søkeindeks generert 2026-06-06; klart for offline søk.\nVanlige stressord: jod, rens, MFE, samband, dose, tilfluktsrom, FIG10.\nAlle\nFør\nUnder\nEtter\nAlle roller\nMannskap\nLagfører\nLeder\nBeredskapsvakt\nMRE\nRADIAC\nMFE\nLIA/liaison\nMateriellansvarlig\nATV/",
+        "navigatorOnline": true,
+        "standalone": false,
+        "manifest": "https://innsats.reidar.tech/manifest.webmanifest",
+        "viewport": {
+          "innerWidth": 428,
+          "innerHeight": 727,
+          "devicePixelRatio": 3,
+          "visualWidth": 428,
+          "visualHeight": 727,
+          "visualOffsetTop": 0,
+          "visualOffsetLeft": 0,
+          "orientationAngle": 0,
+          "orientationType": "portrait-primary"
+        },
+        "overflow": {
+          "htmlClientWidth": 428,
+          "htmlScrollWidth": 428,
+          "bodyClientWidth": 428,
+          "bodyScrollWidth": 428,
+          "horizontalOverflow": false
+        },
+        "activeElement": {
+          "tag": "BODY",
+          "label": "BeredskapsbokaMå leses 3MerOfflineLokaltGenerert innholdsversjon: 2026-06-06 14:"
+        }
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/route-hurtigkort.png",
+        "bytes": 262451,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/hurtigkort",
+          "title": "Beredskapsboka",
+          "online": true
+        }
+      },
+      "events": [
+        {
+          "at": "2026-06-07T00:35:17.807Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/kjente-begrensninger?_rsc=7h4NYy5eoyMcNlUN due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792517.800878,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "13",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:17.808Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/kjente-begrensninger?_rsc=i2HTp31ypYMqictM due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792517.80127,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "13",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:17.808Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/kjente-begrensninger?_rsc=4-XYjrUbp7Ur0pzS due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792517.801563,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "13",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:17.808Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/begrensninger?_rsc=7h4NYy5eoyMcNlUN due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792517.801617,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "13",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:17.808Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/begrensninger?_rsc=FzNdsPEj0qcp437e due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792517.80165,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "13",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:17.808Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/begrensninger?_rsc=qbFbEecXaKZLBP0X due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792517.801827,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "13",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:17.808Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=7h4NYy5eoyMcNlUN due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792517.801946,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "13",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:17.808Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=oSuCYiGFtwNBat-o due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792517.802533,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "13",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:17.808Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=e0RoL-PApv_7edsl due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792517.802589,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "13",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:17.980Z",
+          "method": "Console.messagesCleared",
+          "params": {
+            "reason": "main-frame-navigation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "sok",
+      "route": "/sok",
+      "state": {
+        "href": "https://innsats.reidar.tech/sok",
+        "path": "/sok",
+        "title": "Beredskapsboka",
+        "h1": [
+          "Søk i tiltak, kilder og moduler"
+        ],
+        "h1Count": 1,
+        "headings": [
+          {
+            "level": "H1",
+            "text": "Søk i tiltak, kilder og moduler"
+          }
+        ],
+        "nav": [
+          {
+            "text": "Grenser",
+            "href": "/begrensninger",
+            "current": null
+          },
+          {
+            "text": "Kjente begrensninger",
+            "href": "/kjente-begrensninger",
+            "current": null
+          },
+          {
+            "text": "Data på enheten",
+            "href": "/data-pa-enheten",
+            "current": null
+          },
+          {
+            "text": "Hjem",
+            "href": "/",
+            "current": null
+          },
+          {
+            "text": "Søk",
+            "href": "/sok",
+            "current": "page"
+          },
+          {
+            "text": "Oppdrag",
+            "href": "/oppdrag",
+            "current": null
+          },
+          {
+            "text": "Kort",
+            "href": "/hurtigkort",
+            "current": null
+          },
+          {
+            "text": "Mer",
+            "href": "/mer",
+            "current": null
+          }
+        ],
+        "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nOPERATIVT SØK\nSøk i tiltak, kilder og moduler\nFiltrer lokale treff etter fase, type og kildestatus.\nSøk lokalt i tiltak, kilder og moduler\nLokalt søkeindeks generert 2026-06-06; klart for offline søk.\nVanlige stressord: jod, rens, MFE, samband, dose, tilfluktsrom, FIG10.\nSøkefiltre\nFase: Før\nFase: Under\nFase: Etter\nType: FAQ\nType: kilde\nType: kort\nType: opplæring\nType: ord\nType: tilfluktsrom\nKilde: un",
+        "navigatorOnline": true,
+        "standalone": false,
+        "manifest": "https://innsats.reidar.tech/manifest.webmanifest",
+        "viewport": {
+          "innerWidth": 428,
+          "innerHeight": 727,
+          "devicePixelRatio": 3,
+          "visualWidth": 428,
+          "visualHeight": 727,
+          "visualOffsetTop": 0,
+          "visualOffsetLeft": 0,
+          "orientationAngle": 0,
+          "orientationType": "portrait-primary"
+        },
+        "overflow": {
+          "htmlClientWidth": 428,
+          "htmlScrollWidth": 428,
+          "bodyClientWidth": 428,
+          "bodyScrollWidth": 428,
+          "horizontalOverflow": false
+        },
+        "activeElement": {
+          "tag": "BODY",
+          "label": "BeredskapsbokaMå leses 3MerOfflineLokaltGenerert innholdsversjon: 2026-06-06 14:"
+        }
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/route-sok.png",
+        "bytes": 263941,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/sok",
+          "title": "Beredskapsboka",
+          "online": true
+        }
+      },
+      "events": [
+        {
+          "at": "2026-06-07T00:35:19.445Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/begrensninger?_rsc=gVa27S9v77giB7jf due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792519.443346,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "15",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:19.445Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=J4q3O3qsT59TVyv4 due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792519.443423,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "15",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:19.445Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=gYZeQBtM8Mix8U67 due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792519.443454,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "15",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:19.445Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=zifOedpzPC81e1nT due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792519.443476,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "15",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:19.690Z",
+          "method": "Console.messagesCleared",
+          "params": {
+            "reason": "main-frame-navigation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "oppdrag",
+      "route": "/oppdrag",
+      "state": {
+        "href": "https://innsats.reidar.tech/oppdrag",
+        "path": "/oppdrag",
+        "title": "Beredskapsboka",
+        "h1": [
+          "Lokale oppdrag"
+        ],
+        "h1Count": 1,
+        "headings": [
+          {
+            "level": "H1",
+            "text": "Lokale oppdrag"
+          },
+          {
+            "level": "H2",
+            "text": "Oppdrag"
+          },
+          {
+            "level": "H2",
+            "text": "Fremdrift"
+          },
+          {
+            "level": "H2",
+            "text": "Klargjør offentlig tilfluktsrom"
+          },
+          {
+            "level": "H2",
+            "text": "Offentlig tilfluktsrom og befolkningsbeskyttelse"
+          },
+          {
+            "level": "H2",
+            "text": "Tilfluktsrom teknisk status"
+          },
+          {
+            "level": "H2",
+            "text": "Andre lokale oppdrag"
+          },
+          {
+            "level": "H2",
+            "text": "Lokalt fullførte oppdrag"
+          },
+          {
+            "level": "H2",
+            "text": "Ordre og samband"
+          },
+          {
+            "level": "H2",
+            "text": "5-punktsordre"
+          },
+          {
+            "level": "H2",
+            "text": "Sambandsplan"
+          }
+        ],
+        "nav": [
+          {
+            "text": "Grenser",
+            "href": "/begrensninger",
+            "current": null
+          },
+          {
+            "text": "Kjente begrensninger",
+            "href": "/kjente-begrensninger",
+            "current": null
+          },
+          {
+            "text": "Data på enheten",
+            "href": "/data-pa-enheten",
+            "current": null
+          },
+          {
+            "text": "Hjem",
+            "href": "/",
+            "current": null
+          },
+          {
+            "text": "Søk",
+            "href": "/sok",
+            "current": null
+          },
+          {
+            "text": "Oppdrag",
+            "href": "/oppdrag",
+            "current": "page"
+          },
+          {
+            "text": "Kort",
+            "href": "/hurtigkort",
+            "current": null
+          },
+          {
+            "text": "Mer",
+            "href": "/mer",
+            "current": null
+          }
+        ],
+        "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nOPPDRAGSTAVLE\nLokale oppdrag\nLagres bare lokalt i denne nettleseren\nNytt oppdrag\nSITUASJON FØRST\nOppdrag\nHermes iPhone Safari test 202606070023 · Øvelse\nLokal lagring · Ikke delt\nOffline\nLokalt\nFASE\nFør\nROLLE\nBeredskapsvakt\nSCENARIO\nTilfluktsrom\nNESTE ANBEFALTE HANDLING\nNeste anbefalte handling\nAvklar ansvarslinje med kommune/eier/Sivilforsvaret.\nBruk bare offentlig eller eksplisitt godkjent lokasjons",
+        "navigatorOnline": true,
+        "standalone": false,
+        "manifest": "https://innsats.reidar.tech/manifest.webmanifest",
+        "viewport": {
+          "innerWidth": 428,
+          "innerHeight": 727,
+          "devicePixelRatio": 3,
+          "visualWidth": 428,
+          "visualHeight": 727,
+          "visualOffsetTop": 0,
+          "visualOffsetLeft": 0,
+          "orientationAngle": 0,
+          "orientationType": "portrait-primary"
+        },
+        "overflow": {
+          "htmlClientWidth": 428,
+          "htmlScrollWidth": 428,
+          "bodyClientWidth": 428,
+          "bodyScrollWidth": 428,
+          "horizontalOverflow": false
+        },
+        "activeElement": {
+          "tag": "BODY",
+          "label": "BeredskapsbokaMå leses 3MerOfflineLokaltGenerert innholdsversjon: 2026-06-06 14:"
+        }
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/route-oppdrag.png",
+        "bytes": 259749,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/oppdrag",
+          "title": "Beredskapsboka",
+          "online": true
+        }
+      },
+      "events": [
+        {
+          "at": "2026-06-07T00:35:21.246Z",
+          "method": "Console.messagesCleared",
+          "params": {
+            "reason": "main-frame-navigation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "kart",
+      "route": "/kart",
+      "state": {
+        "href": "https://innsats.reidar.tech/kart",
+        "path": "/kart",
+        "title": "Kart | Beredskapsboka",
+        "h1": [
+          "Kart"
+        ],
+        "h1Count": 1,
+        "headings": [
+          {
+            "level": "H1",
+            "text": "Kart"
+          },
+          {
+            "level": "H2",
+            "text": "Velg skjematisk område og godkjent PMTiles-cache"
+          },
+          {
+            "level": "H2",
+            "text": "Personvernvarsel for lokasjonsdata"
+          },
+          {
+            "level": "H2",
+            "text": "Lokale hendelsesmarkører"
+          },
+          {
+            "level": "H2",
+            "text": "Opprett logg fra synlig kartobjekt"
+          },
+          {
+            "level": "H2",
+            "text": "Punkt, linje, polygon og sektor/teig"
+          },
+          {
+            "level": "H2",
+            "text": "Lokal SVG og GeoJSON"
+          },
+          {
+            "level": "H2",
+            "text": "Post-MVP vurderinger"
+          },
+          {
+            "level": "H2",
+            "text": "Attribusjon og begrensninger"
+          }
+        ],
+        "nav": [
+          {
+            "text": "Grenser",
+            "href": "/begrensninger",
+            "current": null
+          },
+          {
+            "text": "Kjente begrensninger",
+            "href": "/kjente-begrensninger",
+            "current": null
+          },
+          {
+            "text": "Data på enheten",
+            "href": "/data-pa-enheten",
+            "current": null
+          },
+          {
+            "text": "Hjem",
+            "href": "/",
+            "current": null
+          },
+          {
+            "text": "Søk",
+            "href": "/sok",
+            "current": null
+          },
+          {
+            "text": "Oppdrag",
+            "href": "/oppdrag",
+            "current": null
+          },
+          {
+            "text": "Kort",
+            "href": "/hurtigkort",
+            "current": null
+          },
+          {
+            "text": "Mer",
+            "href": "/mer",
+            "current": null
+          }
+        ],
+        "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nOFFLINE KART\nKart\nStatisk, lokal og skjematisk kartflate for innsatsstøtte. Ingen eksterne kartfliser, kart-API-er, backend sync eller persondata.\n\nDepot\nMøteplass nord\nMøteplass sør\nRessursakse\nMarker risiko\nSamband\nHendelsessted: Hermes markør øvelse 202606070023\nSchematic local map package, not authoritative navigation. © Beredskapsboka MVP.\nSkjematisk lokalkart for øvelse og beslutningsstøtte. Ikk",
+        "navigatorOnline": true,
+        "standalone": false,
+        "manifest": "https://innsats.reidar.tech/manifest.webmanifest",
+        "viewport": {
+          "innerWidth": 428,
+          "innerHeight": 727,
+          "devicePixelRatio": 3,
+          "visualWidth": 428,
+          "visualHeight": 727,
+          "visualOffsetTop": 0,
+          "visualOffsetLeft": 0,
+          "orientationAngle": 0,
+          "orientationType": "portrait-primary"
+        },
+        "overflow": {
+          "htmlClientWidth": 428,
+          "htmlScrollWidth": 428,
+          "bodyClientWidth": 428,
+          "bodyScrollWidth": 428,
+          "horizontalOverflow": false
+        },
+        "activeElement": {
+          "tag": "BODY",
+          "label": "BeredskapsbokaMå leses 3MerOfflineLokaltGenerert innholdsversjon: 2026-06-06 14:"
+        }
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/route-kart.png",
+        "bytes": 257771,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/kart",
+          "title": "Kart | Beredskapsboka",
+          "online": true
+        }
+      },
+      "events": [
+        {
+          "at": "2026-06-07T00:35:22.680Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/begrensninger?_rsc=LJq3aWIWiFFGMKXx due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792522.678372,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "18",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:22.680Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=uF00dBM2XhXKFE7G due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792522.679814,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "18",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:22.680Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=N6dunsjuGnVl9HFJ due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792522.680209,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "18",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:22.680Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=PduiqQR97ukR0LC2 due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792522.680246,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "18",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:22.872Z",
+          "method": "Console.messagesCleared",
+          "params": {
+            "reason": "main-frame-navigation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "data-pa-enheten",
+      "route": "/data-pa-enheten",
+      "state": {
+        "href": "https://innsats.reidar.tech/data-pa-enheten",
+        "path": "/data-pa-enheten",
+        "title": "Beredskapsboka",
+        "h1": [
+          "Data lagret på denne enheten"
+        ],
+        "h1Count": 1,
+        "headings": [
+          {
+            "level": "H1",
+            "text": "Data lagret på denne enheten"
+          },
+          {
+            "level": "H2",
+            "text": "Hva lagres lokalt"
+          },
+          {
+            "level": "H2",
+            "text": "Retensjon, reset og eksport"
+          },
+          {
+            "level": "H2",
+            "text": "Eksport/import av lokale appdata"
+          }
+        ],
+        "nav": [
+          {
+            "text": "Grenser",
+            "href": "/begrensninger",
+            "current": null
+          },
+          {
+            "text": "Kjente begrensninger",
+            "href": "/kjente-begrensninger",
+            "current": null
+          },
+          {
+            "text": "Data på enheten",
+            "href": "/data-pa-enheten",
+            "current": null
+          },
+          {
+            "text": "Hjem",
+            "href": "/",
+            "current": null
+          },
+          {
+            "text": "Søk",
+            "href": "/sok",
+            "current": null
+          },
+          {
+            "text": "Oppdrag",
+            "href": "/oppdrag",
+            "current": null
+          },
+          {
+            "text": "Kort",
+            "href": "/hurtigkort",
+            "current": null
+          },
+          {
+            "text": "Mer",
+            "href": "/mer",
+            "current": null
+          }
+        ],
+        "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nLOKAL LAGRING\nData lagret på denne enheten\nMVP-en bruker bare nettleserlagring på enheten du har åpen. Det finnes ingen konto, serverkopi eller synkronisering.\nHva lagres lokalt\nIndexedDB: lokale oppdragstavler, valgte sjekklister, avkrysninger, notater og cachede kontekstsignaler for arbeidsflaten.\nlocalStorage: release-readiness arbeidskopi og andre små brukerinnstillinger som bare gjelder denne net",
+        "navigatorOnline": true,
+        "standalone": false,
+        "manifest": "https://innsats.reidar.tech/manifest.webmanifest",
+        "viewport": {
+          "innerWidth": 428,
+          "innerHeight": 727,
+          "devicePixelRatio": 3,
+          "visualWidth": 428,
+          "visualHeight": 727,
+          "visualOffsetTop": 0,
+          "visualOffsetLeft": 0,
+          "orientationAngle": 0,
+          "orientationType": "portrait-primary"
+        },
+        "overflow": {
+          "htmlClientWidth": 428,
+          "htmlScrollWidth": 428,
+          "bodyClientWidth": 428,
+          "bodyScrollWidth": 428,
+          "horizontalOverflow": false
+        },
+        "activeElement": {
+          "tag": "BODY",
+          "label": "BeredskapsbokaMå leses 3MerOfflineLokaltGenerert innholdsversjon: 2026-06-06 14:"
+        }
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/route-data-pa-enheten.png",
+        "bytes": 261434,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/data-pa-enheten",
+          "title": "Beredskapsboka",
+          "online": true
+        }
+      },
+      "events": [
+        {
+          "at": "2026-06-07T00:35:24.288Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/begrensninger?_rsc=Ah9fRIZEr_rsNR95 due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792524.287527,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "20",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:24.288Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=h5hFm_Mipy1dp3YA due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792524.287602,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "20",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:24.289Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=7gRBwJ6U8kT1oJEI due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792524.287671,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "20",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:24.289Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=sCZgJrJ8CqXaFEdf due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792524.287695,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "20",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:24.461Z",
+          "method": "Console.messagesCleared",
+          "params": {
+            "reason": "main-frame-navigation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "offline",
+      "route": "/offline",
+      "state": {
+        "href": "https://innsats.reidar.tech/offline",
+        "path": "/offline",
+        "title": "Beredskapsboka",
+        "h1": [
+          "Beredskapsboka er frakoblet"
+        ],
+        "h1Count": 1,
+        "headings": [
+          {
+            "level": "H1",
+            "text": "Beredskapsboka er frakoblet"
+          }
+        ],
+        "nav": [],
+        "bodySample": "Online · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nOFFLINE\nBeredskapsboka er frakoblet\nApp-skall og generert innhold kan brukes fra cache. Stale innhold er beslutningsstøtte og må kontrolleres mot gjeldende ordre.\nStatuslinjen viser aktiv service-worker cache-versjon og varsler hvis generert innhold lastes fra stale cache eller fallback.\nÅpne hurtigkort\n",
+        "navigatorOnline": true,
+        "standalone": false,
+        "manifest": "https://innsats.reidar.tech/manifest.webmanifest",
+        "viewport": {
+          "innerWidth": 428,
+          "innerHeight": 727,
+          "devicePixelRatio": 3,
+          "visualWidth": 428,
+          "visualHeight": 727,
+          "visualOffsetTop": 0,
+          "visualOffsetLeft": 0,
+          "orientationAngle": 0,
+          "orientationType": "portrait-primary"
+        },
+        "overflow": {
+          "htmlClientWidth": 428,
+          "htmlScrollWidth": 428,
+          "bodyClientWidth": 428,
+          "bodyScrollWidth": 428,
+          "horizontalOverflow": false
+        },
+        "activeElement": {
+          "tag": "BODY",
+          "label": "Online · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13OfflineBereds"
+        }
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/route-offline.png",
+        "bytes": 179694,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/offline",
+          "title": "Beredskapsboka",
+          "online": true
+        }
+      },
+      "events": [
+        {
+          "at": "2026-06-07T00:35:25.894Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/begrensninger?_rsc=C3SedwYUOMvhTLRC due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792525.891741,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "22",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:25.894Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=YXzeLRlXpU-lVpeN due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792525.89179,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "22",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:25.894Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=yjNecjOtYqzyWeOf due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792525.891819,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "22",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:25.894Z",
+          "method": "Console.messageAdded",
+          "params": {
+            "message": {
+              "source": "javascript",
+              "level": "error",
+              "text": "Fetch API cannot load https://innsats.reidar.tech/ma-leses?_rsc=wkUdv1TTIk3cALp7 due to access control checks.",
+              "type": "log",
+              "line": 1,
+              "column": 100780,
+              "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+              "repeatCount": 1,
+              "timestamp": 1780792525.891843,
+              "stackTrace": {
+                "callFrames": [
+                  {
+                    "functionName": "T",
+                    "url": "https://innsats.reidar.tech/_next/static/chunks/2uka7ew68f9rd.js",
+                    "scriptId": "22",
+                    "lineNumber": 1,
+                    "columnNumber": 100780
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "at": "2026-06-07T00:35:26.054Z",
+          "method": "Console.messagesCleared",
+          "params": {
+            "reason": "main-frame-navigation"
+          }
+        }
+      ]
+    },
+    {
+      "name": "mer",
+      "route": "/mer",
+      "state": {
+        "href": "https://innsats.reidar.tech/mer",
+        "path": "/mer",
+        "title": "Beredskapsboka",
+        "h1": [
+          "Mer"
+        ],
+        "h1Count": 1,
+        "headings": [
+          {
+            "level": "H1",
+            "text": "Mer"
+          },
+          {
+            "level": "H2",
+            "text": "Oppslag og lokale valg"
+          },
+          {
+            "level": "H2",
+            "text": "Publisering og kildekontroll"
+          }
+        ],
+        "nav": [
+          {
+            "text": "Grenser",
+            "href": "/begrensninger",
+            "current": null
+          },
+          {
+            "text": "Kjente begrensninger",
+            "href": "/kjente-begrensninger",
+            "current": null
+          },
+          {
+            "text": "Data på enheten",
+            "href": "/data-pa-enheten",
+            "current": null
+          },
+          {
+            "text": "Hjem",
+            "href": "/",
+            "current": null
+          },
+          {
+            "text": "Søk",
+            "href": "/sok",
+            "current": null
+          },
+          {
+            "text": "Oppdrag",
+            "href": "/oppdrag",
+            "current": null
+          },
+          {
+            "text": "Kort",
+            "href": "/hurtigkort",
+            "current": null
+          },
+          {
+            "text": "Mer",
+            "href": "/mer",
+            "current": "page"
+          }
+        ],
+        "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nSEKUNDÆRE FLATER\nMer\nKilder, læring, innstillinger og administrative kontroller samlet utenfor den feltvendte hovedflyten.\nOPERASJONELL STØTTE\nOppslag og lokale valg\nTrygge støtteflater for oppslag, læring, kart og enhetsdata.\nKilder\nKildebank og kildevarsler for innholdet i Beredskapsboka.\nModuler og læring\nOpplæringsmoduler, fagspor og øvingsstøtte for egen gjennomgang.\nKart\nOffline-kart og enkel lo",
+        "navigatorOnline": true,
+        "standalone": false,
+        "manifest": "https://innsats.reidar.tech/manifest.webmanifest",
+        "viewport": {
+          "innerWidth": 428,
+          "innerHeight": 727,
+          "devicePixelRatio": 3,
+          "visualWidth": 428,
+          "visualHeight": 727,
+          "visualOffsetTop": 0,
+          "visualOffsetLeft": 0,
+          "orientationAngle": 0,
+          "orientationType": "portrait-primary"
+        },
+        "overflow": {
+          "htmlClientWidth": 428,
+          "htmlScrollWidth": 428,
+          "bodyClientWidth": 428,
+          "bodyScrollWidth": 428,
+          "horizontalOverflow": false
+        },
+        "activeElement": {
+          "tag": "BODY",
+          "label": "BeredskapsbokaMå leses 3MerOfflineLokaltGenerert innholdsversjon: 2026-06-06 14:"
+        }
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/route-mer.png",
+        "bytes": 257372,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/mer",
+          "title": "Beredskapsboka",
+          "online": true
+        }
+      },
+      "events": [
+        {
+          "at": "2026-06-07T00:35:27.714Z",
+          "method": "Console.messagesCleared",
+          "params": {
+            "reason": "main-frame-navigation"
+          }
+        }
+      ]
+    }
+  ],
+  "uiNavigation": [
+    {
+      "name": "sok",
+      "route": "/sok",
+      "state": {
+        "href": "https://innsats.reidar.tech/sok",
+        "path": "/sok",
+        "title": "Beredskapsboka",
+        "h1": [
+          "Søk i tiltak, kilder og moduler"
+        ],
+        "h1Count": 1,
+        "headings": [
+          {
+            "level": "H1",
+            "text": "Søk i tiltak, kilder og moduler"
+          }
+        ],
+        "nav": [
+          {
+            "text": "Grenser",
+            "href": "/begrensninger",
+            "current": null
+          },
+          {
+            "text": "Kjente begrensninger",
+            "href": "/kjente-begrensninger",
+            "current": null
+          },
+          {
+            "text": "Data på enheten",
+            "href": "/data-pa-enheten",
+            "current": null
+          },
+          {
+            "text": "Hjem",
+            "href": "/",
+            "current": null
+          },
+          {
+            "text": "Søk",
+            "href": "/sok",
+            "current": "page"
+          },
+          {
+            "text": "Oppdrag",
+            "href": "/oppdrag",
+            "current": null
+          },
+          {
+            "text": "Kort",
+            "href": "/hurtigkort",
+            "current": null
+          },
+          {
+            "text": "Mer",
+            "href": "/mer",
+            "current": null
+          }
+        ],
+        "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nOPERATIVT SØK\nSøk i tiltak, kilder og moduler\nFiltrer lokale treff etter fase, type og kildestatus.\nSøk lokalt i tiltak, kilder og moduler\nLokalt søkeindeks generert 2026-06-06; klart for offline søk.\nVanlige stressord: jod, rens, MFE, samband, dose, tilfluktsrom, FIG10.\nSøkefiltre\nFase: Før\nFase: Under\nFase: Etter\nType: FAQ\nType: kilde\nType: kort\nType: opplæring\nType: ord\nType: tilfluktsrom\nKilde: un",
+        "navigatorOnline": true,
+        "standalone": false,
+        "manifest": "https://innsats.reidar.tech/manifest.webmanifest",
+        "viewport": {
+          "innerWidth": 428,
+          "innerHeight": 727,
+          "devicePixelRatio": 3,
+          "visualWidth": 428,
+          "visualHeight": 727,
+          "visualOffsetTop": 0,
+          "visualOffsetLeft": 0,
+          "orientationAngle": 0,
+          "orientationType": "portrait-primary"
+        },
+        "overflow": {
+          "htmlClientWidth": 428,
+          "htmlScrollWidth": 428,
+          "bodyClientWidth": 428,
+          "bodyScrollWidth": 428,
+          "horizontalOverflow": false
+        },
+        "activeElement": {
+          "tag": "BODY",
+          "label": "(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"1:\\\"$Sreact.fr"
+        }
+      },
+      "events": []
+    },
+    {
+      "name": "oppdrag",
+      "route": "/oppdrag",
+      "state": {
+        "href": "https://innsats.reidar.tech/oppdrag",
+        "path": "/oppdrag",
+        "title": "Beredskapsboka",
+        "h1": [
+          "Lokale oppdrag"
+        ],
+        "h1Count": 1,
+        "headings": [
+          {
+            "level": "H1",
+            "text": "Lokale oppdrag"
+          },
+          {
+            "level": "H2",
+            "text": "Oppdrag"
+          },
+          {
+            "level": "H2",
+            "text": "Fremdrift"
+          },
+          {
+            "level": "H2",
+            "text": "Klargjør offentlig tilfluktsrom"
+          },
+          {
+            "level": "H2",
+            "text": "Offentlig tilfluktsrom og befolkningsbeskyttelse"
+          },
+          {
+            "level": "H2",
+            "text": "Tilfluktsrom teknisk status"
+          },
+          {
+            "level": "H2",
+            "text": "Andre lokale oppdrag"
+          },
+          {
+            "level": "H2",
+            "text": "Lokalt fullførte oppdrag"
+          },
+          {
+            "level": "H2",
+            "text": "Ordre og samband"
+          },
+          {
+            "level": "H2",
+            "text": "5-punktsordre"
+          },
+          {
+            "level": "H2",
+            "text": "Sambandsplan"
+          }
+        ],
+        "nav": [
+          {
+            "text": "Grenser",
+            "href": "/begrensninger",
+            "current": null
+          },
+          {
+            "text": "Kjente begrensninger",
+            "href": "/kjente-begrensninger",
+            "current": null
+          },
+          {
+            "text": "Data på enheten",
+            "href": "/data-pa-enheten",
+            "current": null
+          },
+          {
+            "text": "Hjem",
+            "href": "/",
+            "current": null
+          },
+          {
+            "text": "Søk",
+            "href": "/sok",
+            "current": null
+          },
+          {
+            "text": "Oppdrag",
+            "href": "/oppdrag",
+            "current": "page"
+          },
+          {
+            "text": "Kort",
+            "href": "/hurtigkort",
+            "current": null
+          },
+          {
+            "text": "Mer",
+            "href": "/mer",
+            "current": null
+          }
+        ],
+        "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nOPPDRAGSTAVLE\nLokale oppdrag\nLagres bare lokalt i denne nettleseren\nNytt oppdrag\nSITUASJON FØRST\nOppdrag\nHermes iPhone Safari test 202606070023 · Øvelse\nLokal lagring · Ikke delt\nOffline\nLokalt\nFASE\nFør\nROLLE\nBeredskapsvakt\nSCENARIO\nTilfluktsrom\nNESTE ANBEFALTE HANDLING\nNeste anbefalte handling\nAvklar ansvarslinje med kommune/eier/Sivilforsvaret.\nBruk bare offentlig eller eksplisitt godkjent lokasjons",
+        "navigatorOnline": true,
+        "standalone": false,
+        "manifest": "https://innsats.reidar.tech/manifest.webmanifest",
+        "viewport": {
+          "innerWidth": 428,
+          "innerHeight": 727,
+          "devicePixelRatio": 3,
+          "visualWidth": 428,
+          "visualHeight": 727,
+          "visualOffsetTop": 0,
+          "visualOffsetLeft": 0,
+          "orientationAngle": 0,
+          "orientationType": "portrait-primary"
+        },
+        "overflow": {
+          "htmlClientWidth": 428,
+          "htmlScrollWidth": 428,
+          "bodyClientWidth": 428,
+          "bodyScrollWidth": 428,
+          "horizontalOverflow": false
+        },
+        "activeElement": {
+          "tag": "BODY",
+          "label": "(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"1:\\\"$Sreact.fr"
+        }
+      },
+      "events": []
+    },
+    {
+      "name": "hurtigkort",
+      "route": "/hurtigkort",
+      "state": {
+        "href": "https://innsats.reidar.tech/hurtigkort",
+        "path": "/hurtigkort",
+        "title": "Beredskapsboka",
+        "h1": [
+          "Hurtigkort"
+        ],
+        "h1Count": 1,
+        "headings": [
+          {
+            "level": "H1",
+            "text": "Hurtigkort"
+          },
+          {
+            "level": "H2",
+            "text": "5-punktsordre"
+          },
+          {
+            "level": "H2",
+            "text": "Akutt 113 og livreddende førstehjelp"
+          },
+          {
+            "level": "H2",
+            "text": "Alvorlig ulykke eller død blant eget personell"
+          },
+          {
+            "level": "H2",
+            "text": "CBRNE soneinndeling"
+          },
+          {
+            "level": "H2",
+            "text": "CBRNE verneutstyr og stoppkriterier"
+          },
+          {
+            "level": "H2",
+            "text": "Etabler rens ved CBRN-hendelse"
+          },
+          {
+            "level": "H2",
+            "text": "Evakueringsstøtte"
+          },
+          {
+            "level": "H2",
+            "text": "Flom, pumpe og vannforsyning"
+          },
+          {
+            "level": "H2",
+            "text": "Klargjør offentlig tilfluktsrom"
+          },
+          {
+            "level": "H2",
+            "text": "Kontaminert eller skadet utstyr"
+          },
+          {
+            "level": "H2",
+            "text": "Ledelse, kommando og kontroll"
+          }
+        ],
+        "nav": [
+          {
+            "text": "Grenser",
+            "href": "/begrensninger",
+            "current": null
+          },
+          {
+            "text": "Kjente begrensninger",
+            "href": "/kjente-begrensninger",
+            "current": null
+          },
+          {
+            "text": "Data på enheten",
+            "href": "/data-pa-enheten",
+            "current": null
+          },
+          {
+            "text": "Hjem",
+            "href": "/",
+            "current": null
+          },
+          {
+            "text": "Søk",
+            "href": "/sok",
+            "current": null
+          },
+          {
+            "text": "Oppdrag",
+            "href": "/oppdrag",
+            "current": null
+          },
+          {
+            "text": "Kort",
+            "href": "/hurtigkort",
+            "current": "page"
+          },
+          {
+            "text": "Mer",
+            "href": "/mer",
+            "current": null
+          }
+        ],
+        "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nOPERATIV STØTTE\nHurtigkort\nKildebelagte kort med synlige advarsler. Innholdsversjon: 2026-06-06T14:44:41.137Z\nSøk lokalt i tiltak, kilder og moduler\nLokalt søkeindeks generert 2026-06-06; klart for offline søk.\nVanlige stressord: jod, rens, MFE, samband, dose, tilfluktsrom, FIG10.\nAlle\nFør\nUnder\nEtter\nAlle roller\nMannskap\nLagfører\nLeder\nBeredskapsvakt\nMRE\nRADIAC\nMFE\nLIA/liaison\nMateriellansvarlig\nATV/",
+        "navigatorOnline": true,
+        "standalone": false,
+        "manifest": "https://innsats.reidar.tech/manifest.webmanifest",
+        "viewport": {
+          "innerWidth": 428,
+          "innerHeight": 727,
+          "devicePixelRatio": 3,
+          "visualWidth": 428,
+          "visualHeight": 727,
+          "visualOffsetTop": 0,
+          "visualOffsetLeft": 0,
+          "orientationAngle": 0,
+          "orientationType": "portrait-primary"
+        },
+        "overflow": {
+          "htmlClientWidth": 428,
+          "htmlScrollWidth": 428,
+          "bodyClientWidth": 428,
+          "bodyScrollWidth": 428,
+          "horizontalOverflow": false
+        },
+        "activeElement": {
+          "tag": "BODY",
+          "label": "(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"1:\\\"$Sreact.fr"
+        }
+      },
+      "events": []
+    },
+    {
+      "name": "mer",
+      "route": "/mer",
+      "state": {
+        "href": "https://innsats.reidar.tech/mer",
+        "path": "/mer",
+        "title": "Beredskapsboka",
+        "h1": [
+          "Mer"
+        ],
+        "h1Count": 1,
+        "headings": [
+          {
+            "level": "H1",
+            "text": "Mer"
+          },
+          {
+            "level": "H2",
+            "text": "Oppslag og lokale valg"
+          },
+          {
+            "level": "H2",
+            "text": "Publisering og kildekontroll"
+          }
+        ],
+        "nav": [
+          {
+            "text": "Grenser",
+            "href": "/begrensninger",
+            "current": null
+          },
+          {
+            "text": "Kjente begrensninger",
+            "href": "/kjente-begrensninger",
+            "current": null
+          },
+          {
+            "text": "Data på enheten",
+            "href": "/data-pa-enheten",
+            "current": null
+          },
+          {
+            "text": "Hjem",
+            "href": "/",
+            "current": null
+          },
+          {
+            "text": "Søk",
+            "href": "/sok",
+            "current": null
+          },
+          {
+            "text": "Oppdrag",
+            "href": "/oppdrag",
+            "current": null
+          },
+          {
+            "text": "Kort",
+            "href": "/hurtigkort",
+            "current": null
+          },
+          {
+            "text": "Mer",
+            "href": "/mer",
+            "current": "page"
+          }
+        ],
+        "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.\nGrenser\nKjente begrensninger\nData på enheten\nSEKUNDÆRE FLATER\nMer\nKilder, læring, innstillinger og administrative kontroller samlet utenfor den feltvendte hovedflyten.\nOPERASJONELL STØTTE\nOppslag og lokale valg\nTrygge støtteflater for oppslag, læring, kart og enhetsdata.\nKilder\nKildebank og kildevarsler for innholdet i Beredskapsboka.\nModuler og læring\nOpplæringsmoduler, fagspor og øvingsstøtte for egen gjennomgang.\nKart\nOffline-kart og enkel lo",
+        "navigatorOnline": true,
+        "standalone": false,
+        "manifest": "https://innsats.reidar.tech/manifest.webmanifest",
+        "viewport": {
+          "innerWidth": 428,
+          "innerHeight": 727,
+          "devicePixelRatio": 3,
+          "visualWidth": 428,
+          "visualHeight": 727,
+          "visualOffsetTop": 0,
+          "visualOffsetLeft": 0,
+          "orientationAngle": 0,
+          "orientationType": "portrait-primary"
+        },
+        "overflow": {
+          "htmlClientWidth": 428,
+          "htmlScrollWidth": 428,
+          "bodyClientWidth": 428,
+          "bodyScrollWidth": 428,
+          "horizontalOverflow": false
+        },
+        "activeElement": {
+          "tag": "BODY",
+          "label": "(self.__next_f=self.__next_f||[]).push([0])self.__next_f.push([1,\"1:\\\"$Sreact.fr"
+        }
+      },
+      "events": []
+    }
+  ],
+  "searchFocus": {
+    "focusState": {
+      "activeTag": "INPUT",
+      "activeLabel": "Prøv jod, rens, MFE, samband, dose, tilfluktsrom, FIG10",
+      "value": "tilfluktsrom",
+      "resultLinks": [
+        "Klargjør offentlig tilfluktsrom",
+        "Offentlig tilfluktsrom og befolkningsbeskyttelse"
+      ],
+      "visualViewport": {
+        "width": 428,
+        "height": 727,
+        "offsetTop": 0
+      },
+      "innerHeight": 727
+    },
+    "screenshot": {
+      "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/route-hurtigkort-search-focused.png",
+      "bytes": 262451,
+      "metrics": {
+        "w": 428,
+        "h": 727,
+        "dpr": 3,
+        "y": 0,
+        "href": "https://innsats.reidar.tech/hurtigkort",
+        "title": "Beredskapsboka",
+        "online": true
+      }
+    },
+    "note": "WebKit programmatic focus/type on physical Safari; not claimed as manual keyboard observation."
+  },
+  "manifest": {
+    "href": "https://innsats.reidar.tech/manifest.webmanifest",
+    "navigatorStandalone": false,
+    "response": {
+      "ok": true,
+      "status": 200,
+      "json": {
+        "name": "Beredskapsboka",
+        "short_name": "Beredskap",
+        "description": "Mobilførst offline støtte for Sivilforsvaret.",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#f8fafc",
+        "theme_color": "#082f49",
+        "lang": "no",
+        "icons": [
+          {
+            "src": "/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+          }
+        ]
+      }
+    }
+  },
+  "networkStatus": {
+    "navigatorOnline": true,
+    "health": {
+      "ok": true,
+      "status": 200,
+      "text": "{\"status\":\"healthy\",\"app\":\"beredskapsboka\",\"version\":\"8f85c01ddd08e0714b97644f4e5537f23a29c403\",\"nodeEnv\":\"production\",\"timestamp\":\"2026-06-07T00:35:15.439Z\"}"
+    }
+  },
+  "result": "completed-online-route-smoke"
+}

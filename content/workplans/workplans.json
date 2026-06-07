@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-06T16:44:34.421Z",
+  "generatedAt": "2026-06-06T17:36:24.003Z",
   "sourceCount": 12,
   "planSourceCount": 12,
-  "planSourceHash": "sha256:1153d7b9e7fe0881a0f30fc8b84c632137760c620cb886ece08e1741e2fbda19",
+  "planSourceHash": "sha256:c9fa5b2b5ddb9db946d313eaa6c2ef6ad495dce5c0ff53d5824056b071c1954c",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6752,7 +6752,7 @@
         "Audit hardening tasks 1-10 are implemented and locally verified through e2017a94ba8a933c5be972969bfd2cdd7e1dbacb; strict source governance now reports 53/53 referenced sources approved and 0 pilot blockers. Pilot readiness remains blocked by physical/real-device evidence tasks 385-389 and owner governance decisions; a staging rollback drill passed, but production rollback/governance acceptance is not complete. Do not call the project pilot-ready until Tasks 11-13 have real evidence or explicit owner-accepted caveats."
       ],
       "taskCount": 13,
-      "updatedAt": "2026-06-06T16:44:34.421Z",
+      "updatedAt": "2026-06-06T17:36:24.003Z",
       "tasks": [
         {
           "id": "2026-06-06_141032-audit-findings-implementation-plan-task-1",
@@ -6892,7 +6892,7 @@
           "risk": "high",
           "owner": "AR",
           "evidence": [
-            "Blocked after controller discovery at 2026-06-06T16:41:26Z. Production health was available at SHA 8f85c01ddd08e0714b97644f4e5537f23a29c403, staging health at SHA d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f, and local candidate e2017a94ba8a933c5be972969bfd2cdd7e1dbacb was not deployed. xcrun xctrace list devices showed ReePhone (26.4.2) offline; idevice_id, ios_webkit_debug_proxy, appium, and adb were unavailable; no real-device-cloud environment indicators were present. Chromium/Playwright evidence remains supporting evidence only and cannot complete these tasks."
+            "Blocked overall after partial physical iPhone Safari evidence at 2026-06-06T17:34:29Z. Developer Mode was enabled and devicectl/DDI services were usable for ReePhone (iPhone13,4 / iOS 26.5). Task 385 now has physical Safari evidence against production SHA 8f85c01ddd08e0714b97644f4e5537f23a29c403 under docs/manual-tests/evidence/task-385-iphone-safari-2026-06-06/: sanitized mission Hermes iPhone Safari test 1905, checklist reload persistence, and sanitized map marker Hermes markør øvelse (42, 58). The run was stopped at user request before hardware offline/low-connectivity, Safari toolbar/back-forward/orientation/manual keyboard observations, install-to-home-screen, Android Chrome, and two-build offline-update testing. WebKit request-interception reload produced intercepted=[] and navigator.onLine=true, so it is supporting cache/reload evidence only, not an offline pass. Tasks 385-389 remain blocked overall; do not call pilot-ready."
           ],
           "sourceHeading": "Task 11: Run physical/real-device evidence tasks 385-389 [PARENT-DIRECT]"
         },

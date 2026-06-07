@@ -1,0 +1,378 @@
+{
+  "generatedAt": "2026-06-07T00:46:05.752Z",
+  "baseUrl": "https://innsats.reidar.tech",
+  "priorObservedHealthVersion": "8f85c01ddd08e0714b97644f4e5537f23a29c403",
+  "missionTitle": "Hermes iPhone Safari test 202606070023",
+  "markerLabel": "Hermes markør øvelse 202606070023",
+  "proxyTarget": {
+    "title": "Beredskapsboka",
+    "url": "https://innsats.reidar.tech/oppdrag"
+  },
+  "networkProof": {
+    "href": "https://innsats.reidar.tech/oppdrag",
+    "title": "Beredskapsboka",
+    "navigatorOnline": false,
+    "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOffline / frakoblet — cached/stale content allowed · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nStale innhold fra cache — kontroller mot gjeldende ordre når du er online. (/generated-content/manifest.json)\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lok",
+    "healthFetch": {
+      "error": "TypeError: Load failed"
+    },
+    "networkProbe": {
+      "error": "TypeError: Load failed"
+    }
+  },
+  "serviceWorker": {
+    "navigatorOnline": false,
+    "ready": {
+      "scope": "https://innsats.reidar.tech/",
+      "active": true,
+      "state": "activated"
+    },
+    "registrations": [
+      {
+        "scope": "https://innsats.reidar.tech/",
+        "active": true,
+        "waiting": false,
+        "installing": false
+      }
+    ],
+    "cacheKeys": [
+      "beredskapsboka-v4"
+    ]
+  },
+  "checks": [
+    {
+      "name": "offline reload /oppdrag mission/checklist persistence",
+      "at": "2026-06-07T00:46:09.170Z",
+      "state": {
+        "visible": true,
+        "checked": true,
+        "offlineText": true,
+        "db": true,
+        "missionFound": true,
+        "missionId": "e6e85dd0-56b8-4fe4-8ec2-a42cd632e972",
+        "checklistPersisted": true,
+        "navigatorOnline": false
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/offline-oppdrag-reload.png",
+        "bytes": 278001,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/oppdrag",
+          "title": "Beredskapsboka",
+          "online": false
+        }
+      },
+      "events": [
+        {
+          "method": "Console.messagesCleared",
+          "params": {
+            "reason": "main-frame-navigation"
+          }
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        }
+      ]
+    },
+    {
+      "name": "offline reload /kart marker persistence",
+      "at": "2026-06-07T00:46:12.899Z",
+      "state": {
+        "visible": true,
+        "buttons": [
+          "Logg herfra Hermes markør øvelse 202606070023 (incident-site, X 42, Y 58)",
+          "Rediger Hermes markør øvelse 202606070023 (incident-site, X 42, Y 58)",
+          "Slett Hermes markør øvelse 202606070023 (incident-site, X 42, Y 58)"
+        ],
+        "offlineText": true,
+        "navigatorOnline": false
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/offline-kart-marker.png",
+        "bytes": 294069,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 3318,
+          "href": "https://innsats.reidar.tech/kart",
+          "title": "Kart | Beredskapsboka",
+          "online": false
+        }
+      },
+      "events": [
+        {
+          "method": "Console.messagesCleared",
+          "params": {
+            "reason": "main-frame-navigation"
+          }
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        }
+      ]
+    },
+    {
+      "name": "offline /hurtigkort local search",
+      "at": "2026-06-07T00:46:14.989Z",
+      "state": {
+        "navigatorOnline": false,
+        "value": "tilfluktsrom",
+        "resultLinks": [
+          "Klargjør offentlig tilfluktsrom",
+          "Offentlig tilfluktsrom og befolkningsbeskyttelse"
+        ],
+        "offlineText": true,
+        "bodySample": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOffline / frakoblet — cached/stale content allowed · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nStale innhold fra cache — kontroller mot gjeldende ordre når du er online. (/generated-content/manifest.json)\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lok"
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/offline-hurtigkort-search.png",
+        "bytes": 283116,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/hurtigkort",
+          "title": "Beredskapsboka",
+          "online": false
+        }
+      },
+      "events": [
+        {
+          "method": "Console.messagesCleared",
+          "params": {
+            "reason": "main-frame-navigation"
+          }
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        }
+      ]
+    },
+    {
+      "name": "offline fallback route renders",
+      "at": "2026-06-07T00:46:17.115Z",
+      "state": {
+        "navigatorOnline": false,
+        "h1": [
+          "Beredskapsboka er frakoblet"
+        ],
+        "offlineText": true,
+        "bodySample": "Offline / frakoblet — cached/stale content allowed · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nStale innhold fra cache — kontroller mot gjeldende ordre når du er online. (/generated-content/manifest.json)\nOFFLINE\nBeredskapsboka er frakoblet\nApp-skall og generert innhold kan brukes fra cache. Stale innhold er beslutningsstøtte og må kontrolleres mot gjeldende ordre.\nStatuslinjen viser aktiv service-worker cache-versjon og varsler hvis generert innhold lastes fra stale cache eller fallback.\nÅpne hurtigkort\n"
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/offline-fallback-page.png",
+        "bytes": 208201,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/offline",
+          "title": "Beredskapsboka",
+          "online": false
+        }
+      },
+      "events": [
+        {
+          "method": "Console.messagesCleared",
+          "params": {
+            "reason": "main-frame-navigation"
+          }
+        },
+        {
+          "method": "Console.messageAdded",
+          "level": "error",
+          "text": "Failed to load resource: Internett ser ut til å være frakoblet."
+        }
+      ]
+    }
+  ],
+  "result": "offline-hardware-evidence-pass-for-tested-scope"
+}

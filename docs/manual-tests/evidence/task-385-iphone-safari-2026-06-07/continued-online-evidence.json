@@ -1,0 +1,146 @@
+{
+  "generatedAt": "2026-06-07T00:23:33.157Z",
+  "baseUrl": "https://innsats.reidar.tech",
+  "proxyTarget": {
+    "title": "Kart | Beredskapsboka",
+    "url": "https://innsats.reidar.tech/kart"
+  },
+  "missionTitle": "Hermes iPhone Safari test 202606070023",
+  "markerLabel": "Hermes markør øvelse 202606070023",
+  "steps": [
+    {
+      "name": "create mission via iPhone Safari UI",
+      "at": "2026-06-07T00:23:36.342Z",
+      "health": {},
+      "createMeta": {
+        "path": "/oppdrag/ny",
+        "formText": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pas"
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/oppdrag-online-continued.png",
+        "bytes": 259749,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/oppdrag",
+          "title": "Beredskapsboka",
+          "online": true
+        }
+      }
+    },
+    {
+      "name": "check checklist item and verify IndexedDB persistence",
+      "at": "2026-06-07T00:23:36.348Z",
+      "checkResult": {
+        "checked": true,
+        "label": "Kontroller ventilasjon og luftinntakPåkrevd"
+      },
+      "persisted": {}
+    },
+    {
+      "name": "reload online and verify mission/checklist still visible",
+      "at": "2026-06-07T00:23:36.414Z",
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/oppdrag-reload-persisted.png",
+        "bytes": 259749,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/oppdrag",
+          "title": "Beredskapsboka",
+          "online": true
+        }
+      },
+      "online": true
+    },
+    {
+      "name": "create sanitized map marker via iPhone Safari UI",
+      "at": "2026-06-07T00:23:37.988Z",
+      "mapAdd": {
+        "path": "/kart"
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/map-marker-online-continued.png",
+        "bytes": 294069,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 3282,
+          "href": "https://innsats.reidar.tech/kart",
+          "title": "Kart | Beredskapsboka",
+          "online": true
+        }
+      }
+    },
+    {
+      "name": "reload online and verify map marker persists",
+      "at": "2026-06-07T00:23:38.061Z",
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/map-marker-reload-persisted.png",
+        "bytes": 294069,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 3282,
+          "href": "https://innsats.reidar.tech/kart",
+          "title": "Kart | Beredskapsboka",
+          "online": true
+        }
+      },
+      "online": true
+    },
+    {
+      "name": "focus mobile search input and type sanitized query",
+      "at": "2026-06-07T00:23:40.717Z",
+      "searchFocus": {
+        "activeTag": "INPUT",
+        "activeLabel": "Prøv jod, rens, MFE, samband, dose, tilfluktsrom, FIG10",
+        "visualViewport": {
+          "width": 428,
+          "height": 727,
+          "offsetTop": 0
+        },
+        "innerHeight": 727
+      },
+      "screenshot": {
+        "path": "docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/safari-search-input-focused.png",
+        "bytes": 262451,
+        "metrics": {
+          "w": 428,
+          "h": 727,
+          "dpr": 3,
+          "y": 0,
+          "href": "https://innsats.reidar.tech/hurtigkort",
+          "title": "Beredskapsboka",
+          "online": true
+        }
+      },
+      "note": "Programmatic WebKit focus/type; visual keyboard presence must be treated as supporting unless manually observed."
+    },
+    {
+      "name": "browser history back/forward supporting check",
+      "at": "2026-06-07T00:23:46.102Z",
+      "afterBack": {
+        "href": "https://innsats.reidar.tech/oppdrag",
+        "text": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordr"
+      },
+      "afterForward": {
+        "href": "https://innsats.reidar.tech/kart",
+        "text": "Beredskapsboka\nMå leses 3\nMer\nOffline\nLokalt\nGenerert innholdsversjon: 2026-06-06 14:44:41\nOnline · SW klar · cache v4 · contentVersion 2026-06-06 14:44:41.13\nAktivt lokalt oppdrag klart\nÅpne oppdrag\nOPERATIV GRENSE · LOKAL MVP\nBeredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordr"
+      },
+      "note": "Programmatic history API through inspected Safari page, not a manual Safari toolbar tap."
+    },
+    {
+      "name": "service worker/cache readiness on physical Safari",
+      "at": "2026-06-07T00:23:46.109Z",
+      "serviceWorker": {}
+    }
+  ],
+  "result": "partial-pass-online-supporting"
+}

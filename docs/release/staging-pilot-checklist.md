@@ -43,7 +43,7 @@ Current production comparison point: verify the live SHA with `https://innsats.r
 - Manual smoke on staging covers `/nytt`, `/release`, `/data-pa-enheten`, `/oppdrag`, `/feltmodus` and privacy reset.
 - Rollback command/owner is documented for the staging and production targets.
 - Rollback drill evidence is tracked in `docs/release/rollback-drill-evidence.md`; current `Status: pass-staging-drill` proves the staging rescue path only. Production rollback and owner governance decisions remain pilot caveats until explicitly accepted or separately proven.
-- Real-device evidence for iPhone Safari, Android Chrome, install-to-home-screen, low-connectivity and update-after-offline is attached before final pilot pass.
+- Real-device evidence for iPhone Safari, Android Chrome, install-to-home-screen, low-connectivity and update-after-offline is attached before final pilot pass. Current state: Task 385 has partial physical iPhone Safari evidence under `docs/manual-tests/evidence/task-385-iphone-safari-2026-06-06/` and `docs/manual-tests/evidence/task-385-iphone-safari-2026-06-07/`, including hardware Airplane Mode offline persistence/search/fallback proof for the tested scope. Final Task 385 pass still requires manual Safari keyboard/toolbar/orientation/safe-area observations or an owner-accepted split for home-screen install under Task 387; Tasks 386-389 remain without required physical/lab evidence.
 
 ## Rollback
 
