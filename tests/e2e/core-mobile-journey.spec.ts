@@ -50,7 +50,11 @@ test('mobile user can search, open source-backed card, create mission, run check
   await expect(page.getByRole('heading', { name: /Klargjør.*tilfluktsrom/i })).toBeVisible();
   await expect(page.getByText(/Ikke kildegodkjent for pilot; ikke offisiell ordre eller fullstendig oversikt/i)).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Kilder' })).toBeVisible();
-  await expect(page.getByRole('link', { name: /SRC - Operativt konsept for Sivilforsvaret.*unverified/i })).toBeVisible();
+  const sourceLink = page.getByRole('link', { name: /SRC - Operativt konsept for Sivilforsvaret/i });
+  await expect(sourceLink).toBeVisible();
+  await expect(sourceLink).toContainText(/·\s*verified/i);
+  await expect(sourceLink).toContainText(/Høy kilde-risiko/i);
+  await expect(sourceLink).not.toContainText(/unverified/i);
 
   await page.goto('/oppdrag/ny');
   await page.getByLabel('Tittel').fill(missionTitle);

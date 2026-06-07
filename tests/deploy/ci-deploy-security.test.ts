@@ -10,6 +10,12 @@ function readCiWorkflow() {
   return readWorkflow('.github/workflows/ci.yml');
 }
 
+function readPackageJson() {
+  return JSON.parse(readWorkflow('package.json')) as {
+    scripts: Record<string, string>;
+  };
+}
+
 function manualPublishScript() {
   return readWorkflow('deploy/publish-and-deploy.sh');
 }
@@ -75,6 +81,18 @@ function workflowStep(workflow: string, startName: string, nextName?: string) {
 }
 
 describe('CI workflow checks', () => {
+  it('keeps package CI checks in parity with the CI audit gate', () => {
+    const workflow = readCiWorkflow();
+    const { scripts } = readPackageJson();
+    const checkCi = scripts['check:ci'];
+
+    expect(scripts['audit:ci']).toContain('npm audit --audit-level=high');
+    expect(checkCi).toContain('npm run audit:ci');
+    expect(checkCi.indexOf('npm run audit:ci')).toBeLessThan(checkCi.indexOf('npm run build:content'));
+    expect(checkCi.indexOf('npm run audit:ci')).toBeLessThan(checkCi.indexOf('npm run build:app'));
+    expect(workflow).toMatch(/run:\s*npm run audit:ci/);
+  });
+
   it('runs map package validation in production CI before build', () => {
     const workflow = readCiWorkflow();
 

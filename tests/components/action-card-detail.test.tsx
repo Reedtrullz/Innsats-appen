@@ -28,6 +28,19 @@ it('shows source-backed tilfluktsrom warnings', () => {
   expect(screen.getByText(/ikke offisiell ordre/i)).toBeInTheDocument();
 });
 
+it('keeps card-level pilot warning visible even when the linked source is verified but high risk', () => {
+  const card = { slug: 'tilfluktsrom-klargjoring', title: 'Klargjør offentlig tilfluktsrom', phase: 'for', roles: ['leder'], scenarios: ['tilfluktsrom'], priority: 'high', steps: ['Bruk bare godkjent informasjon'], safety: ['Ikke publiser private data'], reporting: ['Rapporter status'], sourceIds: ['src-operativt-konsept-for-sivilforsvaret'], competenceRequired: [], warning: 'Ikke kildegodkjent for pilot; ikke offisiell ordre eller fullstendig oversikt' } as ActionCard;
+  const sources = [testSource({ id: 'src-operativt-konsept-for-sivilforsvaret', title: 'SRC - Operativt konsept for Sivilforsvaret', status: 'verified', reviewRisk: 'high', verifiedAt: '2026-06-06', body: 'Tilfluktsrom' })];
+
+  render(<ActionCardDetail card={card} sources={sources} />);
+
+  expect(screen.getByText(/Ikke kildegodkjent for pilot/i)).toBeInTheDocument();
+  const sourceLink = screen.getByRole('link', { name: /SRC - Operativt konsept for Sivilforsvaret/i });
+  expect(sourceLink).toHaveTextContent(/·\s*verified/i);
+  expect(sourceLink).toHaveTextContent(/Høy kilde-risiko/i);
+  expect(sourceLink).not.toHaveTextContent(/unverified/i);
+});
+
 it('shows trained-personnel-only treatment and fallback guidance for competence-gated cards', () => {
   const card = { slug: 'radiac-malepunkt', title: 'RADIAC målepunkt', phase: 'under', roles: ['rad'], scenarios: ['radiac-nedfall'], priority: 'high', steps: ['Mål bare etter ordre'], safety: ['Hold dose lav'], reporting: ['Rapporter måling'], sourceIds: ['src-radiac'], competenceRequired: ['RAD10', 'RAD30'] } as ActionCard;
   const sources = [testSource({ id: 'src-radiac', title: 'SRC - RADIAC', body: 'RADIAC' })];
