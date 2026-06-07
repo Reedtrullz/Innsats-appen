@@ -1,5 +1,7 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 function readWorkflow(path: string) {
@@ -14,6 +16,41 @@ function readPackageJson() {
   return JSON.parse(readWorkflow('package.json')) as {
     scripts: Record<string, string>;
   };
+}
+
+const generatedArtifactPaths = [
+  'content/generated/source-documents.json',
+  'content/generated/source-snapshot-metadata.json',
+  'content/workplans/workplans.json',
+] as const;
+
+function writeFixtureFile(root: string, relativePath: string, content: string) {
+  const filePath = join(root, relativePath);
+  mkdirSync(dirname(filePath), { recursive: true });
+  writeFileSync(filePath, content);
+}
+
+function createGeneratedArtifactGitFixture() {
+  const root = mkdtempSync(join(tmpdir(), 'beredskapsboka-generated-gate-'));
+  execFileSync('git', ['init'], { cwd: root, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'ci-test@example.invalid'], { cwd: root });
+  execFileSync('git', ['config', 'user.name', 'CI Test'], { cwd: root });
+
+  for (const artifactPath of generatedArtifactPaths) {
+    writeFixtureFile(root, artifactPath, `clean fixture for ${artifactPath}\n`);
+  }
+  execFileSync('git', ['add', ...generatedArtifactPaths], { cwd: root });
+  execFileSync('git', ['commit', '-m', 'seed generated artifacts'], { cwd: root, stdio: 'ignore' });
+
+  return root;
+}
+
+function runGeneratedGate(command: string, root: string) {
+  return execFileSync('bash', ['-lc', command], { cwd: root, encoding: 'utf8', stdio: 'pipe' });
+}
+
+function resetGeneratedFixture(root: string) {
+  execFileSync('git', ['reset', '--hard', 'HEAD'], { cwd: root, stdio: 'ignore' });
 }
 
 function manualPublishScript() {
@@ -99,6 +136,85 @@ describe('CI workflow checks', () => {
     expect(workflow).toMatch(/name:\s*Validate local map packages/i);
     expect(workflow).toMatch(/npm run validate:maps/);
     expect(workflow.indexOf('npm run validate:maps')).toBeLessThan(workflow.indexOf('npm run build:app'));
+  });
+
+  it('checks tracked generated artifact freshness after content build in package CI', () => {
+    const { scripts } = readPackageJson();
+    const checkGenerated = scripts['check:generated'];
+    const checkCi = scripts['check:ci'];
+    const trackedGeneratedArtifacts = execFileSync(
+      'git',
+      ['ls-files', 'content/generated', 'public/generated-content', 'content/workplans'],
+      { encoding: 'utf8' },
+    )
+      .trim()
+      .split('\n')
+      .filter(Boolean);
+
+    expect(trackedGeneratedArtifacts).toEqual([...generatedArtifactPaths]);
+    expect(checkGenerated).toBe(
+      `git diff --cached --exit-code -- ${generatedArtifactPaths.join(' ')} && git diff --exit-code -- ${generatedArtifactPaths.join(' ')}`,
+    );
+    expect(checkCi).toContain('npm run check:generated');
+    expect(checkCi.indexOf('npm run build:content')).toBeLessThan(
+      checkCi.indexOf('npm run check:generated'),
+    );
+    expect(checkCi.indexOf('npm run check:generated')).toBeLessThan(
+      checkCi.indexOf('npm run validate:maps'),
+    );
+    expect(checkCi.indexOf('npm run check:generated')).toBeLessThan(
+      checkCi.indexOf('npm run typecheck'),
+    );
+    expect(checkCi.indexOf('npm run check:generated')).toBeLessThan(checkCi.indexOf('npm run lint'));
+    expect(checkCi.indexOf('npm run check:generated')).toBeLessThan(checkCi.indexOf('npm run test'));
+    expect(checkCi.indexOf('npm run check:generated')).toBeLessThan(
+      checkCi.indexOf('npm run build:app'),
+    );
+  });
+
+  it('fails generated artifact gate for staged and unstaged generated drift only', () => {
+    const { scripts } = readPackageJson();
+    const command = scripts['check:generated'];
+    const root = createGeneratedArtifactGitFixture();
+
+    try {
+      writeFixtureFile(root, 'docs/manual-tests/unrelated-evidence.md', 'unrelated dirty docs evidence\n');
+      expect(() => runGeneratedGate(command, root)).not.toThrow();
+
+      writeFixtureFile(root, generatedArtifactPaths[0], 'unstaged generated drift\n');
+      expect(() => runGeneratedGate(command, root)).toThrow();
+      resetGeneratedFixture(root);
+
+      writeFixtureFile(root, generatedArtifactPaths[1], 'staged generated drift\n');
+      execFileSync('git', ['add', generatedArtifactPaths[1]], { cwd: root });
+      expect(() => runGeneratedGate(command, root)).toThrow();
+      resetGeneratedFixture(root);
+
+      const indexOnlyPath = generatedArtifactPaths[2];
+      writeFixtureFile(root, indexOnlyPath, 'index-only generated drift\n');
+      execFileSync('git', ['add', indexOnlyPath], { cwd: root });
+      writeFixtureFile(root, indexOnlyPath, `clean fixture for ${indexOnlyPath}\n`);
+      expect(() => runGeneratedGate(command, root)).toThrow();
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('checks generated artifact freshness after content build in GitHub Actions CI', () => {
+    const workflow = readCiWorkflow();
+    const checkStep = workflowStep(
+      workflow,
+      'Check generated artifact freshness',
+      'Validate local map packages',
+    );
+
+    expect(checkStep).toMatch(/run:\s*npm run check:generated/);
+    expect(workflow.indexOf('- name: Build content artifacts')).toBeLessThan(
+      workflow.indexOf('- name: Check generated artifact freshness'),
+    );
+    expect(workflow.indexOf('- name: Check generated artifact freshness')).toBeLessThan(
+      workflow.indexOf('- name: Validate local map packages'),
+    );
   });
 });
 

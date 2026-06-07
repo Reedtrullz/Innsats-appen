@@ -51,6 +51,9 @@ jobs:
       - name: Build content artifacts
         run: npm run build:content
 
+      - name: Check generated artifact freshness
+        run: npm run check:generated
+
       - name: Validate local map packages
         run: npm run validate:maps
 

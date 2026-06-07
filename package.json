@@ -36,8 +36,9 @@
     "report:source-governance:strict": "tsx scripts/report-source-governance.ts --strict",
     "build:search": "tsx scripts/build-search-index.ts",
     "build:content": "npm run import:obsidian && npm run compile:curated && npm run build:search && npm run sync:workplans && npm run validate:content",
+    "check:generated": "git diff --cached --exit-code -- content/generated/source-documents.json content/generated/source-snapshot-metadata.json content/workplans/workplans.json && git diff --exit-code -- content/generated/source-documents.json content/generated/source-snapshot-metadata.json content/workplans/workplans.json",
     "check": "npm run check:ci",
-    "check:ci": "npm run audit:ci && npm run check:workplans && npm run build:content && npm run validate:maps && npm run typecheck && npm run lint && npm run test && npm run build:app && npm run e2e:prod:no-build && npm run perf:budget && npm run perf:lighthouse"
+    "check:ci": "npm run audit:ci && npm run check:workplans && npm run build:content && npm run check:generated && npm run validate:maps && npm run typecheck && npm run lint && npm run test && npm run build:app && npm run e2e:prod:no-build && npm run perf:budget && npm run perf:lighthouse"
   },
   "dependencies": {
     "@next/third-parties": "16.2.7",

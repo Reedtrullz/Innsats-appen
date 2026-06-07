@@ -211,6 +211,11 @@ function drawingActionAriaLabel(action: 'Rediger' | 'Slett' | 'Logg herfra', dra
   return `${action} ${drawing.label} (${MAP_DRAWING_LABELS[drawing.kind]}, ${drawing.points.length} punkt, ${coordinateSummary})`;
 }
 
+const mapObjectRowClass = 'flex min-w-0 flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between';
+const mapObjectSummaryClass = 'min-w-0 max-w-full break-words';
+const mapObjectActionGroupClass = 'flex w-full min-w-0 flex-wrap gap-2 sm:w-auto sm:justify-end';
+const mapObjectActionButtonBaseClass = 'min-h-11 min-w-0 max-w-full whitespace-normal break-words rounded-xl px-3 text-left font-black';
+
 function categoryForMapObject(mapObject: MissionMapMarker | MissionMapDrawing): FieldLogCategory {
   if (mapObject.itemType === 'drawing') return 'observasjon';
   return mapObject.kind === 'hazard'
@@ -893,16 +898,16 @@ export function OfflineMapPanel() {
         <ul className="space-y-2 text-sm font-semibold text-slate-700" data-testid="operations-marker-list">
           {filteredState.markers.length === 0 ? <li>Ingen synlige markører.</li> : filteredState.markers.map((marker) => (
             <li key={marker.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span>{MAP_MARKER_LABELS[marker.kind]} — <span>{marker.label}</span> ({marker.point.x}, {marker.point.y})</span>
-                <span className="flex gap-2">
-                  <button type="button" aria-label={markerActionAriaLabel('Logg herfra', marker)} onClick={() => void createLogFromMapObject(marker)} disabled={mapLogSaving} className="min-h-11 rounded-xl bg-slate-950 px-3 font-black text-white disabled:cursor-wait disabled:bg-slate-500">
+              <div className={mapObjectRowClass} data-testid="operations-marker-action-row">
+                <span className={mapObjectSummaryClass}>{MAP_MARKER_LABELS[marker.kind]} — <span>{marker.label}</span> ({marker.point.x}, {marker.point.y})</span>
+                <span className={mapObjectActionGroupClass} data-testid="operations-marker-action-group">
+                  <button type="button" aria-label={markerActionAriaLabel('Logg herfra', marker)} onClick={() => void createLogFromMapObject(marker)} disabled={mapLogSaving} className={`${mapObjectActionButtonBaseClass} bg-slate-950 text-white disabled:cursor-wait disabled:bg-slate-500`}>
                     Logg herfra {marker.label}
                   </button>
-                  <button type="button" aria-label={markerActionAriaLabel('Rediger', marker)} onClick={() => startMarkerEdit(marker)} className="min-h-11 rounded-xl border border-slate-300 bg-white px-3 font-black text-slate-950">
+                  <button type="button" aria-label={markerActionAriaLabel('Rediger', marker)} onClick={() => startMarkerEdit(marker)} className={`${mapObjectActionButtonBaseClass} border border-slate-300 bg-white text-slate-950`}>
                     Rediger {marker.label}
                   </button>
-                  <button type="button" aria-label={markerActionAriaLabel('Slett', marker)} onClick={() => deleteMarker(marker)} className="min-h-11 rounded-xl border border-red-300 bg-white px-3 font-black text-red-900">
+                  <button type="button" aria-label={markerActionAriaLabel('Slett', marker)} onClick={() => deleteMarker(marker)} className={`${mapObjectActionButtonBaseClass} border border-red-300 bg-white text-red-900`}>
                     Slett {marker.label}
                   </button>
                 </span>
@@ -959,16 +964,16 @@ export function OfflineMapPanel() {
         <ul className="space-y-2 text-sm font-semibold text-slate-700" data-testid="operations-drawing-list">
           {filteredState.drawings.length === 0 ? <li>Ingen synlige sektorer/tegninger.</li> : filteredState.drawings.map((drawing) => (
             <li key={drawing.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span>{MAP_DRAWING_LABELS[drawing.kind]} — <span>{drawing.label}</span> ({drawing.points.length} punkt)</span>
-                <span className="flex gap-2">
-                  <button type="button" aria-label={drawingActionAriaLabel('Logg herfra', drawing)} onClick={() => void createLogFromMapObject(drawing)} disabled={mapLogSaving} className="min-h-11 rounded-xl bg-slate-950 px-3 font-black text-white disabled:cursor-wait disabled:bg-slate-500">
+              <div className={mapObjectRowClass} data-testid="operations-drawing-action-row">
+                <span className={mapObjectSummaryClass}>{MAP_DRAWING_LABELS[drawing.kind]} — <span>{drawing.label}</span> ({drawing.points.length} punkt)</span>
+                <span className={mapObjectActionGroupClass} data-testid="operations-drawing-action-group">
+                  <button type="button" aria-label={drawingActionAriaLabel('Logg herfra', drawing)} onClick={() => void createLogFromMapObject(drawing)} disabled={mapLogSaving} className={`${mapObjectActionButtonBaseClass} bg-slate-950 text-white disabled:cursor-wait disabled:bg-slate-500`}>
                     Logg herfra {drawing.label}
                   </button>
-                  <button type="button" aria-label={drawingActionAriaLabel('Rediger', drawing)} onClick={() => startDrawingEdit(drawing)} className="min-h-11 rounded-xl border border-slate-300 bg-white px-3 font-black text-slate-950">
+                  <button type="button" aria-label={drawingActionAriaLabel('Rediger', drawing)} onClick={() => startDrawingEdit(drawing)} className={`${mapObjectActionButtonBaseClass} border border-slate-300 bg-white text-slate-950`}>
                     Rediger {drawing.label}
                   </button>
-                  <button type="button" aria-label={drawingActionAriaLabel('Slett', drawing)} onClick={() => deleteDrawing(drawing)} className="min-h-11 rounded-xl border border-red-300 bg-white px-3 font-black text-red-900">
+                  <button type="button" aria-label={drawingActionAriaLabel('Slett', drawing)} onClick={() => deleteDrawing(drawing)} className={`${mapObjectActionButtonBaseClass} border border-red-300 bg-white text-red-900`}>
                     Slett {drawing.label}
                   </button>
                 </span>

@@ -212,6 +212,35 @@ it('keeps marker and drawing row actions at or above 44px touch targets', async 
   expect(screen.getByRole('button', { name: /Avbryt/i })).toHaveClass('min-h-11');
 });
 
+it('wraps marker and drawing action rows for long mobile labels', async () => {
+  const longMarkerLabel = 'Sanitert-lokal-etikett-med-ekstra-lang-fritekst-for-iPhone-428px-rad';
+  const longDrawingLabel = 'Lang-sanitert-teig-etikett-med-ekstra-mobiltekst-for-428px-visning';
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+  writeMissionMapState({
+    markers: [createMissionMapMarker({ kind: 'hazard', missionId: activeMission.id, label: longMarkerLabel, x: 20, y: 30 }, new Date('2026-06-05T10:00:00Z'))],
+    drawings: [createMissionMapDrawing({ kind: 'sector', missionId: activeMission.id, label: longDrawingLabel, coordinates: '10,10 20,10 15,20' }, new Date('2026-06-05T10:01:00Z'))],
+  });
+
+  await renderOfflineMapPanel();
+
+  const markerRow = screen.getByTestId('operations-marker-action-row');
+  const drawingRow = screen.getByTestId('operations-drawing-action-row');
+  const markerSummary = markerRow.querySelector('span');
+  const drawingSummary = drawingRow.querySelector('span');
+
+  expect(markerRow).toHaveClass('flex', 'min-w-0', 'flex-col', 'items-start', 'gap-2', 'sm:flex-row', 'sm:items-center', 'sm:justify-between');
+  expect(drawingRow).toHaveClass('flex', 'min-w-0', 'flex-col', 'items-start', 'gap-2', 'sm:flex-row', 'sm:items-center', 'sm:justify-between');
+  expect(markerSummary).toHaveClass('min-w-0', 'max-w-full', 'break-words');
+  expect(drawingSummary).toHaveClass('min-w-0', 'max-w-full', 'break-words');
+
+  for (const group of [screen.getByTestId('operations-marker-action-group'), screen.getByTestId('operations-drawing-action-group')]) {
+    expect(group).toHaveClass('flex', 'w-full', 'min-w-0', 'flex-wrap', 'gap-2', 'sm:w-auto', 'sm:justify-end');
+    for (const button of within(group).getAllByRole('button')) {
+      expect(button).toHaveClass('min-h-11', 'min-w-0', 'max-w-full', 'whitespace-normal', 'break-words');
+    }
+  }
+});
 
 it('updates map controls when field mode changes while the map is open', async () => {
   await renderOfflineMapPanel();
