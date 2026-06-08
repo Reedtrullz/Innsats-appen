@@ -16,6 +16,7 @@ test('exports local app data and imports it back to restore mission and checklis
     location: 'Roundtrip testområde',
   });
   await page.getByRole('checkbox', { name: /Kontroller ventilasjon/i }).check();
+  await page.getByText('Avansert / dokumentasjon').click();
   await page.getByLabel(/Feltlogg tekst/i).fill('Roundtrip feltlogg uten persondata.');
   await page.getByRole('button', { name: /Legg til feltlogg/i }).click();
   await expect(page.getByLabel('Synlige lokale feltlogginnslag').getByText(/Roundtrip feltlogg/i)).toBeVisible();

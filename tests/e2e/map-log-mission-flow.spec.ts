@@ -78,6 +78,7 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
   await expect(page.getByRole('heading', { name: /Kart og logg/i })).toBeVisible();
   await expect(page.getByText(/Fare nord/i).first()).toBeVisible();
   await expect(page.getByText(/Fare observert uten persondata/i).first()).toBeVisible();
+  await page.getByText('Avansert / dokumentasjon').click();
   await page.getByRole('button', { name: /Lag etteraksjonsrapport Markdown/i }).click();
   await expect(page.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Fare observert uten persondata/i);
   await expect(page.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Fare nord/i);

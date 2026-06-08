@@ -914,6 +914,16 @@ it('shows a situation-first mission dashboard with next action, progress and exp
   expect(screen.getByRole('heading', { name: /Fremdrift/i })).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /5-punktsordre/i })).toHaveAttribute('href', '#5-punktsordre');
   expect(screen.getByRole('link', { name: /Sambandsplan/i })).toHaveAttribute('href', '#sambandsplan');
+  expect(screen.getAllByRole('link', { name: /Kart/i }).some((link) => link.getAttribute('href') === '#kart')).toBe(true);
+  for (const targetId of ['hurtiglogg', 'sjekkliste', 'kart', 'ruh-velferd', 'etterrapport', 'oppdragsmappe']) {
+    expect(document.getElementById(targetId)).not.toBeNull();
+  }
+  const advancedDetails = screen.getByText('Avansert / dokumentasjon').closest('details') as HTMLDetailsElement | null;
+  expect(advancedDetails).not.toBeNull();
+  expect(advancedDetails?.open).toBe(false);
+  window.location.hash = '#ruh-velferd';
+  window.dispatchEvent(new HashChangeEvent('hashchange'));
+  await waitFor(() => expect(advancedDetails?.open).toBe(true));
   const text = document.body.textContent ?? '';
   expect(text.indexOf('Oppdrag')).toBeLessThan(text.indexOf('Neste anbefalte handling'));
   expect(text.indexOf('Neste anbefalte handling')).toBeLessThan(text.indexOf('Hurtighandlinger'));

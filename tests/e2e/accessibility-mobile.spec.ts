@@ -209,6 +209,7 @@ test('screen-reader labels remain available on active mission operational contro
   });
 
   await expect(page.getByRole('heading', { name: /Kart og logg/i })).toBeVisible();
+  await page.getByText('Avansert / dokumentasjon').click();
   await expect(page.getByRole('region', { name: /Oppdragsmappe/i })).toBeVisible();
 
   for (const label of [

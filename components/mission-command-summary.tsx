@@ -116,26 +116,6 @@ export function MissionProgressSummary({ mission, checklists, checklistRuns = []
   );
 }
 
-
-export function MissionCommandSignals({ mission, mapSummary }: { mission: MissionContext; mapSummary: MissionMapCommandSummary }) {
-  const criticalCount = (mission.fieldLogEntries ?? []).filter((entry) => entry.criticalObservation || entry.mustBeForwarded).length;
-  const criticalText = commandCountLabel(criticalCount, 'kritisk logg / videresending', 'kritiske logger / videresendinger');
-  const markerText = commandCountLabel(mapSummary.markerCount, 'markør', 'markører');
-  const drawingText = commandCountLabel(mapSummary.drawingCount, 'sektor/tegning', 'sektorer/tegninger');
-
-  return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Oppdragssignaler">
-      <p className="text-xs font-black uppercase tracking-wide text-sky-700">Oppdragssignaler</p>
-      <h2 className="text-xl font-black text-slate-950">Kart og kritisk status</h2>
-      <ul className="mt-2 space-y-2 text-sm font-bold text-slate-800">
-        <li>{criticalText} registrert lokalt</li>
-        <li>{markerText} og {drawingText} på aktivt oppdrag</li>
-      </ul>
-      <p className="mt-2 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Foreslå statusoppdatering manuelt. Ingenting sendes eller godkjennes automatisk.</p>
-    </section>
-  );
-}
-
 export function MissionQuickActionsGrid() {
   return (
     <SectionCard labelledBy="mission-quick-actions-heading" className="bg-slate-50">
@@ -156,18 +136,5 @@ export function MissionQuickActionsGrid() {
         <QuickActionButton href="#oppdragsmappe" label="Oppdragsmappe" description="Samlet eksport" icon="download" tone="success" />
       </div>
     </SectionCard>
-  );
-}
-
-export function MissionExportShortcuts() {
-  return (
-    <section className="grid gap-3 sm:grid-cols-2" aria-label="Eksportsnarveier">
-      <Link className="rounded-2xl bg-white p-4 text-sm font-black text-slate-950 shadow-sm ring-1 ring-slate-200" href="#5-punktsordre">
-        5-punktsordre
-      </Link>
-      <Link className="rounded-2xl bg-white p-4 text-sm font-black text-slate-950 shadow-sm ring-1 ring-slate-200" href="#sambandsplan">
-        Sambandsplan
-      </Link>
-    </section>
   );
 }

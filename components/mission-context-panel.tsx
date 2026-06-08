@@ -14,7 +14,7 @@ import type { MissionContext } from '@/lib/mission/schemas';
 import { ChecklistRunner } from './checklist-runner';
 import { ContextSignalPanel, markStoredContextSignalsStale } from './context-signal-panel';
 import { DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS, disabledExternalDataSources, displaySignalsForExternalDataSourceSettings, externalDataSourceSettingsSnapshot, parseExternalDataSourceSettings, subscribeExternalDataSourceSettings } from '@/lib/integrations/source-settings';
-import { MissionCommandHeader, MissionCommandSignals, MissionProgressSummary, MissionQuickActionsGrid } from './mission-command-summary';
+import { MissionCommandHeader, MissionProgressSummary, MissionQuickActionsGrid } from './mission-command-summary';
 import { TiltakCard } from './tiltak-card';
 import { MissionMapSummary } from './mission-map-summary';
 import { LocalMissionControls } from './mission/local-mission-controls';
@@ -51,7 +51,7 @@ function matchingChecklist(checklists: OperationalChecklist[], mission: MissionC
     ?? checklists[0];
 }
 
-const missionDashboardHashTargets = new Set(['hurtiglogg', 'loggoversikt', 'sjekkliste', '5-punktsordre', 'sambandsplan', 'statusrapport', 'feltlogg', 'etterrapport', 'ruh-velferd', 'oppdragsmappe']);
+const missionDashboardHashTargets = new Set(['hurtiglogg', 'loggoversikt', 'sjekkliste', '5-punktsordre', 'sambandsplan', 'statusrapport', 'feltlogg', 'kart', 'etterrapport', 'ruh-velferd', 'oppdragsmappe']);
 
 type MissionUpdate = (mission: MissionContext) => MissionContext;
 
@@ -193,6 +193,7 @@ function EquipmentReadinessExportControls({ mission, checklists }: { mission: Mi
 function MissionCommandDashboard({ mission, cards, checklist, checklists, onMissionChange, onArchive }: { mission: MissionContext; cards: ActionCard[]; checklist?: OperationalChecklist; checklists: OperationalChecklist[]; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
   const firstActions = missionCards(cards, mission);
   const [checklistRuns, setChecklistRuns] = useState<Awaited<ReturnType<typeof listChecklistRuns>>>([]);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const settingsSnapshot = useSyncExternalStore(
     subscribeExternalDataSourceSettings,
     externalDataSourceSettingsSnapshot,
@@ -240,15 +241,30 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
   }, [mission.id]);
 
   useEffect(() => {
-    const targetId = window.location.hash.slice(1);
-    if (!missionDashboardHashTargets.has(targetId)) return;
-    const frame = window.requestAnimationFrame(() => {
+    function openHashTarget() {
+      const targetId = window.location.hash.slice(1);
+      if (!missionDashboardHashTargets.has(targetId)) return undefined;
+      return window.requestAnimationFrame(() => {
       const target = document.getElementById(targetId);
       const parentDetails = target?.closest('details') as HTMLDetailsElement | null;
-      if (parentDetails) parentDetails.open = true;
-      target?.scrollIntoView({ block: 'start' });
-    });
-    return () => window.cancelAnimationFrame(frame);
+      if (parentDetails) {
+        parentDetails.open = true;
+        setAdvancedOpen(true);
+      }
+      if (typeof target?.scrollIntoView === 'function') target.scrollIntoView({ block: 'start' });
+      });
+    }
+
+    let frame = openHashTarget();
+    const onHashChange = () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      frame = openHashTarget();
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      window.removeEventListener('hashchange', onHashChange);
+    };
   }, [mission.id]);
 
   return (
@@ -300,7 +316,6 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
 
       <div className="grid gap-3 lg:grid-cols-2">
         <MissionProgressSummary mission={mission} checklists={checklists} checklistRuns={checklistRuns} mapSummary={commandMapSummary} />
-        <MissionCommandSignals mission={mission} mapSummary={commandMapSummary} />
       </div>
 
       <MissionMapSummary mission={mission} mapState={scopedMapState} />
@@ -333,7 +348,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
         <LocalMissionControls mission={mission} displaySignals={staleSignals} onMissionChange={onMissionChange} />
       </section>
 
-      <details className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <details open={advancedOpen} onToggle={(event) => setAdvancedOpen(event.currentTarget.open)} className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49]">
           <span>
             <span className="block text-xs font-black uppercase tracking-wide text-slate-500">Avansert / dokumentasjon</span>
