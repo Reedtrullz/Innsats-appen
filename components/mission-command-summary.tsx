@@ -150,7 +150,7 @@ export function MissionQuickActionsGrid() {
         <QuickActionButton href="#sjekkliste" label="Sjekkliste" description="Fortsett aktiv sjekkliste" icon="checklist" tone="success" />
         <QuickActionButton href="#5-punktsordre" label="5-punktsordre" description="Strukturer ordre lokalt" icon="document" tone="slate" />
         <QuickActionButton href="#sambandsplan" label="Sambandsplan" description="Kanaler og roller" icon="radio" tone="warning" />
-        <QuickActionButton href="/kart" label="Kart" description="Lokale markører" icon="map" tone="sky" />
+        <QuickActionButton href="#kart" label="Kart" description="Lokale markører" icon="map" tone="sky" />
         <QuickActionButton href="#ruh-velferd" label="RUH/velferd" description="Lokal oppfølging" icon="shield" tone="warning" />
         <QuickActionButton href="#etterrapport" label="Etterrapport" description="Bygg rapport" icon="archive" tone="slate" />
         <QuickActionButton href="#oppdragsmappe" label="Oppdragsmappe" description="Samlet eksport" icon="download" tone="success" />

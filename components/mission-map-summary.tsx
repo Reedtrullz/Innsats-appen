@@ -14,7 +14,7 @@ export function MissionMapSummary({ mission, mapState }: { mission: MissionConte
   const latestMapReference = latestMapEntry?.mapReference;
 
   return (
-    <section aria-labelledby="mission-map-summary-heading" className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <section id="kart" aria-labelledby="mission-map-summary-heading" className="scroll-mt-28 space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-black uppercase tracking-wide text-sky-700">Kart og logg</p>

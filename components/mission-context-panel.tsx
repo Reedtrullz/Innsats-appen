@@ -333,7 +333,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
         <LocalMissionControls mission={mission} displaySignals={staleSignals} onMissionChange={onMissionChange} />
       </section>
 
-      <details open className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <details className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49]">
           <span>
             <span className="block text-xs font-black uppercase tracking-wide text-slate-500">Avansert / dokumentasjon</span>

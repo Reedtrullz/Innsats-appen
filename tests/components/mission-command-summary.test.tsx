@@ -72,7 +72,7 @@ it('renders mission quick actions as two-column field shortcuts', () => {
   expect(screen.getByRole('link', { name: /Sjekkliste/i })).toHaveAttribute('href', '#sjekkliste');
   expect(screen.getByRole('link', { name: /5-punktsordre/i })).toHaveAttribute('href', '#5-punktsordre');
   expect(screen.getByRole('link', { name: /Sambandsplan/i })).toHaveAttribute('href', '#sambandsplan');
-  expect(screen.getByRole('link', { name: /Kart/i })).toHaveAttribute('href', '/kart');
+  expect(screen.getByRole('link', { name: /Kart/i })).toHaveAttribute('href', '#kart');
   expect(screen.getByRole('link', { name: /RUH\/velferd/i })).toHaveAttribute('href', '#ruh-velferd');
   expect(screen.getByRole('link', { name: /Etterrapport/i })).toHaveAttribute('href', '#etterrapport');
   expect(screen.getByRole('link', { name: /Oppdragsmappe/i })).toHaveAttribute('href', '#oppdragsmappe');
