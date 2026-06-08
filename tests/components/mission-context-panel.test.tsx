@@ -230,7 +230,7 @@ it('lets users generate a local task/status/resource markdown export from the mi
   expect(screen.getByRole('button', { name: /Kopier/i })).toBeInTheDocument();
   expect((screen.getByText(/Vis forhåndsvisning/i).closest('details') as HTMLDetailsElement | null)?.open).toBe(false);
   await userEvent.click(screen.getByText(/Vis forhåndsvisning/i));
-  const preview = screen.getByLabelText(/Lokal oppdragsstatus i Markdown/i) as HTMLTextAreaElement;
+  const preview = screen.getByLabelText(/Lokal statusrapport/i) as HTMLTextAreaElement;
   expect(preview.value).toContain('# Lokal oppdragsstatus');
   expect(preview.value).toContain('Lagres bare lokalt i denne nettleseren');
   expect(preview.value).toContain('sensitivt innhold');
@@ -262,7 +262,7 @@ it('shows a local status privacy warning instead of rendering a preview when sta
   expect(alert).toHaveTextContent(/persondata|pasientdata|skjermet/i);
   expect(alert).not.toHaveTextContent(/Ola Nordmann/i);
   expect(document.body).not.toHaveTextContent(/Ola Nordmann/i);
-  expect(screen.queryByLabelText(/Lokal oppdragsstatus i Markdown/i)).not.toBeInTheDocument();
+  expect(screen.queryByLabelText(/Lokal statusrapport/i)).not.toBeInTheDocument();
   expect(readLocalAuditLog().some((entry) => entry.details?.exportKind === 'status-summary')).toBe(false);
 });
 
@@ -303,7 +303,7 @@ it('does not render a stale local status preview after mission or signal content
   const { rerender } = render(<LocalMissionControls mission={safeMission} displaySignals={safeSignals} onMissionChange={vi.fn(async () => undefined)} />);
   await userEvent.click(screen.getByRole('button', { name: /Lag lokal statusrapport/i }));
   await userEvent.click(screen.getByText(/Vis forhåndsvisning/i));
-  const preview = await screen.findByLabelText(/Lokal oppdragsstatus i Markdown/i) as HTMLTextAreaElement;
+  const preview = await screen.findByLabelText(/Lokal statusrapport/i) as HTMLTextAreaElement;
   expect(preview.value).toContain('Gammel trygg eksportmarkør');
 
   rerender(<LocalMissionControls mission={sensitiveMission} displaySignals={sensitiveSignals} onMissionChange={vi.fn(async () => undefined)} />);
@@ -312,7 +312,7 @@ it('does not render a stale local status preview after mission or signal content
   expect(document.body).not.toHaveTextContent(/Ola Nordmann|01017012345|tilfluktsrom adresse/i);
   const alert = await screen.findByRole('alert', { name: /lokal status personvern/i });
   expect(alert).toHaveTextContent(/persondata|pasientdata|skjermet/i);
-  expect(screen.queryByLabelText(/Lokal oppdragsstatus i Markdown/i)).not.toBeInTheDocument();
+  expect(screen.queryByLabelText(/Lokal statusrapport/i)).not.toBeInTheDocument();
   expect(document.body).not.toHaveTextContent(/Ola Nordmann|01017012345|tilfluktsrom adresse/i);
 });
 
@@ -551,7 +551,7 @@ it('generates a local oppdragsmappe export with map and log artifacts', async ()
   await userEvent.click(screen.getByRole('button', { name: /Bygg oppdragsmappe/i }));
 
   const markdown = await screen.findByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
-  await userEvent.click(screen.getByText(/Vis JSON/i));
+  await userEvent.click(screen.getAllByText(/Vis forhåndsvisning/i).at(-1)!);
   const json = await screen.findByLabelText(/Oppdragsmappe JSON/i) as HTMLTextAreaElement;
   expect(json.value).toContain('Oppdragsmappe UI');
   expect(json.value).toContain('schematic-0-100-local-only');
@@ -623,7 +623,7 @@ it('scopes current mission dashboard, after-action and folder map outputs away f
   expect(folderSection).not.toBeNull();
   await userEvent.click(within(folderSection!).getByRole('button', { name: /Bygg oppdragsmappe/i }));
   const folderMarkdown = await within(folderSection!).findByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
-  await userEvent.click(within(folderSection!).getByText(/Vis JSON/i));
+  await userEvent.click(within(folderSection!).getAllByText(/Vis forhåndsvisning/i).at(-1)!);
   const folderJson = await within(folderSection!).findByLabelText(/Oppdragsmappe JSON/i) as HTMLTextAreaElement;
   expect(folderJson.value).toContain('Current UI marker');
   expect(folderJson.value).toContain('Current UI sector');
@@ -1312,7 +1312,7 @@ it('shows and exports stored context signals with the same stale normalization a
   await openExportDetails(/Lokal statusrapport/i);
   await userEvent.click(screen.getByRole('button', { name: /Lag lokal statusrapport/i }));
   await userEvent.click(screen.getByText(/Vis forhåndsvisning/i));
-  const preview = screen.getByLabelText(/Lokal oppdragsstatus i Markdown/i) as HTMLTextAreaElement;
+  const preview = screen.getByLabelText(/Lokal statusrapport/i) as HTMLTextAreaElement;
   expect(preview.value).toContain('Gammelt regnvarsel: Lagret sammendrag (met, yellow, stale)');
   expect(preview.value).toContain('Gammelt vindvarsel: Lagret sammendrag to (met, yellow, stale)');
   expect(preview.value).not.toContain('(met, yellow, fresh)');

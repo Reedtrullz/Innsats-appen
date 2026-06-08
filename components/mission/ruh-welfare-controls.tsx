@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { ContextNotice } from './context-notice';
+import { ExportReview } from './export-review';
 import { MAN_DOWN_POST_MVP_NOTE, MEDIA_ATTACHMENT_SAFETY_NOTES } from '@/lib/mission/media-safety';
 import { RUH_CATEGORY_OPTIONS, RUH_RISK_OPTIONS, WELFARE_LOAD_OPTIONS, exportRuhJson, exportRuhMarkdown, exportWelfareJson, exportWelfareMarkdown, summarizeWelfareCheck } from '@/lib/mission/ruh-welfare';
 import type { MissionContext, RuhCategory, RuhRisk, WelfareLoad } from '@/lib/mission/schemas';
@@ -27,24 +29,6 @@ function toDatetimeLocalValue(value: Date) {
 function datetimeLocalToIso(value: string) {
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
-}
-
-function ExportReview({ title, text, textareaId, onCopy }: { title: string; text: string; textareaId: string; onCopy: (text: string) => void }) {
-  if (!text) return null;
-  return (
-    <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-950">
-      <p className="font-black">{title} er klar</p>
-      <p className="mt-1 text-sm font-semibold">Se over før lokal bruk eller deling.</p>
-      <button type="button" onClick={() => onCopy(text)} className="mt-3 min-h-11 rounded-xl bg-white px-4 text-sm font-black text-emerald-950 ring-1 ring-emerald-200">Kopier</button>
-      <details className="mt-3 rounded-xl bg-white p-3 ring-1 ring-emerald-200">
-        <summary className="min-h-11 cursor-pointer list-none text-sm font-black">Vis forhåndsvisning</summary>
-        <label htmlFor={textareaId} className="mt-3 block text-sm font-bold">
-          {title}
-          <textarea id={textareaId} readOnly value={text} className="mt-1 min-h-52 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-        </label>
-      </details>
-    </section>
-  );
 }
 
 export function RuhWelfareControls({ mission, onMissionChange }: { mission: MissionContext; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void> }) {
@@ -171,7 +155,7 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Forenklet RUH og belastning</p>
         <h3 className="text-xl font-black">RUH og velferd</h3>
-        <p className="mt-1 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Lokal registrering og eksport. Ikke legg inn persondata eller pasientdata.</p>
+        <ContextNotice variant="privacy" className="mt-1">Lokal registrering og eksport. Ikke legg inn persondata eller pasientdata.</ContextNotice>
       </div>
 
       <div className="grid grid-cols-3 gap-1 rounded-2xl border border-slate-200 bg-slate-50 p-1" role="tablist" aria-label="RUH og velferd valg">

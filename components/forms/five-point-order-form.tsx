@@ -11,6 +11,8 @@ import {
   exportFivePointOrderPdfReadyHtml,
 } from '@/lib/mission/order-export';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
+import { ContextNotice } from '@/components/mission/context-notice';
+import { ExportReview } from '@/components/mission/export-review';
 
 function value(form: FormData, key: string) {
   return String(form.get(key) ?? '').trim();
@@ -92,6 +94,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
   const [exportError, setExportError] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState<OrderStep>('template');
   const template = selectedTemplate(templateId);
+  const completedPointCount = useMemo(() => orderPointLabels.filter((item) => points[item.key].trim().length > 0).length, [points]);
   const requiredPointsComplete = useMemo(() => orderPointLabels.every((item) => points[item.key].trim().length > 0), [points]);
   const stepCompletion: Record<OrderStep, boolean> = {
     template: Boolean(templateId),
@@ -188,7 +191,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
           );
         })}
       </div>
-      <p className="rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Lokal beslutningsstøtte. Kontroller mot gjeldende ordre og unngå persondata før eksport.</p>
+      <ContextNotice variant="local-support">Lokal beslutningsstøtte. Kontroller mot gjeldende ordre og unngå persondata før eksport.</ContextNotice>
 
       <StepBlock step={1} title="Velg mal" active={activeStep === 'template'}>
         <label className="block text-sm font-bold">
@@ -225,6 +228,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
       </StepBlock>
 
       <StepBlock step={2} title="Fyll fem punkter" active={activeStep === 'points'}>
+        <p className="rounded-xl bg-slate-100 p-3 text-sm font-black text-slate-800">{completedPointCount}/5 punkter fylt ut</p>
         {orderPointLabels.map((item) => (
           <label key={item.key} className="block text-sm font-bold">
             {item.label}
@@ -286,19 +290,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
       </StepBlock>
 
       {exportError ? <p role="status" className="rounded-2xl bg-red-50 p-3 text-sm font-bold text-red-950">{exportError}</p> : null}
-      {preview ? (
-        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-950" aria-label="5-punktsordre eksport klar">
-          <p className="font-black">Eksport er klar</p>
-          <p className="mt-1 text-sm font-semibold">Se over innholdet før lokal bruk eller deling.</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button type="button" onClick={() => void copyPreview()} className="min-h-11 rounded-xl bg-white px-4 text-sm font-black text-emerald-950 ring-1 ring-emerald-200">Kopier</button>
-          </div>
-          <details className="mt-3 rounded-xl bg-white p-3 ring-1 ring-emerald-200">
-            <summary className="min-h-11 cursor-pointer list-none text-sm font-black">Vis forhåndsvisning</summary>
-            <pre className="mt-3 max-h-96 overflow-auto whitespace-pre-wrap rounded-xl bg-slate-100 p-3 text-sm">{preview.text}</pre>
-          </details>
-        </section>
-      ) : null}
+      <ExportReview title="Eksport" text={preview?.text ?? ''} textareaId="five-point-order-preview" onCopy={() => void copyPreview()} formatLabel={preview?.format.toUpperCase()} />
     </form>
   );
 }

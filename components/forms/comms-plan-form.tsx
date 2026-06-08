@@ -10,6 +10,7 @@ import {
   exportCommsPlanMarkdown,
   exportCommsPlanPdfReadyHtml,
 } from '@/lib/mission/order-export';
+import { ExportReview } from '@/components/mission/export-review';
 
 function value(form: FormData, key: string) {
   return String(form.get(key) ?? '').trim();
@@ -139,17 +140,7 @@ export function CommsPlanForm({ contentVersion = 'local-mvp' }: CommsPlanFormPro
       </div>
 
       {exportError ? <p role="status" className="rounded-2xl bg-red-50 p-3 text-sm font-bold text-red-950">{exportError}</p> : null}
-      {preview ? (
-        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-950">
-          <p className="font-black">Sambandsplan er klar</p>
-          <p className="mt-1 text-sm font-semibold">Se over innholdet før lokal bruk eller deling.</p>
-          <button type="button" onClick={() => void copyPreview()} className="mt-3 min-h-11 rounded-xl bg-white px-4 text-sm font-black text-emerald-950 ring-1 ring-emerald-200">Kopier</button>
-          <details className="mt-3 rounded-xl bg-white p-3 ring-1 ring-emerald-200">
-            <summary className="min-h-11 cursor-pointer list-none text-sm font-black">Vis forhåndsvisning</summary>
-            <pre className="mt-3 max-h-96 overflow-auto whitespace-pre-wrap rounded-xl bg-slate-100 p-3 text-sm">{preview.text}</pre>
-          </details>
-        </section>
-      ) : null}
+      <ExportReview title="Sambandsplan" text={preview?.text ?? ''} textareaId="comms-plan-preview" onCopy={() => void copyPreview()} formatLabel={preview?.format.toUpperCase()} />
     </form>
   );
 }

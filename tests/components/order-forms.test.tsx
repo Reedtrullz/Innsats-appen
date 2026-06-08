@@ -40,6 +40,15 @@ async function openFivePointPreview() {
   await userEvent.click(previewSummary);
 }
 
+function expectPreviewValue(label: RegExp, pattern: RegExp) {
+  const field = screen.getAllByLabelText(label).find((element) => element.tagName === 'TEXTAREA') as HTMLTextAreaElement | undefined;
+  expect(field?.value).toMatch(pattern);
+}
+
+function previewTextarea(id: string) {
+  return document.querySelector<HTMLTextAreaElement>(`#${id}`);
+}
+
 it('requires all five order points and renders exported markdown', async () => {
   render(<FivePointOrderForm contentVersion="test-content-ui" />);
   expect(screen.getByText(/lokal beslutningsstøtte/i)).toBeInTheDocument();
@@ -76,13 +85,14 @@ it('requires all five order points and renders exported markdown', async () => {
   expect(screen.getAllByText(/Fullført/i).length).toBeGreaterThanOrEqual(3);
   expect((screen.getByText(/Vis forhåndsvisning/i).closest('details') as HTMLDetailsElement | null)?.open).toBe(false);
   await openFivePointPreview();
-  expect(screen.getByText(/# 5-punktsordre/i)).toBeInTheDocument();
-  expect(screen.getByText(/src-5-punktsordre/i)).toBeInTheDocument();
-  expect(screen.getAllByText(/operasjonelt sensitiv informasjon/i).length).toBeGreaterThan(0);
-  expect(screen.getByText(/Tilbakelesing\/forstått: Bekreftet/i)).toBeInTheDocument();
-  expect(screen.getByText(/Innholdsversjon: test-content-ui/i)).toBeInTheDocument();
+  expectPreviewValue(/Eksport/i, /# 5-punktsordre/i);
+  expectPreviewValue(/Eksport/i, /src-5-punktsordre/i);
+  expectPreviewValue(/Eksport/i, /operasjonelt sensitiv informasjon/i);
+  expectPreviewValue(/Eksport/i, /Tilbakelesing\/forstått: Bekreftet/i);
+  expectPreviewValue(/Eksport/i, /Innholdsversjon: test-content-ui/i);
   await userEvent.click(jsonButton);
-  expect(screen.getByText(/"schemaVersion": "five-point-order.v1"/i)).toBeInTheDocument();
+  await openFivePointPreview();
+  expectPreviewValue(/Eksport/i, /"schemaVersion": "five-point-order.v1"/i);
   await userEvent.click(pdfButton);
   expect(screen.getAllByText(/PDF-klar HTML/i).length).toBeGreaterThan(0);
   expect(screen.getAllByText(/Skriv ut.*Lagre som PDF/i).length).toBeGreaterThan(0);
@@ -99,12 +109,12 @@ it('clears stale 5-punktsordre export preview when order text changes', async ()
   await userEvent.click(screen.getByRole('button', { name: /Eksporter Markdown/i }));
   await openFivePointPreview();
 
-  expect(screen.getByText(/# 5-punktsordre/i)).toBeInTheDocument();
+  expectPreviewValue(/Eksport/i, /# 5-punktsordre/i);
   expect(screen.getAllByText(/Situasjon første/i).length).toBeGreaterThan(1);
 
   await userEvent.type(screen.getByLabelText(/Situasjon/i), ' oppdatert');
 
-  expect(screen.queryByText(/# 5-punktsordre/i)).not.toBeInTheDocument();
+  expect(previewTextarea('five-point-order-preview')).not.toBeInTheDocument();
 });
 
 it('blocks 5-punktsordre preview when sensitive text is entered', async () => {
@@ -116,7 +126,7 @@ it('blocks 5-punktsordre preview when sensitive text is entered', async () => {
   await userEvent.click(screen.getByRole('button', { name: /Eksporter Markdown/i }));
 
   expect(await screen.findByText(/Eksport blokkert/i)).toBeInTheDocument();
-  expect(screen.queryByText(/# 5-punktsordre/i)).not.toBeInTheDocument();
+  expect(previewTextarea('five-point-order-preview')).not.toBeInTheDocument();
 });
 
 it('requires expanded sambandsplan fields and renders Markdown/JSON/PDF-ready previews', async () => {
@@ -170,14 +180,14 @@ it('requires expanded sambandsplan fields and renders Markdown/JSON/PDF-ready pr
   expect(screen.getByRole('button', { name: /Kopier/i })).toBeInTheDocument();
   expect((screen.getByText(/Vis forhåndsvisning/i).closest('details') as HTMLDetailsElement | null)?.open).toBe(false);
   await userEvent.click(screen.getByText(/Vis forhåndsvisning/i));
-  expect(screen.getByText(/# Sambandsplan/i)).toBeInTheDocument();
-  expect(screen.getByText(/Talegruppe etter lokal plan/i)).toBeInTheDocument();
-  expect(screen.getByText(/Innholdsversjon: test-content-ui-comms/i)).toBeInTheDocument();
-  expect(screen.getByText(/src-kommunikasjons-og-sambandsdiagram/i)).toBeInTheDocument();
-  expect(screen.getAllByText(/operasjonelt sensitiv informasjon/i).length).toBeGreaterThan(0);
+  expectPreviewValue(/Sambandsplan/i, /# Sambandsplan/i);
+  expectPreviewValue(/Sambandsplan/i, /Talegruppe etter lokal plan/i);
+  expectPreviewValue(/Sambandsplan/i, /Innholdsversjon: test-content-ui-comms/i);
+  expectPreviewValue(/Sambandsplan/i, /src-kommunikasjons-og-sambandsdiagram/i);
+  expectPreviewValue(/Sambandsplan/i, /operasjonelt sensitiv informasjon/i);
   await userEvent.click(jsonButton);
   await userEvent.click(screen.getByText(/Vis forhåndsvisning/i));
-  expect(screen.getByText(/"schemaVersion": "sambandsplan.v1"/i)).toBeInTheDocument();
+  expectPreviewValue(/Sambandsplan/i, /"schemaVersion": "sambandsplan.v1"/i);
   await userEvent.click(pdfButton);
   await userEvent.click(screen.getByText(/Vis forhåndsvisning/i));
   expect(screen.getAllByText(/PDF-klar HTML/i).length).toBeGreaterThan(0);
@@ -197,12 +207,12 @@ it('clears stale sambandsplan export preview when fields change', async () => {
   await userEvent.click(screen.getByRole('button', { name: /Eksporter Markdown/i }));
   await userEvent.click(screen.getByText(/Vis forhåndsvisning/i));
 
-  expect(screen.getByText(/# Sambandsplan/i)).toBeInTheDocument();
-  expect(screen.getByText(/Primær første/i)).toBeInTheDocument();
+  expectPreviewValue(/Sambandsplan/i, /# Sambandsplan/i);
+  expectPreviewValue(/Sambandsplan/i, /Primær første/i);
 
   await userEvent.type(screen.getByLabelText(/Primær kanal\/talegruppe/i), ' oppdatert');
 
-  expect(screen.queryByText(/# Sambandsplan/i)).not.toBeInTheDocument();
+  expect(previewTextarea('comms-plan-preview')).not.toBeInTheDocument();
   expect(screen.queryByText(/Primær første/i)).not.toBeInTheDocument();
 });
 

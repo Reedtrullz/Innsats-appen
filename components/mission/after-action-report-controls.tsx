@@ -7,6 +7,8 @@ import type { MissionMapState } from '@/lib/maps/operations-map';
 import { buildAfterActionReport, buildRuhWelfareSummary, exportAfterActionJson, exportAfterActionMarkdown, exportAfterActionPdfReadyHtml } from '@/lib/mission/after-action-report';
 import { listChecklistRuns } from '@/lib/mission/local-store';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
+import { ContextNotice } from './context-notice';
+import { ExportReview } from './export-review';
 
 function statusSummaryMission(mission: MissionContext, externalSignals: MissionContext['externalSignals']): MissionContext {
   return { ...mission, externalSignals };
@@ -17,24 +19,6 @@ function activeAfterActionChecklists(checklists: OperationalChecklist[], mission
   const active = activeIds.size > 0 ? checklists.filter((checklist) => activeIds.has(checklist.slug)) : [];
   if (active.length > 0) return active;
   return fallbackChecklist ? [fallbackChecklist] : [];
-}
-
-function ExportReview({ title, text, textareaId, onCopy }: { title: string; text: string; textareaId: string; onCopy: (text: string) => void }) {
-  if (!text) return null;
-  return (
-    <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-950">
-      <p className="font-black">{title} er klar</p>
-      <p className="mt-1 text-sm font-semibold">Se over innholdet før lokal bruk eller deling.</p>
-      <button type="button" onClick={() => onCopy(text)} className="mt-3 min-h-11 rounded-xl bg-white px-4 text-sm font-black text-emerald-950 ring-1 ring-emerald-200">Kopier</button>
-      <details className="mt-3 rounded-xl bg-white p-3 ring-1 ring-emerald-200">
-        <summary className="min-h-11 cursor-pointer list-none text-sm font-black">Vis forhåndsvisning</summary>
-        <label htmlFor={textareaId} className="mt-3 block text-sm font-bold">
-          {title}
-          <textarea id={textareaId} readOnly value={text} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-        </label>
-      </details>
-    </section>
-  );
 }
 
 export function AfterActionReportControls({ mission, displaySignals, checklists, fallbackChecklist, mapState }: { mission: MissionContext; displaySignals: MissionContext['externalSignals']; checklists: OperationalChecklist[]; fallbackChecklist?: OperationalChecklist; mapState: MissionMapState }) {
@@ -85,7 +69,7 @@ export function AfterActionReportControls({ mission, displaySignals, checklists,
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Lokal etterrapport</p>
         <h3 className="text-xl font-black">Etteraksjonsrapport</h3>
-        <p className="mt-1 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Generer lokalt, se over, kopier/eksporter. Ikke legg inn persondata.</p>
+        <ContextNotice variant="privacy" className="mt-1">Generer lokalt, se over, kopier/eksporter. Ikke legg inn persondata.</ContextNotice>
       </div>
       <div role="region" aria-label="RUH/velferd lokal gjennomgang før eksport" className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-slate-950">
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">1 · Sjekk grunnlag</p>

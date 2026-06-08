@@ -87,7 +87,7 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
   await openMissionDetails(page, /Samlet lokal oppdragsmappe/i, 'Eksport');
   const folderSection = page.locator('#oppdragsmappe');
   await folderSection.getByRole('button', { name: /Bygg oppdragsmappe/i }).click();
-  await folderSection.getByText(/Vis JSON/i).click();
+  await folderSection.getByText(/Vis forhåndsvisning/i).last().click();
   await expect(folderSection.getByLabel(/Oppdragsmappe JSON/i)).toHaveValue(/schematic-0-100-local-only/i);
 
   await waitForServiceWorker(page);
