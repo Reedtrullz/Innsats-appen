@@ -75,6 +75,21 @@ export async function createLocalMission(page: Page, options: {
   await expect(page.getByText(new RegExp(`${escapeRegex(options.title)}\\s*·\\s*${escapeRegex(missionLocation)}`, 'i'))).toBeVisible();
 }
 
+export async function openMissionMode(page: Page, label: 'Nå' | 'Arbeid' | 'Eksport') {
+  const modeControl = page.getByRole('tablist', { name: /Oppdragsmodus/i });
+  await modeControl.getByRole('tab', { name: label }).click();
+}
+
+export async function openMissionDetails(page: Page, summary: string | RegExp, mode?: 'Nå' | 'Arbeid' | 'Eksport') {
+  if (mode) await openMissionMode(page, mode);
+  const summaryLocator = page.locator('details > summary').filter({ hasText: summary }).first();
+  await expect(summaryLocator).toBeVisible();
+  const isOpen = await summaryLocator.evaluate((element) => (element.parentElement as HTMLDetailsElement | null)?.open ?? false);
+  if (!isOpen) {
+    await summaryLocator.click();
+  }
+}
+
 export async function readLocalDatabaseCounts(page: Page) {
   return page.evaluate(async (databaseName) => {
     const databases = typeof indexedDB.databases === 'function' ? await indexedDB.databases() : [];

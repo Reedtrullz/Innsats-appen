@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { openMissionMode } from './helpers';
 
 async function checklistRunPersisted(page: import('@playwright/test').Page, missionTitle: string) {
   await page.waitForFunction(async (title) => {
@@ -68,6 +69,7 @@ test('mobile user can search, open source-backed card, create mission, run check
   await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
   await expect(page.getByText(new RegExp(`${missionTitle}\\s*·\\s*Trondheim sentrum`, 'i'))).toBeVisible();
 
+  await openMissionMode(page, 'Arbeid');
   const checklistItem = page.getByRole('checkbox', { name: /Kontroller ventilasjon/i });
   await checklistItem.check();
   await expect(checklistItem).toBeChecked();
@@ -83,6 +85,7 @@ test('mobile user can search, open source-backed card, create mission, run check
     await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
     await expect(page.getByText(new RegExp(`${missionTitle}\\s*·\\s*Trondheim sentrum`, 'i'))).toBeVisible();
+    await openMissionMode(page, 'Arbeid');
     await expect(page.getByRole('checkbox', { name: /Kontroller ventilasjon/i })).toBeChecked();
   } finally {
     await context.setOffline(false);

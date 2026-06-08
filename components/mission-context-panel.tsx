@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type MouseEvent, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { CommsPlanForm } from '@/components/forms/comms-plan-form';
+import { FivePointOrderForm } from '@/components/forms/five-point-order-form';
 import type { ActionCard, OperationalChecklist } from '@/lib/content/schemas';
 import { filterActionCards, sortActionCards } from '@/lib/content/filters';
 import { phaseLabels, roleLabels, roles, scenarioLabels, scenarios, phases, type Phase, type Role, type Scenario } from '@/lib/content/taxonomy';
@@ -14,7 +16,7 @@ import type { MissionContext } from '@/lib/mission/schemas';
 import { ChecklistRunner } from './checklist-runner';
 import { ContextSignalPanel, markStoredContextSignalsStale } from './context-signal-panel';
 import { DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS, disabledExternalDataSources, displaySignalsForExternalDataSourceSettings, externalDataSourceSettingsSnapshot, parseExternalDataSourceSettings, subscribeExternalDataSourceSettings } from '@/lib/integrations/source-settings';
-import { MissionCommandHeader, MissionProgressSummary, MissionQuickActionsGrid } from './mission-command-summary';
+import { MissionCommandHeader, MissionProgressSummary } from './mission-command-summary';
 import { TiltakCard } from './tiltak-card';
 import { MissionMapSummary } from './mission-map-summary';
 import { LocalMissionControls } from './mission/local-mission-controls';
@@ -27,7 +29,7 @@ import { MissionFolderExportControls } from './mission/mission-folder-export-con
 import { missionMapStateSnapshot, normalizeMissionMapState, subscribeMissionMapState, mapStateForMission, type MissionMapState } from '@/lib/maps/operations-map';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
 import { OperationalIcon } from './ui/operational-icons';
-import { CriticalNotice } from './ui/operational-primitives';
+import { CriticalNotice, StatusPill } from './ui/operational-primitives';
 
 function operationalPrivacyErrorMessage(context: string) {
   return `${context}: Lokal tekst ble stoppet fordi den kan inneholde persondata, pasientdata, skjermet informasjon eller private lokasjoner. Bruk ordinære systemer for slike opplysninger.`;
@@ -54,6 +56,32 @@ function matchingChecklist(checklists: OperationalChecklist[], mission: MissionC
 const missionDashboardHashTargets = new Set(['hurtiglogg', 'loggoversikt', 'sjekkliste', 'kritisk-tiltak', '5-punktsordre', 'sambandsplan', 'statusrapport', 'feltlogg', 'kart', 'etterrapport', 'ruh-velferd', 'oppdragsmappe']);
 
 type MissionUpdate = (mission: MissionContext) => MissionContext;
+type MissionMode = 'now' | 'work' | 'export';
+
+const modeLabels: Record<MissionMode, string> = {
+  now: 'Nå',
+  work: 'Arbeid',
+  export: 'Eksport',
+};
+
+const modeByHashTarget: Record<string, MissionMode> = {
+  hurtiglogg: 'now',
+  'kritisk-tiltak': 'now',
+  sjekkliste: 'work',
+  kart: 'work',
+  loggoversikt: 'work',
+  feltlogg: 'work',
+  '5-punktsordre': 'export',
+  sambandsplan: 'export',
+  'ruh-velferd': 'export',
+  etterrapport: 'export',
+  oppdragsmappe: 'export',
+  statusrapport: 'export',
+};
+
+function modeForHashTarget(targetId: string): MissionMode | undefined {
+  return modeByHashTarget[targetId];
+}
 
 
 function StructuredLessonsFeedbackControls({ mission, onMissionChange, onArchive }: { mission: MissionContext; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
@@ -189,11 +217,292 @@ function EquipmentReadinessExportControls({ mission, checklists }: { mission: Mi
   );
 }
 
+function MissionModeControl({ activeMode, onModeChange }: { activeMode: MissionMode; onModeChange: (mode: MissionMode) => void }) {
+  const modes: MissionMode[] = ['now', 'work', 'export'];
+  return (
+    <div className="sticky top-[5.65rem] z-20 -mx-1 rounded-2xl border border-slate-200 bg-white/95 p-1 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/85" role="tablist" aria-label="Oppdragsmodus">
+      <div className="grid grid-cols-3 gap-1">
+        {modes.map((mode) => {
+          const selected = activeMode === mode;
+          return (
+            <button
+              key={mode}
+              id={`mission-${mode}-tab`}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              aria-controls={`mission-${mode}-panel`}
+              onClick={() => onModeChange(mode)}
+              className={selected
+                ? 'min-h-11 rounded-xl bg-[#082F49] px-3 text-sm font-black text-white shadow-sm'
+                : 'min-h-11 rounded-xl px-3 text-sm font-black text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#082F49]'}
+            >
+              {modeLabels[mode]}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
-function MissionCommandDashboard({ mission, cards, checklist, checklists, onMissionChange, onArchive }: { mission: MissionContext; cards: ActionCard[]; checklist?: OperationalChecklist; checklists: OperationalChecklist[]; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
+function MissionStatusStrip() {
+  return (
+    <section aria-label="Oppdragets lokale status" className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+      <div className="flex flex-wrap gap-2">
+        <StatusPill label="Lokal" tone="success" compact />
+        <StatusPill label="Ikke delt" tone="slate" compact />
+        <StatusPill label="Ikke kommandosystem" tone="warning" compact />
+        <StatusPill label="Kildebelagt" tone="sky" compact />
+      </div>
+    </section>
+  );
+}
+
+function PanelHeading({ eyebrow, title, id }: { eyebrow: string; title: string; id: string }) {
+  return (
+    <div>
+      <p className="text-xs font-black uppercase tracking-wide text-sky-700">{eyebrow}</p>
+      <h2 id={id} className="text-2xl font-black text-slate-950">{title}</h2>
+    </div>
+  );
+}
+
+function NextActionCard({ nextActionSteps, checklist }: { nextActionSteps: string[]; checklist?: OperationalChecklist }) {
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="flex items-start gap-3">
+        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-sky-800">
+          <OperationalIcon name="spark" className="h-5 w-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-black uppercase tracking-wide text-sky-700">Neste anbefalte handling</p>
+          <h3 className="mt-1 text-xl font-black">Gjør dette først</h3>
+        </div>
+      </div>
+      <ol className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-800">
+        {nextActionSteps.map((step, index) => (
+          <li key={step} className="grid grid-cols-[1.75rem_1fr] items-start gap-2 rounded-xl bg-slate-50 p-2 ring-1 ring-slate-200">
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white text-xs font-black text-slate-700 ring-1 ring-slate-200">{index + 1}</span>
+            <span>{step}</span>
+          </li>
+        ))}
+      </ol>
+      {checklist ? <a href="#sjekkliste" className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[#082F49] px-4 text-sm font-black text-white">Fortsett sjekkliste</a> : null}
+    </section>
+  );
+}
+
+function RecommendedActionsPanel({ recommendedLabel, criticalActions, firstActions, mission }: { recommendedLabel: string; criticalActions: ActionCard[]; firstActions: ActionCard[]; mission: MissionContext }) {
+  return (
+    <section id="kritisk-tiltak" className="scroll-mt-28 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-wide text-sky-700">{recommendedLabel}</p>
+          <h3 className="text-xl font-black">{recommendedLabel}</h3>
+        </div>
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">Oppdatert {formatUpdatedAt(mission.updatedAt)}</span>
+      </div>
+      <div className="mt-3 space-y-3">
+        {criticalActions.length > 0 ? (
+          <CriticalNotice title={`${criticalActions.length} kritisk tiltak først`} tone="critical">
+            Visningen prioriterer høyt merkede tiltak for valgt fase, rolle og scenario.
+          </CriticalNotice>
+        ) : null}
+        {firstActions.length > 0 ? firstActions.map((card) => <TiltakCard key={card.slug} card={card} compact />) : (
+          <p className="rounded-2xl bg-slate-100 p-3 text-sm font-semibold text-slate-700">Ingen tiltakskort matcher dette oppdraget ennå. Bruk søk eller endre fase/scenario.</p>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function MissionNowPanel({
+  mission,
+  checklist,
+  checklists,
+  checklistRuns,
+  commandMapSummary,
+  firstActions,
+  criticalActions,
+  recommendedLabel,
+  nextActionSteps,
+  onMissionChange,
+}: {
+  mission: MissionContext;
+  checklist?: OperationalChecklist;
+  checklists: OperationalChecklist[];
+  checklistRuns: Awaited<ReturnType<typeof listChecklistRuns>>;
+  commandMapSummary: { markerCount: number; drawingCount: number };
+  firstActions: ActionCard[];
+  criticalActions: ActionCard[];
+  recommendedLabel: string;
+  nextActionSteps: string[];
+  onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>;
+}) {
+  return (
+    <section id="mission-now-panel" role="tabpanel" aria-labelledby="mission-now-tab" className="space-y-4">
+      <PanelHeading eyebrow="Nå" title="Situasjon og neste grep" id="mission-now-heading" />
+      <MissionCommandHeader mission={mission} />
+      <MissionStatusStrip />
+      <NextActionCard nextActionSteps={nextActionSteps} checklist={checklist} />
+      <RecommendedActionsPanel recommendedLabel={recommendedLabel} criticalActions={criticalActions} firstActions={firstActions} mission={mission} />
+      <div id="hurtiglogg" className="scroll-mt-28">
+        <QuickFieldLogComposer mission={mission} onMissionChange={onMissionChange} sourceLabel="Oppdragstavle" criticalObservationAriaLabel="Hurtiglogg kritisk flagg" mustBeForwardedAriaLabel="Hurtiglogg videresending flagg" />
+      </div>
+      <MissionProgressSummary mission={mission} checklists={checklists} checklistRuns={checklistRuns} mapSummary={commandMapSummary} />
+    </section>
+  );
+}
+
+function MissionWorkPanel({
+  mission,
+  checklist,
+  checklistRuns,
+  staleSignals,
+  scopedMapState,
+  orderSuggestions,
+  onMissionChange,
+  onChecklistRunSaved,
+}: {
+  mission: MissionContext;
+  checklist?: OperationalChecklist;
+  checklistRuns: Awaited<ReturnType<typeof listChecklistRuns>>;
+  staleSignals: MissionContext['externalSignals'];
+  scopedMapState: MissionMapState;
+  orderSuggestions: string[];
+  onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>;
+  onChecklistRunSaved: () => void;
+}) {
+  return (
+    <section id="mission-work-panel" role="tabpanel" aria-labelledby="mission-work-tab" className="space-y-4">
+      <PanelHeading eyebrow="Arbeid" title="Sjekkliste, logg og kart" id="mission-work-heading" />
+      {checklist ? <div id="sjekkliste" className="scroll-mt-28"><ChecklistRunner checklist={checklist} missionId={mission.id} onRunSaved={onChecklistRunSaved} /></div> : null}
+      <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <summary className="min-h-11 cursor-pointer list-none text-base font-black text-slate-950">
+          <span id="mission-local-work-heading">Loggoversikt og lokale oppgaver</span>
+          <span className="ml-2 rounded-full bg-slate-100 px-2 py-1 text-xs font-black text-slate-600">{mission.tasks.length} oppgaver · {(mission.fieldLogEntries ?? []).length} logger</span>
+        </summary>
+        <div className="mt-3 space-y-3">
+          <MissionLogOverview mission={mission} />
+          <LocalMissionControls mission={mission} displaySignals={staleSignals} onMissionChange={onMissionChange} variant="work" />
+        </div>
+      </details>
+      <MissionMapSummary mission={mission} mapState={scopedMapState} />
+      <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <summary className="min-h-11 cursor-pointer list-none text-base font-black text-slate-950">Feltlogg</summary>
+        <div className="mt-3">
+          <FieldLogControls mission={mission} onMissionChange={onMissionChange} />
+        </div>
+      </details>
+      {orderSuggestions.length > 0 ? (
+        <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950" aria-label="Forslag til manuell ordreoppdatering">
+          <h3 className="text-lg font-black">Forslag til manuell ordreoppdatering</h3>
+          <p className="mt-1 text-sm font-semibold">Automatisk forslag fra kritiske lokale logginnslag. Dette endrer ikke ordre og er ikke offisiell ordre.</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold">
+            {orderSuggestions.map((suggestion) => <li key={suggestion}>{suggestion}</li>)}
+          </ul>
+        </section>
+      ) : null}
+      <CriticalNotice title="Operativ grense" tone="warning">
+        Lokalt arbeidsstøtte. Kontroller alltid mot gjeldende ordre, fagmyndighet og innsatsleders føringer. Ikke legg inn persondata.
+      </CriticalNotice>
+      <p className="sr-only">Sjekklister lastet: {checklistRuns.length}</p>
+    </section>
+  );
+}
+
+function ExportToolDetails({ targetIds, title, eyebrow, children }: { targetIds: string[]; title: string; eyebrow: string; children: ReactNode }) {
+  return (
+    <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <summary className="min-h-11 cursor-pointer list-none rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49]">
+        <span className="block text-xs font-black uppercase tracking-wide text-sky-700">{eyebrow}</span>
+        <span className="block text-lg font-black text-slate-950">{title}</span>
+      </summary>
+      <div className="mt-4 space-y-3">
+        {children}
+      </div>
+      <span className="sr-only">{targetIds.join(', ')}</span>
+    </details>
+  );
+}
+
+function MissionAdvancedPanel({ mission, staleSignals, disabledSources, onMissionChange, onArchive }: { mission: MissionContext; staleSignals: MissionContext['externalSignals']; disabledSources: string[]; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
+  return (
+    <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <summary className="min-h-11 cursor-pointer list-none rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49]">
+        <span className="block text-xs font-black uppercase tracking-wide text-slate-500">Sekundært</span>
+        <span className="block text-lg font-black text-slate-950">Avansert / dokumentasjon</span>
+      </summary>
+      <div className="mt-4 space-y-3">
+        <StructuredLessonsFeedbackControls key={mission.id} mission={mission} onMissionChange={onMissionChange} onArchive={onArchive} />
+        {staleSignals.length > 0 || disabledSources.length > 0 ? <ContextSignalPanel signals={staleSignals} unavailableSources={disabledSources} /> : null}
+      </div>
+    </details>
+  );
+}
+
+function MissionExportPanel({
+  mission,
+  contentVersion,
+  checklists,
+  checklist,
+  staleSignals,
+  disabledSources,
+  scopedMapState,
+  onMissionChange,
+  onArchive,
+}: {
+  mission: MissionContext;
+  contentVersion: string;
+  checklists: OperationalChecklist[];
+  checklist?: OperationalChecklist;
+  staleSignals: MissionContext['externalSignals'];
+  disabledSources: string[];
+  scopedMapState: MissionMapState;
+  onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>;
+  onArchive: (missionId: string) => Promise<void>;
+}) {
+  return (
+    <section id="mission-export-panel" role="tabpanel" aria-labelledby="mission-export-tab" className="space-y-4">
+      <PanelHeading eyebrow="Eksport" title="Dokumentasjon og lokale eksportfiler" id="mission-export-heading" />
+      <MissionStatusStrip />
+      <ExportToolDetails targetIds={['5-punktsordre', 'sambandsplan']} eyebrow="Ordre og samband" title="5-punktsordre og sambandsplan">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div id="5-punktsordre" className="scroll-mt-28">
+            <FivePointOrderForm contentVersion={contentVersion} />
+          </div>
+          <div id="sambandsplan" className="scroll-mt-28">
+            <CommsPlanForm contentVersion={contentVersion} />
+          </div>
+        </div>
+      </ExportToolDetails>
+      <ExportToolDetails targetIds={['statusrapport']} eyebrow="Status" title="Lokal statusrapport">
+        <LocalMissionControls mission={mission} displaySignals={staleSignals} onMissionChange={onMissionChange} variant="export" />
+      </ExportToolDetails>
+      <ExportToolDetails targetIds={['ruh-velferd']} eyebrow="RUH / velferd" title="RUH og velferd">
+        <RuhWelfareControls mission={mission} onMissionChange={onMissionChange} />
+      </ExportToolDetails>
+      <ExportToolDetails targetIds={['etterrapport']} eyebrow="Etterarbeid" title="Etterrapport">
+        <AfterActionReportControls mission={mission} displaySignals={staleSignals} checklists={checklists} fallbackChecklist={checklist} mapState={scopedMapState} />
+      </ExportToolDetails>
+      <ExportToolDetails targetIds={['oppdragsmappe']} eyebrow="Oppdragsmappe" title="Samlet lokal oppdragsmappe">
+        <MissionFolderExportControls mission={mission} checklists={checklists} mapState={scopedMapState} />
+      </ExportToolDetails>
+      <ExportToolDetails targetIds={['mbk']} eyebrow="Materiell" title="MBK / materiellberedskap">
+        <EquipmentReadinessExportControls mission={mission} checklists={checklists} />
+      </ExportToolDetails>
+      <MissionAdvancedPanel mission={mission} staleSignals={staleSignals} disabledSources={disabledSources} onMissionChange={onMissionChange} onArchive={onArchive} />
+    </section>
+  );
+}
+
+
+function MissionCommandDashboard({ mission, cards, checklist, checklists, contentVersion, onMissionChange, onArchive }: { mission: MissionContext; cards: ActionCard[]; checklist?: OperationalChecklist; checklists: OperationalChecklist[]; contentVersion: string; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
   const firstActions = missionCards(cards, mission);
   const [checklistRuns, setChecklistRuns] = useState<Awaited<ReturnType<typeof listChecklistRuns>>>([]);
-  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [activeMode, setActiveMode] = useState<MissionMode>('now');
+  const [pendingHashTarget, setPendingHashTarget] = useState<string | null>(null);
   const settingsSnapshot = useSyncExternalStore(
     subscribeExternalDataSourceSettings,
     externalDataSourceSettingsSnapshot,
@@ -240,165 +549,102 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
     };
   }, [mission.id]);
 
+  function refreshChecklistRuns() {
+    void listChecklistRuns(mission.id).then(setChecklistRuns);
+  }
+
+  function activateHashTarget(targetId: string) {
+    if (!missionDashboardHashTargets.has(targetId)) return;
+    const targetMode = modeForHashTarget(targetId);
+    if (targetMode) setActiveMode(targetMode);
+    setPendingHashTarget(targetId);
+  }
+
   useEffect(() => {
     function openHashTarget() {
       const targetId = decodeURIComponent(window.location.hash.slice(1));
-      if (!missionDashboardHashTargets.has(targetId)) return undefined;
-      return window.requestAnimationFrame(() => {
-        const target = document.getElementById(targetId);
-        const parentDetails = target?.closest('details') as HTMLDetailsElement | null;
-        if (parentDetails) {
-          parentDetails.open = true;
-          setAdvancedOpen(true);
-        }
-        if (typeof target?.scrollIntoView === 'function') target.scrollIntoView({ block: 'start' });
-      });
+      if (!missionDashboardHashTargets.has(targetId)) return;
+      activateHashTarget(targetId);
     }
 
-    let frame = openHashTarget();
+    openHashTarget();
     const onHashChange = () => {
-      if (frame) window.cancelAnimationFrame(frame);
-      frame = openHashTarget();
+      openHashTarget();
     };
     window.addEventListener('hashchange', onHashChange);
     return () => {
-      if (frame) window.cancelAnimationFrame(frame);
       window.removeEventListener('hashchange', onHashChange);
     };
   }, [mission.id]);
+
+  useEffect(() => {
+    if (!pendingHashTarget) return undefined;
+    let innerFrame = 0;
+    const outerFrame = window.requestAnimationFrame(() => {
+      innerFrame = window.requestAnimationFrame(() => {
+        const target = document.getElementById(pendingHashTarget);
+        const parentDetails = target?.closest('details') as HTMLDetailsElement | null;
+        if (parentDetails) parentDetails.open = true;
+        if (typeof target?.scrollIntoView === 'function') target.scrollIntoView({ block: 'start' });
+        setPendingHashTarget(null);
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(outerFrame);
+      if (innerFrame) window.cancelAnimationFrame(innerFrame);
+    };
+  }, [activeMode, pendingHashTarget]);
 
   function handleDashboardAnchorClick(event: MouseEvent<HTMLElement>) {
     const anchor = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
     if (!anchor) return;
     const targetId = decodeURIComponent(anchor.hash.slice(1));
     if (!missionDashboardHashTargets.has(targetId)) return;
-    const target = document.getElementById(targetId);
-    const parentDetails = target?.closest('details') as HTMLDetailsElement | null;
-    if (parentDetails) {
-      parentDetails.open = true;
-      setAdvancedOpen(true);
-    }
+    event.preventDefault();
+    if (window.location.hash !== anchor.hash) window.history.pushState(null, '', anchor.hash);
+    activateHashTarget(targetId);
   }
 
   return (
     <article className="space-y-4" onClickCapture={handleDashboardAnchorClick}>
-      <section className="space-y-4" aria-labelledby="mission-now-heading">
-        <div>
-          <p className="text-xs font-black uppercase tracking-wide text-sky-700">Nå</p>
-          <h2 id="mission-now-heading" className="text-2xl font-black text-slate-950">Situasjon og neste grep</h2>
-        </div>
-      <MissionCommandHeader mission={mission} />
-
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex items-start gap-3">
-          <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-sky-800">
-            <OperationalIcon name="spark" className="h-5 w-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-black uppercase tracking-wide text-sky-700">Neste anbefalte handling</p>
-            <h3 className="mt-1 text-xl font-black">Gjør dette først</h3>
-          </div>
-        </div>
-        <ol className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-800">
-          {nextActionSteps.map((step, index) => (
-            <li key={step} className="grid grid-cols-[1.75rem_1fr] items-start gap-2 rounded-xl bg-slate-50 p-2 ring-1 ring-slate-200">
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-white text-xs font-black text-slate-700 ring-1 ring-slate-200">{index + 1}</span>
-              <span>{step}</span>
-            </li>
-          ))}
-        </ol>
-        {checklist ? <a href="#sjekkliste" className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[#082F49] px-4 text-sm font-black text-white">Åpne sjekkliste</a> : null}
-      </section>
-
-      <MissionQuickActionsGrid phase={mission.phase} />
-
-      <section id="kritisk-tiltak" className="scroll-mt-28 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-black uppercase tracking-wide text-sky-700">{recommendedLabel}</p>
-            <h3 className="text-xl font-black">{recommendedLabel}</h3>
-          </div>
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">Oppdatert {formatUpdatedAt(mission.updatedAt)}</span>
-        </div>
-        <div className="mt-3 space-y-3">
-          {criticalActions.length > 0 ? (
-            <CriticalNotice title={`${criticalActions.length} kritisk tiltak først`} tone="critical">
-              Visningen prioriterer høyt merkede tiltak for valgt fase, rolle og scenario.
-            </CriticalNotice>
-          ) : null}
-          {firstActions.length > 0 ? firstActions.map((card) => <TiltakCard key={card.slug} card={card} compact />) : (
-            <p className="rounded-2xl bg-slate-100 p-3 text-sm font-semibold text-slate-700">Ingen tiltakskort matcher dette oppdraget ennå. Bruk søk eller endre fase/scenario.</p>
-          )}
-        </div>
-      </section>
-
-      <div id="hurtiglogg" className="scroll-mt-28">
-        <QuickFieldLogComposer mission={mission} onMissionChange={onMissionChange} sourceLabel="Oppdragstavle" criticalObservationAriaLabel="Hurtiglogg kritisk flagg" mustBeForwardedAriaLabel="Hurtiglogg videresending flagg" />
-      </div>
-      </section>
-
-      <section className="space-y-4" aria-labelledby="mission-work-heading">
-        <div>
-          <p className="text-xs font-black uppercase tracking-wide text-sky-700">Arbeid</p>
-          <h2 id="mission-work-heading" className="text-2xl font-black text-slate-950">Sjekkliste, logg og kart</h2>
-        </div>
-
-      <div className="grid gap-3 lg:grid-cols-2">
-        <MissionProgressSummary mission={mission} checklists={checklists} checklistRuns={checklistRuns} mapSummary={commandMapSummary} />
-      </div>
-
-      {checklist ? <div id="sjekkliste" className="scroll-mt-28"><ChecklistRunner checklist={checklist} missionId={mission.id} onRunSaved={() => void listChecklistRuns(mission.id).then(setChecklistRuns)} /></div> : null}
-
-      <MissionMapSummary mission={mission} mapState={scopedMapState} />
-
-      {orderSuggestions.length > 0 ? (
-        <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950" aria-label="Forslag til manuell ordreoppdatering">
-          <h3 className="text-lg font-black">Forslag til manuell ordreoppdatering</h3>
-          <p className="mt-1 text-sm font-semibold">Automatisk forslag fra kritiske lokale logginnslag. Dette endrer ikke ordre og er ikke offisiell ordre.</p>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold">
-            {orderSuggestions.map((suggestion) => <li key={suggestion}>{suggestion}</li>)}
-          </ul>
-        </section>
-      ) : null}
-
-      <CriticalNotice title="Operativ grense" tone="warning">
-        Lokalt arbeidsstøtte. Kontroller alltid mot gjeldende ordre, fagmyndighet og innsatsleders føringer. Ikke legg inn persondata.
-      </CriticalNotice>
-
-      <section className="space-y-3" aria-labelledby="mission-local-work-heading">
-        <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <summary className="min-h-11 cursor-pointer list-none text-base font-black text-slate-950">
-            <span id="mission-local-work-heading">Loggoversikt og lokale oppgaver</span>
-          </summary>
-          <div className="mt-3 space-y-3">
-            <MissionLogOverview mission={mission} />
-            <LocalMissionControls mission={mission} displaySignals={staleSignals} onMissionChange={onMissionChange} />
-          </div>
-        </details>
-      </section>
-      </section>
-
-      <section className="space-y-3" aria-labelledby="mission-export-heading">
-      <details open={advancedOpen} onToggle={(event) => setAdvancedOpen(event.currentTarget.open)} className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49]">
-          <span>
-            <span id="mission-export-heading" className="block text-xs font-black uppercase tracking-wide text-slate-500">Eksport</span>
-            <span id="mission-advanced-heading" className="block text-xl font-black text-slate-950">Avansert / dokumentasjon</span>
-            <span className="mt-1 block text-sm font-semibold text-slate-600">Tyngre verktøy samlet lavere i flaten. Alt beholdes lokalt på enheten.</span>
-          </span>
-          <OperationalIcon name="chevron" className="h-5 w-5 shrink-0 text-slate-500 transition group-open:rotate-90" />
-        </summary>
-        <div className="mt-4 space-y-3" aria-labelledby="mission-advanced-heading">
-          <FieldLogControls mission={mission} onMissionChange={onMissionChange} />
-          <RuhWelfareControls mission={mission} onMissionChange={onMissionChange} />
-          <EquipmentReadinessExportControls mission={mission} checklists={checklists} />
-          <StructuredLessonsFeedbackControls key={mission.id} mission={mission} onMissionChange={onMissionChange} onArchive={onArchive} />
-          <AfterActionReportControls mission={mission} displaySignals={staleSignals} checklists={checklists} fallbackChecklist={checklist} mapState={scopedMapState} />
-          <MissionFolderExportControls mission={mission} checklists={checklists} mapState={scopedMapState} />
-          {staleSignals.length > 0 || disabledSources.length > 0 ? <ContextSignalPanel signals={staleSignals} unavailableSources={disabledSources} /> : null}
-        </div>
-      </details>
-      </section>
+      <MissionModeControl activeMode={activeMode} onModeChange={setActiveMode} />
+      {activeMode === 'now' ? (
+        <MissionNowPanel
+          mission={mission}
+          checklist={checklist}
+          checklists={checklists}
+          checklistRuns={checklistRuns}
+          commandMapSummary={commandMapSummary}
+          firstActions={firstActions}
+          criticalActions={criticalActions}
+          recommendedLabel={recommendedLabel}
+          nextActionSteps={nextActionSteps}
+          onMissionChange={onMissionChange}
+        />
+      ) : activeMode === 'work' ? (
+        <MissionWorkPanel
+          mission={mission}
+          checklist={checklist}
+          checklistRuns={checklistRuns}
+          staleSignals={staleSignals}
+          scopedMapState={scopedMapState}
+          orderSuggestions={orderSuggestions}
+          onMissionChange={onMissionChange}
+          onChecklistRunSaved={refreshChecklistRuns}
+        />
+      ) : (
+        <MissionExportPanel
+          mission={mission}
+          contentVersion={contentVersion}
+          checklists={checklists}
+          checklist={checklist}
+          staleSignals={staleSignals}
+          disabledSources={disabledSources}
+          scopedMapState={scopedMapState}
+          onMissionChange={onMissionChange}
+          onArchive={onArchive}
+        />
+      )}
     </article>
   );
 }
@@ -593,7 +839,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
         </section>
       ) : (
         <>
-          <MissionCommandDashboard mission={activeMission} cards={actionCards} checklist={activeChecklist} checklists={checklists} onMissionChange={updateMission} onArchive={archiveActiveMission} />
+          <MissionCommandDashboard mission={activeMission} cards={actionCards} checklist={activeChecklist} checklists={checklists} contentVersion={contentVersion} onMissionChange={updateMission} onArchive={archiveActiveMission} />
           <p data-testid="privacy-message" className="rounded-2xl border border-sky-200 bg-sky-50 p-3 text-sm font-semibold text-sky-950">{privacyMessage}</p>
         </>
       )}

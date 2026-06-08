@@ -21,7 +21,8 @@ it('filters cards by tilfluktsrom scenario', async () => {
 it('uses dense operational card rows in the list', () => {
   render(<ActionCardList cards={cards} showFilters={false} />);
 
-  expect(screen.getAllByText(/Kildebelagt/i).length).toBeGreaterThan(0);
+  expect(screen.queryByText(/Kildebelagt/i)).not.toBeInTheDocument();
+  expect(screen.getAllByText(/Varsel/i).length).toBeGreaterThan(0);
   expect(screen.getByRole('link', { name: /Åpne tiltakskort: Klargjør.*tilfluktsrom/i })).toHaveAttribute('href', '/kort/tilfluktsrom-klargjoring');
   expect(screen.queryByText(/Gjør først/i)).not.toBeInTheDocument();
 });

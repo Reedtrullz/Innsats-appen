@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import {
   EXPORT_SENSITIVITY_WARNING,
   FIVE_POINT_ORDER_ROLE_TEMPLATES,
@@ -32,6 +32,18 @@ interface FivePointOrderFormProps {
 }
 
 const EXPORT_BLOCKED_MESSAGE = 'Eksport blokkert: Fjern persondata, pasientdata, kontaktopplysninger eller skjermet informasjon før lokal eksport.';
+
+function StepBlock({ step, title, children }: { step: number; title: string; children: ReactNode }) {
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+      <div className="flex items-center gap-2">
+        <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-[#082F49] text-xs font-black text-white">{step}</span>
+        <h3 className="text-base font-black text-slate-950">{title}</h3>
+      </div>
+      <div className="mt-3 space-y-3">{children}</div>
+    </section>
+  );
+}
 
 function buildInput(form: FormData, contentVersion: string): FivePointOrderInput {
   return {
@@ -80,75 +92,83 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
   return (
     <form onSubmit={onSubmit} onChange={() => { setPreview(null); setExportError(null); }} className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
-        <p className="text-xs font-black uppercase tracking-wide text-sky-700">Mal → fem punkter → tilbakelesing → eksport</p>
+        <p className="text-xs font-black uppercase tracking-wide text-sky-700">Velg mal → fyll fem punkter → tilbakelesing → eksport</p>
         <h2 className="text-2xl font-black">5-punktsordre</h2>
-        <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Lokal beslutningsstøtte. Kontroller mot gjeldende ordre og unngå persondata.</p>
       </div>
 
-      <label className="block text-sm font-bold">
-        Rolle/mal for 5-punktsordre
-        <select
-          name="templateId"
-          value={templateId}
-          onChange={(event) => {
-            setTemplateId(event.currentTarget.value as FivePointOrderTemplateId);
-            setPreview(null);
-            setExportError(null);
-          }}
-          className="mt-1 min-h-12 w-full rounded-2xl border px-3"
-        >
-          {FIVE_POINT_ORDER_ROLE_TEMPLATES.map((roleTemplate) => (
-            <option key={roleTemplate.id} value={roleTemplate.id}>{roleTemplate.label}</option>
-          ))}
-        </select>
-      </label>
+      <StepBlock step={1} title="Velg mal">
+        <label className="block text-sm font-bold">
+          Rolle/mal for 5-punktsordre
+          <select
+            name="templateId"
+            value={templateId}
+            onChange={(event) => {
+              setTemplateId(event.currentTarget.value as FivePointOrderTemplateId);
+              setPreview(null);
+              setExportError(null);
+            }}
+            className="mt-1 min-h-12 w-full rounded-2xl border px-3"
+          >
+            {FIVE_POINT_ORDER_ROLE_TEMPLATES.map((roleTemplate) => (
+              <option key={roleTemplate.id} value={roleTemplate.id}>{roleTemplate.label}</option>
+            ))}
+          </select>
+        </label>
 
-      <details className="rounded-2xl border border-sky-100 bg-sky-50 p-3 text-sm text-sky-950">
-        <summary className="min-h-11 cursor-pointer list-none font-black">Malveiledning: {template.label}</summary>
-        <p className="mt-1 font-semibold">{template.description}</p>
-        <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li><strong>Situasjon:</strong> {template.guidance.situasjon}</li>
-          <li><strong>Oppdrag:</strong> {template.guidance.oppdrag}</li>
-          <li><strong>Utførelse:</strong> {template.guidance.utforelse}</li>
-          <li><strong>Administrasjon/forsyning:</strong> {template.guidance.administrasjonForsyning}</li>
-          <li><strong>Ledelse/samband:</strong> {template.guidance.ledelseSamband}</li>
-        </ul>
-      </details>
+        <details className="rounded-2xl border border-sky-100 bg-sky-50 p-3 text-sm text-sky-950">
+          <summary className="min-h-11 cursor-pointer list-none font-black">Malveiledning: {template.label}</summary>
+          <p className="mt-1 font-semibold">{template.description}</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5">
+            <li><strong>Situasjon:</strong> {template.guidance.situasjon}</li>
+            <li><strong>Oppdrag:</strong> {template.guidance.oppdrag}</li>
+            <li><strong>Utførelse:</strong> {template.guidance.utforelse}</li>
+            <li><strong>Administrasjon/forsyning:</strong> {template.guidance.administrasjonForsyning}</li>
+            <li><strong>Ledelse/samband:</strong> {template.guidance.ledelseSamband}</li>
+          </ul>
+        </details>
+      </StepBlock>
 
-      <label className="block text-sm font-bold">Situasjon<textarea name="situasjon" required placeholder={template.guidance.situasjon} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
-      <label className="block text-sm font-bold">Oppdrag<textarea name="oppdrag" required placeholder={template.guidance.oppdrag} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
-      <label className="block text-sm font-bold">Utførelse<textarea name="utforelse" required placeholder={template.guidance.utforelse} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
-      <label className="block text-sm font-bold">Administrasjon/forsyning<textarea name="administrasjonForsyning" required placeholder={template.guidance.administrasjonForsyning} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
-      <label className="block text-sm font-bold">Ledelse/samband<textarea name="ledelseSamband" required placeholder={template.guidance.ledelseSamband} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
-      <label className="block text-sm font-bold">Notes<textarea name="notes" className="mt-1 min-h-20 w-full rounded-2xl border px-3 py-2" /></label>
+      <StepBlock step={2} title="Fyll fem punkter">
+        <p className="rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Lokal beslutningsstøtte. Kontroller mot gjeldende ordre og unngå persondata.</p>
+        <label className="block text-sm font-bold">Situasjon<textarea name="situasjon" required placeholder={template.guidance.situasjon} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
+        <label className="block text-sm font-bold">Oppdrag<textarea name="oppdrag" required placeholder={template.guidance.oppdrag} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
+        <label className="block text-sm font-bold">Utførelse<textarea name="utforelse" required placeholder={template.guidance.utforelse} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
+        <label className="block text-sm font-bold">Administrasjon/forsyning<textarea name="administrasjonForsyning" required placeholder={template.guidance.administrasjonForsyning} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
+        <label className="block text-sm font-bold">Ledelse/samband<textarea name="ledelseSamband" required placeholder={template.guidance.ledelseSamband} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
+        <label className="block text-sm font-bold">Notes<textarea name="notes" className="mt-1 min-h-20 w-full rounded-2xl border px-3 py-2" /></label>
+      </StepBlock>
 
-      <label className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-950">
-        <input
-          type="checkbox"
-          name="readbackConfirmed"
-          required
-          checked={readbackConfirmed}
-          onChange={(event) => {
-            setReadbackConfirmed(event.currentTarget.checked);
-            setPreview(null);
-            setExportError(null);
-          }}
-          className="mt-1 h-5 w-5"
-        />
-        Tilbakelesing/forstått er bekreftet før lokal eksport
-      </label>
+      <StepBlock step={3} title="Bekreft tilbakelesing">
+        <label className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-950">
+          <input
+            type="checkbox"
+            name="readbackConfirmed"
+            required
+            checked={readbackConfirmed}
+            onChange={(event) => {
+              setReadbackConfirmed(event.currentTarget.checked);
+              setPreview(null);
+              setExportError(null);
+            }}
+            className="mt-1 h-5 w-5"
+          />
+          Tilbakelesing/forstått er bekreftet før lokal eksport
+        </label>
+        {!readbackConfirmed ? <p className="rounded-xl bg-white p-3 text-sm font-semibold text-slate-700 ring-1 ring-slate-200">Bekreft tilbakelesing/forstått for å åpne lokal eksport.</p> : null}
+      </StepBlock>
 
-      <button type="submit" name="format" value="markdown" disabled={!readbackConfirmed} className="min-h-12 w-full rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter Markdown</button>
-      <details className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-        <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Flere eksportformater</summary>
-        <p className="mt-2 text-sm font-semibold text-slate-700">{EXPORT_SENSITIVITY_WARNING}</p>
-        <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          <button type="submit" name="format" value="json" disabled={!readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter JSON</button>
-          <button type="submit" name="format" value="pdf" disabled={!readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{preview?.format === 'pdf' ? 'Oppdater utskrift' : 'Lag PDF-klar HTML'}</button>
-        </div>
-      </details>
+      <StepBlock step={4} title="Eksporter">
+        <button type="submit" name="format" value="markdown" disabled={!readbackConfirmed} className="min-h-12 w-full rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter Markdown</button>
+        <details className="rounded-2xl border border-slate-200 bg-white p-3">
+          <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Flere eksportformater</summary>
+          <p className="mt-2 text-sm font-semibold text-slate-700">{EXPORT_SENSITIVITY_WARNING}</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <button type="submit" name="format" value="json" disabled={!readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter JSON</button>
+            <button type="submit" name="format" value="pdf" disabled={!readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{preview?.format === 'pdf' ? 'Oppdater utskrift' : 'Lag PDF-klar HTML'}</button>
+          </div>
+        </details>
+      </StepBlock>
 
-      {!readbackConfirmed ? <p className="rounded-2xl bg-slate-100 p-3 text-sm font-semibold text-slate-700">Bekreft tilbakelesing/forstått for å åpne lokal eksport.</p> : null}
       {exportError ? <p role="status" className="rounded-2xl bg-red-50 p-3 text-sm font-bold text-red-950">{exportError}</p> : null}
       {preview ? <pre className="whitespace-pre-wrap rounded-2xl bg-slate-100 p-3 text-sm">{preview.text}</pre> : null}
     </form>

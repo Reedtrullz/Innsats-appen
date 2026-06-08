@@ -62,9 +62,10 @@ export function AfterActionReportControls({ mission, displaySignals, checklists,
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Lokal etterrapport</p>
         <h3 className="text-xl font-black">Etteraksjonsrapport</h3>
-        <p className="mt-1 text-sm font-semibold text-amber-900">Generer lokalt, se over, kopier/eksporter. Ikke legg inn persondata.</p>
+        <p className="mt-1 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Generer lokalt, se over, kopier/eksporter. Ikke legg inn persondata.</p>
       </div>
-      <div role="region" aria-label="RUH/velferd lokal gjennomgang før eksport" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-950">
+      <div role="region" aria-label="RUH/velferd lokal gjennomgang før eksport" className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-slate-950">
+        <p className="text-xs font-black uppercase tracking-wide text-sky-700">1 · Bygg</p>
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
             <h4 className="font-black">RUH/velferd gjennomgang</h4>
@@ -81,28 +82,34 @@ export function AfterActionReportControls({ mission, displaySignals, checklists,
           <p className="mt-2 text-sm font-semibold">Ingen lokale RUH/velferd-oppfølgingskandidater registrert før eksport.</p>
         )}
       </div>
-      <div className="grid gap-3 lg:grid-cols-3">
-        <label className="block text-sm font-bold">
-          Lokal ordretekst
-          <textarea value={localOrderText} onChange={(event) => setLocalOrderText(event.target.value)} className="mt-1 min-h-28 w-full rounded-xl border border-slate-300 p-3 font-mono text-xs" placeholder="Valgfritt. Hvis tomt markeres Ikke registrert i lokal oppdragstavle." />
-        </label>
-        <label className="block text-sm font-bold">
-          Lokalt samband
-          <textarea value={localSambandText} onChange={(event) => setLocalSambandText(event.target.value)} className="mt-1 min-h-28 w-full rounded-xl border border-slate-300 p-3 font-mono text-xs" placeholder="Valgfritt lokalt sambandssammendrag uten sensitiv informasjon." />
-        </label>
-        <label className="block text-sm font-bold">
-          Lokal logg
-          <textarea value={localLogText} onChange={(event) => setLocalLogText(event.target.value)} className="mt-1 min-h-28 w-full rounded-xl border border-slate-300 p-3 font-mono text-xs" placeholder="Valgfritt. Én hendelse per linje, uten persondata." />
-        </label>
-      </div>
-      <button type="button" onClick={() => void generateMarkdown()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Generer etterrapport</button>
       <details className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-        <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Avanserte eksportformater</summary>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button type="button" onClick={() => void generateJson()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag JSON</button>
-          <button type="button" onClick={() => void generatePdfReadyHtml()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag PDF-klar HTML</button>
+        <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">2 · Se over lokale tilleggsnotater</summary>
+        <div className="mt-3 grid gap-3 lg:grid-cols-3">
+          <label className="block text-sm font-bold">
+            Lokal ordretekst
+            <textarea value={localOrderText} onChange={(event) => setLocalOrderText(event.target.value)} className="mt-1 min-h-28 w-full rounded-xl border border-slate-300 p-3 font-mono text-xs" placeholder="Valgfritt. Hvis tomt markeres Ikke registrert i lokal oppdragstavle." />
+          </label>
+          <label className="block text-sm font-bold">
+            Lokalt samband
+            <textarea value={localSambandText} onChange={(event) => setLocalSambandText(event.target.value)} className="mt-1 min-h-28 w-full rounded-xl border border-slate-300 p-3 font-mono text-xs" placeholder="Valgfritt lokalt sambandssammendrag uten sensitiv informasjon." />
+          </label>
+          <label className="block text-sm font-bold">
+            Lokal logg
+            <textarea value={localLogText} onChange={(event) => setLocalLogText(event.target.value)} className="mt-1 min-h-28 w-full rounded-xl border border-slate-300 p-3 font-mono text-xs" placeholder="Valgfritt. Én hendelse per linje, uten persondata." />
+          </label>
         </div>
       </details>
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+        <p className="text-sm font-black text-slate-900">3 · Eksporter</p>
+        <button type="button" onClick={() => void generateMarkdown()} className="mt-3 min-h-11 w-full rounded-xl bg-slate-950 px-4 font-bold text-white sm:w-auto">Generer etterrapport</button>
+        <details className="mt-3 rounded-2xl border border-slate-200 bg-white p-3">
+          <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Avanserte eksportformater</summary>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={() => void generateJson()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag JSON</button>
+            <button type="button" onClick={() => void generatePdfReadyHtml()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag PDF-klar HTML</button>
+          </div>
+        </details>
+      </div>
       {markdown ? (
         <label htmlFor="after-action-markdown" className="block text-sm font-bold">
           Etteraksjonsrapport Markdown

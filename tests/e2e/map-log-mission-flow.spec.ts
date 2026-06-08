@@ -1,5 +1,5 @@
 import { expect, test, type TestInfo } from '@playwright/test';
-import { clearBrowserLocalState, createLocalMission, waitForServiceWorker } from './helpers';
+import { clearBrowserLocalState, createLocalMission, openMissionDetails, openMissionMode, waitForServiceWorker } from './helpers';
 
 function baseOriginFor(testInfo: TestInfo) {
   const configuredBaseUrl = testInfo.project.use.baseURL;
@@ -75,28 +75,33 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
 
   await page.goto('/oppdrag');
   await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
+  await openMissionMode(page, 'Arbeid');
   await expect(page.getByRole('heading', { name: /Kart og logg/i })).toBeVisible();
-  await expect(page.getByText(/Fare nord/i).first()).toBeVisible();
-  await expect(page.getByText(/Fare observert uten persondata/i).first()).toBeVisible();
-  await page.getByText('Avansert / dokumentasjon').click();
-  await page.getByRole('button', { name: /Generer etterrapport/i }).click();
-  await expect(page.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Fare observert uten persondata/i);
-  await expect(page.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Fare nord/i);
-  await page.getByRole('button', { name: /Generer oppdragsmappe/i }).click();
-  await page.getByText(/Vis JSON/i).click();
-  await expect(page.getByLabel(/Oppdragsmappe JSON/i)).toHaveValue(/schematic-0-100-local-only/i);
+  await expect(page.locator('#kart').getByText(/Fare nord/i).first()).toBeVisible();
+  await expect(page.locator('#kart').getByText(/Fare observert uten persondata/i).first()).toBeVisible();
+  await openMissionDetails(page, /Etterrapport/i, 'Eksport');
+  const afterActionSection = page.locator('#etterrapport');
+  await afterActionSection.getByRole('button', { name: /Generer etterrapport/i }).click();
+  await expect(afterActionSection.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Fare observert uten persondata/i);
+  await expect(afterActionSection.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Fare nord/i);
+  await openMissionDetails(page, /Samlet lokal oppdragsmappe/i, 'Eksport');
+  const folderSection = page.locator('#oppdragsmappe');
+  await folderSection.getByRole('button', { name: /Generer oppdragsmappe/i }).click();
+  await folderSection.getByText(/Vis JSON/i).click();
+  await expect(folderSection.getByLabel(/Oppdragsmappe JSON/i)).toHaveValue(/schematic-0-100-local-only/i);
 
   await waitForServiceWorker(page);
   await context.setOffline(true);
   try {
     await page.goto('/oppdrag', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
-    const mapLogSummary = page.locator('section').filter({ has: page.getByRole('heading', { name: /Kart og logg/i }) }).first();
+    await openMissionMode(page, 'Arbeid');
+    const mapLogSummary = page.locator('#kart');
     await expect(mapLogSummary).toContainText(/1 markør/i);
     await expect(mapLogSummary).toContainText(/1 kartkoblet logg/i);
     await expect(mapLogSummary.getByText(new RegExp(escapeRegex(markerLabel), 'i')).first()).toBeVisible();
     await expect(mapLogSummary.getByText(new RegExp(escapeRegex(fieldLogText), 'i')).first()).toBeVisible();
-    await page.getByText('Loggoversikt og lokale oppgaver').click();
+    await openMissionDetails(page, /Loggoversikt og lokale oppgaver/i, 'Arbeid');
     const logOverview = page.locator('#loggoversikt');
     await expect(logOverview.getByRole('heading', { name: /Loggoversikt/i })).toBeVisible();
     await expect(logOverview.getByRole('button', { name: /Kartlogg \(1\)/i })).toBeVisible();
@@ -111,7 +116,7 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
     await expect(page.locator('#hurtiglogg')).toBeInViewport();
     await page.locator('#hurtiglogg').getByLabel(/Hurtiglogg tekst/i).fill(offlineQuickLogText);
     await page.locator('#hurtiglogg').getByRole('button', { name: /Lagre hurtiglogg/i }).click();
-    await page.getByText('Loggoversikt og lokale oppgaver').click();
+    await openMissionDetails(page, /Loggoversikt og lokale oppgaver/i, 'Arbeid');
     await expect(page.locator('#loggoversikt').getByText(new RegExp(escapeRegex(offlineQuickLogText), 'i')).first()).toBeVisible();
   } finally {
     await context.setOffline(false);
@@ -169,16 +174,21 @@ test('map marker and field log stay scoped when switching between two missions',
 
   await page.goto('/oppdrag');
   await expect(page.getByText(missionSummaryPattern(missionB, locationB))).toBeVisible();
-  await expect(page.getByText(new RegExp(escapeRegex(markerLabel), 'i')).first()).toBeVisible();
-  await expect(page.getByText(new RegExp(escapeRegex(fieldLogText), 'i')).first()).toBeVisible();
+  await openMissionMode(page, 'Arbeid');
+  await expect(page.locator('#kart').getByText(new RegExp(escapeRegex(markerLabel), 'i')).first()).toBeVisible();
+  await expect(page.locator('#kart').getByText(new RegExp(escapeRegex(fieldLogText), 'i')).first()).toBeVisible();
 
   await page.getByRole('button', { name: new RegExp(`^Åpne ${escapeRegex(missionA)} som aktivt oppdrag$`) }).click();
+  await openMissionMode(page, 'Nå');
   await expect(page.getByText(missionSummaryPattern(missionA, locationA))).toBeVisible();
-  await expect(page.getByText(new RegExp(escapeRegex(markerLabel), 'i'))).toHaveCount(0);
-  await expect(page.getByText(new RegExp(escapeRegex(fieldLogText), 'i'))).toHaveCount(0);
+  await openMissionMode(page, 'Arbeid');
+  await expect(page.locator('#kart').getByText(new RegExp(escapeRegex(markerLabel), 'i'))).toHaveCount(0);
+  await expect(page.locator('#kart').getByText(new RegExp(escapeRegex(fieldLogText), 'i'))).toHaveCount(0);
 
   await page.getByRole('button', { name: new RegExp(`^Åpne ${escapeRegex(missionB)} som aktivt oppdrag$`) }).click();
+  await openMissionMode(page, 'Nå');
   await expect(page.getByText(missionSummaryPattern(missionB, locationB))).toBeVisible();
-  await expect(page.getByText(new RegExp(escapeRegex(markerLabel), 'i')).first()).toBeVisible();
-  await expect(page.getByText(new RegExp(escapeRegex(fieldLogText), 'i')).first()).toBeVisible();
+  await openMissionMode(page, 'Arbeid');
+  await expect(page.locator('#kart').getByText(new RegExp(escapeRegex(markerLabel), 'i')).first()).toBeVisible();
+  await expect(page.locator('#kart').getByText(new RegExp(escapeRegex(fieldLogText), 'i')).first()).toBeVisible();
 });

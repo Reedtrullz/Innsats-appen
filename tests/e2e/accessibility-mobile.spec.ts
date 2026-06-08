@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-import { clearBrowserLocalState, createLocalMission } from './helpers';
+import { clearBrowserLocalState, createLocalMission, openMissionDetails, openMissionMode } from './helpers';
 
 test.use({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
 
@@ -118,8 +118,13 @@ test('mission and local export form controls have accessible labels', async ({ p
     await expect(page.getByLabel(label)).toBeVisible();
   }
 
-  await page.goto('/oppdrag');
-  await page.getByText('Ordre og samband').click();
+  await createLocalMission(page, {
+    title: `Formlabel øvelse ${Date.now()}`,
+    phase: 'under',
+    scenario: 'flom',
+    location: 'Formlabel testområde',
+  });
+  await openMissionDetails(page, /5-punktsordre og sambandsplan/i, 'Eksport');
   const orderForm = page.locator('form').filter({ has: page.getByRole('heading', { name: '5-punktsordre' }) });
   for (const label of ['Rolle/mal for 5-punktsordre', 'Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband', 'Notes']) {
     await expect(orderForm.getByLabel(new RegExp(label.replace('/', '\\/'), 'i'))).toBeVisible();
@@ -209,10 +214,10 @@ test('screen-reader labels remain available on active mission operational contro
     location: 'Label testområde',
   });
 
+  await openMissionMode(page, 'Arbeid');
   await expect(page.getByRole('heading', { name: /Kart og logg/i })).toBeVisible();
-  await page.getByText('Loggoversikt og lokale oppgaver').click();
-  await page.getByText('Avansert / dokumentasjon').click();
-  await expect(page.getByRole('region', { name: /Oppdragsmappe/i })).toBeVisible();
+  await openMissionDetails(page, /Loggoversikt og lokale oppgaver/i);
+  await openMissionDetails(page, /Feltlogg/i);
 
   for (const label of [
     'Ny lokal oppgave',
@@ -226,17 +231,45 @@ test('screen-reader labels remain available on active mission operational contro
     'Feltlogg tekst',
     'Søk i feltlogg',
     'Filtrer feltloggkategori',
-    'Lokal ordretekst',
-    'Lokalt samband',
-    'Lokal logg',
+  ]) {
+    await expect(page.getByLabel(new RegExp(label.replaceAll('/', '\\/'), 'i')).first()).toBeVisible();
+  }
+
+  await openMissionDetails(page, /RUH og velferd/i, 'Eksport');
+  for (const label of [
     'RUH tidspunkt',
     'RUH kategori',
     'Hva skjedde',
     'Umiddelbart tiltak',
     'RUH risiko',
+  ]) {
+    await expect(page.getByLabel(new RegExp(label.replaceAll('/', '\\/'), 'i')).first()).toBeVisible();
+  }
+
+  await page.locator('#ruh-velferd').getByRole('tab', { name: 'Velferd' }).click();
+  for (const label of [
     'Fysisk belastning',
     'Mental belastning',
     'Velferdsnotat',
+  ]) {
+    await expect(page.getByLabel(new RegExp(label.replaceAll('/', '\\/'), 'i')).first()).toBeVisible();
+  }
+
+  await openMissionDetails(page, /Etterrapport/i, 'Eksport');
+  await page.locator('#etterrapport').getByText(/Se over lokale tilleggsnotater/i).click();
+  for (const label of [
+    'Lokal ordretekst',
+    'Lokalt samband',
+    'Lokal logg',
+  ]) {
+    await expect(page.getByLabel(new RegExp(label.replaceAll('/', '\\/'), 'i')).first()).toBeVisible();
+  }
+
+  await openMissionDetails(page, /Samlet lokal oppdragsmappe/i, 'Eksport');
+  await expect(page.getByRole('region', { name: /Oppdragsmappe/i })).toBeVisible();
+
+  await openMissionDetails(page, /Avansert \/ dokumentasjon/i, 'Eksport');
+  for (const label of [
     'Erfaringsoppsummering',
   ]) {
     await expect(page.getByLabel(new RegExp(label.replaceAll('/', '\\/'), 'i')).first()).toBeVisible();
@@ -251,28 +284,17 @@ test('mission quick actions resolve to real dashboard targets', async ({ page })
     location: 'Ankertest',
   });
 
-  const quickActions = page.locator('section[aria-labelledby="mission-quick-actions-heading"]');
-  const advancedDetails = page.locator('details').filter({ hasText: 'Avansert / dokumentasjon' });
-  await expect(advancedDetails).not.toHaveAttribute('open', '');
-  let secondaryActionsOpen = false;
-
-  for (const [label, targetId, opensAdvanced] of [
+  for (const [label, targetId, mode] of [
     ['Hurtiglogg', 'hurtiglogg', false],
-    ['Sjekkliste', 'sjekkliste', false],
-    ['5-punktsordre', '5-punktsordre', false],
-    ['Sambandsplan', 'sambandsplan', false],
-    ['Kart', 'kart', false],
-    ['RUH/velferd', 'ruh-velferd', true],
-    ['Etterrapport', 'etterrapport', true],
-    ['Oppdragsmappe', 'oppdragsmappe', true],
+    ['Sjekkliste', 'sjekkliste', 'Arbeid'],
+    ['5-punktsordre', '5-punktsordre', 'Eksport'],
+    ['Sambandsplan', 'sambandsplan', 'Eksport'],
+    ['Kart', 'kart', 'Arbeid'],
+    ['RUH/velferd', 'ruh-velferd', 'Eksport'],
+    ['Etterrapport', 'etterrapport', 'Eksport'],
+    ['Oppdragsmappe', 'oppdragsmappe', 'Eksport'],
   ] as const) {
-    if (['5-punktsordre', 'Sambandsplan', 'RUH/velferd', 'Etterrapport', 'Oppdragsmappe'].includes(label)) {
-      if (!secondaryActionsOpen) {
-        await quickActions.getByText('Arbeid og eksport').click();
-        secondaryActionsOpen = true;
-      }
-    }
-    await quickActions.getByRole('link', { name: new RegExp(`^${label.replace('/', '\\/')}`, 'i') }).click();
+    await page.goto(`/oppdrag#${targetId}`);
     await expect(page).toHaveURL(new RegExp(`#${targetId}$`));
 
     const target = page.locator(`[id="${targetId}"]`);
@@ -280,9 +302,8 @@ test('mission quick actions resolve to real dashboard targets', async ({ page })
     await expect(target).toBeVisible();
     await expect(target).toBeInViewport();
 
-    if (opensAdvanced) {
-      await expect(advancedDetails).toHaveAttribute('open', '');
-    }
+    const modeControl = page.getByRole('tablist', { name: /Oppdragsmodus/i });
+    await expect(modeControl.getByRole('tab', { name: mode || 'Nå' })).toHaveAttribute('aria-selected', 'true');
 
     await page.evaluate(() => window.scrollTo(0, 0));
   }

@@ -19,6 +19,7 @@ vi.mock('next/navigation', () => ({
 
 afterEach(async () => {
   await act(async () => {
+    window.history.replaceState(null, '', '/');
     localStorage.clear();
     await clearLocalMissionData();
   });
@@ -62,6 +63,32 @@ async function seedMissions(missions: MissionContext[]) {
   }
 }
 
+async function openMissionMode(label: 'Nå' | 'Arbeid' | 'Eksport') {
+  const modeControl = await screen.findByRole('tablist', { name: /Oppdragsmodus/i });
+  await userEvent.click(within(modeControl).getByRole('tab', { name: label }));
+}
+
+async function openWorkDetails(summary: RegExp | string) {
+  await openMissionMode('Arbeid');
+  await userEvent.click(await findDetailsSummary(summary));
+}
+
+async function openExportDetails(summary: RegExp | string) {
+  await openMissionMode('Eksport');
+  await userEvent.click(await findDetailsSummary(summary));
+}
+
+async function findDetailsSummary(summary: RegExp | string) {
+  await waitFor(() => {
+    const summaries = Array.from(document.querySelectorAll('details > summary')) as HTMLElement[];
+    const match = summaries.find((item) => typeof summary === 'string' ? item.textContent?.includes(summary) : summary.test(item.textContent ?? ''));
+    expect(match).toBeTruthy();
+  });
+  const summaries = Array.from(document.querySelectorAll('details > summary')) as HTMLElement[];
+  const match = summaries.find((item) => typeof summary === 'string' ? item.textContent?.includes(summary) : summary.test(item.textContent ?? ''));
+  return match as HTMLElement;
+}
+
 it('can open another local mission as the active dashboard', async () => {
   await seedMissions([
     mission({ id: 'mission-a', title: 'A', locationText: 'Lokasjon A', updatedAt: '2026-06-04T10:00:00.000Z' }),
@@ -97,8 +124,8 @@ it('wires Hurtiglogg composer and log overview into the active mission dashboard
 
   expect(await screen.findByText('Hurtiglogg · Oppdragstavle')).toBeInTheDocument();
   expect(document.querySelector('#hurtiglogg')).not.toBeNull();
+  await openWorkDetails(/Loggoversikt og lokale oppgaver/i);
   expect(document.querySelector('#loggoversikt')).not.toBeNull();
-  await userEvent.click(screen.getByText(/Loggoversikt og lokale oppgaver/i));
   expect(document.getElementById('loggoversikt')).toHaveTextContent('Dashboard loggoversikt entry');
 });
 
@@ -146,7 +173,7 @@ it('blocks sensitive local task and resource text in the UI before saving locall
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
-  await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i });
+  await openWorkDetails(/Loggoversikt og lokale oppgaver/i);
   await userEvent.type(screen.getByLabelText(/Ny lokal oppgave/i), 'pasient Ola Nordmann');
   await userEvent.click(screen.getByRole('button', { name: /Legg til oppgave/i }));
 
@@ -192,9 +219,10 @@ it('lets users generate a local task/status/resource markdown export from the mi
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
+  await openExportDetails(/Lokal statusrapport/i);
   const exportButton = await screen.findByRole('button', { name: /Lag lokal statusrapport/i });
   expect(screen.getByText(/Kun lokal eksport i denne nettleseren\. Ikke offisiell logg\./i)).toBeInTheDocument();
-  expect(screen.getByText(/sensitiv informasjon/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/sensitiv informasjon/i).length).toBeGreaterThan(0);
 
   await userEvent.click(exportButton);
 
@@ -206,11 +234,13 @@ it('lets users generate a local task/status/resource markdown export from the mi
   expect(preview.value).toContain('trenger assistanse');
   expect(preview.value).toContain('Drivstoff');
 
+  await openWorkDetails(/Loggoversikt og lokale oppgaver/i);
   await userEvent.type(screen.getByLabelText(/Ny lokal oppgave/i), 'Ny eksportoppgave');
   await userEvent.click(screen.getByRole('button', { name: /Legg til oppgave/i }));
 
-  await waitFor(() => {
-    expect(preview.value).toContain('Ny eksportoppgave');
+  await waitFor(async () => {
+    const [storedMission] = await listMissions();
+    expect(storedMission.tasks.some((task) => task.title === 'Ny eksportoppgave')).toBe(true);
   });
 });
 
@@ -329,6 +359,7 @@ it('lets users generate local MBK equipment readiness Markdown and JSON exports 
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={mbkChecklists} />);
 
+  await openExportDetails(/MBK \/ materiellberedskap/i);
   expect(await screen.findByRole('heading', { name: /Materiellberedskap \/ MBK/i })).toBeInTheDocument();
   expect(screen.getByText(/ikke offisiell inventarliste/i)).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: /Lag MBK Markdown/i }));
@@ -386,22 +417,24 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={afterActionChecklists} />);
 
-  await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i });
-  await userEvent.click(screen.getByText('Avansert / dokumentasjon'));
+  await openExportDetails(/Etterrapport/i);
+  const afterActionSection = document.querySelector('#etterrapport') as HTMLElement | null;
+  expect(afterActionSection).not.toBeNull();
   expect(screen.getByRole('heading', { name: /Etteraksjonsrapport/i })).toBeInTheDocument();
   expect(screen.getByText(/Generer lokalt, se over, kopier\/eksporter\. Ikke legg inn persondata/i)).toBeInTheDocument();
 
-  await userEvent.type(screen.getByLabelText(/Lokal ordretekst/i), 'Ordre fra lokal tavle');
-  await userEvent.type(screen.getByLabelText(/Lokalt samband/i), 'Samband kanal lokal');
-  await userEvent.type(screen.getByLabelText(/Lokal logg/i), 'Loggpunkt uten persondata');
-  await userEvent.click(screen.getByRole('button', { name: /Generer etterrapport/i }));
-  await userEvent.click(screen.getByText(/Avanserte eksportformater/i));
-  await userEvent.click(screen.getByRole('button', { name: /Lag JSON/i }));
-  await userEvent.click(screen.getByRole('button', { name: /Lag PDF-klar HTML/i }));
+  await userEvent.click(within(afterActionSection!).getByText(/Se over lokale tilleggsnotater/i));
+  await userEvent.type(within(afterActionSection!).getByLabelText(/Lokal ordretekst/i), 'Ordre fra lokal tavle');
+  await userEvent.type(within(afterActionSection!).getByLabelText(/Lokalt samband/i), 'Samband kanal lokal');
+  await userEvent.type(within(afterActionSection!).getByLabelText(/Lokal logg/i), 'Loggpunkt uten persondata');
+  await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Generer etterrapport/i }));
+  await userEvent.click(within(afterActionSection!).getByText(/Avanserte eksportformater/i));
+  await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Lag JSON/i }));
+  await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Lag PDF-klar HTML/i }));
 
-  const markdownPreview = await screen.findByLabelText(/Etteraksjonsrapport Markdown/i) as HTMLTextAreaElement;
-  const jsonPreview = screen.getByLabelText(/Etteraksjonsrapport JSON/i) as HTMLTextAreaElement;
-  const pdfPreview = screen.getByLabelText(/PDF-klar etteraksjonsrapport HTML/i) as HTMLTextAreaElement;
+  const markdownPreview = await within(afterActionSection!).findByLabelText(/Etteraksjonsrapport Markdown/i) as HTMLTextAreaElement;
+  const jsonPreview = within(afterActionSection!).getByLabelText(/Etteraksjonsrapport JSON/i) as HTMLTextAreaElement;
+  const pdfPreview = within(afterActionSection!).getByLabelText(/PDF-klar etteraksjonsrapport HTML/i) as HTMLTextAreaElement;
 
   expect(markdownPreview.value).toContain('# Etteraksjonsrapport');
   expect(markdownPreview.value).toContain('Eksporterte filer kan inneholde operasjonelt sensitiv informasjon');
@@ -453,16 +486,19 @@ it('shows RUH/welfare follow-up summary from critical log and equipment issue in
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} />);
 
+  await openExportDetails(/RUH og velferd/i);
   const ruhSection = await waitFor(() => {
     const section = document.querySelector('#ruh-velferd');
     expect(section).not.toBeNull();
     return section as HTMLElement;
   });
+  await userEvent.click(within(ruhSection).getByRole('tab', { name: 'Eksport' }));
   const ruhFollowUp = within(ruhSection).getByRole('region', { name: /RUH\/velferd kandidater/i });
   expect(ruhFollowUp).toHaveTextContent(/Nestenulykke ved pumpe/i);
   expect(ruhFollowUp).toHaveTextContent(/Defekt pakning/i);
   expect(ruhFollowUp).toHaveTextContent(/Ikke offisiell HMS\/RUH-innsending/i);
 
+  await openExportDetails(/Etterrapport/i);
   const afterActionSection = document.querySelector('#etterrapport') as HTMLElement | null;
   expect(afterActionSection).not.toBeNull();
   const afterActionFollowUp = within(afterActionSection!).getByRole('region', { name: /RUH\/velferd lokal gjennomgang før eksport/i });
@@ -503,7 +539,7 @@ it('generates a local oppdragsmappe export with map and log artifacts', async ()
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[]} />);
   await screen.findByRole('heading', { name: /Gjør dette først/i });
-  await userEvent.click(screen.getByText('Avansert / dokumentasjon'));
+  await openExportDetails(/Samlet lokal oppdragsmappe/i);
   await userEvent.click(screen.getByRole('button', { name: /Generer oppdragsmappe/i }));
 
   const markdown = await screen.findByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
@@ -559,22 +595,28 @@ it('scopes current mission dashboard, after-action and folder map outputs away f
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[]} />);
 
+  await openMissionMode('Arbeid');
   const mapSummary = (await screen.findByRole('heading', { name: /Kart og logg/i })).closest('section');
   expect(mapSummary).not.toBeNull();
   expect(within(mapSummary!).getByText('1 markør')).toBeInTheDocument();
   expect(within(mapSummary!).getByText('1 tegning')).toBeInTheDocument();
 
-  await userEvent.click(screen.getByText('Avansert / dokumentasjon'));
-  await userEvent.click(screen.getByRole('button', { name: /Generer etterrapport/i }));
-  const afterActionMarkdown = await screen.findByLabelText(/Etteraksjonsrapport Markdown/i) as HTMLTextAreaElement;
+  await openExportDetails(/Etterrapport/i);
+  const afterActionSection = document.querySelector('#etterrapport') as HTMLElement | null;
+  expect(afterActionSection).not.toBeNull();
+  await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Generer etterrapport/i }));
+  const afterActionMarkdown = await within(afterActionSection!).findByLabelText(/Etteraksjonsrapport Markdown/i) as HTMLTextAreaElement;
   expect(afterActionMarkdown.value).toContain('Current UI marker');
   expect(afterActionMarkdown.value).toContain('Current UI sector');
   expect(afterActionMarkdown.value).not.toContain('Wrong UI');
 
-  await userEvent.click(screen.getByRole('button', { name: /Generer oppdragsmappe/i }));
-  const folderMarkdown = await screen.findByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
-  await userEvent.click(screen.getByText(/Vis JSON/i));
-  const folderJson = await screen.findByLabelText(/Oppdragsmappe JSON/i) as HTMLTextAreaElement;
+  await openExportDetails(/Samlet lokal oppdragsmappe/i);
+  const folderSection = document.querySelector('#oppdragsmappe') as HTMLElement | null;
+  expect(folderSection).not.toBeNull();
+  await userEvent.click(within(folderSection!).getByRole('button', { name: /Generer oppdragsmappe/i }));
+  const folderMarkdown = await within(folderSection!).findByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
+  await userEvent.click(within(folderSection!).getByText(/Vis JSON/i));
+  const folderJson = await within(folderSection!).findByLabelText(/Oppdragsmappe JSON/i) as HTMLTextAreaElement;
   expect(folderJson.value).toContain('Current UI marker');
   expect(folderJson.value).toContain('Current UI sector');
   expect(folderJson.value).not.toContain('Wrong UI');
@@ -606,6 +648,7 @@ it('archives pending lessons and feedback typed without clicking the separate sa
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
+  await openExportDetails(/Avansert \/ dokumentasjon/i);
   await screen.findByRole('heading', { name: /Erfaringer og strukturert tilbakemelding/i });
   await userEvent.type(screen.getByLabelText(/Erfaringsoppsummering/i), 'Direkte arkivert erfaring');
   await userEvent.type(screen.getByLabelText(/Tilbakemelding utstyr/i), 'Direkte arkivert utstyrsfeedback');
@@ -655,6 +698,7 @@ it('lets users add, filter and export a structured local field log with patient-
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
+  await openWorkDetails(/Feltlogg/i);
   expect(await screen.findByRole('heading', { name: /Lokal feltlogg/i })).toBeInTheDocument();
   expect(screen.getAllByText(/Ikke offisiell logg/i).length).toBeGreaterThan(0);
   expect(screen.getByText(/ikke registrer navn, ID, fødselsdato, fødselsnummer, diagnose, behandling, journal, helseopplysninger eller pasientdata/i)).toBeInTheDocument();
@@ -718,6 +762,7 @@ it('blocks sensitive field-log text in the UI before saving locally', async () =
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
+  await openWorkDetails(/Feltlogg/i);
   await screen.findByRole('heading', { name: /Lokal feltlogg/i });
   await userEvent.type(screen.getByLabelText(/Feltlogg tekst/i), 'pasient Ola Nordmann');
   await userEvent.click(screen.getByRole('button', { name: /Legg til feltlogg/i }));
@@ -756,9 +801,12 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
+  await openExportDetails(/RUH og velferd/i);
   expect(await screen.findByRole('heading', { name: /RUH og velferd/i })).toBeInTheDocument();
+  expect(screen.getByText(/Lokal registrering og eksport/i)).toBeInTheDocument();
   expect(screen.getAllByText(/ikke offisiell HMS\/RUH-innsending/i).length).toBeGreaterThan(0);
-  expect(screen.getAllByText(/ikke legg inn navn, ID, pasientdata eller persondata/i).length).toBeGreaterThan(0);
+  expect(screen.queryByText(/Belastning og velferd/i)).not.toBeInTheDocument();
+  await userEvent.click(screen.getByText(/MVP-notater/i));
   expect(screen.getByText(/Foto\/video-vedlegg er utsatt i MVP/i)).toBeInTheDocument();
   expect(screen.getByText(/EXIF\/GPS-metadata/i)).toBeInTheDocument();
   expect(screen.getByText(/sikkerhetskritisk post-MVP/i)).toBeInTheDocument();
@@ -784,10 +832,14 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
   });
   expect(screen.getAllByText(/Nesten fall ved glatt dekke/i).length).toBeGreaterThan(0);
 
-  await userEvent.click(screen.getByRole('button', { name: /Lag RUH Markdown/i }));
-  await userEvent.click(screen.getByRole('button', { name: /Lag RUH JSON/i }));
-  const ruhMarkdownPreview = screen.getByLabelText(/RUH Markdown/i) as HTMLTextAreaElement;
-  const ruhJsonPreview = screen.getByLabelText(/RUH JSON/i) as HTMLTextAreaElement;
+  const ruhSection = document.querySelector('#ruh-velferd') as HTMLElement | null;
+  expect(ruhSection).not.toBeNull();
+  await userEvent.click(within(ruhSection!).getByRole('tab', { name: 'Eksport' }));
+  await userEvent.click(within(ruhSection!).getByRole('button', { name: /Lag RUH Markdown/i }));
+  await userEvent.click(within(ruhSection!).getByText(/JSON eksport/i));
+  await userEvent.click(within(ruhSection!).getByRole('button', { name: /Lag RUH JSON/i }));
+  const ruhMarkdownPreview = within(ruhSection!).getByLabelText(/RUH Markdown/i) as HTMLTextAreaElement;
+  const ruhJsonPreview = within(ruhSection!).getByLabelText(/RUH JSON/i) as HTMLTextAreaElement;
   expect(ruhMarkdownPreview.value).toContain('# Lokal forenklet RUH');
   expect(ruhMarkdownPreview.value).toContain('Ikke offisiell HMS/RUH-innsending');
   expect(ruhMarkdownPreview.value).toContain('Nesten fall ved glatt dekke');
@@ -799,17 +851,18 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
   expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'ruh-markdown')).toBe(true);
   expect(readLocalAuditLog().some((entry) => entry.details.exportKind === 'ruh-json')).toBe(true);
 
-  await userEvent.selectOptions(screen.getByLabelText(/Fysisk belastning/i), 'hoy');
-  await userEvent.selectOptions(screen.getByLabelText(/Mental belastning/i), 'moderat');
-  await userEvent.click(screen.getByRole('checkbox', { name: /Trenger hvile/i }));
-  await userEvent.click(screen.getByRole('checkbox', { name: /Trenger avløsning/i }));
-  await userEvent.click(screen.getByRole('checkbox', { name: /Vann påminnelse/i }));
-  await userEvent.click(screen.getByRole('checkbox', { name: /Mat påminnelse/i }));
-  await userEvent.click(screen.getByRole('checkbox', { name: /Varme påminnelse/i }));
-  await userEvent.click(screen.getByRole('checkbox', { name: /Hvile påminnelse/i }));
-  await userEvent.click(screen.getByRole('checkbox', { name: /Tørt tøy påminnelse/i }));
-  await userEvent.type(screen.getByLabelText(/Velferdsnotat/i), 'Lang innsats, planlegg pause');
-  await userEvent.click(screen.getByRole('button', { name: /Lagre velferdssjekk/i }));
+  await userEvent.click(within(ruhSection!).getByRole('tab', { name: 'Velferd' }));
+  await userEvent.selectOptions(within(ruhSection!).getByLabelText(/Fysisk belastning/i), 'hoy');
+  await userEvent.selectOptions(within(ruhSection!).getByLabelText(/Mental belastning/i), 'moderat');
+  await userEvent.click(within(ruhSection!).getByRole('checkbox', { name: /Trenger hvile/i }));
+  await userEvent.click(within(ruhSection!).getByRole('checkbox', { name: /Trenger avløsning/i }));
+  await userEvent.click(within(ruhSection!).getByRole('checkbox', { name: /Vann påminnelse/i }));
+  await userEvent.click(within(ruhSection!).getByRole('checkbox', { name: /Mat påminnelse/i }));
+  await userEvent.click(within(ruhSection!).getByRole('checkbox', { name: /Varme påminnelse/i }));
+  await userEvent.click(within(ruhSection!).getByRole('checkbox', { name: /Hvile påminnelse/i }));
+  await userEvent.click(within(ruhSection!).getByRole('checkbox', { name: /Tørt tøy påminnelse/i }));
+  await userEvent.type(within(ruhSection!).getByLabelText(/Velferdsnotat/i), 'Lang innsats, planlegg pause');
+  await userEvent.click(within(ruhSection!).getByRole('button', { name: /Lagre velferdssjekk/i }));
 
   await waitFor(async () => {
     const [mission] = await listMissions();
@@ -823,9 +876,11 @@ it('lets users add local RUH reports, welfare checks and see media/man-down safe
   expect(screen.getAllByText(/Fysisk: Høy/i).length).toBeGreaterThan(0);
   expect(screen.getAllByText(/Lang innsats, planlegg pause/i).length).toBeGreaterThan(0);
 
-  await userEvent.click(screen.getByRole('button', { name: /Lag velferd Markdown/i }));
-  await userEvent.click(screen.getByRole('button', { name: /Lag velferd JSON/i }));
-  const welfareMarkdownPreview = screen.getByLabelText(/Velferd Markdown/i) as HTMLTextAreaElement;
+  await userEvent.click(within(ruhSection!).getByRole('tab', { name: 'Eksport' }));
+  await userEvent.click(within(ruhSection!).getByRole('button', { name: /Lag velferd Markdown/i }));
+  await userEvent.click(within(ruhSection!).getByText(/JSON eksport/i));
+  await userEvent.click(within(ruhSection!).getByRole('button', { name: /Lag velferd JSON/i }));
+  const welfareMarkdownPreview = within(ruhSection!).getByLabelText(/Velferd Markdown/i) as HTMLTextAreaElement;
   expect(welfareMarkdownPreview.value).toContain('# Lokal velferds- og belastningssjekk');
   expect(welfareMarkdownPreview.value).toContain('Ikke medisinsk vurdering');
   expect(welfareMarkdownPreview.value).toContain('Trenger avløsning');
@@ -838,6 +893,7 @@ it('blocks sensitive RUH and structured feedback text in the UI before saving lo
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
+  await openExportDetails(/RUH og velferd/i);
   await screen.findByRole('heading', { name: /RUH og velferd/i });
   await userEvent.type(screen.getByLabelText(/Hva skjedde/i), 'fødselsnummer 01017012345');
   await userEvent.type(screen.getByLabelText(/Umiddelbart tiltak/i), 'Sperret av område');
@@ -851,6 +907,7 @@ it('blocks sensitive RUH and structured feedback text in the UI before saving lo
     expect(storedMission.ruhReports).toEqual([]);
   });
 
+  await openExportDetails(/Avansert \/ dokumentasjon/i);
   await userEvent.type(screen.getByLabelText(/Erfaringsoppsummering/i), 'skjermet tilfluktsrom adresse');
   await userEvent.click(screen.getByRole('button', { name: /Lagre erfaringer og tilbakemelding/i }));
 
@@ -912,31 +969,41 @@ it('shows a situation-first mission dashboard with next action, progress and exp
   expect(await screen.findByRole('heading', { name: 'Oppdrag' })).toBeInTheDocument();
   expect(screen.getByText(/Flom Jaren · Jaren/i)).toBeInTheDocument();
   expect(screen.getByText(/Lokal lagring · Ikke delt/i)).toBeInTheDocument();
+  const modeControl = screen.getByRole('tablist', { name: /Oppdragsmodus/i });
+  expect(within(modeControl).getByRole('tab', { name: 'Nå' })).toHaveAttribute('aria-selected', 'true');
   const nextActionSection = screen.getByRole('heading', { name: /Gjør dette først/i }).closest('section');
   expect(nextActionSection).not.toBeNull();
   expect(within(nextActionSection!).getByText(/Etabler sikkerhet/i)).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: /Hurtighandlinger/i })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /^Kritisk nå$/i })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /Fremdrift/i })).toBeInTheDocument();
-  await userEvent.click(screen.getByText(/Arbeid og eksport/i));
-  expect(screen.getByRole('link', { name: /5-punktsordre/i })).toHaveAttribute('href', '#5-punktsordre');
-  expect(screen.getByRole('link', { name: /Sambandsplan/i })).toHaveAttribute('href', '#sambandsplan');
-  expect(screen.getAllByRole('link', { name: /Kart/i }).some((link) => link.getAttribute('href') === '#kart')).toBe(true);
-  for (const targetId of ['hurtiglogg', 'sjekkliste', 'kart', 'ruh-velferd', 'etterrapport', 'oppdragsmappe']) {
-    expect(document.getElementById(targetId)).not.toBeNull();
-  }
+  const nowText = document.body.textContent ?? '';
+  expect(nowText.indexOf('Oppdrag')).toBeLessThan(nowText.indexOf('Gjør dette først'));
+  expect(nowText.indexOf('Gjør dette først')).toBeLessThan(nowText.indexOf('Kritisk nå'));
+  expect(nowText.indexOf('Kritisk nå')).toBeLessThan(nowText.indexOf('Fremdrift'));
+  expect(screen.queryByRole('heading', { name: /Hurtighandlinger/i })).not.toBeInTheDocument();
+  expect(screen.queryByRole('heading', { name: /Kart og logg/i })).not.toBeInTheDocument();
+  expect(screen.queryByText('Avansert / dokumentasjon')).not.toBeInTheDocument();
+
+  await openMissionMode('Arbeid');
+  expect(document.getElementById('sjekkliste')).not.toBeNull();
+  expect(document.getElementById('kart')).not.toBeNull();
+  expect(screen.queryByText('Avansert / dokumentasjon')).not.toBeInTheDocument();
+
+  await openMissionMode('Eksport');
+  expect(screen.getAllByText(/5-punktsordre og sambandsplan/i).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/RUH og velferd/i).length).toBeGreaterThan(0);
   const advancedDetails = screen.getByText('Avansert / dokumentasjon').closest('details') as HTMLDetailsElement | null;
-  expect(advancedDetails).not.toBeNull();
   expect(advancedDetails?.open).toBe(false);
-  window.location.hash = '#ruh-velferd';
-  window.dispatchEvent(new HashChangeEvent('hashchange'));
-  await waitFor(() => expect(advancedDetails?.open).toBe(true));
-  const text = document.body.textContent ?? '';
-  expect(text.indexOf('Oppdrag')).toBeLessThan(text.indexOf('Gjør dette først'));
-  expect(text.indexOf('Gjør dette først')).toBeLessThan(text.indexOf('Hurtighandlinger'));
-  expect(text.indexOf('Hurtighandlinger')).toBeLessThan(text.indexOf('Kritisk nå'));
-  expect(text.indexOf('Kritisk nå')).toBeLessThan(text.indexOf('Fremdrift'));
-  expect(text.indexOf('Fremdrift')).toBeLessThan(text.indexOf('Avansert / dokumentasjon'));
+  act(() => {
+    window.history.pushState(null, '', '#ruh-velferd');
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  });
+  await waitFor(() => {
+    const ruhTarget = document.getElementById('ruh-velferd');
+    expect(ruhTarget).not.toBeNull();
+    expect((ruhTarget?.closest('details') as HTMLDetailsElement | null)?.open).toBe(true);
+  });
+  expect(within(modeControl).getByRole('tab', { name: 'Eksport' })).toHaveAttribute('aria-selected', 'true');
 });
 
 it('shows map and field-log summary on the mission dashboard', async () => {
@@ -981,6 +1048,7 @@ it('shows map and field-log summary on the mission dashboard', async () => {
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
+  await openMissionMode('Arbeid');
   expect(await screen.findByRole('heading', { name: /Kart og logg/i })).toBeInTheDocument();
   expect(screen.getAllByText(/kartkoblet logg/i).length).toBeGreaterThan(0);
   expect(screen.getByRole('link', { name: /Åpne kart/i })).toHaveAttribute('href', '/kart');
@@ -1060,6 +1128,7 @@ it('shows local manual order-update suggestions from important field-log entries
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
+  await openMissionMode('Arbeid');
   const orderSuggestionPanel = await screen.findByRole('region', { name: /Forslag til manuell ordreoppdatering/i });
   expect(orderSuggestionPanel).toHaveTextContent(/Dette endrer ikke ordre/i);
   expect(within(orderSuggestionPanel).getByText(/Flomvei stengt/i)).toBeInTheDocument();
@@ -1138,8 +1207,8 @@ it('shows current situation and lets users add local tasks, quick status and res
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
+  await openWorkDetails(/Loggoversikt og lokale oppgaver/i);
   expect(await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i })).toBeInTheDocument();
-  expect(screen.getByText(/Kraftig regn: Lokalt sammendrag/i)).toBeInTheDocument();
   expect(screen.getByText(/Sikre adkomst/)).toBeInTheDocument();
   expect(screen.getByText(/fig-under-innsats/)).toBeInTheDocument();
   expect(screen.getByText(/ikke legg inn navn, ID, pasientdetaljer, helsejournal/i)).toBeInTheDocument();
@@ -1184,6 +1253,7 @@ it('preserves rapid local task, quick status and resource additions in IndexedDB
   }));
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
+  await openWorkDetails(/Loggoversikt og lokale oppgaver/i);
   await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i });
 
   await userEvent.type(screen.getByLabelText(/Ny lokal oppgave/i), 'Sett opp sperring');
@@ -1226,10 +1296,12 @@ it('shows and exports stored context signals with the same stale normalization a
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
+  await openExportDetails(/Avansert \/ dokumentasjon/i);
   await screen.findByText(/Viser sist vellykkede lokale kontekstsignal som stale/i);
   expect(screen.getByText(/Gammelt regnvarsel: Lagret sammendrag \(stale\)/i)).toBeInTheDocument();
   expect(screen.queryByText(/Gammelt regnvarsel: Lagret sammendrag \(fresh\)/i)).not.toBeInTheDocument();
 
+  await openExportDetails(/Lokal statusrapport/i);
   await userEvent.click(screen.getByRole('button', { name: /Lag lokal statusrapport/i }));
   const preview = screen.getByLabelText(/Lokal oppdragsstatus i Markdown/i) as HTMLTextAreaElement;
   expect(preview.value).toContain('Gammelt regnvarsel: Lagret sammendrag (met, yellow, stale)');
@@ -1262,6 +1334,7 @@ it('keeps disabled-source last-known-good mission context visibly stale, not act
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
+  await openExportDetails(/Avansert \/ dokumentasjon/i);
   expect(await screen.findByText(/met utilgjengelig eller avslått lokalt/i)).toBeInTheDocument();
   expect(screen.getByText(/Lagret MET-varsel: Sist vellykket \(stale\)/i)).toBeInTheDocument();
   expect(screen.queryByText(/Lagret MET-varsel: Sist vellykket \(fresh\)/i)).not.toBeInTheDocument();
@@ -1277,6 +1350,7 @@ it('shows disabled context sources even when no signals exist', async () => {
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
+  await openExportDetails(/Avansert \/ dokumentasjon/i);
   const panel = await screen.findByRole('region', { name: /offentlig kontekst/i });
   expect(panel).toHaveTextContent(/ingen ferske offentlige kontekstsignaler/i);
   expect(panel).toHaveTextContent(/kartverket.*utilgjengelig eller avslått lokalt/i);
@@ -1306,7 +1380,7 @@ it('lets users save structured lessons and feedback before locally completing an
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={checklists} />);
 
-  await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i });
+  await openExportDetails(/Avansert \/ dokumentasjon/i);
   expect(screen.getByText(/Lokalt fullførte oppdrag/i)).toBeInTheDocument();
   expect(screen.getAllByText(/ikke offisielt arkiv/i).length).toBeGreaterThan(0);
 

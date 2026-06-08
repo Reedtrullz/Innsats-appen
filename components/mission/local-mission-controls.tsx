@@ -88,8 +88,13 @@ function statusSummaryContentKey(mission: MissionContext, displaySignals: Missio
   });
 }
 
-export function LocalMissionControls({ mission, displaySignals, onMissionChange }: { mission: MissionContext; displaySignals: MissionContext['externalSignals']; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void> }) {
+type LocalMissionControlsVariant = 'full' | 'work' | 'export';
+
+export function LocalMissionControls({ mission, displaySignals, onMissionChange, variant = 'full' }: { mission: MissionContext; displaySignals: MissionContext['externalSignals']; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; variant?: LocalMissionControlsVariant }) {
   const openTasks = mission.tasks.filter((task) => task.status !== 'done');
+  const showStatusExport = variant !== 'work';
+  const showWorkControls = variant !== 'export';
+  const showSignalAndNotes = variant !== 'work';
   const [showStatusSummary, setShowStatusSummary] = useState(false);
   const [statusSummaryMarkdown, setStatusSummaryMarkdown] = useState('');
   const [statusSummaryMarkdownKey, setStatusSummaryMarkdownKey] = useState('');
@@ -198,7 +203,7 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange 
   }
 
   return (
-    <section id="statusrapport" className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <section id={showStatusExport ? 'statusrapport' : undefined} className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Situasjonsoversikt nå</p>
         <h3 className="text-xl font-black">Situasjonsoversikt nå</h3>
@@ -210,7 +215,7 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange 
         <div className="rounded-xl bg-slate-100 p-3"><dt className="font-black">Åpne oppgaver</dt><dd>{openTasks.length}</dd></div>
         <div className="rounded-xl bg-slate-100 p-3"><dt className="font-black">Aktive sjekklister</dt><dd>{mission.activeChecklistIds.length > 0 ? mission.activeChecklistIds.join(', ') : 'Ingen registrert'}</dd></div>
       </dl>
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-950">
+      {showStatusExport ? <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-950">
         <h4 className="font-black">Lokal statusrapport</h4>
         <p className="mt-1 text-sm font-semibold">Kun lokal eksport i denne nettleseren. Ikke offisiell logg. Kan inneholde lokale oppgaver, hurtigstatus og ressursbehov — ikke legg inn eller del sensitiv informasjon.</p>
         <button type="button" onClick={() => generateStatusSummary()} className="mt-3 min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag lokal statusrapport</button>
@@ -220,8 +225,8 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange 
             <textarea id="local-status-summary-markdown" readOnly value={renderedStatusSummaryMarkdown} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
           </label>
         ) : null}
-      </div>
-      <div className="grid gap-3 md:grid-cols-2">
+      </div> : null}
+      {showSignalAndNotes ? <div className="grid gap-3 md:grid-cols-2">
         <div className="rounded-xl border border-slate-200 p-3">
           <h4 className="font-black">Vær/farer</h4>
           {displaySignalItems.length > 0 ? (
@@ -234,9 +239,9 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange 
           <h4 className="font-black">Notater</h4>
           <p className="mt-2 text-sm font-semibold text-slate-700">{displayMissionNotes}</p>
         </div>
-      </div>
+      </div> : null}
       {privacyError ? <p role="alert" aria-label="lokal status personvern" className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{privacyError}</p> : null}
-      <div className="grid gap-3 lg:grid-cols-3">
+      {showWorkControls ? <div className="grid gap-3 lg:grid-cols-3">
         <form onSubmit={(event) => void addTask(event)} className="rounded-xl border border-slate-200 p-3">
           <h4 className="font-black">Lokal oppgaveliste</h4>
           <label className="mt-2 block text-sm font-bold">Ny lokal oppgave<input name="taskTitle" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3" placeholder="Ikke navn, ID eller pasientdetaljer" /></label>
@@ -259,8 +264,7 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange 
           <button type="submit" className="mt-3 min-h-11 w-full rounded-xl bg-slate-950 px-4 font-bold text-white">Registrer ressursbehov</button>
           <ul className="mt-3 space-y-1 text-sm font-semibold text-slate-700">{mission.resourceRequests.map((request) => <li key={request.id}>{resourceKindOptions.find((kind) => kind.value === request.kind)?.label ?? request.kind}</li>)}</ul>
         </form>
-      </div>
+      </div> : null}
     </section>
   );
 }
-

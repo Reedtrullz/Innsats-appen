@@ -45,7 +45,8 @@ export function TiltakCardRow({ card }: { card: ActionCard }) {
         <span className="mt-2 flex flex-wrap gap-1.5">
           <StatusPill label={priorityLabels[card.priority]} tone={priorityTone} compact />
           <StatusPill label={phaseLongLabels[card.phase]} tone="sky" compact />
-          <StatusPill label={card.sourceIds.length > 0 ? 'Kildebelagt' : 'Kilde mangler'} tone={card.sourceIds.length > 0 ? 'success' : 'warning'} compact />
+          {card.sourceIds.length === 0 ? <StatusPill label="Kilde mangler" tone="warning" compact /> : null}
+          {card.warning ? <StatusPill label="Varsel" tone="warning" compact /> : null}
         </span>
       </span>
       <OperationalIcon name="chevron" className="mt-4 h-4 w-4 shrink-0 text-slate-400 group-hover:text-sky-800" />

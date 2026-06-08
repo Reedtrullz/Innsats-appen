@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { clearBrowserLocalState, createLocalMission, readLocalDatabaseCounts } from './helpers';
+import { clearBrowserLocalState, createLocalMission, openMissionDetails, openMissionMode, readLocalDatabaseCounts } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   await clearBrowserLocalState(page);
@@ -15,11 +15,12 @@ test('exports local app data and imports it back to restore mission and checklis
     scenario: 'tilfluktsrom',
     location: 'Roundtrip testområde',
   });
+  await openMissionMode(page, 'Arbeid');
   await page.getByRole('checkbox', { name: /Kontroller ventilasjon/i }).check();
-  await page.getByText('Avansert / dokumentasjon').click();
+  await openMissionDetails(page, /Feltlogg/i, 'Arbeid');
   await page.getByLabel(/Feltlogg tekst/i).fill('Roundtrip feltlogg uten persondata.');
   await page.getByRole('button', { name: /Legg til feltlogg/i }).click();
-  await page.getByText('Loggoversikt og lokale oppgaver').click();
+  await openMissionDetails(page, /Loggoversikt og lokale oppgaver/i, 'Arbeid');
   await expect(page.getByLabel('Synlige lokale feltlogginnslag').getByText(/Roundtrip feltlogg/i)).toBeVisible();
 
   await page.goto('/data-pa-enheten');
@@ -58,7 +59,8 @@ test('exports local app data and imports it back to restore mission and checklis
   await page.goto('/oppdrag');
   await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
   await expect(page.getByText(new RegExp(`${missionTitle}\\s*·\\s*Roundtrip testområde`, 'i'))).toBeVisible();
-  await page.getByText('Loggoversikt og lokale oppgaver').click();
+  await openMissionMode(page, 'Arbeid');
+  await openMissionDetails(page, /Loggoversikt og lokale oppgaver/i, 'Arbeid');
   await expect(page.getByLabel('Synlige lokale feltlogginnslag').getByText(/Roundtrip feltlogg/i)).toBeVisible();
   await expect(page.getByRole('checkbox', { name: /Kontroller ventilasjon/i })).toBeChecked();
 });

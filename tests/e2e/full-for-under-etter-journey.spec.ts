@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { clearBrowserLocalState, createLocalMission, expectOfflineReloadPreservesMission } from './helpers';
+import { clearBrowserLocalState, createLocalMission, expectOfflineReloadPreservesMission, openMissionDetails, openMissionMode } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   await clearBrowserLocalState(page);
@@ -75,7 +75,7 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
 
   await page.goto('/oppdrag');
   await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
-  await page.getByText('Loggoversikt og lokale oppgaver').click();
+  await openMissionDetails(page, /Loggoversikt og lokale oppgaver/i, 'Arbeid');
   await page.getByLabel(/Ny lokal oppgave/i).fill('Kontroller inngang uten persondata');
   await page.getByLabel(/Oppgavestatus/i).selectOption('in-progress');
   await page.getByRole('button', { name: /Legg til oppgave/i }).click();
@@ -93,7 +93,7 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await checklistItem.check();
   await expect(checklistItem).toBeChecked();
 
-  await page.getByText('Avansert / dokumentasjon').click();
+  await openMissionDetails(page, /Feltlogg/i, 'Arbeid');
   await page.getByLabel(/Feltlogg lokasjon/i).fill('Testområde A');
   await page.getByLabel(/Feltlogg kategori/i).selectOption('hms-avvik');
   await page.getByLabel(/Feltlogg tekst/i).fill('Våt terskel observert og merket med sperrebånd.');
@@ -110,8 +110,10 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await page.getByRole('button', { name: /Lag PDF-klar feltlogg/i }).click();
   await expect(page.getByLabel(/PDF-klar feltlogg HTML/i)).toHaveValue(/<!doctype html>/i);
 
-  await expect(page.getByRole('heading', { name: /RUH og velferd/i })).toBeVisible();
-  await expect(page.getByText(new RegExp('ikke offisiell HMS/RUH-innsending', 'i')).first()).toBeVisible();
+  await openMissionDetails(page, /RUH og velferd/i, 'Eksport');
+  const ruhSection = page.locator('#ruh-velferd');
+  await expect(ruhSection.getByRole('heading', { name: /RUH og velferd/i })).toBeVisible();
+  await expect(ruhSection.getByText(new RegExp('ikke offisiell HMS/RUH-innsending', 'i')).first()).toBeVisible();
   await page.getByLabel(/RUH kategori/i).selectOption('nestenulykke');
   await page.getByLabel(/Hva skjedde/i).fill('Nestenulykke ved glatt terskel uten personskade.');
   await page.getByLabel(/Umiddelbart tiltak/i).fill('Tørket område og satt ut varsling.');
@@ -119,35 +121,44 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await page.getByLabel(/RUH trenger videre tiltak/i).check();
   await page.getByRole('button', { name: /Legg til RUH/i }).click();
   await expect(page.getByText(/Nestenulykke ved glatt terskel/i).first()).toBeVisible();
-  await page.getByRole('button', { name: /Lag RUH Markdown/i }).click();
-  await expect(page.getByLabel(/RUH Markdown/i)).toHaveValue(/Lokal forenklet RUH/);
-  await page.getByRole('button', { name: /Lag RUH JSON/i }).click();
-  await expect(page.getByLabel(/RUH JSON/i)).toHaveValue(/nestenulykke/);
+  await ruhSection.getByRole('tab', { name: 'Eksport' }).click();
+  await ruhSection.getByRole('button', { name: /Lag RUH Markdown/i }).click();
+  await expect(ruhSection.getByLabel(/RUH Markdown/i)).toHaveValue(/Lokal forenklet RUH/);
+  await ruhSection.getByText(/JSON eksport/i).click();
+  await ruhSection.getByRole('button', { name: /Lag RUH JSON/i }).click();
+  await expect(ruhSection.getByLabel(/RUH JSON/i)).toHaveValue(/nestenulykke/);
 
-  await page.getByLabel(/Fysisk belastning/i).selectOption('moderat');
-  await page.getByLabel(/Mental belastning/i).selectOption('moderat');
-  await page.getByLabel(/Trenger hvile/i).check();
-  await page.getByLabel(/Vann påminnelse/i).check();
-  await page.getByLabel(/Velferdsnotat/i).fill('Rotasjon vurderes etter 30 minutter.');
-  await page.getByRole('button', { name: /Lagre velferdssjekk/i }).click();
-  await page.getByRole('button', { name: /Lag velferd Markdown/i }).click();
-  await expect(page.getByLabel(/Velferd Markdown/i)).toHaveValue(/Rotasjon vurderes/);
-  await page.getByRole('button', { name: /Lag velferd JSON/i }).click();
-  await expect(page.getByLabel(/Velferd JSON/i)).toHaveValue(/needsRest/);
+  await ruhSection.getByRole('tab', { name: 'Velferd' }).click();
+  await ruhSection.getByLabel(/Fysisk belastning/i).selectOption('moderat');
+  await ruhSection.getByLabel(/Mental belastning/i).selectOption('moderat');
+  await ruhSection.getByLabel(/Trenger hvile/i).check();
+  await ruhSection.getByLabel(/Vann påminnelse/i).check();
+  await ruhSection.getByLabel(/Velferdsnotat/i).fill('Rotasjon vurderes etter 30 minutter.');
+  await ruhSection.getByRole('button', { name: /Lagre velferdssjekk/i }).click();
+  await ruhSection.getByRole('tab', { name: 'Eksport' }).click();
+  await ruhSection.getByRole('button', { name: /Lag velferd Markdown/i }).click();
+  await expect(ruhSection.getByLabel(/Velferd Markdown/i)).toHaveValue(/Rotasjon vurderes/);
+  await ruhSection.getByText(/JSON eksport/i).click();
+  await ruhSection.getByRole('button', { name: /Lag velferd JSON/i }).click();
+  await expect(ruhSection.getByLabel(/Velferd JSON/i)).toHaveValue(/needsRest/);
 
-  await page.getByLabel(/Lokal ordretekst/i).fill('Lokal ordre test uten persondata.');
-  await page.getByLabel(/Lokalt samband/i).fill('Samband etter lokal plan.');
-  await page.getByLabel(/Lokal logg/i).fill('Terskel merket. Ventilasjon kontrollert.');
-  await page.getByRole('button', { name: /Generer etterrapport/i }).click();
-  await expect(page.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Lokal ordre test/);
-  await page.getByText('Avanserte eksportformater').click();
-  await page.getByRole('button', { name: /Lag JSON/i }).click();
-  await expect(page.getByLabel(/Etteraksjonsrapport JSON/i)).toHaveValue(new RegExp(missionTitle));
-  await page.getByRole('button', { name: /Lag PDF-klar HTML/i }).click();
-  await expect(page.getByLabel(/PDF-klar etteraksjonsrapport HTML/i)).toHaveValue(/<!doctype html>/i);
+  await openMissionDetails(page, /Etterrapport/i, 'Eksport');
+  const afterActionSection = page.locator('#etterrapport');
+  await afterActionSection.getByText(/Se over lokale tilleggsnotater/i).click();
+  await afterActionSection.getByLabel(/Lokal ordretekst/i).fill('Lokal ordre test uten persondata.');
+  await afterActionSection.getByLabel(/Lokalt samband/i).fill('Samband etter lokal plan.');
+  await afterActionSection.getByLabel(/Lokal logg/i).fill('Terskel merket. Ventilasjon kontrollert.');
+  await afterActionSection.getByRole('button', { name: /Generer etterrapport/i }).click();
+  await expect(afterActionSection.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Lokal ordre test/);
+  await afterActionSection.getByText('Avanserte eksportformater').click();
+  await afterActionSection.getByRole('button', { name: /Lag JSON/i }).click();
+  await expect(afterActionSection.getByLabel(/Etteraksjonsrapport JSON/i)).toHaveValue(new RegExp(missionTitle));
+  await afterActionSection.getByRole('button', { name: /Lag PDF-klar HTML/i }).click();
+  await expect(afterActionSection.getByLabel(/PDF-klar etteraksjonsrapport HTML/i)).toHaveValue(/<!doctype html>/i);
 
   await expectOfflineReloadPreservesMission(page, context, missionTitle);
+  await openMissionMode(page, 'Arbeid');
   await expect(page.getByRole('checkbox', { name: /Kontroller ventilasjon/i })).toBeChecked();
-  await page.getByText('Avansert / dokumentasjon').click();
+  await openMissionDetails(page, /Feltlogg/i);
   await expect(page.locator('#feltlogg').getByText(/Våt terskel observert/i).first()).toBeVisible();
 });

@@ -4,14 +4,17 @@ import { afterEach, vi } from 'vitest';
 import MissionsPage from '@/app/(app)/oppdrag/page';
 import { CommsPlanForm } from '@/components/forms/comms-plan-form';
 import { FivePointOrderForm } from '@/components/forms/five-point-order-form';
+import { clearLocalMissionData, saveMission } from '@/lib/mission/local-store';
 import { readLocalAuditLog } from '@/lib/privacy/local-profile';
+import { buildMission } from '../helpers/mission-fixtures';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
 
-afterEach(() => {
+afterEach(async () => {
   localStorage.clear();
+  await clearLocalMissionData();
 });
 
 it('requires all five order points and renders exported markdown', async () => {
@@ -190,9 +193,11 @@ it('blocks sambandsplan preview when sensitive contact text is entered', async (
 });
 
 it('mounts order and comms forms in the mission route', async () => {
+  await saveMission(buildMission({ id: 'mission-order-route', title: 'Ordre route' }));
   render(<MissionsPage />);
-  expect(screen.getByText(/Ordre og samband/i)).toBeInTheDocument();
-  await userEvent.click(screen.getByText(/Ordre og samband/i));
+  await userEvent.click(await screen.findByRole('tab', { name: 'Eksport' }));
+  expect(screen.getByText(/5-punktsordre og sambandsplan/i)).toBeInTheDocument();
+  await userEvent.click(screen.getByText(/5-punktsordre og sambandsplan/i));
   expect(screen.getAllByRole('button', { name: /Eksporter Markdown/i }).length).toBeGreaterThanOrEqual(2);
   expect(screen.getByLabelText(/rolle\/mal for sambandsplan/i)).toBeInTheDocument();
   expect(screen.getAllByRole('button', { name: /Eksporter JSON/i }).length).toBeGreaterThanOrEqual(2);

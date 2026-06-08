@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { clearBrowserLocalState, createLocalMission } from './helpers';
+import { clearBrowserLocalState, createLocalMission, openMissionMode } from './helpers';
 
 test.use({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
 
@@ -36,9 +36,13 @@ test('oppdrag opens on Nå and keeps export tools secondary', async ({ page }) =
 
   await expect(page.getByRole('heading', { name: /Situasjon og neste grep/i })).toBeVisible();
   await expect(page.getByRole('heading', { name: /Gjør dette først/i })).toBeVisible();
+  await expect(page.getByText('Avansert / dokumentasjon')).toHaveCount(0);
+  await expect(page.getByText('Ordre og samband')).toHaveCount(0);
+
+  await openMissionMode(page, 'Eksport');
   await expect(page.getByText('Avansert / dokumentasjon')).toBeVisible();
   await expect(page.locator('details').filter({ hasText: 'Avansert / dokumentasjon' })).not.toHaveAttribute('open', '');
-  await expect(page.getByText('Ordre og samband')).toBeVisible();
+  await expect(page.getByText('Ordre og samband', { exact: true })).toBeVisible();
   await expect(page.locator('details').filter({ hasText: 'Ordre og samband' })).not.toHaveAttribute('open', '');
 });
 

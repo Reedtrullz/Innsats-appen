@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
-import { clearBrowserLocalState } from './helpers';
+import { clearBrowserLocalState, createLocalMission, openMissionDetails } from './helpers';
 
 const templateIds = ['lagleder-lagforer', 'fig-leder', 'mfe', 'lia-liaison', 'beredskapsvakt'] as const;
 const templateLabels = ['Lagleder/lagfører', 'FIG-leder', 'MFE', 'LIA/liaison', 'Beredskapsvakt'];
@@ -35,8 +35,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('exports expanded 5-punktsordre templates after readback confirmation', async ({ page }) => {
-  await page.goto('/oppdrag');
-  await page.getByText('Ordre og samband').click();
+  await createLocalMission(page, { title: `Ordre mal ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Ordre testområde' });
+  await openMissionDetails(page, /5-punktsordre og sambandsplan/i, 'Eksport');
   const form = formByHeading(page, '5-punktsordre');
   await expect(form.getByText(/Lokal beslutningsstøtte/i)).toBeVisible();
   await expect(form.getByRole('button', { name: /Eksporter Markdown/i })).toBeDisabled();
@@ -66,8 +66,8 @@ test('exports expanded 5-punktsordre templates after readback confirmation', asy
 });
 
 test('exports expanded sambandsplan templates with local-only warnings', async ({ page }) => {
-  await page.goto('/oppdrag');
-  await page.getByText('Ordre og samband').click();
+  await createLocalMission(page, { title: `Samband mal ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Samband testområde' });
+  await openMissionDetails(page, /5-punktsordre og sambandsplan/i, 'Eksport');
   const form = formByHeading(page, 'Sambandsplan');
   await expect(form.getByText(/ikke legg inn persondata eller sensitive sambandstabeller/i)).toBeVisible();
 
