@@ -79,6 +79,7 @@ test('export forms start staged and collapsed', async ({ page }) => {
   await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
   const orderForm = page.locator('form').filter({ has: page.getByRole('heading', { name: '5-punktsordre' }) });
   await expect(orderForm.getByRole('tab', { name: 'Mal' })).toHaveAttribute('aria-selected', 'true');
+  await expect(orderForm.getByRole('tab', { name: /Eksporter/i })).toBeDisabled();
   await expect(orderForm.getByLabel('Situasjon')).toBeHidden();
   await expect(orderForm.locator('pre')).toHaveCount(0);
 
@@ -87,6 +88,14 @@ test('export forms start staged and collapsed', async ({ page }) => {
   await expect(ruhSection.getByRole('tab', { name: 'RUH' })).toHaveAttribute('aria-selected', 'true');
   await expect(ruhSection.getByLabel(/Fysisk belastning/i)).toBeHidden();
   await expect(ruhSection.getByText(/RUH\/velferd eksport/i)).toBeHidden();
+  await expect(ruhSection.getByLabel(/Hva skjedde/i)).toBeVisible();
+  await ruhSection.getByRole('tab', { name: 'Velferd' }).click();
+  await expect(ruhSection.getByLabel(/Fysisk belastning/i)).toBeVisible();
+  await expect(ruhSection.getByLabel(/Hva skjedde/i)).toBeHidden();
+  await ruhSection.getByRole('tab', { name: 'Eksport' }).click();
+  await expect(ruhSection.getByText(/RUH\/velferd eksport/i)).toBeVisible();
+  await expect(ruhSection.getByLabel(/Hva skjedde/i)).toBeHidden();
+  await expect(ruhSection.getByLabel(/Fysisk belastning/i)).toBeHidden();
 });
 
 test('mer keeps admin and release links out of the first operational viewport', async ({ page }) => {

@@ -131,6 +131,9 @@ test('mission and local export form controls have accessible labels', async ({ p
   for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband', 'Notes']) {
     await expect(orderForm.getByLabel(new RegExp(label.replace('/', '\\/'), 'i'))).toBeVisible();
   }
+  for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
+    await orderForm.getByLabel(new RegExp(label.replace('/', '\\/'), 'i')).fill(`${label} test`);
+  }
   await orderForm.getByRole('tab', { name: /Bekreft/i }).click();
   await expect(orderForm.getByLabel(/Tilbakelesing\/forstått er bekreftet/i)).toBeVisible();
 
@@ -260,7 +263,7 @@ test('screen-reader labels remain available on active mission operational contro
   }
 
   await openMissionDetails(page, /Etterrapport/i, 'Eksport');
-  await page.locator('#etterrapport').getByText(/Se over lokale tilleggsnotater/i).click();
+  await page.locator('#etterrapport').getByText(/Legg til notater/i).click();
   for (const label of [
     'Lokal ordretekst',
     'Lokalt samband',

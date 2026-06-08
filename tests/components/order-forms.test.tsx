@@ -35,6 +35,11 @@ async function confirmFivePointOrderReadback() {
   return readback;
 }
 
+async function openFivePointPreview() {
+  const previewSummary = screen.getByText(/Vis forhåndsvisning/i);
+  await userEvent.click(previewSummary);
+}
+
 it('requires all five order points and renders exported markdown', async () => {
   render(<FivePointOrderForm contentVersion="test-content-ui" />);
   expect(screen.getByText(/lokal beslutningsstøtte/i)).toBeInTheDocument();
@@ -51,20 +56,20 @@ it('requires all five order points and renders exported markdown', async () => {
   expect(screen.getByText(/mobil forsterkningsenhet/i)).toBeInTheDocument();
   await fillFivePointOrderFields();
   await userEvent.type(screen.getByLabelText(/Notes/i), 'lokal note');
-  await userEvent.click(screen.getByRole('tab', { name: /Eksporter/i }));
+  expect(screen.getByRole('tab', { name: /Eksporter/i })).toBeDisabled();
+  const readback = await confirmFivePointOrderReadback();
   const markdownButton = screen.getByRole('button', { name: /Eksporter Markdown/i });
-  expect(markdownButton).toBeDisabled();
   await userEvent.click(screen.getByText(/Flere eksportformater/i));
   const jsonButton = screen.getByRole('button', { name: /Eksporter JSON/i });
   const pdfButton = screen.getByRole('button', { name: /Lag PDF-klar HTML/i });
-  expect(jsonButton).toBeDisabled();
-  expect(pdfButton).toBeDisabled();
-  const readback = await confirmFivePointOrderReadback();
   expect(markdownButton).toBeEnabled();
   expect(jsonButton).toBeEnabled();
   expect(pdfButton).toBeEnabled();
   await userEvent.click(markdownButton);
   expect(readLocalAuditLog().some((entry) => entry.type === 'export-created' && entry.details.exportKind === 'five-point-order-markdown')).toBe(true);
+  expect(screen.getByText(/Eksport er klar/i)).toBeInTheDocument();
+  expect((screen.getByText(/Vis forhåndsvisning/i).closest('details') as HTMLDetailsElement | null)?.open).toBe(false);
+  await openFivePointPreview();
   expect(screen.getByText(/# 5-punktsordre/i)).toBeInTheDocument();
   expect(screen.getByText(/src-5-punktsordre/i)).toBeInTheDocument();
   expect(screen.getAllByText(/operasjonelt sensitiv informasjon/i).length).toBeGreaterThan(0);
@@ -86,14 +91,14 @@ it('clears stale 5-punktsordre export preview when order text changes', async ()
   }
   await confirmFivePointOrderReadback();
   await userEvent.click(screen.getByRole('button', { name: /Eksporter Markdown/i }));
+  await openFivePointPreview();
 
   expect(screen.getByText(/# 5-punktsordre/i)).toBeInTheDocument();
-  expect(screen.getByText(/Situasjon første/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/Situasjon første/i).length).toBeGreaterThan(1);
 
   await userEvent.type(screen.getByLabelText(/Situasjon/i), ' oppdatert');
 
   expect(screen.queryByText(/# 5-punktsordre/i)).not.toBeInTheDocument();
-  expect(screen.queryByText(/Situasjon første/i)).not.toBeInTheDocument();
 });
 
 it('blocks 5-punktsordre preview when sensitive text is entered', async () => {

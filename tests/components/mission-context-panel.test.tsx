@@ -423,14 +423,17 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
   expect(screen.getByRole('heading', { name: /Etteraksjonsrapport/i })).toBeInTheDocument();
   expect(screen.getByText(/Generer lokalt, se over, kopier\/eksporter\. Ikke legg inn persondata/i)).toBeInTheDocument();
 
-  await userEvent.click(within(afterActionSection!).getByText(/Se over lokale tilleggsnotater/i));
+  await userEvent.click(within(afterActionSection!).getByText(/Legg til notater/i));
   await userEvent.type(within(afterActionSection!).getByLabelText(/Lokal ordretekst/i), 'Ordre fra lokal tavle');
   await userEvent.type(within(afterActionSection!).getByLabelText(/Lokalt samband/i), 'Samband kanal lokal');
   await userEvent.type(within(afterActionSection!).getByLabelText(/Lokal logg/i), 'Loggpunkt uten persondata');
   await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Bygg etterrapport/i }));
-  await userEvent.click(within(afterActionSection!).getByText(/Avanserte eksportformater/i));
+  await userEvent.click(within(afterActionSection!).getByText(/Eksporter \/ kopier/i));
   await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Lag JSON/i }));
   await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Lag PDF-klar HTML/i }));
+  await userEvent.click(within(afterActionSection!).getAllByText(/Vis forhåndsvisning/i)[0]);
+  await userEvent.click(within(afterActionSection!).getAllByText(/Vis forhåndsvisning/i)[1]);
+  await userEvent.click(within(afterActionSection!).getAllByText(/Vis forhåndsvisning/i)[2]);
 
   const markdownPreview = await within(afterActionSection!).findByLabelText(/Etteraksjonsrapport Markdown/i) as HTMLTextAreaElement;
   const jsonPreview = within(afterActionSection!).getByLabelText(/Etteraksjonsrapport JSON/i) as HTMLTextAreaElement;

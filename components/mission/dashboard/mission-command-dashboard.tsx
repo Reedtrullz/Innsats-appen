@@ -137,6 +137,34 @@ function StructuredLessonsFeedbackControls({ mission, onMissionChange, onArchive
   );
 }
 
+function EquipmentExportReview({
+  title,
+  text,
+  textareaId,
+  onCopy,
+}: {
+  title: string;
+  text: string;
+  textareaId: string;
+  onCopy: (text: string) => void;
+}) {
+  if (!text) return null;
+  return (
+    <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-950">
+      <p className="font-black">{title} er klar</p>
+      <p className="mt-1 text-sm font-semibold">Se over innholdet før lokal bruk eller deling.</p>
+      <button type="button" onClick={() => onCopy(text)} className="mt-3 min-h-11 rounded-xl bg-white px-4 text-sm font-black text-emerald-950 ring-1 ring-emerald-200">Kopier</button>
+      <details className="mt-3 rounded-xl bg-white p-3 ring-1 ring-emerald-200">
+        <summary className="min-h-11 cursor-pointer list-none text-sm font-black">Vis forhåndsvisning</summary>
+        <label htmlFor={textareaId} className="mt-3 block text-sm font-bold">
+          {title}
+          <textarea id={textareaId} readOnly value={text} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
+        </label>
+      </details>
+    </section>
+  );
+}
+
 function EquipmentReadinessExportControls({ mission, checklists }: { mission: MissionContext; checklists: OperationalChecklist[] }) {
   const [markdown, setMarkdown] = useState('');
   const [json, setJson] = useState('');
@@ -156,6 +184,11 @@ function EquipmentReadinessExportControls({ mission, checklists }: { mission: Mi
     appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'mbk-json' });
   }
 
+  async function copyText(text: string) {
+    if (!text || typeof navigator === 'undefined' || !navigator.clipboard) return;
+    await navigator.clipboard.writeText(text);
+  }
+
   return (
     <section className="space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
@@ -167,18 +200,8 @@ function EquipmentReadinessExportControls({ mission, checklists }: { mission: Mi
         <button type="button" onClick={() => void generateMarkdown()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag MBK Markdown</button>
         <button type="button" onClick={() => void generateJson()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag MBK JSON</button>
       </div>
-      {markdown ? (
-        <label htmlFor="mbk-equipment-markdown" className="block text-sm font-bold">
-          MBK materiellstatus Markdown
-          <textarea id="mbk-equipment-markdown" readOnly value={markdown} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-        </label>
-      ) : null}
-      {json ? (
-        <label htmlFor="mbk-equipment-json" className="block text-sm font-bold">
-          MBK materiellstatus JSON
-          <textarea id="mbk-equipment-json" readOnly value={json} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-        </label>
-      ) : null}
+      <EquipmentExportReview title="MBK materiellstatus Markdown" text={markdown} textareaId="mbk-equipment-markdown" onCopy={(text) => void copyText(text)} />
+      <EquipmentExportReview title="MBK materiellstatus JSON" text={json} textareaId="mbk-equipment-json" onCopy={(text) => void copyText(text)} />
     </section>
   );
 }

@@ -40,8 +40,7 @@ test('exports expanded 5-punktsordre templates after readback confirmation', asy
   await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
   const form = formByHeading(page, '5-punktsordre');
   await expect(form.getByText(/Lokal beslutningsstøtte/i)).toBeVisible();
-  await form.getByRole('tab', { name: /Eksporter/i }).click();
-  await expect(form.getByRole('button', { name: /Eksporter Markdown/i })).toBeDisabled();
+  await expect(form.getByRole('tab', { name: /Eksporter/i })).toBeDisabled();
 
   await fillFivePointOrder(form);
   await form.getByRole('tab', { name: /Bekreft/i }).click();
@@ -55,7 +54,8 @@ test('exports expanded 5-punktsordre templates after readback confirmation', asy
     await expect(form.getByText(new RegExp(`Malveiledning: ${templateLabels[index].replace('/', '\\/')}`, 'i'))).toBeVisible();
     await form.getByRole('tab', { name: /Eksporter/i }).click();
     await form.getByRole('button', { name: /Eksporter JSON/i }).click();
-    const exported = await form.locator('pre').textContent();
+    await form.getByText(/Vis forhåndsvisning/i).last().click();
+    const exported = await form.locator('pre').last().textContent();
     expect(exported).toBeTruthy();
     const parsed = JSON.parse(exported ?? '{}') as { template?: { id?: string; label?: string }; warnings?: string[]; metadata?: { sourceIds?: string[] } };
     expect(parsed.template?.id).toBe(templateIds[index]);
@@ -65,10 +65,12 @@ test('exports expanded 5-punktsordre templates after readback confirmation', asy
   }
 
   await form.getByRole('button', { name: /Eksporter Markdown/i }).click();
-  await expect(form.locator('pre')).toContainText('# 5-punktsordre');
-  await expect(form.locator('pre')).toContainText('Beredskapsvakt');
+  await form.getByText(/Vis forhåndsvisning/i).last().click();
+  await expect(form.locator('pre').last()).toContainText('# 5-punktsordre');
+  await expect(form.locator('pre').last()).toContainText('Beredskapsvakt');
   await form.getByRole('button', { name: /Lag PDF-klar HTML/i }).click();
-  await expect(form.locator('pre')).toContainText('<!doctype html>');
+  await form.getByText(/Vis forhåndsvisning/i).last().click();
+  await expect(form.locator('pre').last()).toContainText('<!doctype html>');
 });
 
 test('exports expanded sambandsplan templates with local-only warnings', async ({ page }) => {

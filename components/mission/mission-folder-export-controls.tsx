@@ -20,6 +20,11 @@ export function MissionFolderExportControls({ mission, checklists, mapState }: {
     appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'mission-folder' });
   }
 
+  async function copyText(text: string) {
+    if (!text || typeof navigator === 'undefined' || !navigator.clipboard) return;
+    await navigator.clipboard.writeText(text);
+  }
+
   return (
     <section id="oppdragsmappe" className="scroll-mt-24 space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200" aria-label="Oppdragsmappe">
       <div>
@@ -43,19 +48,27 @@ export function MissionFolderExportControls({ mission, checklists, mapState }: {
       </div>
       <button type="button" onClick={() => void generate()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Bygg oppdragsmappe</button>
       {markdown ? (
-        <label htmlFor="mission-folder-markdown" className="block text-sm font-bold">
-          Oppdragsmappe Markdown
-          <textarea id="mission-folder-markdown" readOnly value={markdown} className="mt-1 min-h-48 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-        </label>
-      ) : null}
-      {json ? (
-        <details className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-          <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Vis JSON</summary>
-          <label htmlFor="mission-folder-json" className="mt-3 block text-sm font-bold">
-            Oppdragsmappe JSON
-            <textarea id="mission-folder-json" readOnly value={json} className="mt-1 min-h-48 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-          </label>
-        </details>
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-950">
+          <p className="font-black">Oppdragsmappe er klar</p>
+          <p className="mt-1 text-sm font-semibold">Se over innholdet før lokal bruk eller deling.</p>
+          <button type="button" onClick={() => void copyText(markdown)} className="mt-3 min-h-11 rounded-xl bg-white px-4 text-sm font-black text-emerald-950 ring-1 ring-emerald-200">Kopier Markdown</button>
+          <details className="mt-3 rounded-xl bg-white p-3 ring-1 ring-emerald-200">
+            <summary className="min-h-11 cursor-pointer list-none text-sm font-black">Vis forhåndsvisning</summary>
+            <label htmlFor="mission-folder-markdown" className="mt-3 block text-sm font-bold">
+              Oppdragsmappe Markdown
+              <textarea id="mission-folder-markdown" readOnly value={markdown} className="mt-1 min-h-48 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
+            </label>
+          </details>
+          {json ? (
+            <details className="mt-3 rounded-xl bg-white p-3 ring-1 ring-emerald-200">
+              <summary className="min-h-11 cursor-pointer list-none text-sm font-black">Vis JSON</summary>
+              <label htmlFor="mission-folder-json" className="mt-3 block text-sm font-bold">
+                Oppdragsmappe JSON
+                <textarea id="mission-folder-json" readOnly value={json} className="mt-1 min-h-48 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
+              </label>
+            </details>
+          ) : null}
+        </section>
       ) : null}
     </section>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import {
   EXPORT_SENSITIVITY_WARNING,
   FIVE_POINT_ORDER_ROLE_TEMPLATES,
@@ -23,6 +23,16 @@ interface ExportPreview {
   format: ExportFormat;
   text: string;
 }
+
+type OrderPointKey = 'situasjon' | 'oppdrag' | 'utforelse' | 'administrasjonForsyning' | 'ledelseSamband';
+
+const orderPointLabels: Array<{ key: OrderPointKey; label: string; inputName: string; guidanceKey: keyof ReturnType<typeof selectedTemplate>['guidance'] }> = [
+  { key: 'situasjon', label: 'Situasjon', inputName: 'situasjon', guidanceKey: 'situasjon' },
+  { key: 'oppdrag', label: 'Oppdrag', inputName: 'oppdrag', guidanceKey: 'oppdrag' },
+  { key: 'utforelse', label: 'Utførelse', inputName: 'utforelse', guidanceKey: 'utforelse' },
+  { key: 'administrasjonForsyning', label: 'Administrasjon/forsyning', inputName: 'administrasjonForsyning', guidanceKey: 'administrasjonForsyning' },
+  { key: 'ledelseSamband', label: 'Ledelse/samband', inputName: 'ledelseSamband', guidanceKey: 'ledelseSamband' },
+];
 
 function selectedTemplate(templateId: FivePointOrderTemplateId) {
   return FIVE_POINT_ORDER_ROLE_TEMPLATES.find((template) => template.id === templateId) ?? FIVE_POINT_ORDER_ROLE_TEMPLATES[0];
@@ -69,17 +79,49 @@ function buildInput(form: FormData, contentVersion: string): FivePointOrderInput
 
 export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOrderFormProps) {
   const [templateId, setTemplateId] = useState<FivePointOrderTemplateId>('lagleder-lagforer');
+  const [points, setPoints] = useState<Record<OrderPointKey, string>>({
+    situasjon: '',
+    oppdrag: '',
+    utforelse: '',
+    administrasjonForsyning: '',
+    ledelseSamband: '',
+  });
+  const [notes, setNotes] = useState('');
   const [readbackConfirmed, setReadbackConfirmed] = useState(false);
   const [preview, setPreview] = useState<ExportPreview | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState<OrderStep>('template');
   const template = selectedTemplate(templateId);
+  const requiredPointsComplete = useMemo(() => orderPointLabels.every((item) => points[item.key].trim().length > 0), [points]);
+  const stepCompletion: Record<OrderStep, boolean> = {
+    template: Boolean(templateId),
+    points: requiredPointsComplete,
+    confirm: readbackConfirmed,
+    export: Boolean(preview),
+  };
+
+  function resetPreview() {
+    setPreview(null);
+    setExportError(null);
+  }
+
+  function canOpenStep(step: OrderStep) {
+    if (step === 'template') return true;
+    if (step === 'points') return Boolean(templateId);
+    if (step === 'confirm') return requiredPointsComplete;
+    if (step === 'export') return requiredPointsComplete && readbackConfirmed;
+    return true;
+  }
+
+  function goToStep(step: OrderStep) {
+    if (canOpenStep(step)) setActiveStep(step);
+  }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const input = buildInput(form, contentVersion);
-    if (!input.readbackConfirmed) return;
+    if (!requiredPointsComplete || !input.readbackConfirmed) return;
 
     const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
     const format = (submitter?.value as ExportFormat | undefined) ?? 'markdown';
@@ -98,8 +140,13 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
     }
   }
 
+  async function copyPreview() {
+    if (!preview?.text || typeof navigator === 'undefined' || !navigator.clipboard) return;
+    await navigator.clipboard.writeText(preview.text);
+  }
+
   return (
-    <form onSubmit={onSubmit} onChange={() => { setPreview(null); setExportError(null); }} className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <form onSubmit={onSubmit} onChange={resetPreview} className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Velg mal → fyll fem punkter → tilbakelesing → eksport</p>
         <h2 className="text-2xl font-black">5-punktsordre</h2>
@@ -107,16 +154,24 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
       <div className="grid grid-cols-4 gap-1 rounded-2xl bg-slate-100 p-1" role="tablist" aria-label="5-punktsordre steg">
         {orderSteps.map((step) => {
           const selected = activeStep === step.id;
+          const disabled = !canOpenStep(step.id);
           return (
             <button
               key={step.id}
               type="button"
               role="tab"
               aria-selected={selected}
-              onClick={() => setActiveStep(step.id)}
-              className={selected ? 'min-h-11 rounded-xl bg-[#082F49] px-2 text-xs font-black text-white' : 'min-h-11 rounded-xl px-2 text-xs font-black text-slate-700 hover:bg-white'}
+              aria-disabled={disabled}
+              disabled={disabled}
+              onClick={() => goToStep(step.id)}
+              className={selected
+                ? 'min-h-11 rounded-xl bg-[#082F49] px-2 text-xs font-black text-white'
+                : disabled
+                  ? 'min-h-11 rounded-xl px-2 text-xs font-black text-slate-400'
+                  : 'min-h-11 rounded-xl px-2 text-xs font-black text-slate-700 hover:bg-white'}
             >
               {step.label}
+              <span className="sr-only">{stepCompletion[step.id] ? ' fullført' : disabled ? ' låst' : ' tilgjengelig'}</span>
             </button>
           );
         })}
@@ -131,8 +186,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
             value={templateId}
             onChange={(event) => {
               setTemplateId(event.currentTarget.value as FivePointOrderTemplateId);
-              setPreview(null);
-              setExportError(null);
+              resetPreview();
             }}
             className="mt-1 min-h-12 w-full rounded-2xl border px-3"
           >
@@ -153,17 +207,35 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
             <li><strong>Ledelse/samband:</strong> {template.guidance.ledelseSamband}</li>
           </ul>
         </details>
-        <button type="button" onClick={() => setActiveStep('points')} className="min-h-11 w-full rounded-xl bg-[#082F49] px-4 font-bold text-white">Neste: fyll fem punkter</button>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" onClick={() => goToStep('points')} className="min-h-11 flex-1 rounded-xl bg-[#082F49] px-4 font-bold text-white">Neste: fyll fem punkter</button>
+        </div>
       </StepBlock>
 
       <StepBlock step={2} title="Fyll fem punkter" active={activeStep === 'points'}>
-        <label className="block text-sm font-bold">Situasjon<textarea name="situasjon" required placeholder={template.guidance.situasjon} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
-        <label className="block text-sm font-bold">Oppdrag<textarea name="oppdrag" required placeholder={template.guidance.oppdrag} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
-        <label className="block text-sm font-bold">Utførelse<textarea name="utforelse" required placeholder={template.guidance.utforelse} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
-        <label className="block text-sm font-bold">Administrasjon/forsyning<textarea name="administrasjonForsyning" required placeholder={template.guidance.administrasjonForsyning} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
-        <label className="block text-sm font-bold">Ledelse/samband<textarea name="ledelseSamband" required placeholder={template.guidance.ledelseSamband} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
-        <label className="block text-sm font-bold">Notes<textarea name="notes" className="mt-1 min-h-20 w-full rounded-2xl border px-3 py-2" /></label>
-        <button type="button" onClick={() => setActiveStep('confirm')} className="min-h-11 w-full rounded-xl bg-[#082F49] px-4 font-bold text-white">Neste: bekreft tilbakelesing</button>
+        {orderPointLabels.map((item) => (
+          <label key={item.key} className="block text-sm font-bold">
+            {item.label}
+            <textarea
+              name={item.inputName}
+              required
+              value={points[item.key]}
+              onChange={(event) => {
+                const nextValue = event.currentTarget.value;
+                setPoints((current) => ({ ...current, [item.key]: nextValue }));
+                resetPreview();
+              }}
+              placeholder={template.guidance[item.guidanceKey]}
+              className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2"
+            />
+          </label>
+        ))}
+        <label className="block text-sm font-bold">Notes<textarea name="notes" value={notes} onChange={(event) => { setNotes(event.currentTarget.value); resetPreview(); }} className="mt-1 min-h-20 w-full rounded-2xl border px-3 py-2" /></label>
+        {!requiredPointsComplete ? <p className="rounded-xl bg-white p-3 text-sm font-semibold text-slate-700 ring-1 ring-slate-200">Fyll ut alle fem punkter før tilbakelesing.</p> : null}
+        <div className="grid gap-2 sm:grid-cols-2">
+          <button type="button" onClick={() => goToStep('template')} className="min-h-11 rounded-xl border border-slate-300 px-4 font-bold text-slate-900">Tilbake</button>
+          <button type="button" onClick={() => goToStep('confirm')} disabled={!requiredPointsComplete} className="min-h-11 rounded-xl bg-[#082F49] px-4 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Neste: bekreft tilbakelesing</button>
+        </div>
       </StepBlock>
 
       <StepBlock step={3} title="Bekreft tilbakelesing" active={activeStep === 'confirm'}>
@@ -175,31 +247,46 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
             checked={readbackConfirmed}
             onChange={(event) => {
               setReadbackConfirmed(event.currentTarget.checked);
-              setPreview(null);
-              setExportError(null);
+              resetPreview();
             }}
             className="mt-1 h-5 w-5"
           />
           Tilbakelesing/forstått er bekreftet før lokal eksport
         </label>
         {!readbackConfirmed ? <p className="rounded-xl bg-white p-3 text-sm font-semibold text-slate-700 ring-1 ring-slate-200">Bekreft tilbakelesing/forstått for å åpne lokal eksport.</p> : null}
-        <button type="button" onClick={() => setActiveStep('export')} disabled={!readbackConfirmed} className="min-h-11 w-full rounded-xl bg-[#082F49] px-4 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Neste: eksport</button>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <button type="button" onClick={() => goToStep('points')} className="min-h-11 rounded-xl border border-slate-300 px-4 font-bold text-slate-900">Tilbake</button>
+          <button type="button" onClick={() => goToStep('export')} disabled={!readbackConfirmed} className="min-h-11 rounded-xl bg-[#082F49] px-4 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Neste: eksport</button>
+        </div>
       </StepBlock>
 
       <StepBlock step={4} title="Eksporter" active={activeStep === 'export'}>
-        <button type="submit" name="format" value="markdown" disabled={!readbackConfirmed} className="min-h-12 w-full rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter Markdown</button>
+        <button type="button" onClick={() => goToStep('confirm')} className="min-h-11 rounded-xl border border-slate-300 px-4 font-bold text-slate-900">Tilbake</button>
+        <button type="submit" name="format" value="markdown" disabled={!requiredPointsComplete || !readbackConfirmed} className="min-h-12 w-full rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter Markdown</button>
         <details className="rounded-2xl border border-slate-200 bg-white p-3">
           <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Flere eksportformater</summary>
           <p className="mt-2 text-sm font-semibold text-slate-700">{EXPORT_SENSITIVITY_WARNING}</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            <button type="submit" name="format" value="json" disabled={!readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter JSON</button>
-            <button type="submit" name="format" value="pdf" disabled={!readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{preview?.format === 'pdf' ? 'Oppdater utskrift' : 'Lag PDF-klar HTML'}</button>
+            <button type="submit" name="format" value="json" disabled={!requiredPointsComplete || !readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter JSON</button>
+            <button type="submit" name="format" value="pdf" disabled={!requiredPointsComplete || !readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{preview?.format === 'pdf' ? 'Oppdater utskrift' : 'Lag PDF-klar HTML'}</button>
           </div>
         </details>
       </StepBlock>
 
       {exportError ? <p role="status" className="rounded-2xl bg-red-50 p-3 text-sm font-bold text-red-950">{exportError}</p> : null}
-      {preview ? <pre className="whitespace-pre-wrap rounded-2xl bg-slate-100 p-3 text-sm">{preview.text}</pre> : null}
+      {preview ? (
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-950" aria-label="5-punktsordre eksport klar">
+          <p className="font-black">Eksport er klar</p>
+          <p className="mt-1 text-sm font-semibold">Se over innholdet før lokal bruk eller deling.</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={() => void copyPreview()} className="min-h-11 rounded-xl bg-white px-4 text-sm font-black text-emerald-950 ring-1 ring-emerald-200">Kopier</button>
+          </div>
+          <details className="mt-3 rounded-xl bg-white p-3 ring-1 ring-emerald-200">
+            <summary className="min-h-11 cursor-pointer list-none text-sm font-black">Vis forhåndsvisning</summary>
+            <pre className="mt-3 max-h-96 overflow-auto whitespace-pre-wrap rounded-xl bg-slate-100 p-3 text-sm">{preview.text}</pre>
+          </details>
+        </section>
+      ) : null}
     </form>
   );
 }

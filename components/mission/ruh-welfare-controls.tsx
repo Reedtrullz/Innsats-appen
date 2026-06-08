@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { MAN_DOWN_POST_MVP_NOTE, MEDIA_ATTACHMENT_SAFETY_NOTES } from '@/lib/mission/media-safety';
-import { RUH_CATEGORY_OPTIONS, RUH_LOCAL_ONLY_WARNING, RUH_PATIENT_DATA_WARNING, RUH_RISK_OPTIONS, WELFARE_LOAD_OPTIONS, WELFARE_NON_MEDICAL_WARNING, exportRuhJson, exportRuhMarkdown, exportWelfareJson, exportWelfareMarkdown, summarizeWelfareCheck } from '@/lib/mission/ruh-welfare';
+import { RUH_CATEGORY_OPTIONS, RUH_RISK_OPTIONS, WELFARE_LOAD_OPTIONS, exportRuhJson, exportRuhMarkdown, exportWelfareJson, exportWelfareMarkdown, summarizeWelfareCheck } from '@/lib/mission/ruh-welfare';
 import type { MissionContext, RuhCategory, RuhRisk, WelfareLoad } from '@/lib/mission/schemas';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
@@ -29,6 +29,24 @@ function datetimeLocalToIso(value: string) {
   return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
 }
 
+function ExportReview({ title, text, textareaId, onCopy }: { title: string; text: string; textareaId: string; onCopy: (text: string) => void }) {
+  if (!text) return null;
+  return (
+    <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-950">
+      <p className="font-black">{title} er klar</p>
+      <p className="mt-1 text-sm font-semibold">Se over før lokal bruk eller deling.</p>
+      <button type="button" onClick={() => onCopy(text)} className="mt-3 min-h-11 rounded-xl bg-white px-4 text-sm font-black text-emerald-950 ring-1 ring-emerald-200">Kopier</button>
+      <details className="mt-3 rounded-xl bg-white p-3 ring-1 ring-emerald-200">
+        <summary className="min-h-11 cursor-pointer list-none text-sm font-black">Vis forhåndsvisning</summary>
+        <label htmlFor={textareaId} className="mt-3 block text-sm font-bold">
+          {title}
+          <textarea id={textareaId} readOnly value={text} className="mt-1 min-h-52 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
+        </label>
+      </details>
+    </section>
+  );
+}
+
 export function RuhWelfareControls({ mission, onMissionChange }: { mission: MissionContext; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void> }) {
   const [activePanel, setActivePanel] = useState<RuhWelfarePanel>('ruh');
   const [ruhCategory, setRuhCategory] = useState<RuhCategory>('hms');
@@ -43,6 +61,8 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
   const [welfarePrivacyError, setWelfarePrivacyError] = useState('');
   const ruhReports = mission.ruhReports ?? [];
   const welfareChecks = mission.welfareChecks ?? [];
+  const latestRuhReport = ruhReports.at(-1);
+  const latestWelfareCheck = welfareChecks.at(-1);
   const followUpSummary = buildRuhWelfareSummary(mission);
 
   async function addRuhReport(event: React.FormEvent<HTMLFormElement>) {
@@ -141,6 +161,11 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
     appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'welfare-json', count: welfareChecks.length });
   }
 
+  async function copyText(text: string) {
+    if (!text || typeof navigator === 'undefined' || !navigator.clipboard) return;
+    await navigator.clipboard.writeText(text);
+  }
+
   return (
     <section id="ruh-velferd" className="scroll-mt-24 space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
@@ -176,7 +201,7 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
       {activePanel === 'ruh' ? (
         <form onSubmit={(event) => void addRuhReport(event)} className="grid gap-3 rounded-xl border border-slate-200 p-3">
           <h4 className="font-black">Forenklet RUH</h4>
-          <p className="text-sm font-semibold text-amber-900">{RUH_LOCAL_ONLY_WARNING} {RUH_PATIENT_DATA_WARNING}</p>
+          <p className="text-sm font-semibold text-slate-600">Kort lokal registrering uten navn, ID, pasientdata eller persondata.</p>
           <label className="block text-sm font-bold">RUH tidspunkt<input name="ruhTimestamp" type="datetime-local" defaultValue={toDatetimeLocalValue(new Date())} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3" /></label>
           <label className="block text-sm font-bold">RUH kategori<select name="ruhCategory" value={ruhCategory} onChange={(event) => setRuhCategory(event.target.value as RuhCategory)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3">{RUH_CATEGORY_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
           <label className="block text-sm font-bold">Hva skjedde<textarea name="ruhWhatHappened" required className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 p-3" placeholder="Kort avvik/nestenulykke uten navn, ID, pasientdata eller persondata" /></label>
@@ -191,7 +216,7 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
       {activePanel === 'welfare' ? (
         <form onSubmit={(event) => void addWelfareCheck(event)} className="grid gap-3 rounded-xl border border-slate-200 p-3">
           <h4 className="font-black">Belastning og velferd</h4>
-          <p className="text-sm font-semibold text-amber-900">{WELFARE_NON_MEDICAL_WARNING}</p>
+          <p className="text-sm font-semibold text-slate-600">Ikke-medisinsk belastningssjekk for lokal oppfølging.</p>
           <label className="block text-sm font-bold">Fysisk belastning<select name="physicalLoad" value={physicalLoad} onChange={(event) => setPhysicalLoad(event.target.value as WelfareLoad)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3">{WELFARE_LOAD_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
           <label className="block text-sm font-bold">Mental belastning<select name="mentalLoad" value={mentalLoad} onChange={(event) => setMentalLoad(event.target.value as WelfareLoad)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3">{WELFARE_LOAD_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
           <div className="grid gap-2 sm:grid-cols-2">
@@ -214,16 +239,19 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
         </form>
       ) : null}
 
-      {activePanel !== 'export' ? <div className="grid gap-3 lg:grid-cols-2">
+      {activePanel === 'ruh' ? (
         <div className="rounded-xl border border-slate-200 p-3">
           <h4 className="font-black">Siste RUH</h4>
-          {ruhReports.length > 0 ? <ol className="mt-2 space-y-2">{ruhReports.slice(-3).map((report) => <li key={report.id} className="rounded-xl bg-slate-50 p-3 text-sm font-semibold"><span className="font-black">{formatUpdatedAt(report.timestamp)}</span> — {report.whatHappened}</li>)}</ol> : <p className="mt-2 text-sm font-semibold text-slate-600">Ingen lokale RUH registrert.</p>}
+          {latestRuhReport ? <p className="mt-2 rounded-xl bg-slate-50 p-3 text-sm font-semibold"><span className="font-black">{formatUpdatedAt(latestRuhReport.timestamp)}</span> — {latestRuhReport.whatHappened}</p> : <p className="mt-2 text-sm font-semibold text-slate-600">Ingen lokale RUH registrert.</p>}
         </div>
+      ) : null}
+
+      {activePanel === 'welfare' ? (
         <div className="rounded-xl border border-slate-200 p-3">
-          <h4 className="font-black">Siste velferdssjekker</h4>
-          {welfareChecks.length > 0 ? <ol className="mt-2 space-y-2">{welfareChecks.slice(-3).map((check) => <li key={check.id} className="rounded-xl bg-slate-50 p-3 text-sm font-semibold"><span className="font-black">{formatUpdatedAt(check.timestamp)}</span> — {summarizeWelfareCheck(check)}{check.note ? <span className="block">{check.note}</span> : null}</li>)}</ol> : <p className="mt-2 text-sm font-semibold text-slate-600">Ingen velferdssjekker registrert.</p>}
+          <h4 className="font-black">Siste velferdssjekk</h4>
+          {latestWelfareCheck ? <p className="mt-2 rounded-xl bg-slate-50 p-3 text-sm font-semibold"><span className="font-black">{formatUpdatedAt(latestWelfareCheck.timestamp)}</span> — {summarizeWelfareCheck(latestWelfareCheck)}{latestWelfareCheck.note ? <span className="block">{latestWelfareCheck.note}</span> : null}</p> : <p className="mt-2 text-sm font-semibold text-slate-600">Ingen velferdssjekker registrert.</p>}
         </div>
-      </div> : null}
+      ) : null}
 
       {activePanel === 'export' ? (
         <div className="space-y-3">
@@ -251,10 +279,10 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
               </div>
             </details>
           </div>
-          {ruhMarkdown ? <label htmlFor="ruh-markdown" className="block text-sm font-bold">RUH Markdown<textarea id="ruh-markdown" readOnly value={ruhMarkdown} className="mt-1 min-h-52 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" /></label> : null}
-          {ruhJson ? <label htmlFor="ruh-json" className="block text-sm font-bold">RUH JSON<textarea id="ruh-json" readOnly value={ruhJson} className="mt-1 min-h-52 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" /></label> : null}
-          {welfareMarkdown ? <label htmlFor="welfare-markdown" className="block text-sm font-bold">Velferd Markdown<textarea id="welfare-markdown" readOnly value={welfareMarkdown} className="mt-1 min-h-52 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" /></label> : null}
-          {welfareJson ? <label htmlFor="welfare-json" className="block text-sm font-bold">Velferd JSON<textarea id="welfare-json" readOnly value={welfareJson} className="mt-1 min-h-52 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" /></label> : null}
+          <ExportReview title="RUH Markdown" text={ruhMarkdown} textareaId="ruh-markdown" onCopy={(text) => void copyText(text)} />
+          <ExportReview title="RUH JSON" text={ruhJson} textareaId="ruh-json" onCopy={(text) => void copyText(text)} />
+          <ExportReview title="Velferd Markdown" text={welfareMarkdown} textareaId="welfare-markdown" onCopy={(text) => void copyText(text)} />
+          <ExportReview title="Velferd JSON" text={welfareJson} textareaId="welfare-json" onCopy={(text) => void copyText(text)} />
         </div>
       ) : null}
 
