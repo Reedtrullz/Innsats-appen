@@ -7,12 +7,12 @@ import { equipmentStatusLabels, equipmentStatuses } from '@/lib/mission/equipmen
 import type { EquipmentStatus } from '@/lib/mission/schemas';
 import { assertNoSensitiveOperationalText } from '@/lib/privacy/sensitive-text';
 
-export function ChecklistRunner({ checklist, missionId }: { checklist: OperationalChecklist; missionId: string }) {
+export function ChecklistRunner({ checklist, missionId, onRunSaved }: { checklist: OperationalChecklist; missionId: string; onRunSaved?: () => void }) {
   const runId = `${missionId}:${checklist.slug}`;
-  return <ChecklistRunnerState key={runId} checklist={checklist} missionId={missionId} runId={runId} />;
+  return <ChecklistRunnerState key={runId} checklist={checklist} missionId={missionId} runId={runId} onRunSaved={onRunSaved} />;
 }
 
-function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: OperationalChecklist; missionId: string; runId: string }) {
+function ChecklistRunnerState({ checklist, missionId, runId, onRunSaved }: { checklist: OperationalChecklist; missionId: string; runId: string; onRunSaved?: () => void }) {
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [notesByItemId, setNotesByItemId] = useState<Record<string, string>>({});
   const [equipmentStatusByItemId, setEquipmentStatusByItemId] = useState<Record<string, EquipmentStatus>>({});
@@ -63,6 +63,7 @@ function ChecklistRunnerState({ checklist, missionId, runId }: { checklist: Oper
     };
     const write = writeQueueRef.current.catch(() => undefined).then(async () => {
       await saveChecklistRun(snapshot);
+      onRunSaved?.();
     });
     writeQueueRef.current = write;
     return write;

@@ -909,13 +909,17 @@ it('shows a situation-first mission dashboard with next action, progress and exp
   const nextActionSection = screen.getByRole('heading', { name: /Neste anbefalte handling/i }).closest('section');
   expect(nextActionSection).not.toBeNull();
   expect(within(nextActionSection!).getByText(/Etabler sikkerhet/i)).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Hurtighandlinger/i })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /^Kritisk nå$/i })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /Fremdrift/i })).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /5-punktsordre/i })).toHaveAttribute('href', '#5-punktsordre');
   expect(screen.getByRole('link', { name: /Sambandsplan/i })).toHaveAttribute('href', '#sambandsplan');
   const text = document.body.textContent ?? '';
   expect(text.indexOf('Oppdrag')).toBeLessThan(text.indexOf('Neste anbefalte handling'));
-  expect(text.indexOf('Neste anbefalte handling')).toBeLessThan(text.indexOf('Fremdrift'));
-  expect(text.indexOf('Fremdrift')).toBeLessThan(text.indexOf('Anbefalte tiltak'));
+  expect(text.indexOf('Neste anbefalte handling')).toBeLessThan(text.indexOf('Hurtighandlinger'));
+  expect(text.indexOf('Hurtighandlinger')).toBeLessThan(text.indexOf('Kritisk nå'));
+  expect(text.indexOf('Kritisk nå')).toBeLessThan(text.indexOf('Fremdrift'));
+  expect(text.indexOf('Fremdrift')).toBeLessThan(text.indexOf('Avansert / dokumentasjon'));
 });
 
 it('shows map and field-log summary on the mission dashboard', async () => {
@@ -963,6 +967,48 @@ it('shows map and field-log summary on the mission dashboard', async () => {
   expect(await screen.findByRole('heading', { name: /Kart og logg/i })).toBeInTheDocument();
   expect(screen.getAllByText(/kartkoblet logg/i).length).toBeGreaterThan(0);
   expect(screen.getByRole('link', { name: /Åpne kart/i })).toHaveAttribute('href', '/kart');
+});
+
+it('shows saved active checklist progress on the mission dashboard', async () => {
+  await saveMission(mission({
+    id: 'm-command-checklist-progress',
+    title: 'Sjekkliste fremdrift',
+    createdAt: '2026-06-04T09:00:00.000Z',
+    updatedAt: '2026-06-04T09:30:00.000Z',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'flom',
+    locationText: 'Innsatsområde fremdrift',
+    activeChecklistIds: ['fig-under-innsats'],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  }));
+  await saveChecklistRun({
+    id: 'm-command-checklist-progress:fig-under-innsats',
+    missionId: 'm-command-checklist-progress',
+    templateSlug: 'fig-under-innsats',
+    checkedItemIds: ['sikkerhet'],
+    notesByItemId: {},
+    equipmentStatusByItemId: {},
+    updatedAt: '2026-06-04T09:35:00.000Z',
+    schemaVersion: 1,
+  });
+
+  await renderMissionPanel(<MissionContextPanel
+    contentVersion="test-v1"
+    checklists={[{
+      ...checklists[0],
+      slug: 'fig-under-innsats',
+      phase: 'under',
+      scenarios: ['flom'],
+      items: [
+        { id: 'sikkerhet', label: 'Etabler sikkerhet', required: true, sourceIds: ['src-flom'] },
+        { id: 'samband', label: 'Bekreft samband', required: true, sourceIds: ['src-flom'] },
+      ],
+    }]}
+  />);
+
+  expect(await screen.findByText(/1\/2 punkter fullført/i)).toBeInTheDocument();
 });
 
 it('shows local manual order-update suggestions from important field-log entries', async () => {

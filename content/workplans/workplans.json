@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-07T11:45:29.517Z",
-  "sourceCount": 12,
-  "planSourceCount": 12,
-  "planSourceHash": "sha256:08e7a722af13c1bcd0ec6770c5f7f0a365ae46f762e0a3fa34933b3045bdc545",
+  "generatedAt": "2026-06-07T15:17:43.949Z",
+  "sourceCount": 13,
+  "planSourceCount": 13,
+  "planSourceHash": "sha256:653910ad7a562bc9123d2835a3ddaf412e397a78cdfd873abfb6cea661514b88",
   "workplans": [
     {
       "id": "2026-06-02_220432-beredskapsboka-webapp-plan",
@@ -6919,6 +6919,204 @@
             "Blocked until Task 11 real-device evidence and Task 12 owner-governance decisions have real passing evidence or explicit owner-accepted caveats. Strict source governance is now passing, and a staging rollback drill passed, but those are insufficient for pilot-ready without device/governance closure plus exact-SHA CI/deploy/live verification."
           ],
           "sourceHeading": "Task 13: Final pilot-readiness closeout [PARENT-DIRECT]"
+        }
+      ]
+    },
+    {
+      "id": "2026-06-07_165327-comprehensive-audit-remediation-plan",
+      "title": "Comprehensive Audit Remediation Implementation Plan",
+      "sourcePath": ".hermes/plans/2026-06-07_165327-comprehensive-audit-remediation-plan.md",
+      "sourceType": "hermes-plan",
+      "summary": "Fix the concrete audit findings that block trusted pilot use while preserving the local-only/offline MVP boundary and keeping deployed-health evidence separate from pilot-readiness evidence.",
+      "stage": "verify",
+      "risk": "high",
+      "status": "active",
+      "owner": "AR",
+      "evidence": [
+        "Written from the 2026-06-07 comprehensive audit at deployed SHA ca7fcee953ecc938a510e44c84e9e9eb37147562. Baseline checks before planning: local main clean/synced with origin/main; live /api/health.version matched that SHA; GitHub Actions CI / Deploy run 27094096114 completed success; report:source-governance:strict reported 53/53 referenced sources approved and 0 blockers; report:stale-content reported no stale/expired content for 2026-06-07; validate:maps reported 0 packages; npm audit --audit-level=moderate --json reported 3 known moderate Next/PostCSS advisories and 0 high/critical vulnerabilities."
+      ],
+      "taskCount": 20,
+      "updatedAt": "2026-06-07T15:17:43.949Z",
+      "tasks": [
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-1",
+          "title": "Add RED tests for realistic sensitive free-text misses",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 1: Add RED tests for realistic sensitive free-text misses"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-2",
+          "title": "Expand sensitive text detection without blocking warning copy",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 2: Expand sensitive text detection without blocking warning copy"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-3",
+          "title": "Add field-log category-specific privacy RED test",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 3: Add field-log category-specific privacy RED test"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-4",
+          "title": "Centralize field-log privacy validation and surface sanitized errors",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 4: Centralize field-log privacy validation and surface sanitized errors"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-5",
+          "title": "Add RED tests for overlong MET/NVE upstream summaries",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 5: Add RED tests for overlong MET/NVE upstream summaries"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-6",
+          "title": "Normalize upstream context signal strings before route guard validation",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 6: Normalize upstream context signal strings before route guard validation"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-7",
+          "title": "Add a client-side mission context refresh helper contract",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 7: Add a client-side mission context refresh helper contract"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-8",
+          "title": "Implement mission context refresh helper",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 8: Implement mission context refresh helper"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-9",
+          "title": "Add dashboard RED test for explicit context refresh UI",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 9: Add dashboard RED test for explicit context refresh UI"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-10",
+          "title": "Wire explicit mission context refresh UI",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 10: Wire explicit mission context refresh UI"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-11",
+          "title": "Add hydrated browser smoke for context refresh boundary",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 11: Add hydrated browser smoke for context refresh boundary"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-12",
+          "title": "Add RED tests for local persistence failure reporting",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 12: Add RED tests for local persistence failure reporting"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-13",
+          "title": "Return persistence result objects and show not-saved warnings",
+          "status": "planned",
+          "stage": "build",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 13: Return persistence result objects and show not-saved warnings"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-14",
+          "title": "Add CacheStorage reset semantics for map packages",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 14: Add CacheStorage reset semantics for map packages"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-15",
+          "title": "Implement map package CacheStorage reset and backup copy",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 15: Implement map package CacheStorage reset and backup copy"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-16",
+          "title": "Add confirmation for destructive local deletes",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 16: Add confirmation for destructive local deletes"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-17",
+          "title": "Pin optional runtime dependencies and document moderate advisory state",
+          "status": "planned",
+          "stage": "build",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 17: Pin optional runtime dependencies and document moderate advisory state"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-18",
+          "title": "[PARENT-DIRECT] Harden Docker Compose runtime in staging first",
+          "status": "planned",
+          "stage": "release",
+          "risk": "medium",
+          "owner": "AR",
+          "sourceHeading": "Task 18: [PARENT-DIRECT] Harden Docker Compose runtime in staging first"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-19",
+          "title": "[PARENT-DIRECT] Truth-sync pilot evidence and governance docs without closing blocked gates",
+          "status": "planned",
+          "stage": "verify",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 19: [PARENT-DIRECT] Truth-sync pilot evidence and governance docs without closing blocked gates"
+        },
+        {
+          "id": "2026-06-07_165327-comprehensive-audit-remediation-plan-task-20",
+          "title": "[PARENT-DIRECT] Final gates, post-implementation audit, workplan sync, and exact-SHA release closeout",
+          "status": "planned",
+          "stage": "release",
+          "risk": "high",
+          "owner": "AR",
+          "sourceHeading": "Task 20: [PARENT-DIRECT] Final gates, post-implementation audit, workplan sync, and exact-SHA release closeout"
         }
       ]
     }

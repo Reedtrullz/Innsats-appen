@@ -1,5 +1,5 @@
 import MiniSearch from 'minisearch';
-import type { SourceDocument } from './schemas';
+import type { ActionCard, SourceDocument } from './schemas';
 
 export interface SearchDocument {
   id: string;
@@ -13,6 +13,7 @@ export interface SearchDocument {
   href?: string;
   sourceStatus?: SourceDocument['status'];
   sourceIds?: string[];
+  priority?: ActionCard['priority'];
 }
 
 export type SearchHit = SearchDocument & { score?: number; terms?: string[] };
@@ -169,7 +170,7 @@ export function buildSearchIndex(docs: SearchDocument[]) {
   const index = new MiniSearch<SearchDocument>({
     idField: 'id',
     fields: ['title', 'body', 'scenario', 'role', 'phase', 'synonyms'],
-    storeFields: ['id', 'title', 'body', 'scenario', 'role', 'phase', 'synonyms', 'type', 'href', 'sourceStatus', 'sourceIds'],
+    storeFields: ['id', 'title', 'body', 'scenario', 'role', 'phase', 'synonyms', 'type', 'href', 'sourceStatus', 'sourceIds', 'priority'],
     searchOptions: { boost: { title: 3, synonyms: 2 }, prefix: true, fuzzy: 0.2 },
   });
   index.addAll(docs);

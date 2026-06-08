@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { useMemo, useState, useSyncExternalStore, type MouseEvent } from 'react';
 import { searchDocuments, searchIndexFreshnessLabel, suggestSearchQueries, type SearchContext, type SearchDocument, type SearchHit } from '@/lib/content/search';
+import { OperationalIcon } from './ui/operational-icons';
+import { StatusPill } from './ui/operational-primitives';
 
 const LOCATION_CHANGE_EVENT = 'beredskapsboka:locationchange';
 let historyEventsPatched = false;
@@ -81,8 +83,8 @@ function resetSearchFiltersPath(basePath: string, query: string) {
 
 function chipClass(active: boolean) {
   return active
-    ? 'inline-flex min-h-11 items-center rounded-full bg-sky-900 px-4 py-2 text-sm font-bold text-white'
-    : 'inline-flex min-h-11 items-center rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-200';
+    ? 'inline-flex min-h-11 items-center rounded-full bg-[#082F49] px-4 py-2 text-sm font-black text-white'
+    : 'inline-flex min-h-11 items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50';
 }
 
 function termsLabel(terms: string[] | undefined) {
@@ -90,7 +92,35 @@ function termsLabel(terms: string[] | undefined) {
 }
 
 function typeMetadataLabel(type: string) {
-  return type === 'kort' ? 'tiltak' : type;
+  return type === 'kort' ? 'tiltakskort' : type;
+}
+
+function SearchResultRow({ doc }: { doc: SearchHit }) {
+  const highPriority = doc.type === 'kort' && doc.priority === 'high';
+  return (
+    <Link
+      className={`group block rounded-2xl border p-3 text-slate-900 shadow-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49] ${highPriority ? 'border-red-200 bg-red-50/60 hover:border-red-300 hover:bg-red-50' : 'border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50'}`}
+      href={doc.href ?? '#'}
+      aria-label={doc.title}
+    >
+      <span className="flex items-start gap-3">
+        <span className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${highPriority ? 'bg-red-100 text-red-700' : 'bg-sky-50 text-sky-800'}`}>
+          <OperationalIcon name={doc.type === 'kilde' ? 'book' : doc.type === 'kort' ? 'shield' : 'document'} className="h-5 w-5" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-black leading-5 text-slate-950">{doc.title}</span>
+          <span className="mt-2 flex flex-wrap gap-1.5 text-xs font-semibold text-slate-600">
+            {highPriority ? <StatusPill label="Kritisk prioritet" tone="critical" compact /> : null}
+            {doc.type ? <StatusPill label={`Type: ${typeMetadataLabel(doc.type)}`} tone="slate" compact /> : null}
+            {doc.phase ? <StatusPill label={`Fase: ${doc.phase}`} tone="sky" compact /> : null}
+            {doc.sourceStatus ? <StatusPill label={`Kilde: ${doc.sourceStatus}`} tone={doc.sourceStatus === 'verified' ? 'success' : 'warning'} compact /> : null}
+          </span>
+          {termsLabel(doc.terms) ? <span className="mt-2 block text-xs font-semibold text-slate-500">Søkeord: {termsLabel(doc.terms)}</span> : null}
+        </span>
+        <OperationalIcon name="chevron" className="mt-3 h-4 w-4 shrink-0 text-slate-400 group-hover:text-sky-800" />
+      </span>
+    </Link>
+  );
 }
 
 export function SearchBox({
@@ -144,7 +174,9 @@ export function SearchBox({
   const filtersHideResults = Boolean(query.trim() && hasActiveFilters && rawResults.length > 0 && filteredResults.length === 0);
   const resetFiltersHref = resetSearchFiltersPath(suggestionBasePath, query);
   const freshnessLabel = (showFreshnessIndicator || typeof generatedAt !== 'undefined') ? searchIndexFreshnessLabel(generatedAt, now) : null;
-  const grouped = results.reduce<Record<string, SearchHit[]>>((acc, doc) => {
+  const topHits = query.trim() ? results.slice(0, Math.min(3, results.length)) : [];
+  const otherHits = query.trim() ? results.slice(topHits.length) : results;
+  const grouped = otherHits.reduce<Record<string, SearchHit[]>>((acc, doc) => {
     const key = doc.type ?? 'resultat';
     acc[key] ??= [];
     acc[key].push(doc);
@@ -162,20 +194,23 @@ export function SearchBox({
     window.history.pushState(null, '', resetFiltersHref);
   }
   return (
-    <section className="rounded-3xl bg-white p-4 shadow-sm" aria-label="Lokalt søk">
-      <label className="text-sm font-bold text-slate-700" htmlFor="stress-search">Søk lokalt i tiltak, kilder og moduler</label>
-      <input
-        id="stress-search"
-        type="search"
-        value={query}
-        onChange={(event) => setManualQuery(event.target.value)}
-        placeholder="Prøv jod, rens, MFE, samband, dose, tilfluktsrom, FIG10"
-        className="mt-2 min-h-12 w-full rounded-2xl border border-slate-300 px-4 text-base"
-      />
+    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Lokalt søk">
+      <label className="text-sm font-black text-slate-800" htmlFor="stress-search">Søk lokalt i tiltak, kilder og moduler</label>
+      <div className="mt-2 flex min-h-12 items-center gap-2 rounded-2xl border border-slate-300 bg-white px-3 focus-within:border-sky-700 focus-within:ring-2 focus-within:ring-sky-100">
+        <OperationalIcon name="search" className="h-5 w-5 shrink-0 text-slate-500" />
+        <input
+          id="stress-search"
+          type="search"
+          value={query}
+          onChange={(event) => setManualQuery(event.target.value)}
+          placeholder="Prøv jod, rens, MFE, samband, dose, tilfluktsrom, FIG10"
+          className="min-h-11 w-full min-w-0 border-0 bg-transparent px-1 text-base font-semibold outline-none placeholder:text-slate-400"
+        />
+      </div>
       {freshnessLabel ? <p className="mt-2 text-xs font-semibold text-slate-600">{freshnessLabel}</p> : null}
       {!query ? <p className="mt-3 text-sm text-slate-600">Vanlige stressord: jod, rens, MFE, samband, dose, tilfluktsrom, FIG10.</p> : null}
       {enableFilters ? (
-        <fieldset className="mt-4 space-y-3">
+        <fieldset className="mt-4 space-y-3 rounded-2xl bg-slate-50 p-3">
           <legend className="sr-only">Søkefiltre</legend>
           <div className="flex flex-wrap gap-2">
             {PHASE_FILTERS.map((phase) => (
@@ -223,7 +258,7 @@ export function SearchBox({
           {hasActiveFilters ? (
             <button
               type="button"
-              className="rounded-full border border-slate-300 px-3 py-2 text-sm font-bold text-slate-700"
+              className="min-h-11 rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700"
               onClick={resetFilters}
             >
               Fjern aktive filtre
@@ -237,7 +272,7 @@ export function SearchBox({
             <>
               <p className="font-semibold">{rawResults.length} treff skjult av filtre.</p>
               <Link
-                className="inline-flex min-h-11 items-center rounded-full bg-sky-900 px-4 text-sm font-black text-white"
+                className="inline-flex min-h-11 items-center rounded-full bg-[#082F49] px-4 text-sm font-black text-white"
                 href={resetFiltersHref}
                 onClick={resetFiltersAndPreserveQuery}
               >
@@ -254,7 +289,7 @@ export function SearchBox({
                 {suggestions.map((suggestion) => (
                   <li key={suggestion}>
                     <Link
-                      className="rounded-full bg-sky-50 px-3 py-1 font-bold text-sky-900"
+                      className="inline-flex min-h-11 items-center rounded-full bg-sky-50 px-3 py-1 font-bold text-sky-900"
                       href={searchPath(suggestionBasePath, suggestion)}
                       onClick={() => setManualQuery(null)}
                     >
@@ -268,21 +303,25 @@ export function SearchBox({
         </div>
       ) : null}
       <div className="mt-3 space-y-3">
+        {topHits.length > 0 ? (
+          <div>
+            <h2 className="text-sm font-black uppercase tracking-wide text-slate-500">Topptreff</h2>
+            <ul className="mt-2 space-y-2">
+              {topHits.map((doc) => (
+                <li key={doc.id}>
+                  <SearchResultRow doc={doc} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         {Object.entries(grouped).map(([type, docs]) => (
           <div key={type}>
-            <h2 className="text-sm font-black uppercase tracking-wide text-slate-500">{type}</h2>
+            <h2 className="text-sm font-black uppercase tracking-wide text-slate-500">{topHits.length > 0 ? `Andre treff · ${type}` : type}</h2>
             <ul className="mt-2 space-y-2">
               {docs.map((doc) => (
                 <li key={doc.id}>
-                  <Link className="block rounded-2xl bg-slate-50 p-3 text-slate-900" href={doc.href ?? '#'} aria-label={doc.title}>
-                    <span className="block font-semibold">{doc.title}</span>
-                    <span className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold text-slate-600">
-                      {termsLabel(doc.terms) ? <span>Søkeord: {termsLabel(doc.terms)}</span> : null}
-                      {doc.phase ? <span>Fase: {doc.phase}</span> : null}
-                      {doc.type ? <span>Type: {typeMetadataLabel(doc.type)}</span> : null}
-                      {doc.sourceStatus ? <span>Kilde: {doc.sourceStatus}</span> : null}
-                    </span>
-                  </Link>
+                  <SearchResultRow doc={doc} />
                 </li>
               ))}
             </ul>

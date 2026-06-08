@@ -105,7 +105,7 @@ export function OfflineStatus() {
   return (
     <div data-testid="offline-status" className="border-b border-slate-200 bg-white px-4 py-2 text-center text-xs font-semibold text-slate-700" aria-live="polite">
       <div>
-        {state.online ? 'Online' : 'Offline / frakoblet — cached/stale content allowed'} · SW {state.ready ? 'klar' : 'starter'} · cache {shortOfflineVersion(state.cacheVersion || SW_CACHE_NAME)} · contentVersion {shortOfflineVersion(state.contentVersion)}
+        {state.online ? 'Online' : 'Offline / frakoblet — cached/stale content allowed'} · SW {state.ready ? 'klar' : 'starter'} · cache {shortOfflineVersion(state.cacheVersion || SW_CACHE_NAME)}
       </div>
       {warning ? (
         <div data-testid="content-cache-stale-warning" className="mt-1 font-black text-amber-800">

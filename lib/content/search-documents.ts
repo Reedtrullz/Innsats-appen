@@ -60,6 +60,7 @@ export function buildSearchDocuments({
       href: `/kort/${card.slug}`,
       sourceStatus: sourceStatusFor(card.sourceIds, sourcesById),
       sourceIds: card.sourceIds,
+      priority: card.priority,
     })),
     ...sources
       .filter((source) => source.pilotReviewStatus !== 'rejected-for-pilot')

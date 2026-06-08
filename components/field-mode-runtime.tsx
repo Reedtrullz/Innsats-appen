@@ -13,6 +13,7 @@ import {
 import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
 import { listMissions } from '@/lib/mission/local-store';
 import type { MissionContext } from '@/lib/mission/schemas';
+import { OperationalIcon } from './ui/operational-icons';
 
 export function FieldModeRuntime() {
   const [settings, setSettings] = useState<FieldModeSettings>(DEFAULT_FIELD_MODE_SETTINGS);
@@ -109,10 +110,13 @@ export function ActiveMissionShortcut() {
   if (!mission) return null;
 
   return (
-    <div className="border-b border-sky-200 bg-sky-50 px-4 py-2 text-sm font-bold text-sky-950" aria-label="Aktivt oppdrag">
-      <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-2">
-        <span>Aktivt lokalt oppdrag klart</span>
-        <Link href="/oppdrag" className="inline-flex min-h-12 items-center rounded-xl bg-sky-900 px-4 text-white">Åpne oppdrag</Link>
+    <div className="border-b border-sky-200 bg-sky-50 px-3 py-2 text-sm font-bold text-sky-950" aria-label="Aktivt oppdrag">
+      <div className="mx-auto flex max-w-3xl items-center justify-between gap-2">
+        <span className="inline-flex min-w-0 items-center gap-2">
+          <OperationalIcon name="briefcase" className="h-4 w-4 shrink-0" />
+          <span className="truncate">Aktivt lokalt oppdrag klart</span>
+        </span>
+        <Link href="/oppdrag" className="inline-flex min-h-11 shrink-0 items-center rounded-xl bg-[#082F49] px-3 text-xs font-black text-white">Åpne</Link>
       </div>
     </div>
   );

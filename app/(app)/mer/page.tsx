@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { OperationalStatusPills } from '@/components/operational-status-pills';
+import { getContentManifest } from '@/lib/content/load-content';
 
 const operationalLinks = [
   {
@@ -75,6 +77,8 @@ function LinkCard({ href, label, description }: { href: string; label: string; d
 }
 
 export default function MorePage() {
+  const manifest = getContentManifest();
+
   return (
     <article className="space-y-5">
       <section className="rounded-3xl bg-slate-950 p-6 text-white shadow-sm">
@@ -83,6 +87,22 @@ export default function MorePage() {
         <p className="mt-3 text-sm font-semibold text-slate-200">
           Kilder, læring, innstillinger og administrative kontroller samlet utenfor den feltvendte hovedflyten.
         </p>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" aria-labelledby="more-status-heading">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-black uppercase tracking-wide text-sky-800">Status</p>
+            <h2 id="more-status-heading" className="text-2xl font-black text-slate-950">Status på enheten</h2>
+            <p className="mt-1 text-sm font-semibold text-slate-700">MVP-grenser og innholdsversjon samlet utenfor felt-headeren.</p>
+          </div>
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">
+            Innhold: <span data-testid="more-content-version">{manifest.contentVersion}</span>
+          </span>
+        </div>
+        <div className="mt-3">
+          <OperationalStatusPills />
+        </div>
       </section>
 
       <section className="space-y-3" aria-labelledby="more-operational-heading">

@@ -21,8 +21,8 @@ it('shows the operational command-surface landing page', async () => {
   expect(screen.getByRole('link', { name: /Alvorlig ulykke/i })).toHaveAttribute('href', '/kort/alvorlig-ulykke-dod-eget-personell');
   expect(screen.getByRole('link', { name: /Psykologisk førstehjelp/i })).toHaveAttribute('href', '/kort/psykologisk-forstehjelp-sekvens');
   expect(screen.getByRole('link', { name: /Samband \/ ordre/i })).toHaveAttribute('href', '/kort/sambandsplan-start');
-  expect(screen.getByText('Offline-klar')).toBeInTheDocument();
-  expect(screen.getByText('Lagres lokalt')).toBeInTheDocument();
+  expect(screen.getAllByText('Offline-klar').length).toBeGreaterThan(0);
+  expect(screen.getAllByText('Lagres lokalt').length).toBeGreaterThan(0);
   expect(screen.queryByRole('link', { name: /Release readiness/i })).not.toBeInTheDocument();
   expect(screen.getByText(/Ikke offisielt kommandosystem/i)).toBeInTheDocument();
 });

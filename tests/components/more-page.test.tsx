@@ -5,6 +5,10 @@ it('groups secondary and admin routes under Mer', () => {
   render(<MorePage />);
 
   expect(screen.getByRole('heading', { name: 'Mer' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Status på enheten/i })).toBeInTheDocument();
+  expect(screen.getByTestId('more-content-version')).toBeInTheDocument();
+  expect(screen.getByText('Offline-klar')).toBeInTheDocument();
+  expect(screen.getByText('Lagres lokalt')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /^Kilder$/i })).toHaveAttribute('href', '/kilder');
   expect(screen.getByRole('link', { name: /Moduler/i })).toHaveAttribute('href', '/laering');
   expect(screen.getByRole('link', { name: /Feltmodus/i })).toHaveAttribute('href', '/feltmodus');

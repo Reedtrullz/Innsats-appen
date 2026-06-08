@@ -70,12 +70,12 @@ it('shows compact operational chrome and keeps release/admin under Mer', async (
   await renderAndFlush(<AppShell currentPath="/hurtigkort"><p>Innhold</p></AppShell>);
   const header = within(screen.getByRole('banner'));
 
-  expect(screen.getByTestId('shell-content-version')).toBeInTheDocument();
   expect(header.getByRole('link', { name: /Beredskapsboka/i })).toHaveAttribute('href', '/');
   expect(header.getByRole('link', { name: /Må leses/i })).toHaveAttribute('href', '/ma-leses');
   expect(header.getByRole('link', { name: 'Mer' })).toHaveAttribute('href', '/mer');
   expect(header.getByText('Offline')).toBeInTheDocument();
   expect(header.getByText('Lokalt')).toBeInTheDocument();
+  expect(header.queryByText(/Innhold:/i)).not.toBeInTheDocument();
   expect(header.queryByText('Kilde')).not.toBeInTheDocument();
   expect(header.queryByText('Ikke kommando')).not.toBeInTheDocument();
   expect(screen.queryByRole('link', { name: /Release/i })).not.toBeInTheDocument();

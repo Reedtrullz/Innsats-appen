@@ -17,7 +17,7 @@ it('finds operational stress terms locally', async () => {
   for (const term of ['jod', 'rens', 'MFE', 'samband', 'dose', 'tilfluktsrom', 'tilflukt', 'FIG10']) {
     await userEvent.clear(screen.getByRole('searchbox'));
     await userEvent.type(screen.getByRole('searchbox'), term);
-    expect(screen.getByText(/kort/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/kort/i).length).toBeGreaterThan(0);
   }
 });
 
@@ -85,6 +85,15 @@ it('shows operational result metadata and query terms', async () => {
   expect(screen.getByText(/Søkeord:/i)).toHaveTextContent(/pumpe/i);
   expect(screen.getByText(/Fase:/i)).toHaveTextContent(/under/i);
   expect(screen.getByText(/Kilde: verified/i)).toBeInTheDocument();
+});
+
+it('marks high-priority tiltak results with an explicit critical badge', async () => {
+  render(<SearchBox documents={[{ ...docs[2], priority: 'high' }]} />);
+
+  await userEvent.type(screen.getByRole('searchbox'), 'pumpe');
+
+  expect(screen.getByRole('link', { name: /Pumpe og vannforsyning/i })).toBeInTheDocument();
+  expect(screen.getByText(/Kritisk prioritet/i)).toBeInTheDocument();
 });
 
 it('filters operational search results by phase, type and source status', async () => {

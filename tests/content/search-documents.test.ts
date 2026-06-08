@@ -19,6 +19,7 @@ it('builds routeable search documents with operational metadata', () => {
     phase: 'under',
     scenario: 'flom',
     role: 'lagforer',
+    priority: 'high',
     sourceStatus: 'verified',
     sourceIds: ['src-flom'],
   });
