@@ -101,7 +101,7 @@ export function AfterActionReportControls({ mission, displaySignals, checklists,
       </details>
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
         <p className="text-sm font-black text-slate-900">3 · Eksporter</p>
-        <button type="button" onClick={() => void generateMarkdown()} className="mt-3 min-h-11 w-full rounded-xl bg-slate-950 px-4 font-bold text-white sm:w-auto">Generer etterrapport</button>
+        <button type="button" onClick={() => void generateMarkdown()} className="mt-3 min-h-11 w-full rounded-xl bg-slate-950 px-4 font-bold text-white sm:w-auto">Bygg etterrapport</button>
         <details className="mt-3 rounded-2xl border border-slate-200 bg-white p-3">
           <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Avanserte eksportformater</summary>
           <div className="mt-3 flex flex-wrap gap-2">

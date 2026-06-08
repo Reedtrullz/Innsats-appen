@@ -427,7 +427,7 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
   await userEvent.type(within(afterActionSection!).getByLabelText(/Lokal ordretekst/i), 'Ordre fra lokal tavle');
   await userEvent.type(within(afterActionSection!).getByLabelText(/Lokalt samband/i), 'Samband kanal lokal');
   await userEvent.type(within(afterActionSection!).getByLabelText(/Lokal logg/i), 'Loggpunkt uten persondata');
-  await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Generer etterrapport/i }));
+  await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Bygg etterrapport/i }));
   await userEvent.click(within(afterActionSection!).getByText(/Avanserte eksportformater/i));
   await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Lag JSON/i }));
   await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Lag PDF-klar HTML/i }));
@@ -540,7 +540,7 @@ it('generates a local oppdragsmappe export with map and log artifacts', async ()
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[]} />);
   await screen.findByRole('heading', { name: /Gjør dette først/i });
   await openExportDetails(/Samlet lokal oppdragsmappe/i);
-  await userEvent.click(screen.getByRole('button', { name: /Generer oppdragsmappe/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Bygg oppdragsmappe/i }));
 
   const markdown = await screen.findByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
   await userEvent.click(screen.getByText(/Vis JSON/i));
@@ -604,7 +604,7 @@ it('scopes current mission dashboard, after-action and folder map outputs away f
   await openExportDetails(/Etterrapport/i);
   const afterActionSection = document.querySelector('#etterrapport') as HTMLElement | null;
   expect(afterActionSection).not.toBeNull();
-  await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Generer etterrapport/i }));
+  await userEvent.click(within(afterActionSection!).getByRole('button', { name: /Bygg etterrapport/i }));
   const afterActionMarkdown = await within(afterActionSection!).findByLabelText(/Etteraksjonsrapport Markdown/i) as HTMLTextAreaElement;
   expect(afterActionMarkdown.value).toContain('Current UI marker');
   expect(afterActionMarkdown.value).toContain('Current UI sector');
@@ -613,7 +613,7 @@ it('scopes current mission dashboard, after-action and folder map outputs away f
   await openExportDetails(/Samlet lokal oppdragsmappe/i);
   const folderSection = document.querySelector('#oppdragsmappe') as HTMLElement | null;
   expect(folderSection).not.toBeNull();
-  await userEvent.click(within(folderSection!).getByRole('button', { name: /Generer oppdragsmappe/i }));
+  await userEvent.click(within(folderSection!).getByRole('button', { name: /Bygg oppdragsmappe/i }));
   const folderMarkdown = await within(folderSection!).findByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
   await userEvent.click(within(folderSection!).getByText(/Vis JSON/i));
   const folderJson = await within(folderSection!).findByLabelText(/Oppdragsmappe JSON/i) as HTMLTextAreaElement;
@@ -990,7 +990,7 @@ it('shows a situation-first mission dashboard with next action, progress and exp
   expect(screen.queryByText('Avansert / dokumentasjon')).not.toBeInTheDocument();
 
   await openMissionMode('Eksport');
-  expect(screen.getAllByText(/5-punktsordre og sambandsplan/i).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/Ordre, samband og status/i).length).toBeGreaterThan(0);
   expect(screen.getAllByText(/RUH og velferd/i).length).toBeGreaterThan(0);
   const advancedDetails = screen.getByText('Avansert / dokumentasjon').closest('details') as HTMLDetailsElement | null;
   expect(advancedDetails?.open).toBe(false);

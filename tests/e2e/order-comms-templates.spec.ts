@@ -10,6 +10,7 @@ function formByHeading(page: Page, heading: string) {
 }
 
 async function fillFivePointOrder(form: Locator) {
+  await form.getByRole('tab', { name: /Fem punkter/i }).click();
   await form.getByLabel('Situasjon').fill('Teststatus: vannstand stiger ved offentlig kai. Ingen persondata.');
   await form.getByLabel('Oppdrag').fill('Støtt lokal sikring og rapporter endringer til leder.');
   await form.getByLabel('Utførelse').fill('Prioriter sikker adkomst, logg tiltak og stopp ved uavklarte farer.');
@@ -36,18 +37,23 @@ test.beforeEach(async ({ page }) => {
 
 test('exports expanded 5-punktsordre templates after readback confirmation', async ({ page }) => {
   await createLocalMission(page, { title: `Ordre mal ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Ordre testområde' });
-  await openMissionDetails(page, /5-punktsordre og sambandsplan/i, 'Eksport');
+  await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
   const form = formByHeading(page, '5-punktsordre');
   await expect(form.getByText(/Lokal beslutningsstøtte/i)).toBeVisible();
+  await form.getByRole('tab', { name: /Eksporter/i }).click();
   await expect(form.getByRole('button', { name: /Eksporter Markdown/i })).toBeDisabled();
 
   await fillFivePointOrder(form);
+  await form.getByRole('tab', { name: /Bekreft/i }).click();
   await form.getByLabel(/Tilbakelesing\/forstått/i).check();
+  await form.getByRole('tab', { name: /Eksporter/i }).click();
   await form.getByText(/Flere eksportformater/i).click();
 
   for (let index = 0; index < templateIds.length; index += 1) {
+    await form.getByRole('tab', { name: /Mal/i }).click();
     await form.getByLabel(/Rolle\/mal for 5-punktsordre/i).selectOption(templateIds[index]);
     await expect(form.getByText(new RegExp(`Malveiledning: ${templateLabels[index].replace('/', '\\/')}`, 'i'))).toBeVisible();
+    await form.getByRole('tab', { name: /Eksporter/i }).click();
     await form.getByRole('button', { name: /Eksporter JSON/i }).click();
     const exported = await form.locator('pre').textContent();
     expect(exported).toBeTruthy();
@@ -67,7 +73,7 @@ test('exports expanded 5-punktsordre templates after readback confirmation', asy
 
 test('exports expanded sambandsplan templates with local-only warnings', async ({ page }) => {
   await createLocalMission(page, { title: `Samband mal ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Samband testområde' });
-  await openMissionDetails(page, /5-punktsordre og sambandsplan/i, 'Eksport');
+  await openMissionDetails(page, /Sambandsplan/i, 'Eksport');
   const form = formByHeading(page, 'Sambandsplan');
   await expect(form.getByText(/ikke legg inn persondata eller sensitive sambandstabeller/i)).toBeVisible();
 

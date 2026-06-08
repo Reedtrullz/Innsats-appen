@@ -17,6 +17,24 @@ afterEach(async () => {
   await clearLocalMissionData();
 });
 
+async function fillFivePointOrderFields() {
+  await userEvent.click(screen.getByRole('tab', { name: /Fem punkter/i }));
+  for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
+    const field = screen.getByLabelText(new RegExp(label, 'i'));
+    expect(field).toBeRequired();
+    await userEvent.type(field, `${label} tekst`);
+  }
+}
+
+async function confirmFivePointOrderReadback() {
+  await userEvent.click(screen.getByRole('tab', { name: /Bekreft/i }));
+  const readback = screen.getByLabelText(/tilbakelesing\/forstått er bekreftet/i);
+  expect(readback).toBeRequired();
+  await userEvent.click(readback);
+  await userEvent.click(screen.getByRole('tab', { name: /Eksporter/i }));
+  return readback;
+}
+
 it('requires all five order points and renders exported markdown', async () => {
   render(<FivePointOrderForm contentVersion="test-content-ui" />);
   expect(screen.getByText(/lokal beslutningsstøtte/i)).toBeInTheDocument();
@@ -31,12 +49,9 @@ it('requires all five order points and renders exported markdown', async () => {
   await userEvent.selectOptions(templateSelect, 'mfe');
   await userEvent.click(screen.getByText(/Malveiledning: MFE/i));
   expect(screen.getByText(/mobil forsterkningsenhet/i)).toBeInTheDocument();
-  for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
-    const field = screen.getByLabelText(new RegExp(label, 'i'));
-    expect(field).toBeRequired();
-    await userEvent.type(field, `${label} tekst`);
-  }
+  await fillFivePointOrderFields();
   await userEvent.type(screen.getByLabelText(/Notes/i), 'lokal note');
+  await userEvent.click(screen.getByRole('tab', { name: /Eksporter/i }));
   const markdownButton = screen.getByRole('button', { name: /Eksporter Markdown/i });
   expect(markdownButton).toBeDisabled();
   await userEvent.click(screen.getByText(/Flere eksportformater/i));
@@ -44,9 +59,7 @@ it('requires all five order points and renders exported markdown', async () => {
   const pdfButton = screen.getByRole('button', { name: /Lag PDF-klar HTML/i });
   expect(jsonButton).toBeDisabled();
   expect(pdfButton).toBeDisabled();
-  const readback = screen.getByLabelText(/tilbakelesing\/forstått er bekreftet/i);
-  expect(readback).toBeRequired();
-  await userEvent.click(readback);
+  const readback = await confirmFivePointOrderReadback();
   expect(markdownButton).toBeEnabled();
   expect(jsonButton).toBeEnabled();
   expect(pdfButton).toBeEnabled();
@@ -67,10 +80,11 @@ it('requires all five order points and renders exported markdown', async () => {
 it('clears stale 5-punktsordre export preview when order text changes', async () => {
   render(<FivePointOrderForm contentVersion="test-content-ui" />);
 
+  await userEvent.click(screen.getByRole('tab', { name: /Fem punkter/i }));
   for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
     await userEvent.type(screen.getByLabelText(new RegExp(label, 'i')), `${label} første`);
   }
-  await userEvent.click(screen.getByLabelText(/tilbakelesing\/forstått er bekreftet/i));
+  await confirmFivePointOrderReadback();
   await userEvent.click(screen.getByRole('button', { name: /Eksporter Markdown/i }));
 
   expect(screen.getByText(/# 5-punktsordre/i)).toBeInTheDocument();
@@ -85,11 +99,9 @@ it('clears stale 5-punktsordre export preview when order text changes', async ()
 it('blocks 5-punktsordre preview when sensitive text is entered', async () => {
   render(<FivePointOrderForm contentVersion="test-content-ui" />);
 
-  for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
-    await userEvent.type(screen.getByLabelText(new RegExp(label, 'i')), `${label} tekst`);
-  }
+  await fillFivePointOrderFields();
   await userEvent.type(screen.getByLabelText(/Notes/i), 'Pasient Ola Nordmann skal følges opp');
-  await userEvent.click(screen.getByLabelText(/tilbakelesing\/forstått er bekreftet/i));
+  await confirmFivePointOrderReadback();
   await userEvent.click(screen.getByRole('button', { name: /Eksporter Markdown/i }));
 
   expect(await screen.findByText(/Eksport blokkert/i)).toBeInTheDocument();
@@ -196,9 +208,10 @@ it('mounts order and comms forms in the mission route', async () => {
   await saveMission(buildMission({ id: 'mission-order-route', title: 'Ordre route' }));
   render(<MissionsPage />);
   await userEvent.click(await screen.findByRole('tab', { name: 'Eksport' }));
-  expect(screen.getByText(/5-punktsordre og sambandsplan/i)).toBeInTheDocument();
-  await userEvent.click(screen.getByText(/5-punktsordre og sambandsplan/i));
-  expect(screen.getAllByRole('button', { name: /Eksporter Markdown/i }).length).toBeGreaterThanOrEqual(2);
+  expect(screen.getByText(/Ordre, samband og status/i)).toBeInTheDocument();
+  await userEvent.click((screen.getAllByText(/^5-punktsordre$/i)[0]));
+  await userEvent.click((screen.getAllByText(/^Sambandsplan$/i)[0]));
+  expect(screen.getAllByRole('button', { name: /Eksporter Markdown/i }).length).toBeGreaterThanOrEqual(1);
   expect(screen.getByLabelText(/rolle\/mal for sambandsplan/i)).toBeInTheDocument();
-  expect(screen.getAllByRole('button', { name: /Eksporter JSON/i }).length).toBeGreaterThanOrEqual(2);
+  expect(screen.getAllByRole('button', { name: /Eksporter JSON/i }).length).toBeGreaterThanOrEqual(1);
 });

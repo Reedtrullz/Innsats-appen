@@ -25,9 +25,23 @@ export function MissionFolderExportControls({ mission, checklists, mapState }: {
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Oppdragsmappe</p>
         <h3 className="text-xl font-black">Lokal oppdragsmappe</h3>
-        <p className="mt-1 text-sm font-semibold text-amber-900">Generer lokalt, se over, kopier/eksporter. Ikke offisielt arkiv.</p>
+        <p className="mt-1 text-sm font-semibold text-amber-900">Bygg lokalt, se over, eksporter. Ikke offisielt arkiv.</p>
       </div>
-      <button type="button" onClick={() => void generate()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Generer oppdragsmappe</button>
+      <div className="grid gap-2 sm:grid-cols-3">
+        <div className="rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-black uppercase tracking-wide text-sky-700">1 · Build</p>
+          <p className="mt-1 text-sm font-semibold text-slate-700">Samler oppdrag, sjekklister, logg og kart lokalt.</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-black uppercase tracking-wide text-sky-700">2 · Review</p>
+          <p className="mt-1 text-sm font-semibold text-slate-700">Se over innholdet før det brukes videre.</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
+          <p className="text-xs font-black uppercase tracking-wide text-sky-700">3 · Export</p>
+          <p className="mt-1 text-sm font-semibold text-slate-700">Markdown vises først etter bygging.</p>
+        </div>
+      </div>
+      <button type="button" onClick={() => void generate()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Bygg oppdragsmappe</button>
       {markdown ? (
         <label htmlFor="mission-folder-markdown" className="block text-sm font-bold">
           Oppdragsmappe Markdown

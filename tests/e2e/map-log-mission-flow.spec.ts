@@ -81,12 +81,12 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
   await expect(page.locator('#kart').getByText(/Fare observert uten persondata/i).first()).toBeVisible();
   await openMissionDetails(page, /Etterrapport/i, 'Eksport');
   const afterActionSection = page.locator('#etterrapport');
-  await afterActionSection.getByRole('button', { name: /Generer etterrapport/i }).click();
+  await afterActionSection.getByRole('button', { name: /Bygg etterrapport/i }).click();
   await expect(afterActionSection.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Fare observert uten persondata/i);
   await expect(afterActionSection.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Fare nord/i);
   await openMissionDetails(page, /Samlet lokal oppdragsmappe/i, 'Eksport');
   const folderSection = page.locator('#oppdragsmappe');
-  await folderSection.getByRole('button', { name: /Generer oppdragsmappe/i }).click();
+  await folderSection.getByRole('button', { name: /Bygg oppdragsmappe/i }).click();
   await folderSection.getByText(/Vis JSON/i).click();
   await expect(folderSection.getByLabel(/Oppdragsmappe JSON/i)).toHaveValue(/schematic-0-100-local-only/i);
 

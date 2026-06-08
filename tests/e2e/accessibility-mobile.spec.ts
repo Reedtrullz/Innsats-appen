@@ -124,13 +124,17 @@ test('mission and local export form controls have accessible labels', async ({ p
     scenario: 'flom',
     location: 'Formlabel testområde',
   });
-  await openMissionDetails(page, /5-punktsordre og sambandsplan/i, 'Eksport');
+  await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
   const orderForm = page.locator('form').filter({ has: page.getByRole('heading', { name: '5-punktsordre' }) });
-  for (const label of ['Rolle/mal for 5-punktsordre', 'Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband', 'Notes']) {
+  await expect(orderForm.getByLabel(/Rolle\/mal for 5-punktsordre/i)).toBeVisible();
+  await orderForm.getByRole('tab', { name: /Fem punkter/i }).click();
+  for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband', 'Notes']) {
     await expect(orderForm.getByLabel(new RegExp(label.replace('/', '\\/'), 'i'))).toBeVisible();
   }
+  await orderForm.getByRole('tab', { name: /Bekreft/i }).click();
   await expect(orderForm.getByLabel(/Tilbakelesing\/forstått er bekreftet/i)).toBeVisible();
 
+  await openMissionDetails(page, /Sambandsplan/i, 'Eksport');
   const commsForm = page.locator('form').filter({ has: page.getByRole('heading', { name: 'Sambandsplan' }) });
   for (const label of [
     'Rolle/mal for sambandsplan',

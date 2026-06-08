@@ -148,7 +148,7 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await afterActionSection.getByLabel(/Lokal ordretekst/i).fill('Lokal ordre test uten persondata.');
   await afterActionSection.getByLabel(/Lokalt samband/i).fill('Samband etter lokal plan.');
   await afterActionSection.getByLabel(/Lokal logg/i).fill('Terskel merket. Ventilasjon kontrollert.');
-  await afterActionSection.getByRole('button', { name: /Generer etterrapport/i }).click();
+  await afterActionSection.getByRole('button', { name: /Bygg etterrapport/i }).click();
   await expect(afterActionSection.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Lokal ordre test/);
   await afterActionSection.getByText('Avanserte eksportformater').click();
   await afterActionSection.getByRole('button', { name: /Lag JSON/i }).click();

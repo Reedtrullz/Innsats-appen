@@ -17,6 +17,7 @@ function value(form: FormData, key: string) {
 }
 
 type ExportFormat = 'markdown' | 'json' | 'pdf';
+type OrderStep = 'template' | 'points' | 'confirm' | 'export';
 
 interface ExportPreview {
   format: ExportFormat;
@@ -33,9 +34,16 @@ interface FivePointOrderFormProps {
 
 const EXPORT_BLOCKED_MESSAGE = 'Eksport blokkert: Fjern persondata, pasientdata, kontaktopplysninger eller skjermet informasjon før lokal eksport.';
 
-function StepBlock({ step, title, children }: { step: number; title: string; children: ReactNode }) {
+const orderSteps: Array<{ id: OrderStep; label: string }> = [
+  { id: 'template', label: 'Mal' },
+  { id: 'points', label: 'Fem punkter' },
+  { id: 'confirm', label: 'Bekreft' },
+  { id: 'export', label: 'Eksporter' },
+];
+
+function StepBlock({ step, title, active, children }: { step: number; title: string; active: boolean; children: ReactNode }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+    <section hidden={!active} aria-hidden={!active} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
       <div className="flex items-center gap-2">
         <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-[#082F49] text-xs font-black text-white">{step}</span>
         <h3 className="text-base font-black text-slate-950">{title}</h3>
@@ -64,6 +72,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
   const [readbackConfirmed, setReadbackConfirmed] = useState(false);
   const [preview, setPreview] = useState<ExportPreview | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [activeStep, setActiveStep] = useState<OrderStep>('template');
   const template = selectedTemplate(templateId);
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -95,8 +104,26 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Velg mal → fyll fem punkter → tilbakelesing → eksport</p>
         <h2 className="text-2xl font-black">5-punktsordre</h2>
       </div>
+      <div className="grid grid-cols-4 gap-1 rounded-2xl bg-slate-100 p-1" role="tablist" aria-label="5-punktsordre steg">
+        {orderSteps.map((step) => {
+          const selected = activeStep === step.id;
+          return (
+            <button
+              key={step.id}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              onClick={() => setActiveStep(step.id)}
+              className={selected ? 'min-h-11 rounded-xl bg-[#082F49] px-2 text-xs font-black text-white' : 'min-h-11 rounded-xl px-2 text-xs font-black text-slate-700 hover:bg-white'}
+            >
+              {step.label}
+            </button>
+          );
+        })}
+      </div>
+      <p className="rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Lokal beslutningsstøtte. Kontroller mot gjeldende ordre og unngå persondata før eksport.</p>
 
-      <StepBlock step={1} title="Velg mal">
+      <StepBlock step={1} title="Velg mal" active={activeStep === 'template'}>
         <label className="block text-sm font-bold">
           Rolle/mal for 5-punktsordre
           <select
@@ -126,19 +153,20 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
             <li><strong>Ledelse/samband:</strong> {template.guidance.ledelseSamband}</li>
           </ul>
         </details>
+        <button type="button" onClick={() => setActiveStep('points')} className="min-h-11 w-full rounded-xl bg-[#082F49] px-4 font-bold text-white">Neste: fyll fem punkter</button>
       </StepBlock>
 
-      <StepBlock step={2} title="Fyll fem punkter">
-        <p className="rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Lokal beslutningsstøtte. Kontroller mot gjeldende ordre og unngå persondata.</p>
+      <StepBlock step={2} title="Fyll fem punkter" active={activeStep === 'points'}>
         <label className="block text-sm font-bold">Situasjon<textarea name="situasjon" required placeholder={template.guidance.situasjon} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
         <label className="block text-sm font-bold">Oppdrag<textarea name="oppdrag" required placeholder={template.guidance.oppdrag} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
         <label className="block text-sm font-bold">Utførelse<textarea name="utforelse" required placeholder={template.guidance.utforelse} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
         <label className="block text-sm font-bold">Administrasjon/forsyning<textarea name="administrasjonForsyning" required placeholder={template.guidance.administrasjonForsyning} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
         <label className="block text-sm font-bold">Ledelse/samband<textarea name="ledelseSamband" required placeholder={template.guidance.ledelseSamband} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
         <label className="block text-sm font-bold">Notes<textarea name="notes" className="mt-1 min-h-20 w-full rounded-2xl border px-3 py-2" /></label>
+        <button type="button" onClick={() => setActiveStep('confirm')} className="min-h-11 w-full rounded-xl bg-[#082F49] px-4 font-bold text-white">Neste: bekreft tilbakelesing</button>
       </StepBlock>
 
-      <StepBlock step={3} title="Bekreft tilbakelesing">
+      <StepBlock step={3} title="Bekreft tilbakelesing" active={activeStep === 'confirm'}>
         <label className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-950">
           <input
             type="checkbox"
@@ -155,9 +183,10 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
           Tilbakelesing/forstått er bekreftet før lokal eksport
         </label>
         {!readbackConfirmed ? <p className="rounded-xl bg-white p-3 text-sm font-semibold text-slate-700 ring-1 ring-slate-200">Bekreft tilbakelesing/forstått for å åpne lokal eksport.</p> : null}
+        <button type="button" onClick={() => setActiveStep('export')} disabled={!readbackConfirmed} className="min-h-11 w-full rounded-xl bg-[#082F49] px-4 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Neste: eksport</button>
       </StepBlock>
 
-      <StepBlock step={4} title="Eksporter">
+      <StepBlock step={4} title="Eksporter" active={activeStep === 'export'}>
         <button type="submit" name="format" value="markdown" disabled={!readbackConfirmed} className="min-h-12 w-full rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter Markdown</button>
         <details className="rounded-2xl border border-slate-200 bg-white p-3">
           <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Flere eksportformater</summary>
