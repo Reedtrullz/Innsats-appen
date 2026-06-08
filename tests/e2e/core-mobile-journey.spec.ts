@@ -35,9 +35,9 @@ test('mobile user can search, open source-backed card, create mission, run check
   const missionTitle = `Mobil øvelse tilfluktsrom ${Date.now()}`;
 
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: /Hva står du i nå/i })).toBeVisible();
-  await expect(page.getByRole('link', { name: /Start lokalt oppdrag/i })).toBeVisible();
-  await expect(page.getByRole('link', { name: /Finn tiltak raskt/i })).toHaveAttribute('href', '/sok');
+  await expect(page.getByRole('heading', { name: /Hva trenger du nå/i })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Fortsett\/start oppdrag/i })).toBeVisible();
+  await expect(page.getByRole('link', { name: /^Søk/i }).first()).toHaveAttribute('href', '/sok');
   await expect(page.getByRole('link', { name: /Release readiness/i })).toHaveCount(0);
   await expect(page.getByRole('navigation', { name: /Hovednavigasjon/i }).getByRole('link', { name: 'Søk' })).toBeVisible();
   await expect(page.locator('html')).not.toHaveCSS('overflow-x', 'scroll');

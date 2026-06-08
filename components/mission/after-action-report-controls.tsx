@@ -62,7 +62,7 @@ export function AfterActionReportControls({ mission, displaySignals, checklists,
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Lokal etterrapport</p>
         <h3 className="text-xl font-black">Etteraksjonsrapport</h3>
-        <p className="mt-1 text-sm font-semibold text-amber-900">PDF-klar utskrift er HTML for nettleserens Skriv ut &gt; Lagre som PDF. Ikke offisiell innsending. Lagres bare lokalt; ikke legg inn persondata, pasientdata, sensitive private lokasjoner eller skjermet operativ informasjon.</p>
+        <p className="mt-1 text-sm font-semibold text-amber-900">Generer lokalt, se over, kopier/eksporter. Ikke legg inn persondata.</p>
       </div>
       <div role="region" aria-label="RUH/velferd lokal gjennomgang før eksport" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-950">
         <div className="flex flex-wrap items-start justify-between gap-2">
@@ -95,11 +95,14 @@ export function AfterActionReportControls({ mission, displaySignals, checklists,
           <textarea value={localLogText} onChange={(event) => setLocalLogText(event.target.value)} className="mt-1 min-h-28 w-full rounded-xl border border-slate-300 p-3 font-mono text-xs" placeholder="Valgfritt. Én hendelse per linje, uten persondata." />
         </label>
       </div>
-      <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={() => void generateMarkdown()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag etteraksjonsrapport Markdown</button>
-        <button type="button" onClick={() => void generateJson()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag etteraksjonsrapport JSON</button>
-        <button type="button" onClick={() => void generatePdfReadyHtml()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag PDF-klar etteraksjonsrapport</button>
-      </div>
+      <button type="button" onClick={() => void generateMarkdown()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Generer etterrapport</button>
+      <details className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+        <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Avanserte eksportformater</summary>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button type="button" onClick={() => void generateJson()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag JSON</button>
+          <button type="button" onClick={() => void generatePdfReadyHtml()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag PDF-klar HTML</button>
+        </div>
+      </details>
       {markdown ? (
         <label htmlFor="after-action-markdown" className="block text-sm font-bold">
           Etteraksjonsrapport Markdown
@@ -121,4 +124,3 @@ export function AfterActionReportControls({ mission, displaySignals, checklists,
     </section>
   );
 }
-

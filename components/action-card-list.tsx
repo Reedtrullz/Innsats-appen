@@ -8,7 +8,7 @@ import { phaseLabels, scenarioLabels, type Phase } from '@/lib/content/taxonomy'
 import { PhaseTabs } from './phase-tabs';
 import { RoleFilter } from './role-filter';
 import { ScenarioFilter } from './scenario-filter';
-import { TiltakCard } from './tiltak-card';
+import { TiltakCardFull, TiltakCardRow } from './tiltak-card';
 import { WarningBanner } from './warning-banner';
 
 export function ActionCardList({ cards, initialFilter = {}, showFilters = true }: { cards: ActionCard[]; initialFilter?: CardFilter; showFilters?: boolean }) {
@@ -17,16 +17,33 @@ export function ActionCardList({ cards, initialFilter = {}, showFilters = true }
   return (
     <section className="space-y-4">
       {showFilters ? (
-        <div className="space-y-3 rounded-3xl bg-slate-100 p-3">
+        <details className="rounded-2xl bg-slate-100 p-3">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-xl text-sm font-black text-slate-900">
+            Vis alle og filtrer
+            <span aria-hidden="true">+</span>
+          </summary>
+          <div className="mt-3 space-y-3">
           <PhaseTabs value={filter.phase} onChange={(phase) => setFilter((current) => ({ ...current, phase }))} />
           <RoleFilter value={filter.role} onChange={(role) => setFilter((current) => ({ ...current, role }))} />
           <ScenarioFilter value={filter.scenario} onChange={(scenario) => setFilter((current) => ({ ...current, scenario }))} />
           <p className="text-sm font-semibold text-slate-700">Valgte filtre: {filter.phase ? phaseLabels[filter.phase] : 'alle faser'} / {filter.scenario ? scenarioLabels[filter.scenario] : 'alle scenario'}</p>
-        </div>
+          </div>
+        </details>
       ) : null}
       {visibleCards.length === 0 ? <WarningBanner>Ingen kort matcher filteret. Prøv et annet scenario eller søk.</WarningBanner> : null}
       <div className="space-y-3">
-        {visibleCards.map((card) => <TiltakCard key={card.slug} card={card} />)}
+        {visibleCards.slice(0, 8).map((card) => <TiltakCardRow key={card.slug} card={card} />)}
+        {visibleCards.length > 8 ? (
+          <details className="rounded-2xl border border-slate-200 bg-white p-3">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-xl text-sm font-black text-slate-900">
+              Vis alle tiltakskort ({visibleCards.length})
+              <span aria-hidden="true">+</span>
+            </summary>
+            <div className="mt-3 space-y-3">
+              {visibleCards.slice(8).map((card) => <TiltakCardRow key={card.slug} card={card} />)}
+            </div>
+          </details>
+        ) : null}
       </div>
     </section>
   );
@@ -93,13 +110,21 @@ export function PhasePageContent({ phase, cards, checklists = [], latestChange, 
     <div className="space-y-5">
       <div className="rounded-3xl bg-sky-950 p-5 text-white">
         <p className="text-sm font-semibold uppercase tracking-wide">Fase</p>
-        <h1 className="text-3xl font-black">{phaseLabels[phase]}</h1>
-        <p className="mt-2 text-sm text-sky-100">Kildebelagte kort for {phaseLabels[phase].toLowerCase()}-fasen.</p>
+        <h1 className="text-3xl font-black">{phaseLabels[phase]} innsats</h1>
+        <p className="mt-2 text-sm text-sky-100">Kildebelagte kort for {phaseLabels[phase].toLowerCase()} innsats.</p>
       </div>
       <LatestProcedureNotice latestChange={latestChange} />
       <MustReadBeforeDeployment notices={phase === 'for' ? mustRead : []} />
       <PhaseChecklistSummary checklists={phaseChecklists} />
-      <ActionCardList cards={cards} initialFilter={{ phase }} showFilters={false} />
+      <div className="space-y-3">
+        {sortActionCards(filterActionCards(cards, { phase })).slice(0, 6).map((card) => <TiltakCardRow key={card.slug} card={card} />)}
+        <details className="rounded-2xl border border-slate-200 bg-white p-3">
+          <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Vis flere tiltak for fasen</summary>
+          <div className="mt-3 space-y-3">
+            {sortActionCards(filterActionCards(cards, { phase })).slice(6).map((card) => <TiltakCardFull key={card.slug} card={card} />)}
+          </div>
+        </details>
+      </div>
     </div>
   );
 }

@@ -78,13 +78,11 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
   }
 
   return (
-    <form onSubmit={onSubmit} onChange={() => { setPreview(null); setExportError(null); }} className="space-y-4 rounded-3xl bg-white p-5 shadow-sm">
+    <form onSubmit={onSubmit} onChange={() => { setPreview(null); setExportError(null); }} className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
-        <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Lokal ordre</p>
+        <p className="text-xs font-black uppercase tracking-wide text-sky-700">Mal → fem punkter → tilbakelesing → eksport</p>
         <h2 className="text-2xl font-black">5-punktsordre</h2>
-        <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Eksporteres lokalt som beslutningsstøtte. Kontroller mot gjeldende ordre og bruk bare operativt nødvendige opplysninger.</p>
-        <p className="mt-2 rounded-2xl bg-red-50 p-3 text-sm font-semibold text-red-950">{EXPORT_SENSITIVITY_WARNING}</p>
-        <p className="mt-2 rounded-2xl bg-sky-50 p-3 text-sm font-semibold text-sky-950">PDF-klar HTML er tekst for nettleserens Skriv ut &gt; Lagre som PDF. Ikke offisiell innsending.</p>
+        <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Lokal beslutningsstøtte. Kontroller mot gjeldende ordre og unngå persondata.</p>
       </div>
 
       <label className="block text-sm font-bold">
@@ -105,8 +103,8 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
         </select>
       </label>
 
-      <section className="rounded-2xl border border-sky-100 bg-sky-50 p-3 text-sm text-sky-950" aria-label="Malveiledning">
-        <h3 className="font-black">Malveiledning: {template.label}</h3>
+      <details className="rounded-2xl border border-sky-100 bg-sky-50 p-3 text-sm text-sky-950">
+        <summary className="min-h-11 cursor-pointer list-none font-black">Malveiledning: {template.label}</summary>
         <p className="mt-1 font-semibold">{template.description}</p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li><strong>Situasjon:</strong> {template.guidance.situasjon}</li>
@@ -115,7 +113,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
           <li><strong>Administrasjon/forsyning:</strong> {template.guidance.administrasjonForsyning}</li>
           <li><strong>Ledelse/samband:</strong> {template.guidance.ledelseSamband}</li>
         </ul>
-      </section>
+      </details>
 
       <label className="block text-sm font-bold">Situasjon<textarea name="situasjon" required placeholder={template.guidance.situasjon} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
       <label className="block text-sm font-bold">Oppdrag<textarea name="oppdrag" required placeholder={template.guidance.oppdrag} className="mt-1 min-h-24 w-full rounded-2xl border px-3 py-2" /></label>
@@ -140,11 +138,15 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
         Tilbakelesing/forstått er bekreftet før lokal eksport
       </label>
 
-      <div className="grid gap-2 sm:grid-cols-3">
-        <button type="submit" name="format" value="markdown" disabled={!readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter Markdown</button>
-        <button type="submit" name="format" value="json" disabled={!readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter JSON</button>
-        <button type="submit" name="format" value="pdf" disabled={!readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{preview?.format === 'pdf' ? 'Oppdater utskrift' : 'Lag PDF-klar HTML'}</button>
-      </div>
+      <button type="submit" name="format" value="markdown" disabled={!readbackConfirmed} className="min-h-12 w-full rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter Markdown</button>
+      <details className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+        <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Flere eksportformater</summary>
+        <p className="mt-2 text-sm font-semibold text-slate-700">{EXPORT_SENSITIVITY_WARNING}</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          <button type="submit" name="format" value="json" disabled={!readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Eksporter JSON</button>
+          <button type="submit" name="format" value="pdf" disabled={!readbackConfirmed} className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{preview?.format === 'pdf' ? 'Oppdater utskrift' : 'Lag PDF-klar HTML'}</button>
+        </div>
+      </details>
 
       {!readbackConfirmed ? <p className="rounded-2xl bg-slate-100 p-3 text-sm font-semibold text-slate-700">Bekreft tilbakelesing/forstått for å åpne lokal eksport.</p> : null}
       {exportError ? <p role="status" className="rounded-2xl bg-red-50 p-3 text-sm font-bold text-red-950">{exportError}</p> : null}

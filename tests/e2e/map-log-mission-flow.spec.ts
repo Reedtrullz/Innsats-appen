@@ -79,10 +79,11 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
   await expect(page.getByText(/Fare nord/i).first()).toBeVisible();
   await expect(page.getByText(/Fare observert uten persondata/i).first()).toBeVisible();
   await page.getByText('Avansert / dokumentasjon').click();
-  await page.getByRole('button', { name: /Lag etteraksjonsrapport Markdown/i }).click();
+  await page.getByRole('button', { name: /Generer etterrapport/i }).click();
   await expect(page.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Fare observert uten persondata/i);
   await expect(page.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Fare nord/i);
-  await page.getByRole('button', { name: /Lag oppdragsmappe/i }).click();
+  await page.getByRole('button', { name: /Generer oppdragsmappe/i }).click();
+  await page.getByText(/Vis JSON/i).click();
   await expect(page.getByLabel(/Oppdragsmappe JSON/i)).toHaveValue(/schematic-0-100-local-only/i);
 
   await waitForServiceWorker(page);
@@ -95,6 +96,7 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
     await expect(mapLogSummary).toContainText(/1 kartkoblet logg/i);
     await expect(mapLogSummary.getByText(new RegExp(escapeRegex(markerLabel), 'i')).first()).toBeVisible();
     await expect(mapLogSummary.getByText(new RegExp(escapeRegex(fieldLogText), 'i')).first()).toBeVisible();
+    await page.getByText('Loggoversikt og lokale oppgaver').click();
     const logOverview = page.locator('#loggoversikt');
     await expect(logOverview.getByRole('heading', { name: /Loggoversikt/i })).toBeVisible();
     await expect(logOverview.getByRole('button', { name: /Kartlogg \(1\)/i })).toBeVisible();
@@ -109,6 +111,7 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
     await expect(page.locator('#hurtiglogg')).toBeInViewport();
     await page.locator('#hurtiglogg').getByLabel(/Hurtiglogg tekst/i).fill(offlineQuickLogText);
     await page.locator('#hurtiglogg').getByRole('button', { name: /Lagre hurtiglogg/i }).click();
+    await page.getByText('Loggoversikt og lokale oppgaver').click();
     await expect(page.locator('#loggoversikt').getByText(new RegExp(escapeRegex(offlineQuickLogText), 'i')).first()).toBeVisible();
   } finally {
     await context.setOffline(false);

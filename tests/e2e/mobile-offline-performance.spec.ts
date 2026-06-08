@@ -13,7 +13,7 @@ async function expectNoHorizontalOverflow(page: import('@playwright/test').Page)
 }
 
 const coreRoutes: Array<{ route: string; heading: RegExp; maxRequests: number; maxMs: number }> = [
-  { route: '/', heading: /Hva står du i nå/i, maxRequests: 90, maxMs: 8_000 },
+  { route: '/', heading: /Hva trenger du nå/i, maxRequests: 90, maxMs: 8_000 },
   { route: '/sok', heading: /Søk i tiltak, kilder og moduler/i, maxRequests: 90, maxMs: 8_000 },
   { route: '/oppdrag', heading: /Lokale oppdrag/i, maxRequests: 90, maxMs: 8_000 },
   { route: '/under', heading: /Under/i, maxRequests: 90, maxMs: 8_000 },
@@ -53,7 +53,7 @@ test('offline app shell reload is fast after service-worker warmup', async ({ pa
   await waitForServiceWorker(page);
 
   const offlineRoutes = [
-    { route: '/', heading: /Hva står du i nå/i, hasAppShellStatus: true },
+    { route: '/', heading: /Hva trenger du nå/i, hasAppShellStatus: true },
     { route: '/sok', heading: /Søk i tiltak, kilder og moduler/i, hasAppShellStatus: true },
     { route: '/mer', heading: /^Mer$/i, hasAppShellStatus: true },
     { route: '/hurtigkort', heading: /Hurtigkort/i, hasAppShellStatus: true },

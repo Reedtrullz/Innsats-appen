@@ -119,6 +119,7 @@ test('mission and local export form controls have accessible labels', async ({ p
   }
 
   await page.goto('/oppdrag');
+  await page.getByText('Ordre og samband').click();
   const orderForm = page.locator('form').filter({ has: page.getByRole('heading', { name: '5-punktsordre' }) });
   for (const label of ['Rolle/mal for 5-punktsordre', 'Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband', 'Notes']) {
     await expect(orderForm.getByLabel(new RegExp(label.replace('/', '\\/'), 'i'))).toBeVisible();
@@ -209,6 +210,7 @@ test('screen-reader labels remain available on active mission operational contro
   });
 
   await expect(page.getByRole('heading', { name: /Kart og logg/i })).toBeVisible();
+  await page.getByText('Loggoversikt og lokale oppgaver').click();
   await page.getByText('Avansert / dokumentasjon').click();
   await expect(page.getByRole('region', { name: /Oppdragsmappe/i })).toBeVisible();
 
@@ -249,9 +251,10 @@ test('mission quick actions resolve to real dashboard targets', async ({ page })
     location: 'Ankertest',
   });
 
-  const quickActions = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Hurtighandlinger' }) });
+  const quickActions = page.locator('section[aria-labelledby="mission-quick-actions-heading"]');
   const advancedDetails = page.locator('details').filter({ hasText: 'Avansert / dokumentasjon' });
   await expect(advancedDetails).not.toHaveAttribute('open', '');
+  let secondaryActionsOpen = false;
 
   for (const [label, targetId, opensAdvanced] of [
     ['Hurtiglogg', 'hurtiglogg', false],
@@ -263,7 +266,13 @@ test('mission quick actions resolve to real dashboard targets', async ({ page })
     ['Etterrapport', 'etterrapport', true],
     ['Oppdragsmappe', 'oppdragsmappe', true],
   ] as const) {
-    await quickActions.getByRole('link', { name: new RegExp(label.replace('/', '\\/'), 'i') }).click();
+    if (['5-punktsordre', 'Sambandsplan', 'RUH/velferd', 'Etterrapport', 'Oppdragsmappe'].includes(label)) {
+      if (!secondaryActionsOpen) {
+        await quickActions.getByText('Arbeid og eksport').click();
+        secondaryActionsOpen = true;
+      }
+    }
+    await quickActions.getByRole('link', { name: new RegExp(`^${label.replace('/', '\\/')}`, 'i') }).click();
     await expect(page).toHaveURL(new RegExp(`#${targetId}$`));
 
     const target = page.locator(`[id="${targetId}"]`);

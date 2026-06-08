@@ -10,7 +10,7 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   const missionTitle = `Full lokal øvelse ${Date.now()}`;
 
   await page.goto('/for');
-  await expect(page.getByRole('heading', { name: 'Før', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Før innsats', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: /FIG før innsats/i }).first()).toBeVisible();
   await expect(page.getByRole('heading', { name: /Før utrykning samlet kontroll/i }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: /Start lokalt oppdrag/i })).toHaveAttribute('href', '/oppdrag/ny');
@@ -18,14 +18,14 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await expect(page.getByRole('link', { name: /Test Feltmodus/i })).toHaveAttribute('href', '/feltmodus');
 
   await page.goto('/under');
-  await expect(page.getByRole('heading', { name: 'Under', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Under innsats', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: /FIG under innsats/i }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: /5-punktsordre/i }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: /Åpne kart/i })).toHaveAttribute('href', '/kart');
   await expect(page.getByRole('link', { name: /Hurtiglogg/i })).toHaveAttribute('href', '/oppdrag#hurtiglogg');
 
   await page.goto('/etter');
-  await expect(page.getByRole('heading', { name: 'Etter', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Etter innsats', exact: true })).toBeVisible();
   await expect(page.getByText(/Sjekkliste etter innsats/i).first()).toBeVisible();
   await expect(page.getByRole('link', { name: /Åpne etterrapport/i })).toHaveAttribute('href', '/oppdrag#etterrapport');
   await expect(page.getByRole('link', { name: /RUH og velferd/i })).toHaveAttribute('href', '/oppdrag#ruh-velferd');
@@ -39,7 +39,7 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
     location: 'Trondheim sentrum testområde',
   });
 
-  await expect(page.getByRole('heading', { name: /Situasjonsoversikt nå/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
 
   await page.goto('/under');
   await page.getByRole('link', { name: /Hurtiglogg/i }).click();
@@ -74,7 +74,8 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await expect(page.locator('#oppdragsmappe')).toBeInViewport();
 
   await page.goto('/oppdrag');
-  await expect(page.getByRole('heading', { name: /Situasjonsoversikt nå/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
+  await page.getByText('Loggoversikt og lokale oppgaver').click();
   await page.getByLabel(/Ny lokal oppgave/i).fill('Kontroller inngang uten persondata');
   await page.getByLabel(/Oppgavestatus/i).selectOption('in-progress');
   await page.getByRole('button', { name: /Legg til oppgave/i }).click();
@@ -137,11 +138,12 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await page.getByLabel(/Lokal ordretekst/i).fill('Lokal ordre test uten persondata.');
   await page.getByLabel(/Lokalt samband/i).fill('Samband etter lokal plan.');
   await page.getByLabel(/Lokal logg/i).fill('Terskel merket. Ventilasjon kontrollert.');
-  await page.getByRole('button', { name: /Lag etteraksjonsrapport Markdown/i }).click();
+  await page.getByRole('button', { name: /Generer etterrapport/i }).click();
   await expect(page.getByLabel(/Etteraksjonsrapport Markdown/i)).toHaveValue(/Lokal ordre test/);
-  await page.getByRole('button', { name: /Lag etteraksjonsrapport JSON/i }).click();
+  await page.getByText('Avanserte eksportformater').click();
+  await page.getByRole('button', { name: /Lag JSON/i }).click();
   await expect(page.getByLabel(/Etteraksjonsrapport JSON/i)).toHaveValue(new RegExp(missionTitle));
-  await page.getByRole('button', { name: /Lag PDF-klar etteraksjonsrapport/i }).click();
+  await page.getByRole('button', { name: /Lag PDF-klar HTML/i }).click();
   await expect(page.getByLabel(/PDF-klar etteraksjonsrapport HTML/i)).toHaveValue(/<!doctype html>/i);
 
   await expectOfflineReloadPreservesMission(page, context, missionTitle);

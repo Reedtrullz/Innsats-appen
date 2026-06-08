@@ -1,4 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { flushAsyncEffects } from '../helpers/react-effects';
 import BoundaryPage from '@/app/(app)/begrensninger/page';
 import DataOnDevicePage from '@/app/(app)/data-pa-enheten/page';
@@ -10,10 +11,12 @@ it('shows the operational command-surface landing page', async () => {
   await flushAsyncEffects();
 
   expect(screen.getByRole('heading', { name: /Beredskapsboka/i })).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: /Hva står du i nå/i })).toBeInTheDocument();
-  expect(screen.getByText(/kildebelagt beslutningsstøtte før, under og etter innsats/i)).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: /Start lokalt oppdrag/i })).toHaveAttribute('href', '/oppdrag/ny');
-  expect(screen.getByRole('link', { name: /Finn tiltak raskt/i })).toHaveAttribute('href', '/sok');
+  expect(screen.getByRole('heading', { name: /Hva trenger du nå/i })).toBeInTheDocument();
+  expect(screen.getByText(/lokal, kildebelagt beslutningsstøtte/i)).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /Fortsett\/start oppdrag/i })).toHaveAttribute('href', '/oppdrag');
+  expect(screen.getAllByRole('link', { name: /^Søk/i }).some((link) => link.getAttribute('href') === '/sok')).toBe(true);
+  expect(screen.getByRole('link', { name: /Finn kritisk tiltak/i })).toHaveAttribute('href', '/kort/alvorlig-ulykke-dod-eget-personell');
+  await userEvent.click(screen.getByText(/Faser og kilder/i));
   expect(screen.getByRole('link', { name: /^Før innsats$/i })).toHaveAttribute('href', '/for');
   expect(screen.getByRole('link', { name: /^Under innsats$/i })).toHaveAttribute('href', '/under');
   expect(screen.getByRole('link', { name: /^Etter innsats$/i })).toHaveAttribute('href', '/etter');

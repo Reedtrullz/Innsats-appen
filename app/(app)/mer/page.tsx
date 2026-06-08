@@ -116,18 +116,15 @@ export default function MorePage() {
         </div>
       </section>
 
-      <section className="space-y-3 rounded-3xl border border-amber-200 bg-amber-50 p-5" aria-labelledby="more-admin-heading">
-        <div>
-          <p className="text-sm font-black uppercase tracking-wide text-amber-900">Admin/release</p>
-          <h2 id="more-admin-heading" className="text-2xl font-black text-amber-950">Publisering og kildekontroll</h2>
-          <p className="mt-1 text-sm font-semibold text-amber-950">
-            Administrative lenker for kvalitet, datakilder og release. Dette er ikke for feltbeslutninger.
-          </p>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+      <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <summary className="min-h-11 cursor-pointer list-none text-base font-black text-slate-950">
+          <span className="block text-xs font-black uppercase tracking-wide text-slate-500">Utvikling og publisering</span>
+          <span id="more-admin-heading" className="block text-xl font-black">Admin/release</span>
+        </summary>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2" aria-labelledby="more-admin-heading">
           {adminLinks.map((link) => <LinkCard key={link.href} {...link} />)}
         </div>
-      </section>
+      </details>
     </article>
   );
 }

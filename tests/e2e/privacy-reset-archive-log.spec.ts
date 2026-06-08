@@ -16,6 +16,7 @@ test('privacy reset removes active archived checklist and log data after archive
     location: 'Testområde arkiv',
   });
 
+  await page.getByText('Loggoversikt og lokale oppgaver').click();
   await page.getByLabel(/Ny lokal oppgave/i).fill('Arkivklar lokal oppgave');
   await page.getByRole('button', { name: /Legg til oppgave/i }).click();
   await page.getByText('Avansert / dokumentasjon').click();

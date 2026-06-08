@@ -16,9 +16,8 @@ afterEach(() => {
 
 it('requires all five order points and renders exported markdown', async () => {
   render(<FivePointOrderForm contentVersion="test-content-ui" />);
-  expect(screen.getByText(/lagres bare lokalt/i)).toBeInTheDocument();
-  expect(screen.getByText(/ikke legg inn persondata/i)).toBeInTheDocument();
-  expect(screen.getByText(/eksporterte filer kan inneholde operasjonelt sensitiv informasjon/i)).toBeInTheDocument();
+  expect(screen.getByText(/lokal beslutningsstøtte/i)).toBeInTheDocument();
+  expect(screen.getByText(/unngå persondata/i)).toBeInTheDocument();
   const templateSelect = screen.getByLabelText(/rolle\/mal for 5-punktsordre/i);
   expect(templateSelect).toBeInTheDocument();
   expect(screen.getByRole('option', { name: /lagleder\/lagfører/i })).toBeInTheDocument();
@@ -27,7 +26,8 @@ it('requires all five order points and renders exported markdown', async () => {
   expect(screen.getByRole('option', { name: /lia\/liaison/i })).toBeInTheDocument();
   expect(screen.getByRole('option', { name: /beredskapsvakt/i })).toBeInTheDocument();
   await userEvent.selectOptions(templateSelect, 'mfe');
-  expect(screen.getByRole('heading', { name: /malveiledning: mfe/i })).toBeInTheDocument();
+  await userEvent.click(screen.getByText(/Malveiledning: MFE/i));
+  expect(screen.getByText(/mobil forsterkningsenhet/i)).toBeInTheDocument();
   for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
     const field = screen.getByLabelText(new RegExp(label, 'i'));
     expect(field).toBeRequired();
@@ -35,9 +35,10 @@ it('requires all five order points and renders exported markdown', async () => {
   }
   await userEvent.type(screen.getByLabelText(/Notes/i), 'lokal note');
   const markdownButton = screen.getByRole('button', { name: /Eksporter Markdown/i });
+  expect(markdownButton).toBeDisabled();
+  await userEvent.click(screen.getByText(/Flere eksportformater/i));
   const jsonButton = screen.getByRole('button', { name: /Eksporter JSON/i });
   const pdfButton = screen.getByRole('button', { name: /Lag PDF-klar HTML/i });
-  expect(markdownButton).toBeDisabled();
   expect(jsonButton).toBeDisabled();
   expect(pdfButton).toBeDisabled();
   const readback = screen.getByLabelText(/tilbakelesing\/forstått er bekreftet/i);
@@ -188,9 +189,10 @@ it('blocks sambandsplan preview when sensitive contact text is entered', async (
   expect(screen.queryByText(/# Sambandsplan/i)).not.toBeInTheDocument();
 });
 
-it('mounts order and comms forms in the mission route', () => {
+it('mounts order and comms forms in the mission route', async () => {
   render(<MissionsPage />);
-  expect(screen.getByRole('heading', { name: /Ordre og samband/i })).toBeInTheDocument();
+  expect(screen.getByText(/Ordre og samband/i)).toBeInTheDocument();
+  await userEvent.click(screen.getByText(/Ordre og samband/i));
   expect(screen.getAllByRole('button', { name: /Eksporter Markdown/i }).length).toBeGreaterThanOrEqual(2);
   expect(screen.getByLabelText(/rolle\/mal for sambandsplan/i)).toBeInTheDocument();
   expect(screen.getAllByRole('button', { name: /Eksporter JSON/i }).length).toBeGreaterThanOrEqual(2);

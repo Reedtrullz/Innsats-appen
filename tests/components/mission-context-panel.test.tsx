@@ -98,7 +98,8 @@ it('wires Hurtiglogg composer and log overview into the active mission dashboard
   expect(await screen.findByText('Hurtiglogg · Oppdragstavle')).toBeInTheDocument();
   expect(document.querySelector('#hurtiglogg')).not.toBeNull();
   expect(document.querySelector('#loggoversikt')).not.toBeNull();
-  expect(screen.getByRole('region', { name: /loggoversikt/i })).toHaveTextContent('Dashboard loggoversikt entry');
+  await userEvent.click(screen.getByText(/Loggoversikt og lokale oppgaver/i));
+  expect(document.getElementById('loggoversikt')).toHaveTextContent('Dashboard loggoversikt entry');
 });
 
 it('discloses the outbound boundary for public context lookups in mission creation', async () => {
@@ -386,16 +387,17 @@ it('lets users generate after-action Markdown, JSON and PDF-ready exports from t
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={afterActionChecklists} />);
 
   await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i });
+  await userEvent.click(screen.getByText('Avansert / dokumentasjon'));
   expect(screen.getByRole('heading', { name: /Etteraksjonsrapport/i })).toBeInTheDocument();
-  expect(screen.getByText(/PDF-klar utskrift/i)).toBeInTheDocument();
-  expect(screen.getByText(/Ikke offisiell innsending/i)).toBeInTheDocument();
+  expect(screen.getByText(/Generer lokalt, se over, kopier\/eksporter\. Ikke legg inn persondata/i)).toBeInTheDocument();
 
   await userEvent.type(screen.getByLabelText(/Lokal ordretekst/i), 'Ordre fra lokal tavle');
   await userEvent.type(screen.getByLabelText(/Lokalt samband/i), 'Samband kanal lokal');
   await userEvent.type(screen.getByLabelText(/Lokal logg/i), 'Loggpunkt uten persondata');
-  await userEvent.click(screen.getByRole('button', { name: /Lag etteraksjonsrapport Markdown/i }));
-  await userEvent.click(screen.getByRole('button', { name: /Lag etteraksjonsrapport JSON/i }));
-  await userEvent.click(screen.getByRole('button', { name: /Lag PDF-klar etteraksjonsrapport/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Generer etterrapport/i }));
+  await userEvent.click(screen.getByText(/Avanserte eksportformater/i));
+  await userEvent.click(screen.getByRole('button', { name: /Lag JSON/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Lag PDF-klar HTML/i }));
 
   const markdownPreview = await screen.findByLabelText(/Etteraksjonsrapport Markdown/i) as HTMLTextAreaElement;
   const jsonPreview = screen.getByLabelText(/Etteraksjonsrapport JSON/i) as HTMLTextAreaElement;
@@ -500,11 +502,13 @@ it('generates a local oppdragsmappe export with map and log artifacts', async ()
   }));
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[]} />);
-  await screen.findByRole('heading', { name: /Neste anbefalte handling/i });
-  await userEvent.click(screen.getByRole('button', { name: /Lag oppdragsmappe/i }));
+  await screen.findByRole('heading', { name: /Gjør dette først/i });
+  await userEvent.click(screen.getByText('Avansert / dokumentasjon'));
+  await userEvent.click(screen.getByRole('button', { name: /Generer oppdragsmappe/i }));
 
+  const markdown = await screen.findByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
+  await userEvent.click(screen.getByText(/Vis JSON/i));
   const json = await screen.findByLabelText(/Oppdragsmappe JSON/i) as HTMLTextAreaElement;
-  const markdown = screen.getByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
   expect(json.value).toContain('Oppdragsmappe UI');
   expect(json.value).toContain('schematic-0-100-local-only');
   expect(json.value).toContain('Feltlogg i oppdragsmappe');
@@ -560,15 +564,17 @@ it('scopes current mission dashboard, after-action and folder map outputs away f
   expect(within(mapSummary!).getByText('1 markør')).toBeInTheDocument();
   expect(within(mapSummary!).getByText('1 tegning')).toBeInTheDocument();
 
-  await userEvent.click(screen.getByRole('button', { name: /Lag etteraksjonsrapport Markdown/i }));
+  await userEvent.click(screen.getByText('Avansert / dokumentasjon'));
+  await userEvent.click(screen.getByRole('button', { name: /Generer etterrapport/i }));
   const afterActionMarkdown = await screen.findByLabelText(/Etteraksjonsrapport Markdown/i) as HTMLTextAreaElement;
   expect(afterActionMarkdown.value).toContain('Current UI marker');
   expect(afterActionMarkdown.value).toContain('Current UI sector');
   expect(afterActionMarkdown.value).not.toContain('Wrong UI');
 
-  await userEvent.click(screen.getByRole('button', { name: /Lag oppdragsmappe/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Generer oppdragsmappe/i }));
+  const folderMarkdown = await screen.findByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
+  await userEvent.click(screen.getByText(/Vis JSON/i));
   const folderJson = await screen.findByLabelText(/Oppdragsmappe JSON/i) as HTMLTextAreaElement;
-  const folderMarkdown = screen.getByLabelText(/Oppdragsmappe Markdown/i) as HTMLTextAreaElement;
   expect(folderJson.value).toContain('Current UI marker');
   expect(folderJson.value).toContain('Current UI sector');
   expect(folderJson.value).not.toContain('Wrong UI');
@@ -906,12 +912,13 @@ it('shows a situation-first mission dashboard with next action, progress and exp
   expect(await screen.findByRole('heading', { name: 'Oppdrag' })).toBeInTheDocument();
   expect(screen.getByText(/Flom Jaren · Jaren/i)).toBeInTheDocument();
   expect(screen.getByText(/Lokal lagring · Ikke delt/i)).toBeInTheDocument();
-  const nextActionSection = screen.getByRole('heading', { name: /Neste anbefalte handling/i }).closest('section');
+  const nextActionSection = screen.getByRole('heading', { name: /Gjør dette først/i }).closest('section');
   expect(nextActionSection).not.toBeNull();
   expect(within(nextActionSection!).getByText(/Etabler sikkerhet/i)).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /Hurtighandlinger/i })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /^Kritisk nå$/i })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /Fremdrift/i })).toBeInTheDocument();
+  await userEvent.click(screen.getByText(/Arbeid og eksport/i));
   expect(screen.getByRole('link', { name: /5-punktsordre/i })).toHaveAttribute('href', '#5-punktsordre');
   expect(screen.getByRole('link', { name: /Sambandsplan/i })).toHaveAttribute('href', '#sambandsplan');
   expect(screen.getAllByRole('link', { name: /Kart/i }).some((link) => link.getAttribute('href') === '#kart')).toBe(true);
@@ -925,8 +932,8 @@ it('shows a situation-first mission dashboard with next action, progress and exp
   window.dispatchEvent(new HashChangeEvent('hashchange'));
   await waitFor(() => expect(advancedDetails?.open).toBe(true));
   const text = document.body.textContent ?? '';
-  expect(text.indexOf('Oppdrag')).toBeLessThan(text.indexOf('Neste anbefalte handling'));
-  expect(text.indexOf('Neste anbefalte handling')).toBeLessThan(text.indexOf('Hurtighandlinger'));
+  expect(text.indexOf('Oppdrag')).toBeLessThan(text.indexOf('Gjør dette først'));
+  expect(text.indexOf('Gjør dette først')).toBeLessThan(text.indexOf('Hurtighandlinger'));
   expect(text.indexOf('Hurtighandlinger')).toBeLessThan(text.indexOf('Kritisk nå'));
   expect(text.indexOf('Kritisk nå')).toBeLessThan(text.indexOf('Fremdrift'));
   expect(text.indexOf('Fremdrift')).toBeLessThan(text.indexOf('Avansert / dokumentasjon'));
@@ -1102,7 +1109,7 @@ it('shows a fallback next action when the matching action card has no steps', as
     }]}
   />);
 
-  const nextActionSection = (await screen.findByRole('heading', { name: /Neste anbefalte handling/i })).closest('section');
+  const nextActionSection = (await screen.findByRole('heading', { name: /Gjør dette først/i })).closest('section');
   expect(nextActionSection).not.toBeNull();
   expect(within(nextActionSection!).getByText(/Åpne sjekklisten og bekreft fase, samband og sikkerhet/i)).toBeInTheDocument();
 });

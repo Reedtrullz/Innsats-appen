@@ -25,20 +25,23 @@ export function MissionFolderExportControls({ mission, checklists, mapState }: {
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Oppdragsmappe</p>
         <h3 className="text-xl font-black">Lokal oppdragsmappe</h3>
-        <p className="mt-1 text-sm font-semibold text-amber-900">Lokal eksportpakke. Ikke offisielt arkiv eller sentral lagring. Saniter før deling.</p>
+        <p className="mt-1 text-sm font-semibold text-amber-900">Generer lokalt, se over, kopier/eksporter. Ikke offisielt arkiv.</p>
       </div>
-      <button type="button" onClick={() => void generate()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag oppdragsmappe</button>
-      {json ? (
-        <label htmlFor="mission-folder-json" className="block text-sm font-bold">
-          Oppdragsmappe JSON
-          <textarea id="mission-folder-json" readOnly value={json} className="mt-1 min-h-48 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-        </label>
-      ) : null}
+      <button type="button" onClick={() => void generate()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Generer oppdragsmappe</button>
       {markdown ? (
         <label htmlFor="mission-folder-markdown" className="block text-sm font-bold">
           Oppdragsmappe Markdown
           <textarea id="mission-folder-markdown" readOnly value={markdown} className="mt-1 min-h-48 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
         </label>
+      ) : null}
+      {json ? (
+        <details className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
+          <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Vis JSON</summary>
+          <label htmlFor="mission-folder-json" className="mt-3 block text-sm font-bold">
+            Oppdragsmappe JSON
+            <textarea id="mission-folder-json" readOnly value={json} className="mt-1 min-h-48 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
+          </label>
+        </details>
       ) : null}
     </section>
   );

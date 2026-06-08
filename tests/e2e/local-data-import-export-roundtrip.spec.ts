@@ -19,6 +19,7 @@ test('exports local app data and imports it back to restore mission and checklis
   await page.getByText('Avansert / dokumentasjon').click();
   await page.getByLabel(/Feltlogg tekst/i).fill('Roundtrip feltlogg uten persondata.');
   await page.getByRole('button', { name: /Legg til feltlogg/i }).click();
+  await page.getByText('Loggoversikt og lokale oppgaver').click();
   await expect(page.getByLabel('Synlige lokale feltlogginnslag').getByText(/Roundtrip feltlogg/i)).toBeVisible();
 
   await page.goto('/data-pa-enheten');
@@ -57,6 +58,7 @@ test('exports local app data and imports it back to restore mission and checklis
   await page.goto('/oppdrag');
   await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
   await expect(page.getByText(new RegExp(`${missionTitle}\\s*·\\s*Roundtrip testområde`, 'i'))).toBeVisible();
+  await page.getByText('Loggoversikt og lokale oppgaver').click();
   await expect(page.getByLabel('Synlige lokale feltlogginnslag').getByText(/Roundtrip feltlogg/i)).toBeVisible();
   await expect(page.getByRole('checkbox', { name: /Kontroller ventilasjon/i })).toBeChecked();
 });

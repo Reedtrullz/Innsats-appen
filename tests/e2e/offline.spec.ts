@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 import { waitForServiceWorker } from './helpers';
 
 const routeHeadings: Record<string, RegExp> = {
-  '/': /Hva står du i nå/i,
+  '/': /Hva trenger du nå/i,
   '/ma-leses': /Må leses/i,
   '/mer': /^Mer$/i,
   '/begrensninger': /Operative grenser/i,
@@ -11,9 +11,9 @@ const routeHeadings: Record<string, RegExp> = {
   '/data-pa-enheten': /Data lagret på denne enheten/i,
   '/oppdrag/ny': /Opprett lokalt oppdrag/i,
   '/sok': /Søk i tiltak, kilder og moduler/i,
-  '/for': /^Før$/i,
-  '/under': /^Under$/i,
-  '/etter': /^Etter$/i,
+  '/for': /^Før innsats$/i,
+  '/under': /^Under innsats$/i,
+  '/etter': /^Etter innsats$/i,
   '/kilder': /^Kilder$/i,
   '/kort/alvorlig-ulykke-dod-eget-personell': /Alvorlig ulykke eller død blant eget personell/i,
   '/kort/psykologisk-forstehjelp-sekvens': /Psykologisk førstehjelp steg for steg/i,
@@ -54,7 +54,7 @@ async function expectVisibleRoutesWorkOffline(page: Page, routes: string[], sour
 
 test('visible app-shell and boundary links load offline after service-worker warmup', async ({ page, context }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: /Hva står du i nå/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Hva trenger du nå/i })).toBeVisible();
   await waitForServiceWorker(page);
 
   await context.setOffline(true);
@@ -90,8 +90,9 @@ test('serves shell and generated content offline with stale label', async ({ pag
     await expect(page.getByRole('link', { name: 'Beredskapsboka' })).toBeVisible();
     await expect(page.getByTestId('content-version')).toHaveText(version ?? '');
     await expect(page.getByTestId('offline-status')).toContainText(/offline|frakoblet|stale/i);
-    await expect(page.getByText(/5-punktsordre/i)).toBeVisible();
+    await expect(page.getByRole('link', { name: /5-punktsordre/i }).first()).toBeVisible();
 
+    await page.getByText('Vis alle og filtrer').click();
     await page.locator('a[href="/kort/tilfluktsrom-klargjoring"]').first().click();
     await expect(page.getByRole('heading', { name: /Klargjør offentlig tilfluktsrom/i })).toBeVisible();
     await page.locator('a[href="/kilder/src-operativt-konsept-for-sivilforsvaret#excerpt"]').first().click();

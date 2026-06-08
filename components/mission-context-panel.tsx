@@ -51,7 +51,7 @@ function matchingChecklist(checklists: OperationalChecklist[], mission: MissionC
     ?? checklists[0];
 }
 
-const missionDashboardHashTargets = new Set(['hurtiglogg', 'loggoversikt', 'sjekkliste', '5-punktsordre', 'sambandsplan', 'statusrapport', 'feltlogg', 'kart', 'etterrapport', 'ruh-velferd', 'oppdragsmappe']);
+const missionDashboardHashTargets = new Set(['hurtiglogg', 'loggoversikt', 'sjekkliste', 'kritisk-tiltak', '5-punktsordre', 'sambandsplan', 'statusrapport', 'feltlogg', 'kart', 'etterrapport', 'ruh-velferd', 'oppdragsmappe']);
 
 type MissionUpdate = (mission: MissionContext) => MissionContext;
 
@@ -282,6 +282,11 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
 
   return (
     <article className="space-y-4" onClickCapture={handleDashboardAnchorClick}>
+      <section className="space-y-4" aria-labelledby="mission-now-heading">
+        <div>
+          <p className="text-xs font-black uppercase tracking-wide text-sky-700">Nå</p>
+          <h2 id="mission-now-heading" className="text-2xl font-black text-slate-950">Situasjon og neste grep</h2>
+        </div>
       <MissionCommandHeader mission={mission} />
 
       <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -291,7 +296,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-black uppercase tracking-wide text-sky-700">Neste anbefalte handling</p>
-            <h3 className="mt-1 text-xl font-black">Neste anbefalte handling</h3>
+            <h3 className="mt-1 text-xl font-black">Gjør dette først</h3>
           </div>
         </div>
         <ol className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-800">
@@ -305,9 +310,9 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
         {checklist ? <a href="#sjekkliste" className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-[#082F49] px-4 text-sm font-black text-white">Åpne sjekkliste</a> : null}
       </section>
 
-      <MissionQuickActionsGrid />
+      <MissionQuickActionsGrid phase={mission.phase} />
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <section id="kritisk-tiltak" className="scroll-mt-28 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-black uppercase tracking-wide text-sky-700">{recommendedLabel}</p>
@@ -327,9 +332,22 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
         </div>
       </section>
 
+      <div id="hurtiglogg" className="scroll-mt-28">
+        <QuickFieldLogComposer mission={mission} onMissionChange={onMissionChange} sourceLabel="Oppdragstavle" criticalObservationAriaLabel="Hurtiglogg kritisk flagg" mustBeForwardedAriaLabel="Hurtiglogg videresending flagg" />
+      </div>
+      </section>
+
+      <section className="space-y-4" aria-labelledby="mission-work-heading">
+        <div>
+          <p className="text-xs font-black uppercase tracking-wide text-sky-700">Arbeid</p>
+          <h2 id="mission-work-heading" className="text-2xl font-black text-slate-950">Sjekkliste, logg og kart</h2>
+        </div>
+
       <div className="grid gap-3 lg:grid-cols-2">
         <MissionProgressSummary mission={mission} checklists={checklists} checklistRuns={checklistRuns} mapSummary={commandMapSummary} />
       </div>
+
+      {checklist ? <div id="sjekkliste" className="scroll-mt-28"><ChecklistRunner checklist={checklist} missionId={mission.id} onRunSaved={() => void listChecklistRuns(mission.id).then(setChecklistRuns)} /></div> : null}
 
       <MissionMapSummary mission={mission} mapState={scopedMapState} />
 
@@ -347,25 +365,25 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
         Lokalt arbeidsstøtte. Kontroller alltid mot gjeldende ordre, fagmyndighet og innsatsleders føringer. Ikke legg inn persondata.
       </CriticalNotice>
 
-      {checklist ? <div id="sjekkliste"><ChecklistRunner checklist={checklist} missionId={mission.id} onRunSaved={() => void listChecklistRuns(mission.id).then(setChecklistRuns)} /></div> : null}
-
       <section className="space-y-3" aria-labelledby="mission-local-work-heading">
-        <div>
-          <p className="text-xs font-black uppercase tracking-wide text-sky-700">Lokal arbeidsflate</p>
-          <h3 id="mission-local-work-heading" className="text-xl font-black text-slate-950">Logg, status og oppgaver</h3>
-        </div>
-        <div id="hurtiglogg">
-          <QuickFieldLogComposer mission={mission} onMissionChange={onMissionChange} sourceLabel="Oppdragstavle" criticalObservationAriaLabel="Hurtiglogg kritisk flagg" mustBeForwardedAriaLabel="Hurtiglogg videresending flagg" />
-        </div>
-        <MissionLogOverview mission={mission} />
-        <LocalMissionControls mission={mission} displaySignals={staleSignals} onMissionChange={onMissionChange} />
+        <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <summary className="min-h-11 cursor-pointer list-none text-base font-black text-slate-950">
+            <span id="mission-local-work-heading">Loggoversikt og lokale oppgaver</span>
+          </summary>
+          <div className="mt-3 space-y-3">
+            <MissionLogOverview mission={mission} />
+            <LocalMissionControls mission={mission} displaySignals={staleSignals} onMissionChange={onMissionChange} />
+          </div>
+        </details>
+      </section>
       </section>
 
+      <section className="space-y-3" aria-labelledby="mission-export-heading">
       <details open={advancedOpen} onToggle={(event) => setAdvancedOpen(event.currentTarget.open)} className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49]">
           <span>
-            <span className="block text-xs font-black uppercase tracking-wide text-slate-500">Avansert / dokumentasjon</span>
-            <span id="mission-advanced-heading" className="block text-xl font-black text-slate-950">Eksport, etterarbeid og kontekst</span>
+            <span id="mission-export-heading" className="block text-xs font-black uppercase tracking-wide text-slate-500">Eksport</span>
+            <span id="mission-advanced-heading" className="block text-xl font-black text-slate-950">Avansert / dokumentasjon</span>
             <span className="mt-1 block text-sm font-semibold text-slate-600">Tyngre verktøy samlet lavere i flaten. Alt beholdes lokalt på enheten.</span>
           </span>
           <OperationalIcon name="chevron" className="h-5 w-5 shrink-0 text-slate-500 transition group-open:rotate-90" />
@@ -380,6 +398,7 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
           {staleSignals.length > 0 || disabledSources.length > 0 ? <ContextSignalPanel signals={staleSignals} unavailableSources={disabledSources} /> : null}
         </div>
       </details>
+      </section>
     </article>
   );
 }

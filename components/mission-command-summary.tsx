@@ -116,7 +116,31 @@ export function MissionProgressSummary({ mission, checklists, checklistRuns = []
   );
 }
 
-export function MissionQuickActionsGrid() {
+const quickActionGroups = {
+  primary: [
+    { href: '#sjekkliste', label: 'Sjekkliste', description: 'Fortsett aktiv sjekkliste', icon: 'checklist', tone: 'success' },
+    { href: '#hurtiglogg', label: 'Hurtiglogg', description: 'Logg kritisk observasjon', icon: 'clipboard', tone: 'sky' },
+    { href: '#kart', label: 'Kart', description: 'Lokale markører', icon: 'map', tone: 'sky' },
+    { href: '#kritisk-tiltak', label: 'Kritisk tiltak', description: 'Prioriterte kort', icon: 'alert', tone: 'critical' },
+  ],
+  work: [
+    { href: '#5-punktsordre', label: '5-punktsordre', description: 'Strukturer ordre lokalt', icon: 'document', tone: 'slate' },
+    { href: '#sambandsplan', label: 'Sambandsplan', description: 'Kanaler og roller', icon: 'radio', tone: 'warning' },
+  ],
+  export: [
+    { href: '#ruh-velferd', label: 'RUH/velferd', description: 'Lokal oppfølging', icon: 'shield', tone: 'warning' },
+    { href: '#etterrapport', label: 'Etterrapport', description: 'Bygg rapport', icon: 'archive', tone: 'slate' },
+    { href: '#oppdragsmappe', label: 'Oppdragsmappe', description: 'Samlet eksport', icon: 'download', tone: 'success' },
+  ],
+} as const;
+
+export function MissionQuickActionsGrid({ phase = 'under' }: { phase?: MissionContext['phase'] }) {
+  const primary = phase === 'for'
+    ? [quickActionGroups.work[0], quickActionGroups.work[1], quickActionGroups.primary[0], quickActionGroups.primary[1]]
+    : phase === 'etter'
+      ? [quickActionGroups.export[1], quickActionGroups.export[2], quickActionGroups.primary[0], quickActionGroups.primary[1]]
+      : quickActionGroups.primary;
+
   return (
     <SectionCard labelledBy="mission-quick-actions-heading" className="bg-slate-50">
       <div className="flex items-start justify-between gap-3">
@@ -125,15 +149,16 @@ export function MissionQuickActionsGrid() {
           <h3 id="mission-quick-actions-heading" className="text-xl font-black text-slate-950">Hurtighandlinger</h3>
         </div>
       </div>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <QuickActionButton href="#hurtiglogg" label="Hurtiglogg" description="Logg kritisk observasjon" icon="clipboard" tone="sky" />
-        <QuickActionButton href="#sjekkliste" label="Sjekkliste" description="Fortsett aktiv sjekkliste" icon="checklist" tone="success" />
-        <QuickActionButton href="#5-punktsordre" label="5-punktsordre" description="Strukturer ordre lokalt" icon="document" tone="slate" />
-        <QuickActionButton href="#sambandsplan" label="Sambandsplan" description="Kanaler og roller" icon="radio" tone="warning" />
-        <QuickActionButton href="#kart" label="Kart" description="Lokale markører" icon="map" tone="sky" />
-        <QuickActionButton href="#ruh-velferd" label="RUH/velferd" description="Lokal oppfølging" icon="shield" tone="warning" />
-        <QuickActionButton href="#etterrapport" label="Etterrapport" description="Bygg rapport" icon="archive" tone="slate" />
-        <QuickActionButton href="#oppdragsmappe" label="Oppdragsmappe" description="Samlet eksport" icon="download" tone="success" />
+      <div className="mt-3 space-y-3">
+        <div className="grid grid-cols-2 gap-2">
+          {primary.map((action) => <QuickActionButton key={action.href} {...action} />)}
+        </div>
+        <details className="rounded-2xl border border-slate-200 bg-white p-3">
+          <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Arbeid og eksport</summary>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            {[...quickActionGroups.work, ...quickActionGroups.export].map((action) => <QuickActionButton key={action.href} {...action} />)}
+          </div>
+        </details>
       </div>
     </SectionCard>
   );
