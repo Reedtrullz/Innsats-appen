@@ -170,7 +170,19 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
                   ? 'min-h-11 rounded-xl px-2 text-xs font-black text-slate-400'
                   : 'min-h-11 rounded-xl px-2 text-xs font-black text-slate-700 hover:bg-white'}
             >
-              {step.label}
+              <span className="block">{step.label}</span>
+              <span
+                aria-hidden="true"
+                className={selected
+                  ? 'mt-1 block text-[0.65rem] font-black text-sky-100'
+                  : stepCompletion[step.id]
+                    ? 'mt-1 block text-[0.65rem] font-black text-emerald-700'
+                    : disabled
+                      ? 'mt-1 block text-[0.65rem] font-black text-slate-400'
+                      : 'mt-1 block text-[0.65rem] font-black text-slate-500'}
+              >
+                {stepCompletion[step.id] ? 'Fullført' : disabled ? 'Låst' : 'Klar'}
+              </span>
               <span className="sr-only">{stepCompletion[step.id] ? ' fullført' : disabled ? ' låst' : ' tilgjengelig'}</span>
             </button>
           );

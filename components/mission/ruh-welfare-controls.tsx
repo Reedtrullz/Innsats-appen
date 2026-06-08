@@ -220,17 +220,17 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
           <label className="block text-sm font-bold">Fysisk belastning<select name="physicalLoad" value={physicalLoad} onChange={(event) => setPhysicalLoad(event.target.value as WelfareLoad)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3">{WELFARE_LOAD_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
           <label className="block text-sm font-bold">Mental belastning<select name="mentalLoad" value={mentalLoad} onChange={(event) => setMentalLoad(event.target.value as WelfareLoad)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3">{WELFARE_LOAD_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
           <div className="grid gap-2 sm:grid-cols-2">
-            <label className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm font-bold"><input name="needsRest" type="checkbox" className="h-5 w-5" />Trenger hvile</label>
-            <label className="flex items-center gap-2 rounded-xl border border-slate-200 p-3 text-sm font-bold"><input name="needsRelief" type="checkbox" className="h-5 w-5" />Trenger avløsning</label>
+            <label className="flex min-h-11 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-black"><input name="needsRest" type="checkbox" className="h-5 w-5" />Trenger hvile</label>
+            <label className="flex min-h-11 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-black"><input name="needsRelief" type="checkbox" className="h-5 w-5" />Trenger avløsning</label>
           </div>
           <fieldset className="rounded-xl border border-slate-200 p-3">
             <legend className="px-1 text-sm font-black">Velferdspåminnelser</legend>
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
-              <label className="flex items-center gap-2 text-sm font-bold"><input name="reminderWater" type="checkbox" className="h-5 w-5" />Vann påminnelse</label>
-              <label className="flex items-center gap-2 text-sm font-bold"><input name="reminderFood" type="checkbox" className="h-5 w-5" />Mat påminnelse</label>
-              <label className="flex items-center gap-2 text-sm font-bold"><input name="reminderWarmth" type="checkbox" className="h-5 w-5" />Varme påminnelse</label>
-              <label className="flex items-center gap-2 text-sm font-bold"><input name="reminderRest" type="checkbox" className="h-5 w-5" />Hvile påminnelse</label>
-              <label className="flex items-center gap-2 text-sm font-bold"><input name="reminderDryClothing" type="checkbox" className="h-5 w-5" />Tørt tøy påminnelse</label>
+              <label className="flex min-h-11 items-center gap-2 rounded-full bg-slate-50 px-3 py-2 text-sm font-black"><input name="reminderWater" type="checkbox" className="h-5 w-5" />Vann påminnelse</label>
+              <label className="flex min-h-11 items-center gap-2 rounded-full bg-slate-50 px-3 py-2 text-sm font-black"><input name="reminderFood" type="checkbox" className="h-5 w-5" />Mat påminnelse</label>
+              <label className="flex min-h-11 items-center gap-2 rounded-full bg-slate-50 px-3 py-2 text-sm font-black"><input name="reminderWarmth" type="checkbox" className="h-5 w-5" />Varme påminnelse</label>
+              <label className="flex min-h-11 items-center gap-2 rounded-full bg-slate-50 px-3 py-2 text-sm font-black"><input name="reminderRest" type="checkbox" className="h-5 w-5" />Hvile påminnelse</label>
+              <label className="flex min-h-11 items-center gap-2 rounded-full bg-slate-50 px-3 py-2 text-sm font-black"><input name="reminderDryClothing" type="checkbox" className="h-5 w-5" />Tørt tøy påminnelse</label>
             </div>
           </fieldset>
           <label className="block text-sm font-bold">Velferdsnotat<textarea name="welfareNote" className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 p-3" placeholder="Kort ikke-medisinsk notat" /></label>

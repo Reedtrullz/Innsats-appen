@@ -220,10 +220,26 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange,
         <p className="mt-1 text-sm font-semibold">Kun lokal eksport i denne nettleseren. Ikke offisiell logg. Kan inneholde lokale oppgaver, hurtigstatus og ressursbehov — ikke legg inn eller del sensitiv informasjon.</p>
         <button type="button" onClick={() => generateStatusSummary()} className="mt-3 min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag lokal statusrapport</button>
         {showStatusSummary ? (
-          <label htmlFor="local-status-summary-markdown" className="mt-3 block text-sm font-bold">
-            Lokal oppdragsstatus i Markdown
-            <textarea id="local-status-summary-markdown" readOnly value={renderedStatusSummaryMarkdown} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-          </label>
+          <section className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-950">
+            <p className="font-black">Lokal statusrapport er klar</p>
+            <p className="mt-1 text-sm font-semibold">Se over innholdet før lokal bruk eller deling.</p>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof navigator !== 'undefined' && navigator.clipboard) void navigator.clipboard.writeText(renderedStatusSummaryMarkdown);
+              }}
+              className="mt-3 min-h-11 rounded-xl bg-white px-4 text-sm font-black text-emerald-950 ring-1 ring-emerald-200"
+            >
+              Kopier
+            </button>
+            <details className="mt-3 rounded-xl bg-white p-3 ring-1 ring-emerald-200">
+              <summary className="min-h-11 cursor-pointer list-none text-sm font-black">Vis forhåndsvisning</summary>
+              <label htmlFor="local-status-summary-markdown" className="mt-3 block text-sm font-bold">
+                Lokal oppdragsstatus i Markdown
+                <textarea id="local-status-summary-markdown" readOnly value={renderedStatusSummaryMarkdown} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
+              </label>
+            </details>
+          </section>
         ) : null}
       </div> : null}
       {showSignalAndNotes ? <div className="grid gap-3 md:grid-cols-2">

@@ -85,7 +85,8 @@ test('exports expanded sambandsplan templates with local-only warnings', async (
     await form.getByLabel(/Rolle\/mal for sambandsplan/i).selectOption(templateIds[index]);
     await expect(form.getByRole('region', { name: /Malveiledning sambandsplan/i })).toContainText(templateLabels[index]);
     await form.getByRole('button', { name: /Eksporter JSON/i }).click();
-    const exported = await form.locator('pre').textContent();
+    await form.getByText(/Vis forhåndsvisning/i).last().click();
+    const exported = await form.locator('pre').last().textContent();
     expect(exported).toBeTruthy();
     const parsed = JSON.parse(exported ?? '{}') as { template?: { id?: string; label?: string }; warnings?: string[]; metadata?: { sourceIds?: string[] } };
     expect(parsed.template?.id).toBe(templateIds[index]);
@@ -95,8 +96,12 @@ test('exports expanded sambandsplan templates with local-only warnings', async (
   }
 
   await form.getByRole('button', { name: /Eksporter Markdown/i }).click();
-  await expect(form.locator('pre')).toContainText('# Sambandsplan');
-  await expect(form.locator('pre')).toContainText('Beredskapsvakt');
+  await expect(form.getByText(/Sambandsplan er klar/i)).toBeVisible();
+  await expect(form.getByRole('button', { name: /Kopier/i })).toBeVisible();
+  await form.getByText(/Vis forhåndsvisning/i).last().click();
+  await expect(form.locator('pre').last()).toContainText('# Sambandsplan');
+  await expect(form.locator('pre').last()).toContainText('Beredskapsvakt');
   await form.getByRole('button', { name: /Lag PDF-klar HTML/i }).click();
-  await expect(form.locator('pre')).toContainText('<!doctype html>');
+  await form.getByText(/Vis forhåndsvisning/i).last().click();
+  await expect(form.locator('pre').last()).toContainText('<!doctype html>');
 });

@@ -54,9 +54,13 @@ it('requires all five order points and renders exported markdown', async () => {
   await userEvent.selectOptions(templateSelect, 'mfe');
   await userEvent.click(screen.getByText(/Malveiledning: MFE/i));
   expect(screen.getByText(/mobil forsterkningsenhet/i)).toBeInTheDocument();
+  expect(screen.getByRole('tab', { name: /Bekreft/i })).toBeDisabled();
+  expect(screen.getByRole('tab', { name: /Eksporter/i })).toBeDisabled();
+  expect(screen.getAllByText(/Låst/i).length).toBeGreaterThanOrEqual(2);
   await fillFivePointOrderFields();
   await userEvent.type(screen.getByLabelText(/Notes/i), 'lokal note');
   expect(screen.getByRole('tab', { name: /Eksporter/i })).toBeDisabled();
+  expect(screen.getByRole('tab', { name: /Bekreft/i })).toBeEnabled();
   const readback = await confirmFivePointOrderReadback();
   const markdownButton = screen.getByRole('button', { name: /Eksporter Markdown/i });
   await userEvent.click(screen.getByText(/Flere eksportformater/i));
@@ -68,6 +72,8 @@ it('requires all five order points and renders exported markdown', async () => {
   await userEvent.click(markdownButton);
   expect(readLocalAuditLog().some((entry) => entry.type === 'export-created' && entry.details.exportKind === 'five-point-order-markdown')).toBe(true);
   expect(screen.getByText(/Eksport er klar/i)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Kopier/i })).toBeInTheDocument();
+  expect(screen.getAllByText(/Fullført/i).length).toBeGreaterThanOrEqual(3);
   expect((screen.getByText(/Vis forhåndsvisning/i).closest('details') as HTMLDetailsElement | null)?.open).toBe(false);
   await openFivePointPreview();
   expect(screen.getByText(/# 5-punktsordre/i)).toBeInTheDocument();
@@ -160,14 +166,20 @@ it('requires expanded sambandsplan fields and renders Markdown/JSON/PDF-ready pr
   const jsonButton = screen.getByRole('button', { name: /Eksporter JSON/i });
   const pdfButton = screen.getByRole('button', { name: /Lag PDF-klar HTML/i });
   await userEvent.click(markdownButton);
+  expect(screen.getByText(/Sambandsplan er klar/i)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Kopier/i })).toBeInTheDocument();
+  expect((screen.getByText(/Vis forhåndsvisning/i).closest('details') as HTMLDetailsElement | null)?.open).toBe(false);
+  await userEvent.click(screen.getByText(/Vis forhåndsvisning/i));
   expect(screen.getByText(/# Sambandsplan/i)).toBeInTheDocument();
   expect(screen.getByText(/Talegruppe etter lokal plan/i)).toBeInTheDocument();
   expect(screen.getByText(/Innholdsversjon: test-content-ui-comms/i)).toBeInTheDocument();
   expect(screen.getByText(/src-kommunikasjons-og-sambandsdiagram/i)).toBeInTheDocument();
   expect(screen.getAllByText(/operasjonelt sensitiv informasjon/i).length).toBeGreaterThan(0);
   await userEvent.click(jsonButton);
+  await userEvent.click(screen.getByText(/Vis forhåndsvisning/i));
   expect(screen.getByText(/"schemaVersion": "sambandsplan.v1"/i)).toBeInTheDocument();
   await userEvent.click(pdfButton);
+  await userEvent.click(screen.getByText(/Vis forhåndsvisning/i));
   expect(screen.getAllByText(/PDF-klar HTML/i).length).toBeGreaterThan(0);
   expect(screen.getAllByText(/Skriv ut.*Lagre som PDF/i).length).toBeGreaterThan(0);
 });
@@ -183,6 +195,7 @@ it('clears stale sambandsplan export preview when fields change', async () => {
   await userEvent.type(screen.getByLabelText(/Prosedyre ved bortfall av samband/i), 'Fallback først');
   await userEvent.type(screen.getByLabelText(/Batteri-\/ladestatus/i), 'Fulladet');
   await userEvent.click(screen.getByRole('button', { name: /Eksporter Markdown/i }));
+  await userEvent.click(screen.getByText(/Vis forhåndsvisning/i));
 
   expect(screen.getByText(/# Sambandsplan/i)).toBeInTheDocument();
   expect(screen.getByText(/Primær første/i)).toBeInTheDocument();
