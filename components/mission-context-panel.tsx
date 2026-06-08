@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type MouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ActionCard, OperationalChecklist } from '@/lib/content/schemas';
 import { filterActionCards, sortActionCards } from '@/lib/content/filters';
@@ -242,16 +242,16 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
 
   useEffect(() => {
     function openHashTarget() {
-      const targetId = window.location.hash.slice(1);
+      const targetId = decodeURIComponent(window.location.hash.slice(1));
       if (!missionDashboardHashTargets.has(targetId)) return undefined;
       return window.requestAnimationFrame(() => {
-      const target = document.getElementById(targetId);
-      const parentDetails = target?.closest('details') as HTMLDetailsElement | null;
-      if (parentDetails) {
-        parentDetails.open = true;
-        setAdvancedOpen(true);
-      }
-      if (typeof target?.scrollIntoView === 'function') target.scrollIntoView({ block: 'start' });
+        const target = document.getElementById(targetId);
+        const parentDetails = target?.closest('details') as HTMLDetailsElement | null;
+        if (parentDetails) {
+          parentDetails.open = true;
+          setAdvancedOpen(true);
+        }
+        if (typeof target?.scrollIntoView === 'function') target.scrollIntoView({ block: 'start' });
       });
     }
 
@@ -267,8 +267,21 @@ function MissionCommandDashboard({ mission, cards, checklist, checklists, onMiss
     };
   }, [mission.id]);
 
+  function handleDashboardAnchorClick(event: MouseEvent<HTMLElement>) {
+    const anchor = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
+    if (!anchor) return;
+    const targetId = decodeURIComponent(anchor.hash.slice(1));
+    if (!missionDashboardHashTargets.has(targetId)) return;
+    const target = document.getElementById(targetId);
+    const parentDetails = target?.closest('details') as HTMLDetailsElement | null;
+    if (parentDetails) {
+      parentDetails.open = true;
+      setAdvancedOpen(true);
+    }
+  }
+
   return (
-    <article className="space-y-4">
+    <article className="space-y-4" onClickCapture={handleDashboardAnchorClick}>
       <MissionCommandHeader mission={mission} />
 
       <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">

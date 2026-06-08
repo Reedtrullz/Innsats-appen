@@ -240,3 +240,41 @@ test('screen-reader labels remain available on active mission operational contro
     await expect(page.getByLabel(new RegExp(label.replaceAll('/', '\\/'), 'i')).first()).toBeVisible();
   }
 });
+
+test('mission quick actions resolve to real dashboard targets', async ({ page }) => {
+  await createLocalMission(page, {
+    title: `Hurtighandling øvelse ${Date.now()}`,
+    phase: 'under',
+    scenario: 'flom',
+    location: 'Ankertest',
+  });
+
+  const quickActions = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Hurtighandlinger' }) });
+  const advancedDetails = page.locator('details').filter({ hasText: 'Avansert / dokumentasjon' });
+  await expect(advancedDetails).not.toHaveAttribute('open', '');
+
+  for (const [label, targetId, opensAdvanced] of [
+    ['Hurtiglogg', 'hurtiglogg', false],
+    ['Sjekkliste', 'sjekkliste', false],
+    ['5-punktsordre', '5-punktsordre', false],
+    ['Sambandsplan', 'sambandsplan', false],
+    ['Kart', 'kart', false],
+    ['RUH/velferd', 'ruh-velferd', true],
+    ['Etterrapport', 'etterrapport', true],
+    ['Oppdragsmappe', 'oppdragsmappe', true],
+  ] as const) {
+    await quickActions.getByRole('link', { name: new RegExp(label.replace('/', '\\/'), 'i') }).click();
+    await expect(page).toHaveURL(new RegExp(`#${targetId}$`));
+
+    const target = page.locator(`[id="${targetId}"]`);
+    await expect(target, `${label} should resolve to #${targetId}`).toHaveCount(1);
+    await expect(target).toBeVisible();
+    await expect(target).toBeInViewport();
+
+    if (opensAdvanced) {
+      await expect(advancedDetails).toHaveAttribute('open', '');
+    }
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+  }
+});
