@@ -50,8 +50,7 @@ function bakeSearchSynonyms(docs: Array<{ id: string; synonyms?: string }>, syno
     }
   }
   for (const doc of docs) {
-    const bareSlug = doc.id.startsWith('kort:') ? doc.id.slice(5) : doc.id;
-    const extraTokens = cardSynonymMap.get(bareSlug) ?? cardSynonymMap.get(doc.id);
+    const extraTokens = cardSynonymMap.get(doc.id);
     if (extraTokens && extraTokens.length > 0) {
       doc.synonyms = [doc.synonyms ?? '', ...extraTokens].join(' ').trim();
     }

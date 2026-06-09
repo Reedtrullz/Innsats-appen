@@ -29,7 +29,7 @@ export default function HurtigkortPage() {
         <p className="mt-1 text-sm font-semibold text-sky-100">Søk først. Bla kompakt når du ikke vet nøyaktig hva du trenger.</p>
         <p className="mt-3 text-xs font-bold text-sky-200">Innhold: <span data-testid="content-version">{manifest.contentVersion}</span></p>
       </section>
-      <SearchBox documents={searchDocuments} externalSynonyms={synonyms.map((s) => ({ canonical: s.canonical, aliases: s.aliases }))} generatedAt={searchIndexGeneratedAt} showFreshnessIndicator />
+      <SearchBox documents={searchDocuments} generatedAt={searchIndexGeneratedAt} showFreshnessIndicator />
 
       {criticalCards.length > 0 ? (
         <section className="space-y-3" aria-labelledby="hurtigkort-critical-heading">

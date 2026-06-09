@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 
 const PROFILE_KEY = 'beredskapsboka-local-profile-v1';
 
-async function setProfileRole(page: import('@playwright/test').Page, role: string) {
-  await page.evaluate(([key, r]) => {
+function setProfileRole(page: import('@playwright/test').Page, role: string) {
+  return page.evaluate(([key, r]) => {
     localStorage.setItem(key, JSON.stringify({
       schemaVersion: 1,
       profileEnabled: true,
@@ -13,12 +13,6 @@ async function setProfileRole(page: import('@playwright/test').Page, role: strin
       updatedAt: new Date().toISOString(),
     }));
   }, [PROFILE_KEY, role] as const);
-}
-
-async function gotoWithRole(page: import('@playwright/test').Page, role: string) {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await setProfileRole(page, role);
-  await page.reload({ waitUntil: 'domcontentloaded' });
 }
 
 async function navLabels(page: import('@playwright/test').Page) {
@@ -39,18 +33,21 @@ test('default home shows Hva trenger du nå and default nav order', async ({ pag
 });
 
 test('leder role shows Lederoversikt and leder nav order', async ({ page }) => {
-  await gotoWithRole(page, 'leder');
+  await setProfileRole(page, 'leder');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: /Lederoversikt/i })).toBeVisible();
   expect(await navLabels(page)).toEqual(['Hjem', 'Oppdrag', 'Søk', 'Kort', 'Mer']);
 });
 
 test('lagforer role shows lagforer nav order', async ({ page }) => {
-  await gotoWithRole(page, 'lagforer');
+  await setProfileRole(page, 'lagforer');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
   expect(await navLabels(page)).toEqual(['Oppdrag', 'Kort', 'Hjem', 'Søk', 'Mer']);
 });
 
 test('mannskap role shows simplified hero and mannskap nav order', async ({ page }) => {
-  await gotoWithRole(page, 'mannskap');
+  await setProfileRole(page, 'mannskap');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: /Enkel tilgang/i })).toBeVisible();
   await expect(page.getByText(/Hurtigkort/i).first()).toBeVisible();
   expect(await navLabels(page)).toEqual(['Kort', 'Søk', 'Oppdrag', 'Hjem', 'Mer']);

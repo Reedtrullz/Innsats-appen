@@ -86,16 +86,19 @@ test('synonym queries all return results on the dedicated search page', async ({
 test('offline search returns results without network', async ({ page, context: browserContext }) => {
   await page.goto('/sok');
   const search = page.getByRole('searchbox');
+  await search.fill('brann');
+  await expect(page.getByLabel('Lokalt søk').getByRole('link').first()).toBeVisible();
 
   await browserContext.setOffline(true);
   await search.fill('samband');
   await expect(page.getByLabel('Lokalt søk').getByRole('link').first()).toBeVisible();
+  await expect(page.getByText(/nettverk|offline|internett/i)).toHaveCount(0);
 
+  await browserContext.setOffline(false);
   await search.fill('radiac');
   await expect(page.getByLabel('Lokalt søk').getByRole('link').first()).toBeVisible();
 
+  await browserContext.setOffline(true);
   await search.fill('sektor');
   await expect(page.getByLabel('Lokalt søk').getByRole('link').first()).toBeVisible();
-
-  await browserContext.setOffline(false);
 });

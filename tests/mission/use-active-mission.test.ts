@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, expect, it, vi } from 'vitest';
 import type { MissionContext } from '@/lib/mission/schemas';
 
 const mockListMissions = vi.fn<() => Promise<MissionContext[]>>();
@@ -11,11 +11,9 @@ vi.mock('@/lib/mission/local-store', () => ({
 
 vi.mock('@/lib/mission/active-mission-selection', () => ({
   readSelectedActiveMissionId: () => mockReadSelectedId(),
-  saveSelectedActiveMissionId: (id: string | null) => (
-    mockSaveSelectedId(id)
-  ),
+  saveSelectedActiveMissionId: (id: string | null) => mockSaveSelectedId(id),
   selectActiveMission: (missions: MissionContext[], selectedId?: string | null) => {
-    const id = (typeof selectedId === 'string' ? selectedId.trim() : '') || null;
+    const id = selectedId?.trim() || null;
     return missions.find((m) => m.id === id) ?? missions[0] ?? null;
   },
 }));
@@ -87,15 +85,13 @@ it('clears stale selected id', async () => {
   expect(result.current.mission?.id).toBe('a');
 });
 
-it('setActiveMissionId persists and updates active mission', async () => {
+it('setActiveMissionId persists and updates', async () => {
   mockListMissions.mockResolvedValue([mission('a'), mission('b')]);
   const { result } = renderHook(() => useActiveMission());
   await waitFor(() => expect(result.current.loading).toBe(false));
-
   await act(async () => {
     result.current.setActiveMissionId('b');
   });
-
   expect(mockSaveSelectedId).toHaveBeenCalledWith('b');
   expect(result.current.mission?.id).toBe('b');
 });

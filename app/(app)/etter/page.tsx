@@ -1,6 +1,5 @@
 import { PhasePageContent } from '@/components/action-card-list';
 import { getActionCards } from '@/lib/content/load-content';
-import { ActiveMissionClientEntry } from '@/components/etter-active-mission-entry';
 
 function EtterReportingEntryPoints() {
   return (
@@ -21,7 +20,6 @@ export default function Page() {
   return (
     <div className="space-y-5">
       <PhasePageContent phase="etter" cards={getActionCards()} />
-      <ActiveMissionClientEntry />
       <EtterReportingEntryPoints />
     </div>
   );

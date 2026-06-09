@@ -1,9 +1,7 @@
 import { SearchBox } from '@/components/search-box';
 import { OperationalIcon } from '@/components/ui/operational-icons';
-import { getActionCards, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSearchSynonyms, getSourceDocuments, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
+import { getActionCards, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSourceDocuments, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
 import { buildSearchDocuments } from '@/lib/content/search-documents';
-
-export const dynamic = 'force-static';
 
 export default function SokPage() {
   const searchDocuments = buildSearchDocuments({
@@ -16,7 +14,6 @@ export default function SokPage() {
     faq: getFAQEntries(),
   });
   const searchIndexGeneratedAt = getSearchIndexGeneratedAt();
-  const synonyms = getSearchSynonyms();
 
   return (
     <div className="space-y-5">
@@ -34,7 +31,6 @@ export default function SokPage() {
       </section>
       <SearchBox
         documents={searchDocuments}
-        externalSynonyms={synonyms.map((s) => ({ canonical: s.canonical, aliases: s.aliases }))}
         generatedAt={searchIndexGeneratedAt}
         showFreshnessIndicator
         enableFilters
