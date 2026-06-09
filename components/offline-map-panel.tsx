@@ -503,7 +503,7 @@ export function OfflineMapPanel() {
   function addMarker(formData: FormData) {
     if (!activeMission) {
       setMapPrivacyError(null);
-      setStatusMessage(missingMissionAction());
+      setStatusMessage('Opprett aktivt oppdrag før du legger til lokale markører.');
       return;
     }
     try {
@@ -541,7 +541,7 @@ export function OfflineMapPanel() {
     event.preventDefault();
     if (!activeMission) {
       setMapPrivacyError(null);
-      setStatusMessage(missingMissionAction());
+      setStatusMessage('Opprett aktivt oppdrag før du redigerer lokale markører.');
       return;
     }
     const x = parseMarkerEditCoordinate(markerEditDraft.x);
@@ -566,7 +566,7 @@ export function OfflineMapPanel() {
 
   function deleteMarker(marker: MissionMapMarker) {
     if (!activeMission) {
-      setStatusMessage(missingMissionAction());
+      setStatusMessage('Opprett aktivt oppdrag før du sletter lokale markører.');
       return;
     }
     persistState(deleteMissionMapObject(mapState, activeMission.id, marker.id), 'Slettet lokal markør.');
@@ -575,7 +575,7 @@ export function OfflineMapPanel() {
 
   async function createLogFromMapObject(mapObject: MissionMapMarker | MissionMapDrawing) {
     if (!activeMission) {
-      setStatusMessage(missingMissionAction());
+      setStatusMessage('Opprett aktivt oppdrag før feltlogg fra kart.');
       return;
     }
     const text = mapLogText.trim();
@@ -632,7 +632,7 @@ export function OfflineMapPanel() {
   function addDrawing(formData: FormData) {
     if (!activeMission) {
       setMapPrivacyError(null);
-      setStatusMessage(missingMissionAction());
+      setStatusMessage('Opprett aktivt oppdrag før du lagrer lokale kartobjekter.');
       return;
     }
     try {
@@ -669,7 +669,7 @@ export function OfflineMapPanel() {
     event.preventDefault();
     if (!activeMission) {
       setMapPrivacyError(null);
-      setStatusMessage(missingMissionAction());
+      setStatusMessage('Opprett aktivt oppdrag før du endrer lokale kartobjekter.');
       return;
     }
     try {
@@ -696,7 +696,7 @@ export function OfflineMapPanel() {
 
   function deleteDrawing(drawing: MissionMapDrawing) {
     if (!activeMission) {
-      setStatusMessage(missingMissionAction());
+      setStatusMessage('Opprett aktivt oppdrag før du sletter lokale kartobjekter.');
       return;
     }
     persistState(deleteMissionMapObject(mapState, activeMission.id, drawing.id), 'Slettet lokal sektor/teig.');
@@ -706,7 +706,7 @@ export function OfflineMapPanel() {
 
   function resetOperations() {
     if (!activeMission) {
-      setStatusMessage(missingMissionAction());
+      setStatusMessage('Opprett aktivt oppdrag før du nullstiller lokale kartobjekter.');
       return;
     }
     const nextState: MissionMapState = {
@@ -725,7 +725,7 @@ export function OfflineMapPanel() {
   function exportSvg() {
     if (!activeMission) {
       setMapPrivacyError(null);
-      setStatusMessage(missingMissionAction());
+      setStatusMessage('Opprett aktivt oppdrag før du eksporterer lokale kartobjekter.');
       return;
     }
     try {
@@ -742,7 +742,7 @@ export function OfflineMapPanel() {
   function exportGeoJson() {
     if (!activeMission) {
       setMapPrivacyError(null);
-      setStatusMessage(missingMissionAction());
+      setStatusMessage('Opprett aktivt oppdrag før du eksporterer lokale kartobjekter.');
       return;
     }
     try {
@@ -759,7 +759,7 @@ export function OfflineMapPanel() {
   function importGeoJson() {
     if (!activeMission) {
       setMapPrivacyError(null);
-      setStatusMessage(missingMissionAction());
+      setStatusMessage('Opprett aktivt oppdrag før du importerer kartobjekter.');
       return;
     }
     try {

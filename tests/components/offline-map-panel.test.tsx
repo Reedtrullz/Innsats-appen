@@ -571,7 +571,7 @@ it('blocks local marker saves when no active mission exists', async () => {
 
   await waitFor(() => {
     expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toBeNull();
-    expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Opprett eller velg et aktivt oppdrag først/i);
+    expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Opprett aktivt oppdrag før du legger til lokale markører/i);
   });
 });
 
@@ -1084,7 +1084,7 @@ it('blocks local drawing saves when no active mission exists', async () => {
 
   await waitFor(() => {
     expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toBeNull();
-    expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Opprett eller velg et aktivt oppdrag først/i);
+    expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Opprett aktivt oppdrag før du lagrer lokale kartobjekter/i);
   });
 });
 
@@ -1126,5 +1126,5 @@ it('blocks GeoJSON import when no active mission exists', async () => {
   await user.click(screen.getByRole('button', { name: /Importer GeoJSON lokalt/i }));
 
   expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toBeNull();
-  expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Opprett eller velg et aktivt oppdrag først/i);
+  expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Opprett aktivt oppdrag før du importerer kartobjekter/i);
 });
