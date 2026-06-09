@@ -5,6 +5,8 @@ import { FIELD_LOG_CATEGORY_OPTIONS, FIELD_LOG_CATEGORY_LABELS, FIELD_LOG_LOCAL_
 import type { FieldLogCategory, MissionContext } from '@/lib/mission/schemas';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+import { ContextNotice } from './context-notice';
+import { ExportReview } from './export-review';
 import type { MissionUpdate } from './quick-field-log-composer';
 
 function operationalPrivacyErrorMessage(context: string) {
@@ -89,12 +91,17 @@ export function FieldLogControls({ mission, onMissionChange }: { mission: Missio
     appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'field-log-pdf-ready-html', count: filteredEntries.length });
   }
 
+  async function copyText(text: string) {
+    if (!text || typeof navigator === 'undefined' || !navigator.clipboard) return;
+    await navigator.clipboard.writeText(text);
+  }
+
   return (
     <section id="feltlogg" className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Strukturert lokal feltlogg</p>
         <h3 className="text-xl font-black">Lokal feltlogg</h3>
-        <p className="mt-1 text-sm font-semibold text-amber-900">{FIELD_LOG_LOCAL_ONLY_WARNING} {FIELD_LOG_PATIENT_DATA_WARNING}</p>
+        <ContextNotice variant="privacy" className="mt-1">{FIELD_LOG_LOCAL_ONLY_WARNING} {FIELD_LOG_PATIENT_DATA_WARNING}</ContextNotice>
       </div>
       <form onSubmit={(event) => void addFieldLogEntry(event)} className="grid gap-3 rounded-xl border border-slate-200 p-3 lg:grid-cols-3">
         <label className="block text-sm font-bold">
@@ -174,24 +181,9 @@ export function FieldLogControls({ mission, onMissionChange }: { mission: Missio
           <button type="button" onClick={generatePdfReadyHtml} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag PDF-klar feltlogg</button>
         </div>
       </div>
-      {markdown ? (
-        <label htmlFor="field-log-markdown" className="block text-sm font-bold">
-          Feltlogg Markdown
-          <textarea id="field-log-markdown" readOnly value={markdown} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-        </label>
-      ) : null}
-      {json ? (
-        <label htmlFor="field-log-json" className="block text-sm font-bold">
-          Feltlogg JSON
-          <textarea id="field-log-json" readOnly value={json} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-        </label>
-      ) : null}
-      {pdfReadyHtml ? (
-        <label htmlFor="field-log-pdf-ready-html" className="block text-sm font-bold">
-          PDF-klar feltlogg HTML
-          <textarea id="field-log-pdf-ready-html" readOnly value={pdfReadyHtml} className="mt-1 min-h-64 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-xs text-slate-900" />
-        </label>
-      ) : null}
+      <ExportReview title="Feltlogg Markdown" text={markdown} textareaId="field-log-markdown" onCopy={(text) => void copyText(text)} formatLabel="Markdown" />
+      <ExportReview title="Feltlogg JSON" text={json} textareaId="field-log-json" onCopy={(text) => void copyText(text)} formatLabel="JSON" />
+      <ExportReview title="PDF-klar feltlogg HTML" text={pdfReadyHtml} textareaId="field-log-pdf-ready-html" onCopy={(text) => void copyText(text)} formatLabel="HTML" />
     </section>
   );
 }

@@ -10,6 +10,7 @@ import {
   exportCommsPlanMarkdown,
   exportCommsPlanPdfReadyHtml,
 } from '@/lib/mission/order-export';
+import { ContextNotice } from '@/components/mission/context-notice';
 import { ExportReview } from '@/components/mission/export-review';
 
 function value(form: FormData, key: string) {
@@ -85,9 +86,9 @@ export function CommsPlanForm({ contentVersion = 'local-mvp' }: CommsPlanFormPro
       <div>
         <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Lokal samband</p>
         <h2 className="text-2xl font-black">Sambandsplan</h2>
-        <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Kontroller mot lokal sambandsplan og bruk bare operativt nødvendige opplysninger; ikke legg inn persondata eller sensitive sambandstabeller, abonnentlister eller ISSI-lister.</p>
-        <p className="mt-2 rounded-2xl bg-red-50 p-3 text-sm font-semibold text-red-950">{EXPORT_SENSITIVITY_WARNING}</p>
-        <p className="mt-2 rounded-2xl bg-sky-50 p-3 text-sm font-semibold text-sky-950">PDF-klar HTML er tekst for nettleserens Skriv ut &gt; Lagre som PDF. Ikke offisiell innsending.</p>
+        <ContextNotice variant="privacy" className="mt-2">Kontroller mot lokal sambandsplan og bruk bare operativt nødvendige opplysninger; ikke legg inn persondata eller sensitive sambandstabeller, abonnentlister eller ISSI-lister.</ContextNotice>
+        <ContextNotice variant="blocked-sensitive-content" className="mt-2">{EXPORT_SENSITIVITY_WARNING}</ContextNotice>
+        <ContextNotice variant="not-official" className="mt-2">PDF-klar HTML er tekst for nettleserens Skriv ut &gt; Lagre som PDF. Ikke offisiell innsending.</ContextNotice>
       </div>
 
       <label className="block text-sm font-bold">

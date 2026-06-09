@@ -104,10 +104,13 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await page.getByLabel(/Søk i feltlogg/i).fill('terskel');
   await expect(page.getByText(/1\/1 treff/i)).toBeVisible();
   await page.getByRole('button', { name: /Lag feltlogg Markdown/i }).click();
+  await page.getByText(/Vis forhåndsvisning/i).last().click();
   await expect(page.getByLabel(/Feltlogg Markdown/i)).toHaveValue(/Våt terskel observert/);
   await page.getByRole('button', { name: /Lag feltlogg JSON/i }).click();
+  await page.getByText(/Vis forhåndsvisning/i).last().click();
   await expect(page.getByLabel(/Feltlogg JSON/i)).toHaveValue(/"category": "hms-avvik"/);
   await page.getByRole('button', { name: /Lag PDF-klar feltlogg/i }).click();
+  await page.getByText(/Vis forhåndsvisning/i).last().click();
   await expect(page.getByLabel(/PDF-klar feltlogg HTML/i)).toHaveValue(/<!doctype html>/i);
 
   await openMissionDetails(page, /RUH og velferd/i, 'Eksport');

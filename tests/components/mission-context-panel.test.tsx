@@ -749,6 +749,9 @@ it('lets users add, filter and export a structured local field log with patient-
   await userEvent.click(screen.getByRole('button', { name: /Lag feltlogg Markdown/i }));
   await userEvent.click(screen.getByRole('button', { name: /Lag feltlogg JSON/i }));
   await userEvent.click(screen.getByRole('button', { name: /Lag PDF-klar feltlogg/i }));
+  for (const summary of screen.getAllByText(/Vis forhåndsvisning/i).slice(-3)) {
+    await userEvent.click(summary);
+  }
 
   const markdownPreview = screen.getByLabelText(/Feltlogg Markdown/i) as HTMLTextAreaElement;
   const jsonPreview = screen.getByLabelText(/Feltlogg JSON/i) as HTMLTextAreaElement;

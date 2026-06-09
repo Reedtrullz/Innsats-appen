@@ -219,7 +219,7 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange,
       </dl>
       {showStatusExport ? <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-950">
         <h4 className="font-black">Lokal statusrapport</h4>
-        <p className="mt-1 text-sm font-semibold">Kun lokal eksport i denne nettleseren. Ikke offisiell logg. Kan inneholde lokale oppgaver, hurtigstatus og ressursbehov — ikke legg inn eller del sensitiv informasjon.</p>
+        <ContextNotice variant="privacy" className="mt-1">Kun lokal eksport i denne nettleseren. Ikke offisiell logg. Kan inneholde lokale oppgaver, hurtigstatus og ressursbehov — ikke legg inn eller del sensitiv informasjon.</ContextNotice>
         <button type="button" onClick={() => generateStatusSummary()} className="mt-3 min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag lokal statusrapport</button>
         <ExportReview
           title="Lokal statusrapport"
