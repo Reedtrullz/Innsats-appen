@@ -104,19 +104,71 @@ export function MissionCommandDashboard({ mission, cards, checklist, checklists,
 
   useEffect(() => {
     if (!pendingHashTarget) return undefined;
-    let innerFrame = 0;
-    const outerFrame = window.requestAnimationFrame(() => {
-      innerFrame = window.requestAnimationFrame(() => {
-        const target = document.getElementById(pendingHashTarget);
-        const parentDetails = target?.closest('details') as HTMLDetailsElement | null;
-        if (parentDetails) parentDetails.open = true;
-        if (typeof target?.scrollIntoView === 'function') target.scrollIntoView({ block: 'start' });
+    const targetId = pendingHashTarget;
+    let cancelled = false;
+    const headerOffset = 112; // sticky app header (~56px) + sticky mode control (~56px)
+    const maxAttempts = 8;
+
+    function openAncestorDetails(target: HTMLElement) {
+      let opened = false;
+      let element: HTMLElement | null = target;
+      while (element) {
+        if (element.tagName === 'DETAILS' && !(element as HTMLDetailsElement).open) {
+          (element as HTMLDetailsElement).open = true;
+          opened = true;
+        }
+        element = element.parentElement;
+      }
+      return opened;
+    }
+
+    function attemptScroll(remaining: number) {
+      if (cancelled) return;
+      const target = document.getElementById(targetId);
+      const scrollIntoView = target && typeof target.scrollIntoView === 'function' ? target.scrollIntoView.bind(target) : null;
+      if (!target) {
+        if (remaining > 0) {
+          window.requestAnimationFrame(() => attemptScroll(remaining - 1));
+        } else {
+          setPendingHashTarget(null);
+        }
+        return;
+      }
+
+      const openedDetails = openAncestorDetails(target);
+      const rect = target.getBoundingClientRect();
+      const fullyVisible = rect.top >= headerOffset && rect.bottom <= window.innerHeight;
+
+      if (openedDetails) {
+        // Layout will change after the <details> opens; scroll now, then re-measure next frame.
+        scrollIntoView?.({ block: 'start' });
+        if (remaining > 0) {
+          window.requestAnimationFrame(() => attemptScroll(remaining - 1));
+        } else {
+          setPendingHashTarget(null);
+        }
+        return;
+      }
+
+      if (fullyVisible) {
         setPendingHashTarget(null);
-      });
+        return;
+      }
+
+      scrollIntoView?.({ block: 'start' });
+      if (remaining > 0) {
+        window.requestAnimationFrame(() => attemptScroll(remaining - 1));
+      } else {
+        setPendingHashTarget(null);
+      }
+    }
+
+    const initialFrame = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => attemptScroll(maxAttempts));
     });
     return () => {
-      window.cancelAnimationFrame(outerFrame);
-      if (innerFrame) window.cancelAnimationFrame(innerFrame);
+      cancelled = true;
+      window.cancelAnimationFrame(initialFrame);
     };
   }, [activeMode, pendingHashTarget]);
 
