@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('creates and reopens a local mission offline', async ({ page, context }) => {
   await page.goto('/oppdrag/ny');
   await page.getByLabel('Tittel').fill('Øvelse tilfluktsrom');
-  await page.getByLabel('Rolle').selectOption('beredskapsvakt');
+  await page.getByLabel('Rolle', { exact: true }).selectOption('beredskapsvakt');
   await page.getByLabel('Fase').selectOption('for');
   await page.getByLabel('Scenario').selectOption('tilfluktsrom');
   await page.getByLabel('Sted/lokasjon').fill('Trondheim sentrum');

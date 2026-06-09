@@ -65,7 +65,7 @@ export async function createLocalMission(page: Page, options: {
 }) {
   await page.goto('/oppdrag/ny');
   await page.getByLabel('Tittel').fill(options.title);
-  await page.getByLabel('Rolle').selectOption(options.role ?? 'beredskapsvakt');
+  await page.getByLabel('Rolle', { exact: true }).selectOption(options.role ?? 'beredskapsvakt');
   await page.getByLabel('Fase').selectOption(options.phase ?? 'for');
   await page.getByLabel('Scenario').selectOption(options.scenario ?? 'tilfluktsrom');
   const missionLocation = options.location ?? 'Trondheim sentrum';

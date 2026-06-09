@@ -102,7 +102,7 @@ test('keyboard can use persistent bottom navigation and submit a new mission for
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { name: /Opprett lokalt oppdrag/i })).toBeVisible();
   await page.getByLabel('Tittel').fill(missionTitle);
-  await page.getByLabel('Rolle').selectOption('beredskapsvakt');
+  await page.getByLabel('Rolle', { exact: true }).selectOption('beredskapsvakt');
   await page.getByLabel('Fase').selectOption('for');
   await page.getByLabel('Scenario').selectOption('tilfluktsrom');
   await page.getByLabel('Sted/lokasjon').fill('Keyboard testområde');
