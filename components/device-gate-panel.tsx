@@ -26,29 +26,15 @@ function statusIcon(status: CheckStatus, manualConfirmed: boolean): { icon: Oper
 }
 
 export function DeviceGatePanel() {
-  const [checks, setChecks] = useState<DeviceGateCheck[]>(() =>
-    CHECK_DEFS.map((def) => {
-      const auto = runAutoDetect(def.id);
-      return { ...def, autoDetected: auto.status, manualConfirmed: false, detail: auto.detail };
-    }),
-  );
-  const [sha, setSha] = useState<string | null>(null);
-  const [shaFetchedAt, setShaFetchedAt] = useState<string | null>(null);
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
+  const [checks, setChecks] = useState<DeviceGateCheck[]>(() => {
     const persisted = loadPersistedGate();
-    setSha(persisted.sha);
-    setShaFetchedAt(persisted.shaFetchedAt);
-
-    setChecks((prev) =>
-      prev.map((check) => ({
-        ...check,
-        manualConfirmed: persisted.confirmed[check.id] ?? false,
-      })),
-    );
-    setHydrated(true);
-  }, []);
+    return CHECK_DEFS.map((def) => {
+      const auto = runAutoDetect(def.id);
+      return { ...def, autoDetected: auto.status, manualConfirmed: persisted.confirmed[def.id] ?? false, detail: auto.detail };
+    });
+  });
+  const [sha, setSha] = useState<string | null>(() => loadPersistedGate().sha);
+  const [shaFetchedAt, setShaFetchedAt] = useState<string | null>(() => loadPersistedGate().shaFetchedAt);
 
   useEffect(() => {
     fetch('/api/health', { cache: 'no-store' })
