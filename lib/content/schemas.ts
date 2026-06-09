@@ -240,6 +240,7 @@ export const ContentManifestSchema = z.object({
   changelogCount: z.number().int().nonnegative().default(0),
   mustReadCount: z.number().int().nonnegative().default(0),
   workplanCount: z.number().int().nonnegative().default(0),
+  searchSynonymCount: z.number().int().nonnegative().default(0),
   copiedAssetCount: z.number().int().nonnegative().default(0),
 });
 

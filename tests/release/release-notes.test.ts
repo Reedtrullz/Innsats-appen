@@ -21,8 +21,8 @@ const manifest: ContentManifest = {
   localOverlayCount: 0,
   changelogCount: 2,
   mustReadCount: 3,
-  searchSynonymCount: 0,
   workplanCount: 5,
+  searchSynonymCount: 0,
   copiedAssetCount: 0,
 };
 

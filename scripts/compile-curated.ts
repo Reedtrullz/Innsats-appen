@@ -94,8 +94,8 @@ async function readManifest(generatedDir: string): Promise<ContentManifest> {
       localOverlayCount: 0,
       changelogCount: 0,
       mustReadCount: 0,
-      searchSynonymCount: 0,
       workplanCount: 0,
+      searchSynonymCount: 0,
       copiedAssetCount: 0,
       usedPregeneratedFallback: false,
     };
