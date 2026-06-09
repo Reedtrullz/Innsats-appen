@@ -23,39 +23,42 @@ export interface SearchContext {
   scenario?: string;
 }
 
-const OPERATIONAL_SYNONYM_GROUPS = [
-  ['jod', 'kaliumjodid', 'jodtablett', 'jodtabletter', 'jod-tablett', 'jod tabletter', 'atomulykke', 'atomberedskap', 'radioaktivt nedfall', 'nukleær hendelse'],
-  ['rens', 'sanering', 'dekontaminering', 'grovrens', 'finrens', 'ren side', 'uren side', 'mre', 'cbrn', 'renseenhet'],
-  ['mfe', 'mobil forsterkningsenhet', 'mobile forsterkningsenheter', 'forsterkningsenhet', 'nasjonal støtte', 'støtteanmodning', 'stotteanmodning'],
-  ['samband', 'radio', 'nødnett', 'nodnett', 'kallesignal', 'sambandstest', 'sambanstest', 'kommunikasjonsplan', 'sambandsplan'],
-  ['samleplass', 'oppmøtested', 'oppmotested', 'frammøtested', 'frammotested', 'fremmøtested', 'depot', 'staging', 'mottakspunkt', 'samlepunkt'],
+export interface SearchSynonymGroup {
+  canonical: string;
+  aliases: string[];
+}
+
+const BUILT_IN_SYNONYM_GROUPS: string[][] = [
+  ['jod', 'kaliumjodid', 'jodtablett', 'jodtabletter', 'jod-tablett', 'jod tablet', 'jodttablett', 'atomulykke', 'atomberedskap', 'radioaktivt nedfall', 'nukleær hendelse', 'nukleaer hendelse'],
+  ['rens', 'sanering', 'dekontaminering', 'dekontaminasjion', 'grovrens', 'finrens', 'ren side', 'uren side', 'mre', 'cbrn', 'cbrne', 'renseenhet'],
+  ['mfe', 'mobil forsterkningsenhet', 'mobile forsterkningsenheter', 'forsterkningsenhet', 'forsterkningseenhet', 'forsterkning', 'nasjonal støtte', 'nasjonal stotte', 'støtteanmodning', 'stotteanmodning'],
+  ['samband', 'radio', 'nødnett', 'nodnett', 'kallesignal', 'sambandstest', 'sambanstest', 'samban', 'kommunikasjonsplan', 'sambandsplan'],
+  ['samleplass', 'oppmøtested', 'oppmotested', 'frammøtested', 'frammotested', 'fremmøtested', 'fremmotested', 'samleplas', 'depot', 'staging', 'mottakspunkt', 'samlepunkt'],
   ['dose', 'dosimeter', 'doserate', 'dosekontroll', 'radiac', 'stråling', 'straling', 'oppholdstid'],
   ['ordre', '5-punktsordre', '5 punktsordre', 'fempunktsordre', 'oppdrag', 'ordrepunkt', 'situasjon', 'utførelse', 'utforelse', 'ledelse'],
   ['ko', 'il-ko', 'ilko', 'kommandoplass', 'innsatsleders ko', 'innsatsleders il-ko'],
-  ['innsatsleder', 'il', 'innsatsledelse', 'politi', 'brann', 'helse', 'stab'],
+  ['innsatsleder', 'il', 'innsatsledelse', 'politi', 'brann', 'helse', 'stab', 'inssatsleder', 'innsatslederr'],
   ['beredskapsvakt', 'vakt', 'vakthavende', 'varselmottak'],
   ['pumpe', 'lensepumpe', 'flom', 'vannforsyning', 'slangeutlegg', 'vannskade'],
   ['skadde', 'skadet', 'førstehjelp', 'forstehjelp', '113', 'livreddende førstehjelp', 'livreddende forstehjelp', 'pasient'],
-  ['psykososial', 'defuse', 'defusing', 'debrief', 'efok', 'kollegastøtte', 'kollegastotte', 'psykisk førstehjelp', 'psykisk forstehjelp'],
+  ['psykososial', 'defuse', 'defusing', 'debrief', 'efok', 'kollegastøtte', 'kollegastotte', 'psykisk førstehjelp', 'psykisk forstehjelp', 'psykososiall'],
   ['mbk', 'materiellberedskap', 'materiellkontroll', 'etterkontroll', 'klargjøring', 'klargjoring', 'karantene', 'service', 'vask'],
-] as const;
+];
 
-const TYPO_ALIASES: Record<string, string> = {
-  jodtablet: 'jod',
-  joddtablett: 'jod',
-  sambanstest: 'samband',
-  samban: 'samband',
-  samleplas: 'samleplass',
-  inssatsleder: 'innsatsleder',
-  innsatslederr: 'innsatsleder',
-  psykososiall: 'psykososial',
-  dekontaminasjion: 'dekontaminering',
-  forsterkningseenhet: 'forsterkningsenhet',
-  nodnett: 'nødnett',
-  forstehjelp: 'førstehjelp',
-};
+function buildSynonymGroups(external?: SearchSynonymGroup[]): string[][] {
+  const built = [...BUILT_IN_SYNONYM_GROUPS];
+  if (external) {
+    for (const group of external) {
+      built.push([group.canonical, ...group.aliases]);
+    }
+  }
+  return built;
+}
 
-const CRITICAL_CANONICAL_TERMS = OPERATIONAL_SYNONYM_GROUPS.map((group) => group[0]);
+function getCriticalCanonicalTerms(external?: SearchSynonymGroup[]): string[] {
+  const groups = buildSynonymGroups(external);
+  return groups.map((group) => group[0]);
+}
 
 function stripAccentsExceptNorwegian(value: string) {
   return value
@@ -71,8 +74,15 @@ function stripAccentsExceptNorwegian(value: string) {
     .replace(/[ùúûüū]/g, 'u');
 }
 
+function foldNorwegian(value: string) {
+  return value
+    .replace(/æ/g, 'ae')
+    .replace(/ø/g, 'o')
+    .replace(/å/g, 'a');
+}
+
 export function normalizeSearchText(value: string) {
-  return stripAccentsExceptNorwegian(value)
+  return foldNorwegian(stripAccentsExceptNorwegian(value))
     .normalize('NFKC')
     .toLowerCase()
     .replace(/[‐‑‒–—−/_.:;,()[\]{}]+/g, ' ')
@@ -134,15 +144,13 @@ function isNearTerm(query: string, term: string) {
   return distance <= typoThreshold(Math.max(queryCompact.length, termCompact.length));
 }
 
-function matchingGroups(query: string) {
+function matchingGroups(query: string, external?: SearchSynonymGroup[]) {
   const normalizedQuery = normalizeSearchText(query);
   const queryCompact = compact(query);
   const queryWords = words(query);
   const aliases = new Set<string>();
-  const typoAlias = TYPO_ALIASES[normalizedQuery] ?? TYPO_ALIASES[queryCompact];
-  if (typoAlias) aliases.add(typoAlias);
 
-  for (const group of OPERATIONAL_SYNONYM_GROUPS) {
+  for (const group of buildSynonymGroups(external)) {
     if (group.some((term) => {
       const normalizedTerm = normalizeSearchText(term);
       const termCompact = compact(term);
@@ -157,12 +165,12 @@ function matchingGroups(query: string) {
   return aliases;
 }
 
-export function expandOperationalSearchQuery(query: string) {
+export function expandOperationalSearchQuery(query: string, externalSynonyms?: SearchSynonymGroup[]) {
   const terms = new Set<string>();
   const normalizedQuery = normalizeSearchText(query);
   if (normalizedQuery) terms.add(normalizedQuery);
   for (const word of words(query)) terms.add(word);
-  for (const term of matchingGroups(query)) terms.add(normalizeSearchText(term));
+  for (const term of matchingGroups(query, externalSynonyms)) terms.add(normalizeSearchText(term));
   return Array.from(terms).filter(Boolean);
 }
 
@@ -213,10 +221,10 @@ function deterministicSort(a: SearchHit, b: SearchHit) {
   return `${a.title}|${a.id}`.localeCompare(`${b.title}|${b.id}`, 'nb');
 }
 
-export function searchDocuments(documents: SearchDocument[], query: string, context: SearchContext = {}): SearchHit[] {
+export function searchDocuments(documents: SearchDocument[], query: string, context: SearchContext = {}, externalSynonyms?: SearchSynonymGroup[]): SearchHit[] {
   const trimmed = query.trim();
   if (!trimmed) return [];
-  const expandedTerms = expandOperationalSearchQuery(trimmed);
+  const expandedTerms = expandOperationalSearchQuery(trimmed, externalSynonyms);
   return documents
     .map<SearchHit | null>((doc) => {
       let score = 0;
@@ -243,12 +251,13 @@ export function searchContent(index: MiniSearch<SearchDocument>, query: string):
   return index.search(trimmed).map((hit) => hit as unknown as SearchHit);
 }
 
-export function suggestSearchQueries(query: string, limit = 5) {
+export function suggestSearchQueries(query: string, limit = 5, externalSynonyms?: SearchSynonymGroup[]) {
   const normalizedQuery = normalizeSearchText(query);
-  if (!normalizedQuery) return CRITICAL_CANONICAL_TERMS.slice(0, limit);
-  const expanded = expandOperationalSearchQuery(query);
+  const criticalTerms = getCriticalCanonicalTerms(externalSynonyms);
+  if (!normalizedQuery) return criticalTerms.slice(0, limit);
+  const expanded = expandOperationalSearchQuery(query, externalSynonyms);
   const scored = new Map<string, number>();
-  for (const group of OPERATIONAL_SYNONYM_GROUPS) {
+  for (const group of buildSynonymGroups(externalSynonyms)) {
     const canonical = group[0];
     for (const term of group) {
       const normalizedTerm = normalizeSearchText(term);

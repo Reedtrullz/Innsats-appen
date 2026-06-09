@@ -13,6 +13,7 @@ import {
   MustReadNoticeSchema,
   OperationalChecklistSchema,
   ProtectionMeasureSchema,
+  SearchSynonymGroupSchema,
   SourceDocumentSchema,
   TrainingPathSchema,
   type ActionCard,
@@ -27,6 +28,7 @@ import {
   type MustReadNotice,
   type OperationalChecklist,
   type ProtectionMeasure,
+  type SearchSynonymGroup,
   type SourceDocument,
   type TrainingPath,
 } from './schemas';
@@ -117,4 +119,8 @@ export function getSearchIndexGeneratedAt(): string | undefined {
   if (!fs.existsSync(filePath)) return undefined;
   const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8')) as { generatedAt?: unknown };
   return typeof parsed.generatedAt === 'string' ? parsed.generatedAt : undefined;
+}
+
+export function getSearchSynonyms(): SearchSynonymGroup[] {
+  return loadArray('search-synonyms.json', 'search synonyms', (value) => SearchSynonymGroupSchema.parse(value));
 }

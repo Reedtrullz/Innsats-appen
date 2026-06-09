@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildSearchDocuments } from '@/lib/content/search-documents';
 import { buildSearchIndex } from '@/lib/content/search';
-import type { ActionCard, FAQEntry, GlossaryTerm, ProtectionMeasure, SourceDocument, TrainingPath } from '@/lib/content/schemas';
+import type { ActionCard, FAQEntry, GlossaryTerm, ProtectionMeasure, SearchSynonymGroup, SourceDocument, TrainingPath } from '@/lib/content/schemas';
 
 async function readJson<T>(filePath: string): Promise<T> {
   return JSON.parse(await fs.readFile(filePath, 'utf8')) as T;
@@ -15,13 +15,14 @@ async function writeJson(filePath: string, value: unknown) {
 }
 
 export async function buildGeneratedSearchIndex(generatedDir = 'content/generated', publicGeneratedDir = 'public/generated-content') {
-  const [actionCards, sources, glossary, trainingPaths, protectionMeasures, faq] = await Promise.all([
+  const [actionCards, sources, glossary, trainingPaths, protectionMeasures, faq, searchSynonyms] = await Promise.all([
     readJson<ActionCard[]>(path.join(generatedDir, 'action-cards.json')),
     readJson<SourceDocument[]>(path.join(generatedDir, 'source-documents.json')),
     readJson<GlossaryTerm[]>(path.join(generatedDir, 'glossary.json')),
     readJson<TrainingPath[]>(path.join(generatedDir, 'training-paths.json')),
     readJson<ProtectionMeasure[]>(path.join(generatedDir, 'protection-measures.json')),
     readJson<FAQEntry[]>(path.join(generatedDir, 'faq.json')),
+    readJson<SearchSynonymGroup[]>(path.join(generatedDir, 'search-synonyms.json')),
   ]);
   const docs = buildSearchDocuments({
     cards: actionCards,
@@ -31,11 +32,30 @@ export async function buildGeneratedSearchIndex(generatedDir = 'content/generate
     protection: protectionMeasures,
     faq,
   });
+  bakeSearchSynonyms(docs, searchSynonyms);
   const index = buildSearchIndex(docs);
   const payload = { documents: docs, index: index.toJSON(), generatedAt: new Date().toISOString() };
   await writeJson(path.join(generatedDir, 'search-index.json'), payload);
   await writeJson(path.join(publicGeneratedDir, 'search-index.json'), payload);
   return payload;
+}
+
+function bakeSearchSynonyms(docs: Array<{ id: string; synonyms?: string }>, synonyms: SearchSynonymGroup[]) {
+  const cardSynonymMap = new Map<string, string[]>();
+  for (const group of synonyms) {
+    const tokens = [group.canonical, ...group.aliases];
+    for (const cardId of group.cardIds) {
+      const existing = cardSynonymMap.get(cardId) ?? [];
+      cardSynonymMap.set(cardId, [...existing, ...tokens]);
+    }
+  }
+  for (const doc of docs) {
+    const bareSlug = doc.id.startsWith('kort:') ? doc.id.slice(5) : doc.id;
+    const extraTokens = cardSynonymMap.get(bareSlug) ?? cardSynonymMap.get(doc.id);
+    if (extraTokens && extraTokens.length > 0) {
+      doc.synonyms = [doc.synonyms ?? '', ...extraTokens].join(' ').trim();
+    }
+  }
 }
 
 async function main() {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState, useSyncExternalStore, type MouseEvent } from 'react';
-import { searchDocuments, searchIndexFreshnessLabel, suggestSearchQueries, type SearchContext, type SearchDocument, type SearchHit } from '@/lib/content/search';
+import { searchDocuments, searchIndexFreshnessLabel, suggestSearchQueries, type SearchContext, type SearchDocument, type SearchHit, type SearchSynonymGroup } from '@/lib/content/search';
 import { OperationalIcon } from './ui/operational-icons';
 import { StatusPill } from './ui/operational-primitives';
 
@@ -126,6 +126,7 @@ function SearchResultRow({ doc }: { doc: SearchHit }) {
 export function SearchBox({
   documents,
   initialQuery = '',
+  externalSynonyms,
   context,
   generatedAt,
   now,
@@ -134,6 +135,7 @@ export function SearchBox({
   enableFilters = false,
 }: {
   documents: SearchDocument[];
+  externalSynonyms?: SearchSynonymGroup[];
   initialQuery?: string;
   context?: SearchContext;
   generatedAt?: string;
@@ -154,8 +156,8 @@ export function SearchBox({
   const rawResults = useMemo(() => {
     const q = query.trim();
     if (!q) return [];
-    return searchDocuments(documents, q, rankingContext);
-  }, [documents, query, rankingContext]);
+    return searchDocuments(documents, q, rankingContext, externalSynonyms);
+  }, [documents, query, rankingContext, externalSynonyms]);
   const filteredResults = useMemo(() => rawResults.filter((doc) => {
     if (activePhase && doc.phase !== activePhase) return false;
     if (activeType && doc.type !== activeType) return false;
@@ -166,8 +168,8 @@ export function SearchBox({
   const suggestions = useMemo(() => {
     const q = query.trim();
     if (!q || rawResults.length > 0) return [];
-    return suggestSearchQueries(q, 5);
-  }, [query, rawResults.length]);
+    return suggestSearchQueries(q, 5, externalSynonyms);
+  }, [query, rawResults.length, externalSynonyms]);
   const typeFilters = useMemo(() => uniqueSorted(documents.map((doc) => doc.type)), [documents]);
   const sourceStatusFilters = useMemo(() => uniqueSorted(documents.map((doc) => doc.sourceStatus)), [documents]);
   const hasActiveFilters = Boolean(activePhase || activeType || activeSourceStatus);

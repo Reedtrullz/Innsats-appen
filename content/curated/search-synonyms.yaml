@@ -1,0 +1,256 @@
+# Operational search synonyms – canonical terms mapped to aliases and misspellings.
+# Each group has a canonical term and a list of aliases. Aliases are folded to
+# the canonical term at search time so that querying any alias matches the same
+# documents as the canonical term.
+#
+# cardIds – optional list of action-card slugs that this group should boost for.
+# When a cardId is listed, the canonical term + all aliases are injected into
+# that card's synonym field even if the term does not appear in the card text.
+- canonical: jod
+  aliases:
+    - kaliumjodid
+    - jodtablett
+    - jodtabletter
+    - jod-tablett
+    - jod tablet
+    - jodttablett
+    - atomulykke
+    - atomberedskap
+    - radioaktivt nedfall
+    - nukleær hendelse
+    - nukleaer hendelse
+  cardIds: [jod-atomberedskap]
+
+- canonical: rens
+  aliases:
+    - sanering
+    - dekontaminering
+    - dekontaminasjion
+    - grovrens
+    - finrens
+    - ren side
+    - uren side
+    - mre
+    - cbrn
+    - cbrne
+    - rensenhet
+  cardIds: [mre-rens-start, mre-ren-uren-side-grovrens, cbrne-startkort, cbrne-soneinndeling, cbrne-verneutstyr-stoppkriterier, kontaminert-utstyr-handtering]
+
+- canonical: MFE
+  aliases:
+    - mobil forsterkningsenhet
+    - mobile forsterkningsenheter
+    - forsterkningsenhet
+    - forsterkningseenhet
+    - nasjonal støtte
+    - nasjonal stotte
+    - støtteanmodning
+    - stotteanmodning
+    - forsterkning
+  cardIds: [mfe-anmodning, mfe-anmodning-mottak-oppfolging]
+
+- canonical: samband
+  aliases:
+    - radio
+    - nødnett
+    - nodnett
+    - kallesignal
+    - sambandstest
+    - sambanstest
+    - kommunikasjonsplan
+    - sambandsplan
+  cardIds: [sambandsplan-start]
+
+- canonical: samleplass
+  aliases:
+    - oppmøtested
+    - oppmotested
+    - frammøtested
+    - frammotested
+    - fremmøtested
+    - fremmotested
+    - depot
+    - staging
+    - mottakspunkt
+    - samlepunkt
+    - skadeplass
+  cardIds: [samleplass-skadde-start, samleplass-skadde-utvidet]
+
+- canonical: dose
+  aliases:
+    - dosimeter
+    - doserate
+    - dosekontroll
+    - radiac
+    - stråling
+    - straling
+    - oppholdstid
+    - målepunkt
+    - malepunkt
+    - måletjeneste
+    - maletjeneste
+    - radiacmåletjeneste
+  cardIds: [radiac-dosekontroll, radiac-malepunkt, radiac-oppholdstid-rullering]
+
+- canonical: ordre
+  aliases:
+    - 5-punktsordre
+    - 5 punktsordre
+    - fempunktsordre
+    - oppdrag
+    - ordrepunkt
+    - situasjon
+    - utførelse
+    - utforelse
+    - ledelse
+    - obbo
+    - beslutningssløyfe
+    - beslutningssloyfe
+  cardIds: [fem-punktsordre, ledelse-kommando-kontroll, obbo-beslutningssloyfe, oppdragsanalyse]
+
+- canonical: KO
+  aliases:
+    - il-ko
+    - ilko
+    - kommandoplass
+    - innsatsleders ko
+    - innsatsleders il-ko
+  cardIds: [ledelse-kommando-kontroll]
+
+- canonical: innsatsleder
+  aliases:
+    - IL
+    - innsatsledelse
+    - politi
+    - brann
+    - helse
+    - stab
+    - inssatsleder
+    - innsatslederr
+  cardIds: [ledelse-kommando-kontroll, etikk-og-rollegrenser]
+
+- canonical: beredskapsvakt
+  aliases:
+    - vakt
+    - vakthavende
+    - varselmottak
+    - varsling
+  cardIds: []
+
+- canonical: pumpe
+  aliases:
+    - lensepumpe
+    - flom
+    - vannforsyning
+    - slangeutlegg
+    - vannskade
+  cardIds: [flom-pumpe-start, flom-pumpe-vannforsyning, brann-vannforsyning-slange, pumpe-stromfare]
+
+- canonical: skadde
+  aliases:
+    - skadet
+    - førstehjelp
+    - forstehjelp
+    - '113'
+    - livreddende førstehjelp
+    - livreddende forstehjelp
+    - pasient
+    - akutt
+    - helsehjelp
+  cardIds: [akutt-113-livreddende-forstehjelp, samleplass-skadde-start, samleplass-skadde-utvidet]
+
+- canonical: psykososial
+  aliases:
+    - defuse
+    - defusing
+    - debrief
+    - efok
+    - kollegastøtte
+    - kollegastotte
+    - psykisk førstehjelp
+    - psykisk forstehjelp
+    - psykologisk
+    - oppfølging
+    - oppfolging
+  cardIds: [psykososial-forstehjelp, psykologisk-forstehjelp-sekvens, psykososial-ikke-tvungen-debrief, alvorlig-ulykke-dod-eget-personell]
+
+- canonical: MBK
+  aliases:
+    - materiellberedskap
+    - materiellkontroll
+    - etterkontroll
+    - klargjøring
+    - klargjoring
+    - karantene
+    - service
+    - vask
+  cardIds: [fig-etterinnsats-klargjoring]
+
+- canonical: tilfluktsrom
+  aliases:
+    - offentlig tilfluktsrom
+    - befolkningsbeskyttelse
+    - tilfluktsrom klargjoring
+  cardIds: [tilfluktsrom-klargjoring, tilfluktsrom-offentlig-beredskap]
+
+- canonical: FIG
+  aliases:
+    - FIG10
+    - FIG20
+    - FIG30
+    - FIG31
+    - FIGP
+    - fig
+    - grunnkurs
+    - lagfører
+    - lagforer
+    - leder FIG
+    - fig for innsats
+    - fig etter innsats
+  cardIds: [fig-for-innsats, fig-etterinnsats-klargjoring]
+
+- canonical: sektor
+  aliases:
+    - teig
+    - søkesektor
+    - søketeig
+    - sokesektor
+    - soketeig
+    - søkeområde
+    - ledeteig
+    - avgrensning
+    - sektorinndeling
+  cardIds: [soketeig-sektor, sok-og-redning-startkort]
+
+- canonical: ATV
+  aliases:
+    - ATV-båt
+    - ATV-bat
+    - ATV båt
+    - båt
+    - bat
+    - fører båt
+    - forer bat
+    - transport
+  cardIds: [kjoretoy-transportberedskap]
+
+- canonical: LIA
+  aliases:
+    - lagerbygning
+    - lager
+    - forsyning
+    - forsyninger
+    - depot
+    - logistikk
+  cardIds: []
+
+- canonical: hurtigkort
+  aliases:
+    - hurtigkort
+    - startkort
+    - sjekkliste
+    - sjekklister
+    - checkliste
+    - tiltakskort
+    - referansekort
+  cardIds: []

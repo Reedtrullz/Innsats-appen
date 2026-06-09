@@ -1,5 +1,5 @@
 import { buildContentCoverageReport } from '@/lib/content/coverage-report';
-import { getActionCards, getChecklists, getGlossaryTerms, getProtectionMeasures, getSourceDocuments, getTrainingPaths } from '@/lib/content/load-content';
+import { getActionCards, getChecklists, getGlossaryTerms, getProtectionMeasures, getSearchSynonyms, getSourceDocuments, getTrainingPaths } from '@/lib/content/load-content';
 import type { ActionCard, SourceDocument } from '@/lib/content/schemas';
 
 const requiredMarkers = [
@@ -62,6 +62,16 @@ it('keeps coverage backed by both action cards and source documents', () => {
   expect(cardsText).toContain('sjekkliste');
   expect(cardsText).toContain('psykologisk');
   expect(sourcesText).toContain('5-punktsordre');
+});
+
+it('resolves every search-synonym cardId to an existing action card slug', () => {
+  const synonyms = getSearchSynonyms();
+  const cardSlugs = new Set(getActionCards().map((card) => card.slug));
+  for (const group of synonyms) {
+    for (const cardId of group.cardIds) {
+      expect(cardSlugs, `synonym group "${group.canonical}" references missing card slug: ${cardId}`).toContain(cardId);
+    }
+  }
 });
 
 it('does not leave orphan sources without accepted-risk metadata', () => {

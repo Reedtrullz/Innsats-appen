@@ -1,6 +1,6 @@
 import { SearchBox } from '@/components/search-box';
 import { TiltakCardRow } from '@/components/tiltak-card';
-import { getActionCards, getContentManifest, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSourceDocuments, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
+import { getActionCards, getContentManifest, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSearchSynonyms, getSourceDocuments, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
 import { buildSearchDocuments } from '@/lib/content/search-documents';
 import { sortActionCards } from '@/lib/content/filters';
 
@@ -18,6 +18,7 @@ export default function HurtigkortPage() {
   });
   const manifest = getContentManifest();
   const searchIndexGeneratedAt = getSearchIndexGeneratedAt();
+  const synonyms = getSearchSynonyms();
   const sortedCards = sortActionCards(cards);
   const criticalCards = sortedCards.filter((card) => card.priority === 'high').slice(0, 4);
   const relevantCards = sortedCards.filter((card) => card.priority !== 'high').slice(0, 6);
@@ -28,7 +29,7 @@ export default function HurtigkortPage() {
         <p className="mt-1 text-sm font-semibold text-sky-100">Søk først. Bla kompakt når du ikke vet nøyaktig hva du trenger.</p>
         <p className="mt-3 text-xs font-bold text-sky-200">Innhold: <span data-testid="content-version">{manifest.contentVersion}</span></p>
       </section>
-      <SearchBox documents={searchDocuments} generatedAt={searchIndexGeneratedAt} showFreshnessIndicator />
+      <SearchBox documents={searchDocuments} externalSynonyms={synonyms.map((s) => ({ canonical: s.canonical, aliases: s.aliases }))} generatedAt={searchIndexGeneratedAt} showFreshnessIndicator />
 
       {criticalCards.length > 0 ? (
         <section className="space-y-3" aria-labelledby="hurtigkort-critical-heading">

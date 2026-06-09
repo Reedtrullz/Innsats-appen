@@ -199,6 +199,12 @@ export const ContentChangelogEntrySchema = z.object({
   mustRead: z.boolean().default(false),
 });
 
+export const SearchSynonymGroupSchema = z.object({
+  canonical: z.string().min(1),
+  aliases: z.array(z.string().min(1)).min(1),
+  cardIds: z.array(z.string().min(1)).default([]),
+});
+
 export const MustReadNoticeSchema = z.object({
   id: z.string().min(1).regex(slugPattern, 'must-read id must be lowercase kebab-case'),
   title: z.string().min(1),
@@ -229,6 +235,7 @@ export const ContentManifestSchema = z.object({
   localOverlayCount: z.number().int().nonnegative().default(0),
   changelogCount: z.number().int().nonnegative().default(0),
   mustReadCount: z.number().int().nonnegative().default(0),
+  searchSynonymCount: z.number().int().nonnegative().default(0),
   workplanCount: z.number().int().nonnegative().default(0),
   copiedAssetCount: z.number().int().nonnegative().default(0),
 });
@@ -248,5 +255,6 @@ export type ExportTemplateMetadata = z.infer<typeof ExportTemplateMetadataSchema
 export type ImageMetadata = z.infer<typeof ImageMetadataSchema>;
 export type LocalOverlayDeclaration = z.infer<typeof LocalOverlayDeclarationSchema>;
 export type ContentChangelogEntry = z.infer<typeof ContentChangelogEntrySchema>;
+export type SearchSynonymGroup = z.infer<typeof SearchSynonymGroupSchema>;
 export type MustReadNotice = z.infer<typeof MustReadNoticeSchema>;
 export type ContentManifest = z.infer<typeof ContentManifestSchema>;

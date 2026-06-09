@@ -17,6 +17,8 @@ const criticalQueries = [
   'materiellberedskap',
 ];
 
+const synonymQueries = ['radiac', 'MFE', 'sektor', 'ATV', 'LIA', 'CBRNE'];
+
 test('critical operational search terms return local results', async ({ page }) => {
   await page.goto('/hurtigkort');
   await expect(page.getByRole('heading', { name: 'Hurtigkort' })).toBeVisible();
@@ -70,4 +72,30 @@ test('search explains when filters hide otherwise matching results', async ({ pa
   await expect(search).toHaveValue('dekontaminering');
   await expect(page.getByLabel('Lokalt søk').getByRole('link').first()).toBeVisible();
   await expect(page.getByText(/treff skjult av filtre/i)).toHaveCount(0);
+});
+
+test('synonym queries all return results on the dedicated search page', async ({ page }) => {
+  await page.goto('/sok');
+  const search = page.getByRole('searchbox');
+  for (const query of synonymQueries) {
+    await search.fill(query);
+    await expect(page.getByLabel('Lokalt søk').getByRole('link').first(), `query "${query}" returned no results`).toBeVisible();
+  }
+});
+
+test('offline search returns results without network', async ({ page, context: browserContext }) => {
+  await page.goto('/sok');
+  const search = page.getByRole('searchbox');
+
+  await browserContext.setOffline(true);
+  await search.fill('samband');
+  await expect(page.getByLabel('Lokalt søk').getByRole('link').first()).toBeVisible();
+
+  await search.fill('radiac');
+  await expect(page.getByLabel('Lokalt søk').getByRole('link').first()).toBeVisible();
+
+  await search.fill('sektor');
+  await expect(page.getByLabel('Lokalt søk').getByRole('link').first()).toBeVisible();
+
+  await browserContext.setOffline(false);
 });

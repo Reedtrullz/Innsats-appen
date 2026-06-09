@@ -63,6 +63,7 @@ function emptyManifest(now: string): ContentManifest {
     localOverlayCount: 0,
     changelogCount: 0,
     mustReadCount: 0,
+    searchSynonymCount: 0,
     workplanCount: 0,
     copiedAssetCount: 0,
     usedPregeneratedFallback: false,
@@ -91,6 +92,7 @@ function manifestWithDefaults(previous: ContentManifest | undefined, now: string
     localOverlayCount: previous.localOverlayCount ?? base.localOverlayCount,
     changelogCount: previous.changelogCount ?? base.changelogCount,
     mustReadCount: previous.mustReadCount ?? base.mustReadCount,
+    searchSynonymCount: previous.searchSynonymCount ?? base.searchSynonymCount,
     workplanCount: previous.workplanCount ?? base.workplanCount,
     copiedAssetCount: previous.copiedAssetCount ?? base.copiedAssetCount,
   };
