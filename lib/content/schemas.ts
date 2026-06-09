@@ -52,6 +52,8 @@ export const SourceDocumentSchema = z
     }
   });
 
+export const ActionCardAuthoritySchema = z.enum(['leder', 'lagforer', 'mannskap', 'beredskapsvakt']);
+
 export const ActionCardSchema = z.object({
   slug: z.string().min(1).regex(slugPattern, 'action card slug must be lowercase kebab-case'),
   title: z.string().min(1),
@@ -67,6 +69,8 @@ export const ActionCardSchema = z.object({
   competenceRationale: z.string().optional(),
   equipmentRequired: z.array(EquipmentTermSchema).default([]),
   warning: z.string().optional(),
+  authority: ActionCardAuthoritySchema.optional(),
+  doNot: z.array(z.string().min(1)).default([]),
 });
 
 export const ChecklistItemSchema = z.object({
@@ -235,7 +239,6 @@ export const ContentManifestSchema = z.object({
   localOverlayCount: z.number().int().nonnegative().default(0),
   changelogCount: z.number().int().nonnegative().default(0),
   mustReadCount: z.number().int().nonnegative().default(0),
-  searchSynonymCount: z.number().int().nonnegative().default(0),
   workplanCount: z.number().int().nonnegative().default(0),
   copiedAssetCount: z.number().int().nonnegative().default(0),
 });

@@ -1,8 +1,8 @@
 - slug: fem-punktsordre
   title: 5-punktsordre
   phase: under
-  roles: [lagforer, leder]
-  scenarios: [generelt]
+  roles: [ lagforer, leder ]
+  scenarios: [ generelt ]
   priority: high
   steps:
     - Situasjon
@@ -14,15 +14,16 @@
     - Kontroller at ordre er forstått før utførelse.
   reporting:
     - Rapporter avvik og endringer tilbake i kommandolinjen.
-  sourceIds: [src-5-punktsordre]
-  competenceRequired: [FIG10]
+  sourceIds: [ src-5-punktsordre ]
+  competenceRequired: [ FIG10 ]
   warning: Beslutningsstøtte. Kontroller alltid mot gjeldende ordre.
+  authority: leder
 
 - slug: sambandsplan-start
   title: Start sambandsplan
   phase: for
-  roles: [lagforer, leder, beredskapsvakt]
-  scenarios: [generelt]
+  roles: [ lagforer, leder, beredskapsvakt ]
+  scenarios: [ generelt ]
   priority: high
   steps:
     - Avklar kanal eller talegruppe før avmarsj.
@@ -32,15 +33,17 @@
     - Ikke legg sensitive sambandstabeller i åpen app.
   reporting:
     - Loggfør sambandsbrudd og fallback-løsning.
-  sourceIds: [src-kommunikasjons-og-sambandsdiagram]
-  competenceRequired: [FIG10]
+  sourceIds: [ src-kommunikasjons-og-sambandsdiagram ]
+  competenceRequired: [ FIG10 ]
   warning: Kontroller mot lokal sambandsplan.
+  authority: leder
+  doNot: [ Ikke legg sensitive sambandstabeller i åpen app. ]
 
 - slug: tilfluktsrom-klargjoring
   title: Klargjør offentlig tilfluktsrom
   phase: for
-  roles: [leder, beredskapsvakt, stab-logistikk]
-  scenarios: [tilfluktsrom]
+  roles: [ leder, beredskapsvakt, stab-logistikk ]
+  scenarios: [ tilfluktsrom ]
   priority: high
   steps:
     - Avklar ansvarslinje med kommune/eier/Sivilforsvaret.
@@ -51,35 +54,51 @@
     - Ikke publiser private eller skjermede tilfluktsromdata i appen.
   reporting:
     - Rapporter åpning, kapasitet, teknisk status, avvik og behov.
-  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
+  sourceIds: [ src-operativt-konsept-for-sivilforsvaret ]
   competenceRequired: []
-  competenceRationale: Tilfluktsromstøtte varierer lokalt og må styres av ansvarlig myndighet, eier og lokal opplæring.
-  equipmentRequired: [ventilasjon, nodstrom, vann, sanitaer, belysning, samband]
-  warning: Ikke offisiell ordre eller fullstendig oversikt. Bruk bare godkjent informasjon; ikke publiser private eller skjermede tilfluktsromdata.
+  competenceRationale: Tilfluktsromstøtte varierer lokalt og må styres av
+    ansvarlig myndighet, eier og lokal opplæring.
+  equipmentRequired: [ ventilasjon, nodstrom, vann, sanitaer, belysning, samband ]
+  warning: Ikke offisiell ordre eller fullstendig oversikt. Bruk bare godkjent
+    informasjon; ikke publiser private eller skjermede tilfluktsromdata.
+  authority: leder
+  doNot:
+    [
+      Ikke publiser private eller skjermede tilfluktsromdata i appen.,
+      Ikke offisiell ordre eller fullstendig oversikt. Bruk bare godkjent
+        informasjon; ikke publiser private eller skjermede tilfluktsromdata.
+    ]
 
 - slug: cbrne-startkort
   title: Startkort CBRN/CBRNE
   phase: under
-  roles: [leder, mre, lagforer]
-  scenarios: [cbrn-cbrne]
+  roles: [ leder, mre, lagforer ]
+  scenarios: [ cbrn-cbrne ]
   priority: high
   steps:
     - Avklar soneinndeling før mannskap går inn.
     - Bruk riktig verneutstyr og rullering.
     - Etabler renselogikk og rapportering før eksponert personell flyttes videre.
   safety:
-    - Stopp arbeid ved ukjent stoff, manglende verneutstyr eller uklar sonegrense.
+    - Stopp arbeid ved ukjent stoff, manglende verneutstyr eller uklar
+      sonegrense.
   reporting:
     - Rapporter sone, antall eksponerte, ressursbehov og avvik.
-  sourceIds: [src-tiltakskort-cbrne, src-veileder-for-sivilforsvarets-renseenheter-cbrn]
-  competenceRequired: [MRE10]
+  sourceIds: [ src-tiltakskort-cbrne, src-veileder-for-sivilforsvarets-renseenheter-cbrn ]
+  competenceRequired: [ MRE10 ]
   warning: Faglig støtte, ikke erstatning for innsatsleders ordre eller fagmyndighet.
+  authority: leder
+  doNot:
+    [
+      "Stopp arbeid ved ukjent stoff, manglende verneutstyr eller uklar
+        sonegrense."
+    ]
 
 - slug: radiac-dosekontroll
   title: RADIAC dosekontroll
   phase: under
-  roles: [rad, lagforer, leder]
-  scenarios: [radiac-nedfall]
+  roles: [ rad, lagforer, leder ]
+  scenarios: [ radiac-nedfall ]
   priority: high
   steps:
     - Kontroller dosimeter og måleutstyr før måling.
@@ -89,16 +108,26 @@
     - Avbryt ved dose-/rateverdier utenfor gitt ordre eller ukjent målesituasjon.
   reporting:
     - Rapporter måleverdier med tid, sted, metode og usikkerhet.
-  sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i, src-veileder-radiacmaletjeneste-del-ii]
-  competenceRequired: [RAD10]
-  equipmentRequired: [dosimeter, maleinstrument]
+  sourceIds:
+    [
+      src-bestemmelse-radiacmaletjeneste-del-i,
+      src-veileder-radiacmaletjeneste-del-ii
+    ]
+  competenceRequired: [ RAD10 ]
+  equipmentRequired: [ dosimeter, maleinstrument ]
   warning: Kontroller alltid mot gjeldende radiacbestemmelse og ordre.
+  authority: leder
+  doNot:
+    [
+      Avbryt ved dose-/rateverdier utenfor gitt ordre eller ukjent
+        målesituasjon.
+    ]
 
 - slug: mfe-anmodning
   title: Anmodning om MFE-støtte
   phase: for
-  roles: [beredskapsvakt, leder, stab-logistikk]
-  scenarios: [mfe-stotte, flom]
+  roles: [ beredskapsvakt, leder, stab-logistikk ]
+  scenarios: [ mfe-stotte, flom ]
   priority: medium
   steps:
     - Avklar oppdragstype, ressursbehov og forventet varighet.
@@ -108,16 +137,19 @@
     - Ikke send ressurs uten tydelig oppdragsforståelse og kontaktpunkt.
   reporting:
     - Loggfør anmodning, tidspunkt, beslutning og ressursstatus.
-  sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-grunnopplaering-mfe-10-mannskap]
+  sourceIds: [ src-tiltakskort-05-stotte-av-mfe, src-grunnopplaering-mfe-10-mannskap ]
   competenceRequired: []
-  competenceRationale: Anmodning og mottak av MFE er leder-/beredskapsvaktprosess; selve MFE-oppgaven utføres av trent MFE-personell.
+  competenceRationale: Anmodning og mottak av MFE er leder-/beredskapsvaktprosess;
+    selve MFE-oppgaven utføres av trent MFE-personell.
   warning: Kontroller mot gjeldende distriktets tiltakskort.
+  authority: leder
+  doNot: [ Ikke send ressurs uten tydelig oppdragsforståelse og kontaktpunkt. ]
 
 - slug: psykososial-forstehjelp
   title: Psykologisk førstehjelp og kollegastøtte
   phase: etter
-  roles: [mannskap, lagforer, leder]
-  scenarios: [psykososial]
+  roles: [ mannskap, lagforer, leder ]
+  scenarios: [ psykososial ]
   priority: high
   steps:
     - Skap ro, trygghet og enkel oversikt.
@@ -127,15 +159,25 @@
     - Ikke gjennomfør tvungen debrief eller medisinsk vurdering uten kompetanse.
   reporting:
     - Rapporter behov for oppfølging gjennom kommandolinjen.
-  sourceIds: [src-tiltakskort-psykologisk-forstehjelp, src-psykososial-oppfolging-og-kollegastotte]
-  competenceRequired: [FIG10]
+  sourceIds:
+    [
+      src-tiltakskort-psykologisk-forstehjelp,
+      src-psykososial-oppfolging-og-kollegastotte
+    ]
+  competenceRequired: [ FIG10 ]
   warning: Støtteinformasjon, ikke helsefaglig diagnose eller behandling.
+  authority: leder
+  doNot:
+    [
+      Ikke gjennomfør tvungen debrief eller medisinsk vurdering uten
+        kompetanse.
+    ]
 
 - slug: fig-etterinnsats-klargjoring
   title: Sjekkliste etter innsats – klargjør FIG/FIGP
   phase: etter
-  roles: [mannskap, lagforer, materiellansvarlig]
-  scenarios: [generelt]
+  roles: [ mannskap, lagforer, materiellansvarlig ]
+  scenarios: [ generelt ]
   priority: medium
   steps:
     - Kontroller personlig utrustning og kjøretøy.
@@ -145,15 +187,16 @@
     - Håndter kontaminert eller skadet utstyr etter egen prosedyre.
   reporting:
     - Meld materiellavvik og personellforhold.
-  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats]
-  competenceRequired: [FIG10]
+  sourceIds: [ src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats ]
+  competenceRequired: [ FIG10 ]
   warning: Kontroller mot lokal MBK-/materiellrutine.
+  authority: lagforer
 
 - slug: samleplass-skadde-start
   title: Start samleplass skadde
   phase: under
-  roles: [lagforer, leder, mannskap]
-  scenarios: [samleplass-skadde]
+  roles: [ lagforer, leder, mannskap ]
+  scenarios: [ samleplass-skadde ]
   priority: high
   steps:
     - Velg trygg plass med adkomst, skjerming og mulighet for videre transport.
@@ -163,15 +206,21 @@
     - Ikke registrer pasientidentifiserende data i Beredskapsboka.
   reporting:
     - Rapporter antall, ressursbehov og flaskehalser uten persondata.
-  sourceIds: [src-samleplass-skadde]
-  competenceRequired: [FIG10]
+  sourceIds: [ src-samleplass-skadde ]
+  competenceRequired: [ FIG10 ]
   warning: Ikke et pasientjournalsystem.
+  authority: leder
+  doNot:
+    [
+      Ikke registrer pasientidentifiserende data i Beredskapsboka.,
+      Ikke et pasientjournalsystem.
+    ]
 
 - slug: jod-atomberedskap
   title: Jodtabletter og atomberedskap
   phase: for
-  roles: [leder, rad, beredskapsvakt]
-  scenarios: [radiac-nedfall]
+  roles: [ leder, rad, beredskapsvakt ]
+  scenarios: [ radiac-nedfall ]
   priority: medium
   steps:
     - Avklar om myndighet har gitt råd om jodtabletter.
@@ -181,16 +230,25 @@
     - Ikke gi medisinske råd utover offisielle myndighetsråd.
   reporting:
     - Loggfør informasjonsbehov og henvendelser.
-  sourceIds: [src-jodtabletter-i-sivilforsvaret, src-atomberedskap-i-norge-og-sivilforsvarets-rolle, src-slik-gjor-vi-ved-radioaktivt-nedfall]
+  sourceIds:
+    [
+      src-jodtabletter-i-sivilforsvaret,
+      src-atomberedskap-i-norge-og-sivilforsvarets-rolle,
+      src-slik-gjor-vi-ved-radioaktivt-nedfall
+    ]
   competenceRequired: []
-  competenceRationale: Jodtablettkortet peker kun til offisiell myndighetsinformasjon; radiac måling og dosevurdering krever RADIAC-kompetanse.
+  competenceRationale: Jodtablettkortet peker kun til offisiell
+    myndighetsinformasjon; radiac måling og dosevurdering krever
+    RADIAC-kompetanse.
   warning: Følg alltid offisielle råd fra myndighetene.
+  authority: leder
+  doNot: [ Ikke gi medisinske råd utover offisielle myndighetsråd. ]
 
 - slug: fig-for-innsats
   title: FIG før innsats
   phase: for
-  roles: [mannskap, lagforer]
-  scenarios: [generelt]
+  roles: [ mannskap, lagforer ]
+  scenarios: [ generelt ]
   priority: medium
   steps:
     - Møt med personlig utrustning og kontroller verneutstyr.
@@ -200,15 +258,17 @@
     - Ikke start arbeid uten oppdragsforståelse og egensikkerhet.
   reporting:
     - Rapporter klar/mangler til lagfører.
-  sourceIds: [src-tiltakskort-for-innsats, src-sjekkliste-fig-og-figp]
-  competenceRequired: [FIG10]
+  sourceIds: [ src-tiltakskort-for-innsats, src-sjekkliste-fig-og-figp ]
+  competenceRequired: [ FIG10 ]
   warning: Kontroller mot lokal ordre og tiltakskort.
+  authority: lagforer
+  doNot: [ Ikke start arbeid uten oppdragsforståelse og egensikkerhet. ]
 
 - slug: mre-rens-start
   title: Etabler rens ved CBRN-hendelse
   phase: under
-  roles: [mre, leder, lagforer]
-  scenarios: [cbrn-cbrne]
+  roles: [ mre, leder, lagforer ]
+  scenarios: [ cbrn-cbrne ]
   priority: high
   steps:
     - Velg rensested etter vind, sone og logistikk.
@@ -218,15 +278,25 @@
     - Stans dersom sonegrense eller verneutstyr er uklart.
   reporting:
     - Rapporter kapasitet, kø, forbruk og avvik.
-  sourceIds: [src-sjekkliste-mobil-renseenhet-mre, src-veileder-for-sivilforsvarets-renseenheter-cbrn]
-  competenceRequired: [MRE10]
+  sourceIds:
+    [
+      src-sjekkliste-mobil-renseenhet-mre,
+      src-veileder-for-sivilforsvarets-renseenheter-cbrn
+    ]
+  competenceRequired: [ MRE10 ]
   warning: Ikke erstatning for fagleder/innsatsleders ordre.
+  authority: leder
+  doNot:
+    [
+      Stans dersom sonegrense eller verneutstyr er uklart.,
+      Ikke erstatning for fagleder/innsatsleders ordre.
+    ]
 
 - slug: flom-pumpe-start
   title: Flom og pumpeutlegg
   phase: under
-  roles: [mannskap, lagforer, leder]
-  scenarios: [flom]
+  roles: [ mannskap, lagforer, leder ]
+  scenarios: [ flom ]
   priority: medium
   steps:
     - Avklar vannvei, sikring og strømfare.
@@ -236,554 +306,904 @@
     - Stans ved strømfare, undergraving eller ukjent forurensning.
   reporting:
     - Rapporter effekt, behov og risiko.
-  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
-  competenceRequired: [FIG10]
-  equipmentRequired: [pumpe, slangeutlegg]
+  sourceIds: [ src-eksempler-pa-utlegg-fra-pumpe ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ pumpe, slangeutlegg ]
   warning: Kontroller alltid lokal risikovurdering.
+  authority: leder
+  doNot: [ "Stans ved strømfare, undergraving eller ukjent forurensning." ]
 
 - slug: oppdragsanalyse
   title: Oppdragsanalyse før innsats
   phase: for
-  roles: [leder, lagforer, beredskapsvakt]
-  scenarios: [generelt]
+  roles: [ leder, lagforer, beredskapsvakt ]
+  scenarios: [ generelt ]
   priority: high
   steps:
     - Avklar bistandsanmodning, oppdragsgiver, ønsket effekt og egne rammer.
     - Vurder situasjon, risiko, tilgjengelige ressurser, varighet og sambandsvei.
-    - Formuler foreløpig oppdrag, begrensninger og behov for ny beslutning før laget sendes.
+    - Formuler foreløpig oppdrag, begrensninger og behov for ny beslutning før
+      laget sendes.
   safety:
-    - Ikke start innsats med uklar myndighetslinje, ukjent risiko eller manglende egensikkerhet.
+    - Ikke start innsats med uklar myndighetslinje, ukjent risiko eller
+      manglende egensikkerhet.
   reporting:
-    - Loggfør beslutningsgrunnlag, forutsetninger, avklarte begrensninger og endringer lokalt.
-  sourceIds: [src-tiltakskort-02-bistandsanmodning-og-oppdragsanalyse, src-operativt-konsept-for-sivilforsvaret]
-  competenceRequired: [FIG20]
-  equipmentRequired: [samband]
-  warning: Beslutningsstøtte for offentlig/offline bruk; erstatter ikke ordre, lokal plan eller operativ leder.
+    - Loggfør beslutningsgrunnlag, forutsetninger, avklarte begrensninger og
+      endringer lokalt.
+  sourceIds:
+    [
+      src-tiltakskort-02-bistandsanmodning-og-oppdragsanalyse,
+      src-operativt-konsept-for-sivilforsvaret
+    ]
+  competenceRequired: [ FIG20 ]
+  equipmentRequired: [ samband ]
+  warning: Beslutningsstøtte for offentlig/offline bruk; erstatter ikke ordre,
+    lokal plan eller operativ leder.
+  authority: leder
+  doNot:
+    [
+      "Ikke start innsats med uklar myndighetslinje, ukjent risiko eller
+        manglende egensikkerhet."
+    ]
 
 - slug: obbo-beslutningssloyfe
   title: OBBO og beslutningssløyfe
   phase: under
-  roles: [lagforer, leder]
-  scenarios: [generelt]
+  roles: [ lagforer, leder ]
+  scenarios: [ generelt ]
   priority: high
   steps:
     - Observer endringer i situasjon, fare, egne ressurser og oppdragets effekt.
     - Bedøm hva endringen betyr for risiko, prioritet og behov for samvirke.
-    - Beslutt tiltak innenfor ordre, gi tydelig ordre til laget og følg opp ny observasjon.
+    - Beslutt tiltak innenfor ordre, gi tydelig ordre til laget og følg opp ny
+      observasjon.
   safety:
-    - Stans tiltak som går utenfor gitt ordre eller trygg gjennomføring, og be om avklaring.
+    - Stans tiltak som går utenfor gitt ordre eller trygg gjennomføring, og be
+      om avklaring.
   reporting:
     - Meld vesentlige endringer, beslutning og behov tilbake i kommandolinjen.
-  sourceIds: [src-enhetlig-ledelsessystem-els]
-  competenceRequired: [FIG20]
-  equipmentRequired: [samband]
-  warning: Enkel beslutningsstøtte; bruk gjeldende ordre, ELS-prinsipper og lokal kommandolinje.
+  sourceIds: [ src-enhetlig-ledelsessystem-els ]
+  competenceRequired: [ FIG20 ]
+  equipmentRequired: [ samband ]
+  warning: Enkel beslutningsstøtte; bruk gjeldende ordre, ELS-prinsipper og lokal
+    kommandolinje.
+  authority: leder
+  doNot:
+    [
+      "Stans tiltak som går utenfor gitt ordre eller trygg gjennomføring, og
+        be om avklaring."
+    ]
 
 - slug: ledelse-kommando-kontroll
   title: Ledelse, kommando og kontroll
   phase: under
-  roles: [leder, lagforer, liaison]
-  scenarios: [generelt]
+  roles: [ leder, lagforer, liaison ]
+  scenarios: [ generelt ]
   priority: high
   steps:
-    - Etabler hvem som leder laget, hvem som er kontaktpunkt, og hvordan ordre mottas.
+    - Etabler hvem som leder laget, hvem som er kontaktpunkt, og hvordan ordre
+      mottas.
     - Hold oversikt over oppdrag, ressursstatus, risiko, samband og avløsning.
     - Gi korte ordre, sjekk forståelse og oppdater laget ved endret situasjon.
   safety:
-    - Unngå parallelle ordrelinjer; avklar konfliktende beskjeder før tiltak fortsetter.
+    - Unngå parallelle ordrelinjer; avklar konfliktende beskjeder før tiltak
+      fortsetter.
   reporting:
-    - Rapporter status, avvik, ressursbehov og beslutninger etter avtalt intervall.
-  sourceIds: [src-enhetlig-ledelsessystem-els, src-operativt-konsept-for-sivilforsvaret, src-vedlegg-a-styrende-dokumenter]
-  competenceRequired: [FIG20]
-  equipmentRequired: [samband]
-  warning: Offentlig rolle- og ordrestøtte; ikke legg inn sensitive sambandstabeller eller interne lister.
+    - Rapporter status, avvik, ressursbehov og beslutninger etter avtalt
+      intervall.
+  sourceIds:
+    [
+      src-enhetlig-ledelsessystem-els,
+      src-operativt-konsept-for-sivilforsvaret,
+      src-vedlegg-a-styrende-dokumenter
+    ]
+  competenceRequired: [ FIG20 ]
+  equipmentRequired: [ samband ]
+  warning: Offentlig rolle- og ordrestøtte; ikke legg inn sensitive
+    sambandstabeller eller interne lister.
+  authority: leder
+  doNot:
+    [
+      Unngå parallelle ordrelinjer; avklar konfliktende beskjeder før tiltak
+        fortsetter.
+    ]
 
 - slug: presse-og-mediahandtering
   title: Presse- og mediahåndtering
   phase: under
-  roles: [leder, lagforer, liaison]
-  scenarios: [generelt]
+  roles: [ leder, lagforer, liaison ]
+  scenarios: [ generelt ]
   priority: medium
   steps:
-    - Henvis presse til utpekt talsperson eller innsatsledelsens informasjonsfunksjon.
-    - Skjerm skadde, rammede, mannskap og pågående arbeid fra unødvendig eksponering.
-    - Gi ikke vurderinger, årsak, identitet eller operative detaljer på eget initiativ.
+    - Henvis presse til utpekt talsperson eller innsatsledelsens
+      informasjonsfunksjon.
+    - Skjerm skadde, rammede, mannskap og pågående arbeid fra unødvendig
+      eksponering.
+    - Gi ikke vurderinger, årsak, identitet eller operative detaljer på eget
+      initiativ.
   safety:
-    - Hold arbeidsro og sikker avstand; stopp intervjuønsker som forstyrrer innsats eller personvern.
+    - Hold arbeidsro og sikker avstand; stopp intervjuønsker som forstyrrer
+      innsats eller personvern.
   reporting:
     - Meld mediehenvendelser og eventuelle avvik til leder/innsatsledelse.
-  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
-  competenceRequired: [FIG10]
-  warning: Generisk offentlig veiledning; følg lokal informasjonslinje og ikke del sensitive opplysninger.
+  sourceIds: [ src-operativt-konsept-for-sivilforsvaret ]
+  competenceRequired: [ FIG10 ]
+  warning: Generisk offentlig veiledning; følg lokal informasjonslinje og ikke del
+    sensitive opplysninger.
+  authority: leder
+  doNot:
+    [
+      Hold arbeidsro og sikker avstand; stopp intervjuønsker som forstyrrer
+        innsats eller personvern.
+    ]
 
 - slug: etikk-og-rollegrenser
   title: Etikk og rollegrenser i innsats
   phase: under
-  roles: [mannskap, lagforer, leder]
-  scenarios: [generelt]
+  roles: [ mannskap, lagforer, leder ]
+  scenarios: [ generelt ]
   priority: medium
   steps:
-    - Hold deg til tildelt rolle, kompetanse og ordre; be om avklaring ved usikkerhet.
+    - Hold deg til tildelt rolle, kompetanse og ordre; be om avklaring ved
+      usikkerhet.
     - Møt rammede, publikum og samvirkeaktører med ro, respekt og diskresjon.
-    - Unngå fotografering, deling, rådgivning eller helsefaglige vurderinger uten mandat.
+    - Unngå fotografering, deling, rådgivning eller helsefaglige vurderinger
+      uten mandat.
   safety:
-    - Varsle leder hvis oppgaven krever kompetanse, myndighet eller utstyr laget ikke har.
+    - Varsle leder hvis oppgaven krever kompetanse, myndighet eller utstyr laget
+      ikke har.
   reporting:
     - Meld rolleuklarhet, etiske dilemmaer og avvik gjennom kommandolinjen.
-  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
-  competenceRequired: [FIG10]
-  warning: Påminnelse om rollegrenser; erstatter ikke tjenesteplikt, lokale instrukser eller lovpålagte krav.
+  sourceIds: [ src-operativt-konsept-for-sivilforsvaret ]
+  competenceRequired: [ FIG10 ]
+  warning: Påminnelse om rollegrenser; erstatter ikke tjenesteplikt, lokale
+    instrukser eller lovpålagte krav.
+  authority: leder
 
 - slug: alvorlig-ulykke-dod-eget-personell
   title: Alvorlig ulykke eller død blant eget personell
   phase: under
-  roles: [leder, lagforer, beredskapsvakt]
-  scenarios: [generelt, psykososial]
+  roles: [ leder, lagforer, beredskapsvakt ]
+  scenarios: [ generelt, psykososial ]
   priority: high
   steps:
-    - Sikre skadestedet, stans farlig arbeid og få oversikt over hvem som er berørt.
-    - Varsle nødetater ved akutt fare og varsle distrikt/kommandolinje umiddelbart.
-    - Skjerm personell, ivareta vitner og følg lokal varslings- og oppfølgingsrutine.
+    - Sikre skadestedet, stans farlig arbeid og få oversikt over hvem som er
+      berørt.
+    - Varsle nødetater ved akutt fare og varsle distrikt/kommandolinje
+      umiddelbart.
+    - Skjerm personell, ivareta vitner og følg lokal varslings- og
+      oppfølgingsrutine.
   safety:
-    - Ikke flytt eller eksponer berørte mer enn nødvendig for livreddende tiltak og sikkerhet.
+    - Ikke flytt eller eksponer berørte mer enn nødvendig for livreddende tiltak
+      og sikkerhet.
   reporting:
-    - Rapporter kort status, tiltak, ressursbehov og hvem som håndterer videre varsling.
-  sourceIds: [src-tiltakskort-alvorlig-ulykke-eller-dod-eget-personell, src-tiltakskort-04-alvorlig-ulykke-dod-og-mental-forstehjelp]
-  competenceRequired: [FIG20]
-  equipmentRequired: [samband]
-  warning: Følg lokalt tiltakskort og lederlinje; ikke registrer navn eller private detaljer i appen.
+    - Rapporter kort status, tiltak, ressursbehov og hvem som håndterer videre
+      varsling.
+  sourceIds:
+    [
+      src-tiltakskort-alvorlig-ulykke-eller-dod-eget-personell,
+      src-tiltakskort-04-alvorlig-ulykke-dod-og-mental-forstehjelp
+    ]
+  competenceRequired: [ FIG20 ]
+  equipmentRequired: [ samband ]
+  warning: Følg lokalt tiltakskort og lederlinje; ikke registrer navn eller
+    private detaljer i appen.
+  authority: leder
+  doNot:
+    [
+      Ikke flytt eller eksponer berørte mer enn nødvendig for livreddende
+        tiltak og sikkerhet.
+    ]
 
 - slug: akutt-113-livreddende-forstehjelp
   title: Akutt 113 og livreddende førstehjelp
   phase: under
-  roles: [mannskap, lagforer, leder]
-  scenarios: [generelt]
+  roles: [ mannskap, lagforer, leder ]
+  scenarios: [ generelt ]
   priority: high
   steps:
-    - Ved livstruende skade eller sykdom, ring 113 straks og følg medisinsk veiledning.
-    - Sikre egen sikkerhet, fri luftvei, pust, blødning og nedkjøling innen egen kompetanse.
+    - Ved livstruende skade eller sykdom, ring 113 straks og følg medisinsk
+      veiledning.
+    - Sikre egen sikkerhet, fri luftvei, pust, blødning og nedkjøling innen egen
+      kompetanse.
     - Send møteperson hvis mulig, hold samband åpent og oppdater om endringer.
   safety:
-    - Ikke utsett mannskap for fare for å gi hjelp; trekk ut hvis området ikke er sikkert.
+    - Ikke utsett mannskap for fare for å gi hjelp; trekk ut hvis området ikke
+      er sikkert.
   reporting:
-    - Meld 113-varsling, antall berørte og ressursbehov til leder uten personidentifiserende detaljer.
-  sourceIds: [src-tiltakskort-04-alvorlig-ulykke-dod-og-mental-forstehjelp]
-  competenceRequired: [FIG10]
-  equipmentRequired: [samband]
+    - Meld 113-varsling, antall berørte og ressursbehov til leder uten
+      personidentifiserende detaljer.
+  sourceIds: [ src-tiltakskort-04-alvorlig-ulykke-dod-og-mental-forstehjelp ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ samband ]
   warning: Førstehjelpspåminnelse; følg 113, helsepersonell og lokal beredskapsordre.
+  authority: leder
+  doNot:
+    [
+      Ikke utsett mannskap for fare for å gi hjelp; trekk ut hvis området ikke
+        er sikkert.
+    ]
 
 - slug: psykologisk-forstehjelp-sekvens
   title: Psykologisk førstehjelp steg for steg
   phase: etter
-  roles: [mannskap, lagforer, leder]
-  scenarios: [psykososial]
+  roles: [ mannskap, lagforer, leder ]
+  scenarios: [ psykososial ]
   priority: high
   steps:
     - Skap ro, trygghet og enkel oversikt før du stiller spørsmål.
-    - Lytt, bekreft reaksjoner og hjelp personen med praktiske behov og kontakt med leder.
-    - Koble videre til kollegastøtte, helse eller lederlinje når reaksjoner, risiko eller behov tilsier det.
+    - Lytt, bekreft reaksjoner og hjelp personen med praktiske behov og kontakt
+      med leder.
+    - Koble videre til kollegastøtte, helse eller lederlinje når reaksjoner,
+      risiko eller behov tilsier det.
   safety:
-    - Ikke press frem detaljer, skyldspørsmål eller forklaringer; la personen styre tempoet.
+    - Ikke press frem detaljer, skyldspørsmål eller forklaringer; la personen
+      styre tempoet.
   reporting:
     - Meld behov for oppfølging uten personidentifiserende detaljer.
-  sourceIds: [src-tiltakskort-psykologisk-forstehjelp, src-psykososial-oppfolging-og-kollegastotte]
-  competenceRequired: [FIG10]
-  warning: Støttekort, ikke diagnose eller behandling; bruk kvalifisert hjelp ved akutt psykisk fare.
+  sourceIds:
+    [
+      src-tiltakskort-psykologisk-forstehjelp,
+      src-psykososial-oppfolging-og-kollegastotte
+    ]
+  competenceRequired: [ FIG10 ]
+  warning: Støttekort, ikke diagnose eller behandling; bruk kvalifisert hjelp ved
+    akutt psykisk fare.
+  authority: leder
+  doNot:
+    [
+      "Ikke press frem detaljer, skyldspørsmål eller forklaringer; la personen
+        styre tempoet."
+    ]
 
 - slug: psykososial-ikke-tvungen-debrief
   title: Unngå tvungen debrief og press
   phase: etter
-  roles: [lagforer, leder, mannskap]
-  scenarios: [psykososial]
+  roles: [ lagforer, leder, mannskap ]
+  scenarios: [ psykososial ]
   priority: high
   steps:
     - Tilby defuse, praktisk støtte, hvile og informasjon om normale reaksjoner.
     - La berørte velge hvor mye de vil si, og følg opp senere ved behov.
-    - Eskaler bekymring for akutt fare, sterk funksjonssvikt eller vedvarende reaksjoner til leder/helse.
+    - Eskaler bekymring for akutt fare, sterk funksjonssvikt eller vedvarende
+      reaksjoner til leder/helse.
   safety:
-    - Ikke gjennomfør tvungen debrief, ikke press detaljer og ikke samle forklaringer som behandling.
+    - Ikke gjennomfør tvungen debrief, ikke press detaljer og ikke samle
+      forklaringer som behandling.
   reporting:
-    - Meld kun behov for videre oppfølging og praktiske tiltak gjennom lederlinjen.
-  sourceIds: [src-tiltakskort-psykologisk-forstehjelp, src-psykososial-oppfolging-og-kollegastotte]
-  competenceRequired: [FIG10]
-  warning: Psykososial støtte skal være frivillig og skånsom; ikke bruk tvungen debrief eller detaljpress.
+    - Meld kun behov for videre oppfølging og praktiske tiltak gjennom
+      lederlinjen.
+  sourceIds:
+    [
+      src-tiltakskort-psykologisk-forstehjelp,
+      src-psykososial-oppfolging-og-kollegastotte
+    ]
+  competenceRequired: [ FIG10 ]
+  warning: Psykososial støtte skal være frivillig og skånsom; ikke bruk tvungen
+    debrief eller detaljpress.
+  authority: leder
+  doNot:
+    [
+      "Ikke gjennomfør tvungen debrief, ikke press detaljer og ikke samle
+        forklaringer som behandling."
+    ]
 
 - slug: skogbrann-startkort
   title: Skogbrann støtteinnsats
   phase: under
-  roles: [mannskap, lagforer, leder]
-  scenarios: [skogbrann, brann]
+  roles: [ mannskap, lagforer, leder ]
+  scenarios: [ skogbrann, brann ]
   priority: high
   steps:
-    - Avklar oppdrag, sektor, retrettvei, møtepunkt og sambandsvei med innsatsledelse.
-    - Vurder vind, røyk, terreng, brannfront, arbeidstid og behov for vann/logistikk.
+    - Avklar oppdrag, sektor, retrettvei, møtepunkt og sambandsvei med
+      innsatsledelse.
+    - Vurder vind, røyk, terreng, brannfront, arbeidstid og behov for
+      vann/logistikk.
     - Hold laget samlet og meld endringer i brannbildet raskt.
   safety:
-    - Trekk ut ved skiftende vind, røykeksponering, tap av retrettvei eller uklart oppdrag.
+    - Trekk ut ved skiftende vind, røykeksponering, tap av retrettvei eller
+      uklart oppdrag.
   reporting:
-    - Rapporter sektorstatus, mannskapsstatus, vannbehov og observerte fareendringer.
-  sourceIds: [src-tiltakskort-under-innsats]
-  competenceRequired: [FIG10]
-  equipmentRequired: [verneutstyr, samband, vann]
-  warning: Generisk støtte for Sivilforsvaret; følg brannvesenets innsatsledelse og lokal ordre.
+    - Rapporter sektorstatus, mannskapsstatus, vannbehov og observerte
+      fareendringer.
+  sourceIds: [ src-tiltakskort-under-innsats ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ verneutstyr, samband, vann ]
+  warning: Generisk støtte for Sivilforsvaret; følg brannvesenets innsatsledelse
+    og lokal ordre.
+  authority: leder
 
 - slug: brann-vannforsyning-slange
   title: Brannstøtte med vannforsyning og slange
   phase: under
-  roles: [mannskap, lagforer, materiellansvarlig]
-  scenarios: [brann, skogbrann]
+  roles: [ mannskap, lagforer, materiellansvarlig ]
+  scenarios: [ brann, skogbrann ]
   priority: medium
   steps:
-    - Avklar ønsket effekt, vannkilde, pumpeplass, slangevei og trygt arbeidsområde.
-    - Legg slange slik at ferdsel, rømningsvei og kjøretøyflyt ikke blokkeres unødvendig.
-    - Overvåk koblinger, trykkendringer, friksjonsskader og behov for mer materiell.
+    - Avklar ønsket effekt, vannkilde, pumpeplass, slangevei og trygt
+      arbeidsområde.
+    - Legg slange slik at ferdsel, rømningsvei og kjøretøyflyt ikke blokkeres
+      unødvendig.
+    - Overvåk koblinger, trykkendringer, friksjonsskader og behov for mer
+      materiell.
   safety:
-    - Stans ved fare fra trafikk, røyk, varme, elektrisk anlegg eller ustabil vannvei.
+    - Stans ved fare fra trafikk, røyk, varme, elektrisk anlegg eller ustabil
+      vannvei.
   reporting:
     - Meld kapasitet, avbrudd, vannmangel og materiellbehov til leder.
-  sourceIds: [src-tiltakskort-under-innsats, src-eksempler-pa-utlegg-fra-pumpe]
-  competenceRequired: [FIG10]
-  equipmentRequired: [pumpe, slangeutlegg, samband]
+  sourceIds: [ src-tiltakskort-under-innsats, src-eksempler-pa-utlegg-fra-pumpe ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ pumpe, slangeutlegg, samband ]
   warning: Ikke brannteknisk taktikk; utfør bare støtteoppgaver gitt av innsatsledelse.
+  authority: lagforer
+  doNot:
+    [
+      "Stans ved fare fra trafikk, røyk, varme, elektrisk anlegg eller ustabil
+        vannvei.",
+      Ikke brannteknisk taktikk; utfør bare støtteoppgaver gitt av
+        innsatsledelse.
+    ]
 
 - slug: sok-og-redning-startkort
   title: Søk og redning startkort
   phase: under
-  roles: [mannskap, lagforer, leder]
-  scenarios: [sok-og-redning]
+  roles: [ mannskap, lagforer, leder ]
+  scenarios: [ sok-og-redning ]
   priority: high
   steps:
     - Motta oppdrag, siste kjente punkt, søksområde, samband og sikkerhetsbrief.
-    - Gjennomfør søk etter tildelt metode og hold laget samlet eller etter avtalt makkerordning.
-    - Merk funn/observasjoner lokalt og meld raskt uten å spre private opplysninger.
+    - Gjennomfør søk etter tildelt metode og hold laget samlet eller etter
+      avtalt makkerordning.
+    - Merk funn/observasjoner lokalt og meld raskt uten å spre private
+      opplysninger.
   safety:
-    - Stans søk ved tap av samband, farlig terreng, mørke/ vær eller uklar lagstatus.
+    - Stans søk ved tap av samband, farlig terreng, mørke/ vær eller uklar
+      lagstatus.
   reporting:
     - Rapporter dekningsgrad, funn, mangler, posisjon og behov til KO/leder.
-  sourceIds: [src-vedlegg-c-operative-forhold, src-tiltakskort-under-innsats]
-  competenceRequired: [FIG10]
-  equipmentRequired: [personlig-utrustning, samband]
-  warning: Lokal/offline søksstøtte; ikke lagre personsensitiv informasjon eller operative søksplaner for videre deling.
+  sourceIds: [ src-vedlegg-c-operative-forhold, src-tiltakskort-under-innsats ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ personlig-utrustning, samband ]
+  warning: Lokal/offline søksstøtte; ikke lagre personsensitiv informasjon eller
+    operative søksplaner for videre deling.
+  authority: leder
+  doNot:
+    [
+      "Stans søk ved tap av samband, farlig terreng, mørke/ vær eller uklar
+        lagstatus."
+    ]
 
 - slug: soketeig-sektor
   title: Søkesektor og teig
   phase: under
-  roles: [lagforer, mannskap]
-  scenarios: [sok-og-redning]
+  roles: [ lagforer, mannskap ]
+  scenarios: [ sok-og-redning ]
   priority: medium
   steps:
-    - Bekreft teiggrense, startpunkt, sluttpunkt, metode og forventet rapporteringsintervall.
-    - Hold oversikt over hva som faktisk er gjennomsøkt og hvilke hindringer som står igjen.
+    - Bekreft teiggrense, startpunkt, sluttpunkt, metode og forventet
+      rapporteringsintervall.
+    - Hold oversikt over hva som faktisk er gjennomsøkt og hvilke hindringer som
+      står igjen.
     - Meld avvik, usikre grenser og behov for ny teig før laget flyttes.
   safety:
-    - Ikke kryss inn i ny sektor uten ordre når det kan skape dobbeltarbeid eller risiko.
+    - Ikke kryss inn i ny sektor uten ordre når det kan skape dobbeltarbeid
+      eller risiko.
   reporting:
-    - Rapporter teigstatus, dekningsgrad, hindringer og lokale posisjonsreferanser.
-  sourceIds: [src-vedlegg-c-operative-forhold]
-  competenceRequired: [FIG10]
-  equipmentRequired: [samband]
-  warning: Bruk kun som lokal huskeliste; søksledelse og KO bestemmer sektor, metode og prioritet.
+    - Rapporter teigstatus, dekningsgrad, hindringer og lokale
+      posisjonsreferanser.
+  sourceIds: [ src-vedlegg-c-operative-forhold ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ samband ]
+  warning: Bruk kun som lokal huskeliste; søksledelse og KO bestemmer sektor,
+    metode og prioritet.
+  authority: lagforer
+  doNot:
+    [
+      Ikke kryss inn i ny sektor uten ordre når det kan skape dobbeltarbeid
+        eller risiko.
+    ]
 
 - slug: flom-pumpe-vannforsyning
   title: Flom, pumpe og vannforsyning
   phase: under
-  roles: [mannskap, lagforer, leder]
-  scenarios: [flom]
+  roles: [ mannskap, lagforer, leder ]
+  scenarios: [ flom ]
   priority: high
   steps:
     - Kartlegg vannvei, mottakssted, høydeforskjell, pumpesikring og slangevei.
     - Prioriter liv, kritisk infrastruktur og skadebegrensning etter ordre.
     - Kontroller drivstoff, sil, slanger, avlastning, vakt og plan for stopp.
   safety:
-    - Stans ved strømfare, forurenset vann, undergraving, rasfare eller utrygg adkomst.
+    - Stans ved strømfare, forurenset vann, undergraving, rasfare eller utrygg
+      adkomst.
   reporting:
     - Rapporter effekt, vannstand, pumpekapasitet, risiko og behov for avløsning.
-  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-under-innsats]
-  competenceRequired: [FIG10]
-  equipmentRequired: [pumpe, slangeutlegg, verneutstyr]
+  sourceIds: [ src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-under-innsats ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ pumpe, slangeutlegg, verneutstyr ]
   warning: Generisk pumpe-/flomstøtte; lokal risikovurdering og ordre går foran.
+  authority: leder
+  doNot:
+    [
+      "Stans ved strømfare, forurenset vann, undergraving, rasfare eller
+        utrygg adkomst."
+    ]
 
 - slug: skred-sikkerhet-samvirke
   title: Skred sikkerhet og samvirke
   phase: under
-  roles: [mannskap, lagforer, leder]
-  scenarios: [skred]
+  roles: [ mannskap, lagforer, leder ]
+  scenarios: [ skred ]
   priority: high
   steps:
-    - Avklar med innsatsledelse/fagmyndighet før mannskap går inn i område med ustabilt terreng eller uklar sikkerhet.
-    - Etabler trygg adkomst, retrettvei, sambandskontakt og tydelig lagkontroll etter ordre.
-    - Utfør bare tildelte støtteoppgaver og meld observasjoner om terreng, vær og nye farer til leder.
+    - Avklar med innsatsledelse/fagmyndighet før mannskap går inn i område med
+      ustabilt terreng eller uklar sikkerhet.
+    - Etabler trygg adkomst, retrettvei, sambandskontakt og tydelig lagkontroll
+      etter ordre.
+    - Utfør bare tildelte støtteoppgaver og meld observasjoner om terreng, vær
+      og nye farer til leder.
   safety:
-    - Stans ved ustabilt terreng, uavklart sone, endrede forhold eller manglende ordre/faglig avklaring.
+    - Stans ved ustabilt terreng, uavklart sone, endrede forhold eller manglende
+      ordre/faglig avklaring.
   reporting:
     - Rapporter posisjon, observasjoner, mannskapsstatus og behov til leder/KO.
-  sourceIds: [src-vedlegg-c-operative-forhold, src-tiltakskort-under-innsats]
-  competenceRequired: [FIG10]
-  equipmentRequired: [personlig-utrustning, samband]
+  sourceIds: [ src-vedlegg-c-operative-forhold, src-tiltakskort-under-innsats ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ personlig-utrustning, samband ]
   warning: Ikke skredfaglig instruks; følg fagmyndighet, innsatsledelse og gitt ordre.
+  authority: leder
+  doNot:
+    [
+      "Stans ved ustabilt terreng, uavklart sone, endrede forhold eller
+        manglende ordre/faglig avklaring.",
+      "Ikke skredfaglig instruks; følg fagmyndighet, innsatsledelse og gitt
+        ordre."
+    ]
 
 - slug: evakueringsstotte
   title: Evakueringsstøtte
   phase: under
-  roles: [mannskap, lagforer, leder, stab-logistikk]
-  scenarios: [evakuering]
+  roles: [ mannskap, lagforer, leder, stab-logistikk ]
+  scenarios: [ evakuering ]
   priority: high
   steps:
-    - Avklar evakueringsområde, mottakssted, transportbehov, sårbare grupper og ansvarslinje.
-    - Etabler trygg flyt, enkel publikumshåndtering og tydelig informasjon fra ansvarlig myndighet.
-    - Hold oversikt over ressursbehov og flaskehalser uten å registrere private persondetaljer.
+    - Avklar evakueringsområde, mottakssted, transportbehov, sårbare grupper og
+      ansvarslinje.
+    - Etabler trygg flyt, enkel publikumshåndtering og tydelig informasjon fra
+      ansvarlig myndighet.
+    - Hold oversikt over ressursbehov og flaskehalser uten å registrere private
+      persondetaljer.
   safety:
     - Ikke gå inn i område uten sikker adkomst, sambandsvei og avklart retrett.
   reporting:
     - Rapporter status, transportbehov, hindringer og ressursmangler til leder.
-  sourceIds: [src-operativt-konsept-for-sivilforsvaret, src-vedlegg-c-operative-forhold]
-  competenceRequired: [FIG10]
-  equipmentRequired: [samband, kjoretoy]
-  warning: Offentlig støtte; kommunen/politi/innsatsledelse gir beslutning, rute og prioritet.
+  sourceIds: [ src-operativt-konsept-for-sivilforsvaret, src-vedlegg-c-operative-forhold ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ samband, kjoretoy ]
+  warning: Offentlig støtte; kommunen/politi/innsatsledelse gir beslutning, rute
+    og prioritet.
+  authority: leder
+  doNot:
+    [
+      "Ikke gå inn i område uten sikker adkomst, sambandsvei og avklart
+        retrett."
+    ]
 
 - slug: samleplass-skadde-utvidet
   title: Samleplass skadde utvidet støtte
   phase: under
-  roles: [mannskap, lagforer, leder]
-  scenarios: [samleplass-skadde]
+  roles: [ mannskap, lagforer, leder ]
+  scenarios: [ samleplass-skadde ]
   priority: high
   steps:
-    - Velg trygg plass etter ordre med adkomst, skjerming, lys, trafikkflyt og mulighet for videre transport.
-    - Skill inn, vente, behandlingsstøtte og uttransport etter helse/innsatsleders behov.
-    - Ikke registrer journalfelt, navn, fødselsdato eller kontaktopplysninger i appen.
+    - Velg trygg plass etter ordre med adkomst, skjerming, lys, trafikkflyt og
+      mulighet for videre transport.
+    - Skill inn, vente, behandlingsstøtte og uttransport etter
+      helse/innsatsleders behov.
+    - Ikke registrer journalfelt, navn, fødselsdato eller kontaktopplysninger i
+      appen.
   safety:
     - Hold fri adkomst for helse og nødetater, og skjerm rammede mot innsyn.
   reporting:
-    - Rapporter antallskategorier, ressursbehov og flaskehalser uten personidentifiserende detaljer.
-  sourceIds: [src-samleplass-skadde]
-  competenceRequired: [FIG10]
-  equipmentRequired: [samband, belysning]
-  warning: Beredskapsboka er ikke helseregistrering; bruk kun anonymisert ressurs- og flytstatus.
+    - Rapporter antallskategorier, ressursbehov og flaskehalser uten
+      personidentifiserende detaljer.
+  sourceIds: [ src-samleplass-skadde ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ samband, belysning ]
+  warning: Beredskapsboka er ikke helseregistrering; bruk kun anonymisert ressurs-
+    og flytstatus.
+  authority: leder
+  doNot: [ "Hold fri adkomst for helse og nødetater, og skjerm rammede mot innsyn." ]
 
 - slug: tilfluktsrom-offentlig-beredskap
   title: Offentlig tilfluktsrom og befolkningsbeskyttelse
   phase: for
-  roles: [leder, beredskapsvakt, stab-logistikk]
-  scenarios: [tilfluktsrom]
+  roles: [ leder, beredskapsvakt, stab-logistikk ]
+  scenarios: [ tilfluktsrom ]
   priority: high
   steps:
-    - Bruk bare offentlig eller eksplisitt godkjent informasjon om ansvar, kapasitet og åpning.
-    - Kontroller ventilasjon, nødstrøm, vann, sanitær, belysning, samband og publikumshåndtering etter ordre.
-    - Forbered enkel lokal status uten adresser eller detaljer som ikke er godkjent for publisering.
+    - Bruk bare offentlig eller eksplisitt godkjent informasjon om ansvar,
+      kapasitet og åpning.
+    - Kontroller ventilasjon, nødstrøm, vann, sanitær, belysning, samband og
+      publikumshåndtering etter ordre.
+    - Forbered enkel lokal status uten adresser eller detaljer som ikke er
+      godkjent for publisering.
   safety:
-    - Ikke lagre private rom, skjermede lokasjoner eller ikke-offentlige lister i appen.
+    - Ikke lagre private rom, skjermede lokasjoner eller ikke-offentlige lister
+      i appen.
   reporting:
-    - Rapporter klargjøringsstatus, åpning, tekniske avvik og ressursbehov til ansvarlig myndighet.
-  sourceIds: [src-operativt-konsept-for-sivilforsvaret]
-  competenceRationale: Tilfluktsromstøtte varierer lokalt og må styres av ansvarlig myndighet og lokal opplæring.
-  equipmentRequired: [ventilasjon, nodstrom, vann, sanitaer, belysning, samband]
-  warning: Ikke offisiell ordre eller fullstendig oversikt; lokal/offline beslutningsstøtte uten private eller skjermede lokasjonsdata. Ansvarlig myndighet og gjeldende ordre styrer.
+    - Rapporter klargjøringsstatus, åpning, tekniske avvik og ressursbehov til
+      ansvarlig myndighet.
+  sourceIds: [ src-operativt-konsept-for-sivilforsvaret ]
+  competenceRationale: Tilfluktsromstøtte varierer lokalt og må styres av
+    ansvarlig myndighet og lokal opplæring.
+  equipmentRequired: [ ventilasjon, nodstrom, vann, sanitaer, belysning, samband ]
+  warning: Ikke offisiell ordre eller fullstendig oversikt; lokal/offline
+    beslutningsstøtte uten private eller skjermede lokasjonsdata. Ansvarlig
+    myndighet og gjeldende ordre styrer.
+  authority: leder
+  doNot:
+    [
+      "Ikke lagre private rom, skjermede lokasjoner eller ikke-offentlige
+        lister i appen.",
+      Ikke offisiell ordre eller fullstendig oversikt; lokal/offline
+        beslutningsstøtte uten private eller skjermede lokasjonsdata. Ansvarlig
+        myndighet og gjeldende ordre styrer.
+    ]
 
 - slug: cbrne-soneinndeling
   title: CBRNE soneinndeling
   phase: under
-  roles: [leder, lagforer, mre]
-  scenarios: [cbrn-cbrne]
+  roles: [ leder, lagforer, mre ]
+  scenarios: [ cbrn-cbrne ]
   priority: high
   steps:
-    - Avklar varm, lunken og ren side med innsatsledelse/fagmyndighet før arbeid starter.
-    - Merk praktiske grenser, inn-/utpassering og renselogikk på et generelt nivå.
+    - Avklar varm, lunken og ren side med innsatsledelse/fagmyndighet før arbeid
+      starter.
+    - Merk praktiske grenser, inn-/utpassering og renselogikk på et generelt
+      nivå.
     - Hold mannskap utenfor sone til verneutstyr, oppgave og ordre er bekreftet.
   safety:
-    - Stopp eller avbryt ved ukjent stoff, uklar sone, værendring eller manglende ordre.
+    - Stopp eller avbryt ved ukjent stoff, uklar sone, værendring eller
+      manglende ordre.
   reporting:
-    - Rapporter soneavklaring, ressursbehov, avvik og kapasitet uten taktiske detaljer.
-  sourceIds: [src-tiltakskort-cbrne, src-veileder-for-sivilforsvarets-renseenheter-cbrn]
-  competenceRequired: [MRE10]
-  equipmentRequired: [verneutstyr, renseutstyr, samband]
-  warning: CBRNE-kort er offentlig beslutningsstøtte; fagmyndighet og innsatsleders ordre styrer alltid.
+    - Rapporter soneavklaring, ressursbehov, avvik og kapasitet uten taktiske
+      detaljer.
+  sourceIds: [ src-tiltakskort-cbrne, src-veileder-for-sivilforsvarets-renseenheter-cbrn ]
+  competenceRequired: [ MRE10 ]
+  equipmentRequired: [ verneutstyr, renseutstyr, samband ]
+  warning: CBRNE-kort er offentlig beslutningsstøtte; fagmyndighet og
+    innsatsleders ordre styrer alltid.
+  authority: leder
+  doNot:
+    [
+      "Stopp eller avbryt ved ukjent stoff, uklar sone, værendring eller
+        manglende ordre."
+    ]
 
 - slug: cbrne-verneutstyr-stoppkriterier
   title: CBRNE verneutstyr og stoppkriterier
   phase: under
-  roles: [mre, lagforer, leder]
-  scenarios: [cbrn-cbrne]
+  roles: [ mre, lagforer, leder ]
+  scenarios: [ cbrn-cbrne ]
   priority: high
   steps:
     - Kontroller oppgave, sone, verneutstyr, rullering og makker før innsats.
-    - Følg påkledning/avkledning etter lokal prosedyre og hold ren/uren side adskilt.
+    - Følg påkledning/avkledning etter lokal prosedyre og hold ren/uren side
+      adskilt.
     - Avklar stoppkriterier før mannskap eksponeres.
   safety:
-    - Avbryt ved skade på verneutstyr, symptomer, ukjent stoff, uklare grenser eller ordrebrudd.
+    - Avbryt ved skade på verneutstyr, symptomer, ukjent stoff, uklare grenser
+      eller ordrebrudd.
   reporting:
-    - Meld stopp, avvik, eksponering, behov for fagmyndighet og materiellstatus til leder.
-  sourceIds: [src-tiltakskort-cbrne, src-veileder-for-sivilforsvarets-renseenheter-cbrn]
-  competenceRequired: [MRE10]
-  equipmentRequired: [verneutstyr, renseutstyr, samband]
-  warning: Ingen detaljert farlig-stoff-taktikk; stopp og vent på ordre/fagmyndighet ved usikkerhet.
+    - Meld stopp, avvik, eksponering, behov for fagmyndighet og materiellstatus
+      til leder.
+  sourceIds: [ src-tiltakskort-cbrne, src-veileder-for-sivilforsvarets-renseenheter-cbrn ]
+  competenceRequired: [ MRE10 ]
+  equipmentRequired: [ verneutstyr, renseutstyr, samband ]
+  warning: Ingen detaljert farlig-stoff-taktikk; stopp og vent på
+    ordre/fagmyndighet ved usikkerhet.
+  authority: leder
+  doNot:
+    [
+      "Avbryt ved skade på verneutstyr, symptomer, ukjent stoff, uklare
+        grenser eller ordrebrudd."
+    ]
 
 - slug: mre-ren-uren-side-grovrens
   title: MRE ren/uren side og grovrens
   phase: under
-  roles: [mre, lagforer, leder]
-  scenarios: [cbrn-cbrne]
+  roles: [ mre, lagforer, leder ]
+  scenarios: [ cbrn-cbrne ]
   priority: high
   steps:
-    - Etabler tydelig uren side, renselinje, ren side, avfallspunkt og personellflyt etter ordre.
+    - Etabler tydelig uren side, renselinje, ren side, avfallspunkt og
+      personellflyt etter ordre.
     - Prioriter grovrens for å redusere spredning før videre håndtering.
-    - Hold rent og urent utstyr adskilt, og bruk makkerkontroll ved kritiske overganger.
+    - Hold rent og urent utstyr adskilt, og bruk makkerkontroll ved kritiske
+      overganger.
   safety:
-    - Stans rens ved uklar sone, manglende vann/renseutstyr, skadet verneutstyr eller ordreendring.
+    - Stans rens ved uklar sone, manglende vann/renseutstyr, skadet verneutstyr
+      eller ordreendring.
   reporting:
-    - Rapporter kapasitet, kø, forbruk, stopp og behov for fagmyndighet/forsterkning.
-  sourceIds: [src-veileder-for-sivilforsvarets-renseenheter-cbrn, src-sjekkliste-mobil-renseenhet-mre]
-  competenceRequired: [MRE10]
-  equipmentRequired: [renseutstyr, verneutstyr, vann]
+    - Rapporter kapasitet, kø, forbruk, stopp og behov for
+      fagmyndighet/forsterkning.
+  sourceIds:
+    [
+      src-veileder-for-sivilforsvarets-renseenheter-cbrn,
+      src-sjekkliste-mobil-renseenhet-mre
+    ]
+  competenceRequired: [ MRE10 ]
+  equipmentRequired: [ renseutstyr, verneutstyr, vann ]
   warning: MRE-støtte må følge lokal prosedyre, fagmyndighet og innsatsleders ordre.
+  authority: leder
+  doNot:
+    [
+      "Stans rens ved uklar sone, manglende vann/renseutstyr, skadet
+        verneutstyr eller ordreendring."
+    ]
 
 - slug: radiac-malepunkt
   title: RADIAC målepunkt
   phase: under
-  roles: [rad, lagforer, leder]
-  scenarios: [radiac-nedfall]
+  roles: [ rad, lagforer, leder ]
+  scenarios: [ radiac-nedfall ]
   priority: high
   steps:
-    - Bekreft ordre, målepunkt, tid, instrument, bakgrunn og rapporteringsformat før måling.
-    - Mål på angitt punkt og noter verdi, enhet, tidspunkt, posisjonsreferanse og usikkerhet lokalt.
+    - Bekreft ordre, målepunkt, tid, instrument, bakgrunn og rapporteringsformat
+      før måling.
+    - Mål på angitt punkt og noter verdi, enhet, tidspunkt, posisjonsreferanse
+      og usikkerhet lokalt.
     - Sammenlign med forventet område og be om kontrollmåling ved avvik.
   safety:
-    - Avbryt ved uventet høy verdi, instrumentfeil, uklar ordre eller behov for fagmyndighet.
+    - Avbryt ved uventet høy verdi, instrumentfeil, uklar ordre eller behov for
+      fagmyndighet.
   reporting:
     - Rapporter måleverdi, tid, metode, posisjon og usikkerhet via avtalt kanal.
-  sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i, src-veileder-radiacmaletjeneste-del-ii, src-sjekkliste-radiaclag-rad, src-den-nasjonale-maleberedskapen]
-  competenceRequired: [RAD10]
-  equipmentRequired: [dosimeter, maleinstrument, samband]
-  warning: RADIAC-data er beslutningsgrunnlag; følg ordre, fagmyndighet og gjeldende målebestemmelse.
+  sourceIds:
+    [
+      src-bestemmelse-radiacmaletjeneste-del-i,
+      src-veileder-radiacmaletjeneste-del-ii,
+      src-sjekkliste-radiaclag-rad,
+      src-den-nasjonale-maleberedskapen
+    ]
+  competenceRequired: [ RAD10 ]
+  equipmentRequired: [ dosimeter, maleinstrument, samband ]
+  warning: RADIAC-data er beslutningsgrunnlag; følg ordre, fagmyndighet og
+    gjeldende målebestemmelse.
+  authority: leder
+  doNot:
+    [
+      "Avbryt ved uventet høy verdi, instrumentfeil, uklar ordre eller behov
+        for fagmyndighet."
+    ]
 
 - slug: radiac-oppholdstid-rullering
   title: RADIAC oppholdstid og rullering
   phase: under
-  roles: [rad, lagforer, leder]
-  scenarios: [radiac-nedfall]
+  roles: [ rad, lagforer, leder ]
+  scenarios: [ radiac-nedfall ]
   priority: high
   steps:
-    - Avklar dose-/rategrunnlag, oppholdstid, rullering, hvile og grense for ny vurdering før innsetting.
+    - Avklar dose-/rategrunnlag, oppholdstid, rullering, hvile og grense for ny
+      vurdering før innsetting.
     - Kontroller dosimeter og makkerstatus før, under og etter oppdrag.
-    - Planlegg avløsning og trekk ut før fastsatte grenser eller ved endret målebilde.
+    - Planlegg avløsning og trekk ut før fastsatte grenser eller ved endret
+      målebilde.
   safety:
-    - Stans/avbryt ved uklar ordre, manglende dosimeter, instrumentfeil eller tegn til overskridelse.
+    - Stans/avbryt ved uklar ordre, manglende dosimeter, instrumentfeil eller
+      tegn til overskridelse.
   reporting:
-    - Rapporter oppholdstid, dose-/rateobservasjoner, rullering og behov for fagmyndighet.
-  sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i, src-veileder-radiacmaletjeneste-del-ii, src-sentrale-stralebegreper]
-  competenceRequired: [RAD10]
-  equipmentRequired: [dosimeter, maleinstrument, samband]
-  warning: Ikke beregn egne grenser i appen; bruk ordre, fagmyndighet og RADIAC-bestemmelser.
+    - Rapporter oppholdstid, dose-/rateobservasjoner, rullering og behov for
+      fagmyndighet.
+  sourceIds:
+    [
+      src-bestemmelse-radiacmaletjeneste-del-i,
+      src-veileder-radiacmaletjeneste-del-ii,
+      src-sentrale-stralebegreper
+    ]
+  competenceRequired: [ RAD10 ]
+  equipmentRequired: [ dosimeter, maleinstrument, samband ]
+  warning: Ikke beregn egne grenser i appen; bruk ordre, fagmyndighet og
+    RADIAC-bestemmelser.
+  authority: leder
+  doNot:
+    [
+      "Stans/avbryt ved uklar ordre, manglende dosimeter, instrumentfeil eller
+        tegn til overskridelse.",
+      "Ikke beregn egne grenser i appen; bruk ordre, fagmyndighet og
+        RADIAC-bestemmelser."
+    ]
 
 - slug: mfe-anmodning-mottak-oppfolging
   title: MFE anmodning, mottak og oppfølging
   phase: for
-  roles: [beredskapsvakt, leder, mfe, stab-logistikk]
-  scenarios: [mfe-stotte, generelt]
+  roles: [ beredskapsvakt, leder, mfe, stab-logistikk ]
+  scenarios: [ mfe-stotte, generelt ]
   priority: medium
   steps:
-    - Avklar oppdrag, kapasitet, varighet, oppmøtested, transport, samband og mottaker.
-    - Bekreft ressursstatus, forventet ankomst og hvem som gir første ordre lokalt.
+    - Avklar oppdrag, kapasitet, varighet, oppmøtested, transport, samband og
+      mottaker.
+    - Bekreft ressursstatus, forventet ankomst og hvem som gir første ordre
+      lokalt.
     - Følg opp drift, avløsning, forsyning, avvik og demobilisering.
   safety:
-    - Ikke send eller motta MFE uten tydelig kontaktpunkt, oppdragsforståelse og sikkerhetsbrief.
+    - Ikke send eller motta MFE uten tydelig kontaktpunkt, oppdragsforståelse og
+      sikkerhetsbrief.
   reporting:
-    - Loggfør anmodning, beslutning, ankomst, oppdrag, avvik og avslutning lokalt.
-  sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-tiltakskort-06-oppsettende-mfe-distrikt, src-grunnopplaering-mfe-10-mannskap, src-sjekkliste-mobil-forsterkningsenhet-mfe]
-  competenceRequired: [MFE10]
-  equipmentRequired: [samband, kjoretoy]
-  warning: Følg gjeldende tiltakskort og distriktets ordre; appen sender ingen offisiell anmodning.
+    - Loggfør anmodning, beslutning, ankomst, oppdrag, avvik og avslutning
+      lokalt.
+  sourceIds:
+    [
+      src-tiltakskort-05-stotte-av-mfe,
+      src-tiltakskort-06-oppsettende-mfe-distrikt,
+      src-grunnopplaering-mfe-10-mannskap,
+      src-sjekkliste-mobil-forsterkningsenhet-mfe
+    ]
+  competenceRequired: [ MFE10 ]
+  equipmentRequired: [ samband, kjoretoy ]
+  warning: Følg gjeldende tiltakskort og distriktets ordre; appen sender ingen
+    offisiell anmodning.
+  authority: leder
+  doNot:
+    [
+      "Ikke send eller motta MFE uten tydelig kontaktpunkt, oppdragsforståelse
+        og sikkerhetsbrief."
+    ]
 
 - slug: posisjonsrapport-kart-kompass-gps
   title: Posisjonsrapport med kart, kompass og GPS
   phase: under
-  roles: [mannskap, lagforer, leder]
-  scenarios: [generelt, sok-og-redning]
+  roles: [ mannskap, lagforer, leder ]
+  scenarios: [ generelt, sok-og-redning ]
   priority: medium
   steps:
-    - Finn posisjon med kart/kompass/GPS og kontroller at referansesystem er forstått.
-    - Rapporter posisjon kort med punkt, retning/avstand, tidspunkt og usikkerhet.
-    - Bruk lokal/offline notatstøtte og slett eller anonymiser når oppdraget er avsluttet.
+    - Finn posisjon med kart/kompass/GPS og kontroller at referansesystem er
+      forstått.
+    - Rapporter posisjon kort med punkt, retning/avstand, tidspunkt og
+      usikkerhet.
+    - Bruk lokal/offline notatstøtte og slett eller anonymiser når oppdraget er
+      avsluttet.
   safety:
-    - Ikke lagre eller send live tracking, og ikke del sensitive lokasjoner i åpne kanaler.
+    - Ikke lagre eller send live tracking, og ikke del sensitive lokasjoner i
+      åpne kanaler.
   reporting:
     - Send posisjonsrapport kun via avtalt sambandsvei eller direkte til leder.
-  sourceIds: [src-sjekkliste-fig-og-figp, src-vedlegg-c-operative-forhold]
-  competenceRequired: [FIG10]
-  equipmentRequired: [samband]
-  warning: Lokal/offline posisjonsstøtte; appen skal ikke brukes til sporing eller sensitiv lokasjonsdeling.
+  sourceIds: [ src-sjekkliste-fig-og-figp, src-vedlegg-c-operative-forhold ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ samband ]
+  warning: Lokal/offline posisjonsstøtte; appen skal ikke brukes til sporing eller
+    sensitiv lokasjonsdeling.
+  authority: leder
+  doNot:
+    [
+      "Ikke lagre eller send live tracking, og ikke del sensitive lokasjoner i
+        åpne kanaler."
+    ]
 
 - slug: rute-og-evakueringsvei
   title: Rute og evakueringsvei
   phase: under
-  roles: [lagforer, leder, mannskap]
-  scenarios: [evakuering, generelt]
+  roles: [ lagforer, leder, mannskap ]
+  scenarios: [ evakuering, generelt ]
   priority: medium
   steps:
-    - Avklar start, mål, hindringer, alternativ rute, retrett og ansvarlig beslutningstaker.
+    - Avklar start, mål, hindringer, alternativ rute, retrett og ansvarlig
+      beslutningstaker.
     - Vurder trafikk, vær, terreng, sårbare personer, kjøretøybehov og samband.
-    - Oppdater laget ved ruteendring og bekreft at alle kjenner møtepunkt og fallback.
+    - Oppdater laget ved ruteendring og bekreft at alle kjenner møtepunkt og
+      fallback.
   safety:
-    - Ikke lagre eller del sensitive lokasjoner, live tracking eller rutedetaljer som ikke er godkjent.
+    - Ikke lagre eller del sensitive lokasjoner, live tracking eller
+      rutedetaljer som ikke er godkjent.
   reporting:
-    - Rapporter lokal/offline ruteavvik, stengninger og behov til leder uten private adresser.
-  sourceIds: [src-vedlegg-c-operative-forhold, src-operativt-konsept-for-sivilforsvaret]
-  competenceRequired: [FIG10]
-  equipmentRequired: [samband, kjoretoy]
-  warning: Rutevalg er lokal beslutning etter ordre; ikke publiser sensitive lokasjoner eller bevegelsesmønster.
+    - Rapporter lokal/offline ruteavvik, stengninger og behov til leder uten
+      private adresser.
+  sourceIds: [ src-vedlegg-c-operative-forhold, src-operativt-konsept-for-sivilforsvaret ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ samband, kjoretoy ]
+  warning: Rutevalg er lokal beslutning etter ordre; ikke publiser sensitive
+    lokasjoner eller bevegelsesmønster.
+  authority: leder
+  doNot:
+    [
+      "Ikke lagre eller del sensitive lokasjoner, live tracking eller
+        rutedetaljer som ikke er godkjent."
+    ]
 
 - slug: kjoretoy-transportberedskap
   title: Kjøretøy og transportberedskap
   phase: for
-  roles: [mannskap, lagforer, materiellansvarlig, stab-logistikk]
-  scenarios: [generelt, evakuering]
+  roles: [ mannskap, lagforer, materiellansvarlig, stab-logistikk ]
+  scenarios: [ generelt, evakuering ]
   priority: medium
   steps:
-    - Kontroller drivstoff, lys, dekk, last, førstehjelpsutstyr, samband og førerstatus.
-    - Avklar transportoppdrag, rute, lastbegrensning, passasjerbehov og parkering/mottak.
+    - Kontroller drivstoff, lys, dekk, last, førstehjelpsutstyr, samband og
+      førerstatus.
+    - Avklar transportoppdrag, rute, lastbegrensning, passasjerbehov og
+      parkering/mottak.
     - Meld mangler før avmarsj og planlegg avløsning ved lang varighet.
   safety:
-    - Ikke kjør med uavklart fører, usikret last, kjent teknisk feil eller manglende oppdrag.
+    - Ikke kjør med uavklart fører, usikret last, kjent teknisk feil eller
+      manglende oppdrag.
   reporting:
-    - Rapporter klar/mangler, avgang, ankomst, avvik og behov for vedlikehold lokalt.
-  sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats]
-  competenceRequired: [FIG10]
-  equipmentRequired: [kjoretoy, samband]
+    - Rapporter klar/mangler, avgang, ankomst, avvik og behov for vedlikehold
+      lokalt.
+  sourceIds: [ src-sjekkliste-fig-og-figp, src-tiltakskort-for-innsats ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ kjoretoy, samband ]
   warning: Generisk kjøretøysjekk; følg lokal materiellrutine, trafikkregler og ordre.
+  authority: lagforer
+  doNot:
+    [
+      "Ikke kjør med uavklart fører, usikret last, kjent teknisk feil eller
+        manglende oppdrag."
+    ]
 
 - slug: pumpe-stromfare
   title: Pumpe ved strømfare
   phase: under
-  roles: [mannskap, lagforer, leder]
-  scenarios: [flom]
+  roles: [ mannskap, lagforer, leder ]
+  scenarios: [ flom ]
   priority: high
   steps:
-    - Vurder om pumpested, vannvei eller arbeidsområde kan innebære strømfare eller elektrisk usikkerhet før pumpestart.
-    - Stans arbeid og avklar videre innsats med leder når strømfare kan foreligge.
-    - Plasser pumpe, slanger og mannskap bare etter avklart ordre, og vent på fagperson ved elektrisk usikkerhet.
+    - Vurder om pumpested, vannvei eller arbeidsområde kan innebære strømfare
+      eller elektrisk usikkerhet før pumpestart.
+    - Stans arbeid og avklar videre innsats med leder når strømfare kan
+      foreligge.
+    - Plasser pumpe, slanger og mannskap bare etter avklart ordre, og vent på
+      fagperson ved elektrisk usikkerhet.
   safety:
-    - Stans/avbryt umiddelbart ved mulig strømfare eller elektrisk usikkerhet, og vent på ordre/fagperson.
+    - Stans/avbryt umiddelbart ved mulig strømfare eller elektrisk usikkerhet,
+      og vent på ordre/fagperson.
   reporting:
-    - Meld strømfare, avbrutt arbeid og behov for fagperson eller ny ordre til leder.
-  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-under-innsats]
-  competenceRequired: [FIG10]
-  equipmentRequired: [pumpe, slangeutlegg, verneutstyr]
-  warning: Ikke el-faglig instruks; stopp ved elektrisk usikkerhet og vent på ordre/fagperson.
+    - Meld strømfare, avbrutt arbeid og behov for fagperson eller ny ordre til
+      leder.
+  sourceIds: [ src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-under-innsats ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ pumpe, slangeutlegg, verneutstyr ]
+  warning: Ikke el-faglig instruks; stopp ved elektrisk usikkerhet og vent på
+    ordre/fagperson.
+  authority: leder
+  doNot:
+    [
+      "Stans/avbryt umiddelbart ved mulig strømfare eller elektrisk
+        usikkerhet, og vent på ordre/fagperson.",
+      Ikke el-faglig instruks; stopp ved elektrisk usikkerhet og vent på
+        ordre/fagperson.
+    ]
 
 - slug: kontaminert-utstyr-handtering
   title: Kontaminert eller skadet utstyr
   phase: etter
-  roles: [mannskap, lagforer, materiellansvarlig]
-  scenarios: [generelt, brann, cbrn-cbrne]
+  roles: [ mannskap, lagforer, materiellansvarlig ]
+  scenarios: [ generelt, brann, cbrn-cbrne ]
   priority: high
   steps:
-    - Skill kontaminert utstyr fra skadet utstyr og fra rent materiell så tidlig som mulig.
-    - Merk, pakk, vask eller sett i karantene etter lokal prosedyre og lederens beskjed.
+    - Skill kontaminert utstyr fra skadet utstyr og fra rent materiell så tidlig
+      som mulig.
+    - Merk, pakk, vask eller sett i karantene etter lokal prosedyre og lederens
+      beskjed.
     - Dokumenter materiellstatus lokalt uten sensitive hendelsesdetaljer.
   safety:
-    - Ikke ta kontaminert eller skadet utstyr tilbake i bruk før det er kontrollert etter lokal prosedyre.
+    - Ikke ta kontaminert eller skadet utstyr tilbake i bruk før det er
+      kontrollert etter lokal prosedyre.
   reporting:
-    - Meld type avvik, mengde, behov for renhold/vedlikehold og om beredskap påvirkes.
-  sourceIds: [src-renhold-etter-branninnsats, src-sjekkliste-fig-og-figp, src-tiltakskort-under-innsats]
-  competenceRequired: [FIG10]
-  equipmentRequired: [verneutstyr]
-  warning: Håndter kontaminert/skadet utstyr etter lokal prosedyre; ikke registrer sensitive hendelsesdetaljer.
+    - Meld type avvik, mengde, behov for renhold/vedlikehold og om beredskap
+      påvirkes.
+  sourceIds:
+    [
+      src-renhold-etter-branninnsats,
+      src-sjekkliste-fig-og-figp,
+      src-tiltakskort-under-innsats
+    ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ verneutstyr ]
+  warning: Håndter kontaminert/skadet utstyr etter lokal prosedyre; ikke registrer
+    sensitive hendelsesdetaljer.
+  authority: lagforer
+  doNot:
+    [
+      Ikke ta kontaminert eller skadet utstyr tilbake i bruk før det er
+        kontrollert etter lokal prosedyre.
+    ]

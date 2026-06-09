@@ -1,11 +1,19 @@
 import Link from 'next/link';
 import type { ActionCard } from '@/lib/content/schemas';
-import { phaseLabels, priorityLabels, scenarioLabels } from '@/lib/content/taxonomy';
+import { phaseLabels, priorityLabels, roleLabels, scenarioLabels } from '@/lib/content/taxonomy';
 import { OperationalIcon } from './ui/operational-icons';
 import { CriticalNotice, StatusPill } from './ui/operational-primitives';
 
 type Priority = ActionCard['priority'];
 type Phase = ActionCard['phase'];
+type Authority = NonNullable<ActionCard['authority']>;
+
+const authorityLabels: Record<Authority, string> = {
+  leder: 'Leder',
+  lagforer: 'Lagfører',
+  mannskap: 'Mannskap',
+  beredskapsvakt: 'Beredskapsvakt',
+};
 
 const priorityTreatment: Record<Priority, string> = {
   high: 'border-red-200 bg-gradient-to-b from-red-50 to-white shadow-red-950/5',
@@ -18,6 +26,30 @@ const phaseLongLabels: Record<Phase, string> = {
   under: `${phaseLabels.under} innsats`,
   etter: `${phaseLabels.etter} innsats`,
 };
+
+function AuthorityBadge({ authority }: { authority: Authority }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-[#082F49] px-2.5 py-1 text-xs font-black text-white" title={`Beslutningsmyndighet: ${authorityLabels[authority]}`}>
+      <OperationalIcon name="shield" className="h-3.5 w-3.5" />
+      {authorityLabels[authority]}
+    </span>
+  );
+}
+
+export function DoNotCallout({ items }: { items: string[] }) {
+  if (items.length === 0) return null;
+  return (
+    <div className="rounded-2xl border-2 border-red-300 bg-red-50 px-3 py-2 text-sm text-red-950">
+      <p className="flex items-center gap-2 font-black">
+        <OperationalIcon name="alert" className="h-4 w-4" />
+        Ikke gjør
+      </p>
+      <ul className="mt-1 list-disc space-y-1 pl-5 font-semibold">
+        {items.map((item) => <li key={item}>{item}</li>)}
+      </ul>
+    </div>
+  );
+}
 
 type TiltakCardProps = {
   card: ActionCard;
@@ -45,8 +77,10 @@ export function TiltakCardRow({ card }: { card: ActionCard }) {
         <span className="mt-2 flex flex-wrap gap-1.5">
           <StatusPill label={priorityLabels[card.priority]} tone={priorityTone} compact />
           <StatusPill label={phaseLongLabels[card.phase]} tone="sky" compact />
+          {card.authority ? <AuthorityBadge authority={card.authority} /> : null}
           {card.sourceIds.length === 0 ? <StatusPill label="Kilde mangler" tone="warning" compact /> : null}
           {card.warning ? <StatusPill label="Varsel" tone="warning" compact /> : null}
+          {card.doNot && card.doNot.length > 0 ? <StatusPill label={`${card.doNot.length} nei`} tone="critical" compact /> : null}
         </span>
       </span>
       <OperationalIcon name="chevron" className="mt-4 h-4 w-4 shrink-0 text-slate-400 group-hover:text-sky-800" />
@@ -65,6 +99,7 @@ export function TiltakCardCompact({ card, ctaLabel = 'Åpne tiltakskort' }: Omit
       <div className="flex flex-wrap items-center gap-2">
         <StatusPill label={priorityLabels[card.priority]} tone={priorityTone} />
         <StatusPill label={phaseLongLabels[card.phase]} tone="sky" />
+        {card.authority ? <AuthorityBadge authority={card.authority} /> : null}
         <span className={`inline-flex min-h-8 items-center rounded-full bg-white px-3 py-1 text-xs font-black ring-1 ${sourceCount > 0 ? 'text-slate-700 ring-slate-200' : 'text-amber-900 ring-amber-200'}`}>
           {sourceCount > 0 ? 'Kildebelagt' : 'Kilde mangler'}
           {sourceCount > 0 ? <span className="sr-only"> med {sourceCount} kilde{sourceCount === 1 ? '' : 'r'}</span> : null}
@@ -79,6 +114,7 @@ export function TiltakCardCompact({ card, ctaLabel = 'Åpne tiltakskort' }: Omit
         </h2>
       </div>
 
+      <DoNotCallout items={card.doNot ?? []} />
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-slate-600">Gjør først</p>
         {visibleSteps.length > 0 ? (
@@ -121,6 +157,7 @@ export function TiltakCardFull({ card, ctaLabel = 'Åpne tiltakskort' }: Omit<Ti
         <StatusPill label={priorityLabels[card.priority]} tone={priorityTone} />
         {card.priority === 'high' ? <StatusPill label="Kritisk støtte" tone="critical" /> : null}
         <StatusPill label={phaseLongLabels[card.phase]} tone="sky" />
+        {card.authority ? <AuthorityBadge authority={card.authority} /> : null}
         {card.scenarios.map((scenario) => <StatusPill key={scenario} label={scenarioLabels[scenario]} tone="success" />)}
         <span className={`inline-flex min-h-8 items-center rounded-full bg-white px-3 py-1 text-xs font-black ring-1 ${sourceCount > 0 ? 'text-slate-700 ring-slate-200' : 'text-amber-900 ring-amber-200'}`}>
           {sourceCount > 0 ? 'Kildebelagt' : 'Kilde mangler'}
@@ -141,6 +178,7 @@ export function TiltakCardFull({ card, ctaLabel = 'Åpne tiltakskort' }: Omit<Ti
         ) : null}
       </div>
 
+      <DoNotCallout items={card.doNot ?? []} />
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-slate-600">Gjør først</p>
         {visibleSteps.length > 0 ? (

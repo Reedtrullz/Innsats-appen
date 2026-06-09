@@ -3,6 +3,17 @@ import { sourceFreshness } from '@/lib/content/source-review';
 import { competenceLabels, phaseLabels, roleLabels, scenarioLabels } from '@/lib/content/taxonomy';
 import { SourceBadge } from './source-badge';
 import { WarningBanner } from './warning-banner';
+import { OperationalIcon } from './ui/operational-icons';
+import { DoNotCallout } from './tiltak-card';
+
+type Authority = NonNullable<ActionCard['authority']>;
+
+const authorityLabels: Record<Authority, string> = {
+  leder: 'Leder',
+  lagforer: 'Lagfører',
+  mannskap: 'Mannskap',
+  beredskapsvakt: 'Beredskapsvakt',
+};
 
 function CompetenceGuardrail({ card }: { card: ActionCard }) {
   const competenceRequired = card.competenceRequired ?? [];
@@ -109,8 +120,28 @@ export function ActionCardDetail({ card, sources }: { card: ActionCard; sources:
           {(card.equipmentRequired ?? []).map((term) => <span key={term} className="rounded-full bg-indigo-100 px-2.5 py-1 text-indigo-950">Utstyr: {term}</span>)}
         </div>
       </div>
+      {card.authority ? (
+        <div className="mt-3 flex items-center gap-2">
+          <span className="text-xs font-black uppercase tracking-wide text-slate-600">Beslutningsmyndighet:</span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#082F49] px-2.5 py-1 text-xs font-black text-white">
+            <OperationalIcon name="shield" className="h-3.5 w-3.5" />
+            {authorityLabels[card.authority]}
+          </span>
+        </div>
+      ) : null}
       {card.warning ? <WarningBanner>{card.warning}</WarningBanner> : null}
       {linkedSources.flatMap((source) => source.warnings).map((warning) => <WarningBanner key={warning}>{warning}</WarningBanner>)}
+      {(card.doNot ?? []).length > 0 ? (
+        <section className="rounded-3xl border-2 border-red-300 bg-red-50 p-5 text-red-950 shadow-sm">
+          <h2 className="flex items-center gap-2 text-xl font-black">
+            <OperationalIcon name="alert" className="h-5 w-5" />
+            Ikke gjør
+          </h2>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm font-semibold">
+            {(card.doNot ?? []).map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        </section>
+      ) : null}
       <CompetenceGuardrail card={card} />
       <SourceConfidencePanel linkedSources={linkedSources} missingSourceIds={missingSourceIds} />
       <section className="rounded-3xl bg-white p-5 shadow-sm">

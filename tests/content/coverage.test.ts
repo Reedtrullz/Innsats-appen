@@ -1,5 +1,5 @@
 import { buildContentCoverageReport } from '@/lib/content/coverage-report';
-import { getActionCards, getChecklists, getGlossaryTerms, getProtectionMeasures, getSearchSynonyms, getSourceDocuments, getTrainingPaths } from '@/lib/content/load-content';
+import { getActionCards, getChecklists, getGlossaryTerms, getProtectionMeasures, getSourceDocuments, getTrainingPaths } from '@/lib/content/load-content';
 import type { ActionCard, SourceDocument } from '@/lib/content/schemas';
 
 const requiredMarkers = [
@@ -64,16 +64,6 @@ it('keeps coverage backed by both action cards and source documents', () => {
   expect(sourcesText).toContain('5-punktsordre');
 });
 
-it('resolves every search-synonym cardId to an existing action card slug', () => {
-  const synonyms = getSearchSynonyms();
-  const cardSlugs = new Set(getActionCards().map((card) => card.slug));
-  for (const group of synonyms) {
-    for (const cardId of group.cardIds) {
-      expect(cardSlugs, `synonym group "${group.canonical}" references missing card slug: ${cardId}`).toContain(cardId);
-    }
-  }
-});
-
 it('does not leave orphan sources without accepted-risk metadata', () => {
   const report = buildContentCoverageReport({
     sources: getSourceDocuments(),
@@ -86,4 +76,24 @@ it('does not leave orphan sources without accepted-risk metadata', () => {
 
   expect(report.linkage.sourcesWithoutReferences).toEqual([]);
   expect(report.releaseBoard.gaps.find((gap) => gap.id === 'content-orphan-sources')?.count ?? 0).toBe(0);
+});
+
+it('ensures every action card has a valid authority value', () => {
+  const cards = getActionCards();
+  const validAuthorities = new Set(['leder', 'lagforer', 'mannskap', 'beredskapsvakt']);
+  for (const card of cards) {
+    expect(card.authority, `card ${card.slug} missing authority`).toBeDefined();
+    expect(validAuthorities.has(card.authority!), `card ${card.slug} invalid authority: ${card.authority}`).toBe(true);
+  }
+});
+
+it('ensures doNot entries are non-empty strings', () => {
+  const cards = getActionCards();
+  for (const card of cards) {
+    if (!card.doNot || card.doNot.length === 0) continue;
+    for (const item of card.doNot) {
+      expect(typeof item, `card ${card.slug} doNot item is not a string`).toBe('string');
+      expect((item as string).length, `card ${card.slug} doNot item is empty`).toBeGreaterThan(0);
+    }
+  }
 });
