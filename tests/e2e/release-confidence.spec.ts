@@ -63,6 +63,18 @@ test('5-punktsordre guided steps stay locked, show progress and render collapsed
 test('generated exports use collapsed ExportReview pattern across mission export tools', async ({ page }) => {
   await createLocalMission(page, { title: `Export review ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Review QA' });
 
+  await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
+  const order = orderForm(page);
+  await fillOrderPoints(order);
+  await order.getByRole('tab', { name: /Bekreft/i }).click();
+  await order.getByLabel(/Tilbakelesing\/forstått/i).check();
+  await order.getByRole('tab', { name: /Eksporter/i }).click();
+  await order.getByRole('button', { name: /Eksporter Markdown/i }).click();
+  await expectCollapsedReview(order, /Eksport er klar/i);
+  await expect(order.locator('#five-point-order-preview')).toBeHidden();
+  await order.getByText(/Vis forhåndsvisning/i).last().click();
+  await expect(order.locator('#five-point-order-preview')).toHaveValue(/# 5-punktsordre/);
+
   await openMissionDetails(page, /Sambandsplan/i, 'Eksport');
   const comms = page.locator('form').filter({ has: page.getByRole('heading', { name: 'Sambandsplan' }) });
   await comms.getByLabel(/Primær kanal\/talegruppe/i).fill('Primær etter lokal plan');
@@ -95,6 +107,18 @@ test('generated exports use collapsed ExportReview pattern across mission export
   await folder.getByRole('button', { name: /Bygg oppdragsmappe/i }).click();
   await expectCollapsedReview(folder, /Oppdragsmappe Markdown er klar/i);
   await expect(folder.getByLabel(/Oppdragsmappe Markdown/i)).toBeHidden();
+
+  await openMissionDetails(page, /Lokal statusrapport/i, 'Eksport');
+  const status = page.locator('#statusrapport');
+  await status.getByRole('button', { name: /Lag lokal statusrapport/i }).click();
+  await expectCollapsedReview(status, /Lokal statusrapport er klar/i);
+  await expect(status.locator('#local-status-summary-markdown')).toBeHidden();
+
+  await openMissionDetails(page, /MBK \/ materiellberedskap/i, 'Eksport');
+  const mbk = page.locator('section').filter({ has: page.getByRole('heading', { name: /Materiellberedskap \/ MBK/i }) }).first();
+  await mbk.getByRole('button', { name: /Lag MBK Markdown/i }).click();
+  await expectCollapsedReview(mbk, /MBK materiellstatus Markdown er klar/i);
+  await expect(mbk.locator('#mbk-equipment-markdown')).toBeHidden();
 });
 
 test('oppdrag mode routing remains stable for default and hash targets', async ({ page }) => {
@@ -109,16 +133,56 @@ test('oppdrag mode routing remains stable for default and hash targets', async (
   await page.goto('/oppdrag#sjekkliste');
   await expect(page.getByRole('tab', { name: 'Arbeid' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('#sjekkliste')).toBeVisible();
+  await expect(page.locator('#sjekkliste')).toBeInViewport();
+
+  await page.goto('/oppdrag#kart');
+  await expect(page.getByRole('tab', { name: 'Arbeid' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#kart')).toBeVisible();
+  await expect(page.locator('#kart')).toBeInViewport();
 
   await page.goto('/oppdrag#etterrapport');
   await expect(page.getByRole('tab', { name: 'Eksport' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('#etterrapport')).toBeVisible();
+  await expect(page.locator('#etterrapport')).toBeInViewport();
 
   await page.goto('/oppdrag#oppdragsmappe');
   await expect(page.getByRole('tab', { name: 'Eksport' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('#oppdragsmappe')).toBeVisible();
+  await expect(page.locator('#oppdragsmappe')).toBeInViewport();
 
   await openMissionMode(page, 'Nå');
   await expect(page.getByRole('tab', { name: 'Nå' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByText('Primært')).toHaveCount(0);
+});
+
+test('warning discipline keeps privacy errors blocking and generic notices contained', async ({ page }) => {
+  await createLocalMission(page, { title: `Warning discipline ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Warning QA' });
+
+  await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
+  const order = orderForm(page);
+  await fillOrderPoints(order);
+  await order.getByLabel(/Notes/i).fill('pasient Ola Nordmann');
+  await order.getByRole('tab', { name: /Bekreft/i }).click();
+  await order.getByLabel(/Tilbakelesing\/forstått/i).check();
+  await order.getByRole('tab', { name: /Eksporter/i }).click();
+  await order.getByRole('button', { name: /Eksporter Markdown/i }).click();
+  await expect(order.getByText(/Eksport blokkert/i)).toBeVisible();
+
+  await openMissionDetails(page, /Feltlogg/i, 'Arbeid');
+  const fieldLog = page.locator('#feltlogg');
+  await fieldLog.getByLabel(/Feltlogg tekst/i).fill('pasient Ola Nordmann');
+  await fieldLog.getByRole('button', { name: /Legg til feltlogg/i }).click();
+  await expect(fieldLog.getByRole('alert', { name: /feltlogg personvern/i })).toBeVisible();
+
+  await openMissionDetails(page, /RUH og velferd/i, 'Eksport');
+  const ruh = page.locator('#ruh-velferd');
+  await expect(ruh.getByText(/Ikke legg inn persondata eller pasientdata/i)).toHaveCount(1);
+
+  await openMissionMode(page, 'Nå');
+  await expect(page.getByRole('heading', { name: /Situasjon og neste grep/i })).toBeVisible();
+
+  await page.goto('/hurtigkort');
+  await expect(page.getByRole('heading', { name: 'Hurtigkort' })).toBeVisible();
+  await expect(page.getByRole('alert')).toHaveCount(1);
+  await expect(page.getByText(/Eksport blokkert|Lag .*Markdown|Lag .*JSON/i)).toHaveCount(0);
 });
