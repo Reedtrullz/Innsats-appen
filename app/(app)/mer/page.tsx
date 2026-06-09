@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { OperationalStatusPills } from '@/components/operational-status-pills';
+import { ThemeSelector } from '@/components/theme-selector';
 import { getContentManifest } from '@/lib/content/load-content';
 
 const operationalLinks = [
@@ -104,6 +105,8 @@ export default function MorePage() {
           <OperationalStatusPills />
         </div>
       </section>
+
+      <ThemeSelector />
 
       <section className="space-y-3" aria-labelledby="more-operational-heading">
         <div>

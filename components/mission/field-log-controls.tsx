@@ -97,7 +97,7 @@ export function FieldLogControls({ mission, onMissionChange }: { mission: Missio
   }
 
   return (
-    <section id="feltlogg" className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <section id="feltlogg-controls" className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Strukturert lokal feltlogg</p>
         <h3 className="text-xl font-black">Lokal feltlogg</h3>
