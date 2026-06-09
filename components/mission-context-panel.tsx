@@ -9,6 +9,7 @@ import { readSelectedActiveMissionId, saveSelectedActiveMissionId, selectActiveM
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import type { MissionContext } from '@/lib/mission/schemas';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+import { DecisionSupportNotice } from './decision-support-notice';
 import { MissionCommandDashboard } from './mission/dashboard/mission-command-dashboard';
 
 function operationalPrivacyErrorMessage(context: string) {
@@ -176,7 +177,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
         <div>
           <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Nytt oppdrag</p>
           <h1 className="text-3xl font-black">Opprett lokalt oppdrag</h1>
-          <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">Lagres bare lokalt i denne nettleseren. Ikke legg inn persondata.</p>
+          <DecisionSupportNotice compact />
           {createPrivacyError ? <p role="alert" aria-label="oppdrag personvern" className="mt-2 rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{createPrivacyError}</p> : null}
         </div>
         <label className="block text-sm font-bold">Tittel<input name="title" required className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3" placeholder="Eksempel: Tilfluktsrom sentrum" /></label>
@@ -187,7 +188,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
         <label className="block text-sm font-bold">Scenario<select name="scenario" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{scenarios.map((scenario) => <option key={scenario} value={scenario}>{scenarioLabels[scenario]}</option>)}</select></label>
         <div>
           <label className="block text-sm font-bold">Sted/lokasjon<input name="locationText" required className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3" placeholder="Kun sted, ikke persondata" /></label>
-          <p className="mt-1 text-xs text-slate-600">Når du henter offentlig kontekst: Bare valgt posisjon eller søketekst sendes til offentlige API-er hos MET/Kartverket/NVE. Dine oppdragsnotater og privat tekst forblir lokalt på enheten.</p>
+          <p className="mt-1 text-xs text-slate-600">Når offentlig kontekst legges til post-MVP: bare valgt posisjon eller søketekst vil bli sendt til offentlige API-er hos MET/Kartverket/NVE. Dine oppdragsnotater og privat tekst forblir lokalt på enheten.</p>
         </div>
         <button type="submit" className="min-h-12 w-full rounded-xl bg-slate-950 px-5 font-bold text-white">Lagre oppdrag</button>
       </form>

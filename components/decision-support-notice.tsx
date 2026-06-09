@@ -9,6 +9,11 @@ export function DecisionSupportNotice({ compact = false }: { compact?: boolean }
           ? 'Beslutningsstøtte, ikke et offisielt kommandosystem. Data lagres bare lokalt. Ikke legg inn persondata.'
           : 'Beredskapsboka er beslutningsstøtte og ikke et offisielt kommando-, ordre- eller hendelsessystem. Data lagres bare lokalt i denne nettleseren. Ikke legg inn persondata, pasientdata eller private/skjermede tilfluktsromdata.'}
       </p>
+      <p className={`${compact ? 'mt-1 text-xs' : 'mt-2 text-xs'} font-semibold`}>
+        {compact
+          ? 'Ekstern kontekst (MET/Kartverket/NVE) legges til post-MVP.'
+          : 'Ekstern kontekst (posisjon/søk til MET/Kartverket/NVE) legges til post-MVP. Ingen data sendes ut av appen i MVP.'}
+      </p>
       <nav aria-label="MVP-grenser" className={`${compact ? 'mt-2' : 'mt-3'} flex flex-wrap gap-2 text-xs font-black`}>
         <Link href="/begrensninger" className="inline-flex min-h-11 items-center rounded-full bg-white px-4 py-2 text-amber-950 ring-1 ring-amber-200">Grenser</Link>
         <Link href="/kjente-begrensninger" className="inline-flex min-h-11 items-center rounded-full bg-white px-4 py-2 text-amber-950 ring-1 ring-amber-200">Kjente begrensninger</Link>

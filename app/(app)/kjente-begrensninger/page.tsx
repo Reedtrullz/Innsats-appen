@@ -9,6 +9,7 @@ export default function KnownLimitationsPage() {
       <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
         <ul className="list-disc space-y-2 pl-5 text-sm font-semibold text-slate-700">
           <li>Ingen backend, ingen innlogging, ingen synkronisering, ingen live tracking i MVP. Må leses og innholdsendringer er ikke Nødvarsel, ikke pushvarsel og ikke offisiell befolkningsvarsling.</li>
+          <li>Post-MVP: kontekstoppslag (posisjon/søk til MET/Kartverket/NVE) vil introdusere begrenset datautveksling med offentlige API-er. Kun valgt posisjon eller søketekst sendes; oppdragsdata forblir lokale.</li>
           <li>Ingen pasient/persondata skal registreres. Bruk godkjente systemer for personopplysninger, pasientopplysninger og hendelseslogg.</li>
           <li>Ingen private/skjermede tilfluktsrom eller ikke-offentlig lokasjonsdata publiseres eller lagres som statisk innhold.</li>
           <li>Eksterne kontekstsignaler kan være forsinket, utilgjengelige eller generaliserte. Kontroller mot primærkilde og lokale meldinger.</li>

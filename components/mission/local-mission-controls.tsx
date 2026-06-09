@@ -209,7 +209,7 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange,
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Situasjonsoversikt nå</p>
         <h3 className="text-xl font-black">Situasjonsoversikt nå</h3>
-        <ContextNotice variant="privacy" className="mt-1">Lokalt og offline. Ikke legg inn navn, ID, pasientdetaljer, helsejournal eller skjermet operativ informasjon.</ContextNotice>
+        <ContextNotice variant="privacy" className="mt-1">Lokalt og offline. Ekstern kontekst (posisjon/søk til MET/Kartverket/NVE) legges til post-MVP. Ikke legg inn navn, ID, pasientdetaljer, helsejournal eller skjermet operativ informasjon.</ContextNotice>
       </div>
       <dl className="grid gap-2 text-sm sm:grid-cols-2">
         <div className="rounded-xl bg-slate-100 p-3"><dt className="font-black">Oppdrag</dt><dd>{displayMissionTitle} / {displayMissionLocation}</dd></div>

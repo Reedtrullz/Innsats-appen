@@ -134,7 +134,7 @@ it('discloses the outbound boundary for public context lookups in mission creati
 
   const text = document.body.textContent ?? '';
   expect(text).toContain('MET/Kartverket/NVE');
-  expect(text).toContain('posisjon eller søketekst sendes til offentlige API-er');
+  expect(text).toContain('posisjon eller søketekst vil bli sendt til offentlige API-er');
   expect(text).toContain('oppdragsnotater og privat tekst forblir lokalt');
 });
 
