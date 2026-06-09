@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 const PROFILE_KEY = 'beredskapsboka-local-profile-v1';
 
 function setProfileRole(page: import('@playwright/test').Page, role: string) {
-  return page.evaluate(([key, r]) => {
+  return page.addInitScript(([key, r]) => {
     localStorage.setItem(key, JSON.stringify({
       schemaVersion: 1,
       profileEnabled: true,
