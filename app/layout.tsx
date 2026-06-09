@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { RoleProviderWrapper } from '@/components/role-provider-wrapper';
 import { ServiceWorkerRegistration } from '@/components/service-worker-registration';
 import { getThemeInitScript } from '@/lib/theme';
 import './globals.css';
@@ -14,7 +15,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <script dangerouslySetInnerHTML={{ __html: getThemeInitScript() }} />
         <ServiceWorkerRegistration />
-        {children}
+        <RoleProviderWrapper>{children}</RoleProviderWrapper>
       </body>
     </html>
   );
