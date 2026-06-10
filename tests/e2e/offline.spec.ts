@@ -6,6 +6,7 @@ const routeHeadings: Record<string, RegExp> = {
   '/': /Hva trenger du nå/i,
   '/ma-leses': /Må leses/i,
   '/mer': /^Mer$/i,
+  '/hjelp': /Lær flytene i Innsats-appen/i,
   '/begrensninger': /Operative grenser/i,
   '/kjente-begrensninger': /Kjente begrensninger/i,
   '/data-pa-enheten': /Data lagret på denne enheten/i,

@@ -38,7 +38,7 @@ export function MissionCommandHeader({ mission }: { mission: MissionContext }) {
       <div className="space-y-3 border-b border-white/10 px-4 py-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-black uppercase tracking-wide text-sky-200">Mission command</p>
+            <p className="text-xs font-black uppercase tracking-wide text-sky-200">Oppdragsledelse</p>
             <h2 className="mt-1 text-2xl font-black tracking-tight">Oppdrag</h2>
             <p className="mt-1 break-words text-base font-semibold text-slate-100">{mission.title} · {mission.locationText}</p>
           </div>

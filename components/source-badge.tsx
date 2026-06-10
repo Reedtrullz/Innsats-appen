@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { SourceDocument } from '@/lib/content/schemas';
 import { sourceExcerpt, sourceSectionAnchor, type SourceCardLink } from '@/lib/content/source-navigation';
 import { sourceFreshness } from '@/lib/content/source-review';
+import { SourceStatusLegend } from './source-status-legend';
 import { WarningBanner } from './warning-banner';
 
 function freshnessClasses(tone: ReturnType<typeof sourceFreshness>['tone']) {
@@ -34,6 +35,7 @@ export function SourceDocumentView({ source, linkedCards = [], now }: { source: 
           <span className={`rounded-full border px-3 py-1 ${freshnessClasses(freshness.tone)}`}>{freshness.label}</span>
           <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">Risiko: {source.reviewRisk}</span>
         </div>
+        <SourceStatusLegend className="mt-3" />
         <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 sm:grid-cols-2">
           <p>{`Verifisert: ${source.verifiedAt}`}</p>
           {source.reviewAfter ? <p>{`Ny gjennomgang: ${source.reviewAfter}`}</p> : null}

@@ -187,7 +187,7 @@ export const MissionContextSchema = z
     phase: PhaseSchema,
     role: RoleSchema,
     scenario: ScenarioSchema,
-    locationText: sensitiveText('mission.locationText').min(1),
+    locationText: sensitiveText('mission.locationText').default(''),
     coordinates: CoordinatesSchema.optional(),
     municipality: sensitiveText('mission.municipality').optional(),
     externalSignals: z.array(ExternalContextSignalSchema).default([]),

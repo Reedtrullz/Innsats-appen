@@ -13,7 +13,8 @@ it('shows operational MVP status as compact trust pills', () => {
 it('supports compact labels for tight mobile chrome', () => {
   render(<OperationalStatusPills compact />);
 
-  expect(screen.getByText('Offline')).toBeInTheDocument();
+  // "Offline-klar" stays unabbreviated so it never reads as a connectivity state next to the live indicator.
+  expect(screen.getByText('Offline-klar')).toBeInTheDocument();
   expect(screen.getByText('Lokalt')).toBeInTheDocument();
   expect(screen.getByText('Kilde')).toBeInTheDocument();
   expect(screen.getByText('Ikke kommando')).toBeInTheDocument();
@@ -22,7 +23,7 @@ it('supports compact labels for tight mobile chrome', () => {
 it('supports limiting compact pills for constrained shell chrome', () => {
   render(<OperationalStatusPills compact limit={2} />);
 
-  expect(screen.getByText('Offline')).toBeInTheDocument();
+  expect(screen.getByText('Offline-klar')).toBeInTheDocument();
   expect(screen.getByText('Lokalt')).toBeInTheDocument();
   expect(screen.queryByText('Kilde')).not.toBeInTheDocument();
   expect(screen.queryByText('Ikke kommando')).not.toBeInTheDocument();

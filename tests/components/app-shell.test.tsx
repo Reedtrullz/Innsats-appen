@@ -66,18 +66,21 @@ it('applies field mode runtime CSS for night mode and 48x48 touch targets', asyn
   expect(runtimeCss).toContain('background: #020617');
 });
 
-it('shows compact operational chrome and keeps release/admin under Mer', async () => {
+it('shows consolidated operational status chrome and keeps release/admin under Mer', async () => {
   await renderAndFlush(<AppShell currentPath="/hurtigkort"><p>Innhold</p></AppShell>);
   const header = within(screen.getByRole('banner'));
 
   expect(header.getByRole('link', { name: /Beredskapsboka/i })).toHaveAttribute('href', '/');
   expect(header.getByRole('link', { name: /Må leses/i })).toHaveAttribute('href', '/ma-leses');
   expect(header.getByRole('link', { name: 'Mer' })).toHaveAttribute('href', '/mer');
-  expect(header.getByText('Offline')).toBeInTheDocument();
-  expect(header.getByText('Lokalt')).toBeInTheDocument();
-  expect(header.queryByText(/Innhold:/i)).not.toBeInTheDocument();
-  expect(header.queryByText('Kilde')).not.toBeInTheDocument();
-  expect(header.queryByText('Ikke kommando')).not.toBeInTheDocument();
+  // Status now lives in a single consolidated strip below the header, not inside the banner.
+  expect(header.queryByText('Offline-klar')).not.toBeInTheDocument();
+  expect(screen.getByText(/Tilkoblet/)).toBeInTheDocument();
+  expect(screen.getByText('Offline-klar')).toBeInTheDocument();
+  expect(screen.getByText('Lokalt')).toBeInTheDocument();
+  // No raw developer diagnostics in the default view.
+  expect(screen.queryByText(/cache v/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/SW klar/i)).not.toBeInTheDocument();
   expect(screen.queryByRole('link', { name: /Release/i })).not.toBeInTheDocument();
   expect(screen.queryByRole('link', { name: /Kildegjennomgang/i })).not.toBeInTheDocument();
 });

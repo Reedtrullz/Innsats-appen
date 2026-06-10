@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { OperationalStatusPills } from '@/components/operational-status-pills';
+import { OperationalStatus } from '@/components/operational-status';
 import { ThemeSelector } from '@/components/theme-selector';
 import { getContentManifest } from '@/lib/content/load-content';
+import { formatNbDateTime } from '@/lib/formatting/format-date';
 
 const operationalLinks = [
   {
@@ -103,11 +104,11 @@ export default function MorePage() {
             <p className="mt-1 text-sm font-semibold text-slate-700">MVP-grenser og innholdsversjon samlet utenfor felt-headeren.</p>
           </div>
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">
-            Innhold: <span data-testid="more-content-version">{manifest.contentVersion}</span>
+            Innhold oppdatert: <span data-testid="more-content-version">{formatNbDateTime(manifest.contentVersion)}</span>
           </span>
         </div>
         <div className="mt-3">
-          <OperationalStatusPills />
+          <OperationalStatus showConnectivity={false} />
         </div>
       </section>
 

@@ -281,7 +281,7 @@ function SchematicMap({ packageId, state, enabledLayers }: { packageId: string; 
           return (
             <g key={feature.id}>
               <circle cx={feature.x} cy={feature.y} r="4.2" fill={style.fill} stroke={style.stroke} strokeWidth="1" />
-              <text x={Math.min(feature.x + 5, 82)} y={Math.max(feature.y - 3, 8)} fill="#f8fafc" fontSize="3.3" fontWeight="700">
+              <text x={feature.x > 50 ? feature.x - 5 : feature.x + 5} y={Math.max(feature.y - 3, 8)} textAnchor={feature.x > 50 ? 'end' : 'start'} fill="#f8fafc" fontSize="3.3" fontWeight="700">
                 {feature.label}
               </text>
             </g>
@@ -290,7 +290,7 @@ function SchematicMap({ packageId, state, enabledLayers }: { packageId: string; 
         {renderedOperations.map((item) => item.itemType === 'marker' ? (
           <g key={item.id} data-testid={`map-marker-${item.kind}`}>
             <circle cx={item.point.x} cy={item.point.y} r="3.2" fill={markerColors[item.kind]} stroke="#ffffff" strokeWidth="1" />
-            <text x={Math.min(item.point.x + 4, 82)} y={Math.max(item.point.y - 4, 7)} fill="#ffffff" fontSize="3.1" fontWeight="800">{MAP_MARKER_LABELS[item.kind]}: {item.label}</text>
+            <text x={item.point.x > 50 ? item.point.x - 4 : item.point.x + 4} y={Math.max(item.point.y - 4, 7)} textAnchor={item.point.x > 50 ? 'end' : 'start'} fill="#ffffff" fontSize="3.1" fontWeight="800">{MAP_MARKER_LABELS[item.kind]}: {item.label}</text>
           </g>
         ) : (
           <g key={item.id} data-testid={`map-drawing-${item.kind}`}>

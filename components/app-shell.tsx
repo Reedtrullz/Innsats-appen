@@ -5,8 +5,7 @@ import { RoleSelector } from './role-selector';
 import { BottomNav } from './bottom-nav';
 import { DecisionSupportNotice } from './decision-support-notice';
 import { ActiveMissionShortcut, FieldModeRuntime } from './field-mode-runtime';
-import { OfflineStatus } from './offline-status';
-import { OperationalStatusPills } from './operational-status-pills';
+import { OperationalStatus } from './operational-status';
 import { OperationalIcon } from './ui/operational-icons';
 
 export function AppShell({ children, currentPath }: { children: React.ReactNode; currentPath?: string }) {
@@ -34,11 +33,12 @@ export function AppShell({ children, currentPath }: { children: React.ReactNode;
             <Link href="/mer" className="hidden min-h-11 items-center rounded-full bg-white/10 px-3 py-2 text-xs font-black text-white ring-1 ring-white/15 sm:inline-flex">Mer</Link>
           </div>
         </div>
-        <div className="mx-auto flex max-w-3xl items-center gap-2 px-0.5 pb-1 text-[0.66rem] font-semibold text-sky-100">
-          <OperationalStatusPills compact limit={2} />
-        </div>
       </header>
-      <OfflineStatus />
+      <div className="border-b border-slate-200 bg-white px-3 py-2">
+        <div className="mx-auto max-w-3xl">
+          <OperationalStatus variant="compact" />
+        </div>
+      </div>
       <ActiveMissionShortcut />
       <main className="mx-auto max-w-3xl px-3 pb-28 pt-3 sm:px-4 sm:pt-4">
         <div className="mb-4">

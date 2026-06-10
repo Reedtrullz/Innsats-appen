@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getContentChangelog, getContentManifest } from '@/lib/content/load-content';
 import { buildReleaseNotes } from '@/lib/release/release-notes';
+import { formatNbDateTime } from '@/lib/formatting/format-date';
 
 export const revalidate = 3600;
 
@@ -24,10 +25,10 @@ export default function WhatsNewPage() {
           samband og offisielle kilder før bruk i felt.
         </p>
         <div className="mt-4 grid gap-3 rounded-2xl bg-slate-50 p-4 text-sm text-slate-800 sm:grid-cols-2">
-          <p><strong>Innholdsversjon:</strong> {notes.contentVersion}</p>
+          <p><strong>Innholdsversjon:</strong> {formatNbDateTime(notes.contentVersion)}</p>
           <p><strong>Release-ID:</strong> {notes.releaseId}</p>
           <p><strong>Må-leses:</strong> {notes.mustReadCount}</p>
-          <p><strong>Generert:</strong> {notes.generatedAt}</p>
+          <p><strong>Generert:</strong> {formatNbDateTime(notes.generatedAt)}</p>
         </div>
         <Link href="/endringer" className="mt-3 inline-flex min-h-11 items-center rounded-full bg-slate-900 px-4 text-sm font-black text-white">
           Åpne full endringslogg

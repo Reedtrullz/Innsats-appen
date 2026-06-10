@@ -9,7 +9,12 @@ import { readSelectedActiveMissionId, saveSelectedActiveMissionId, selectActiveM
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import type { MissionContext } from '@/lib/mission/schemas';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+import { useRole } from '@/lib/role/role-context';
 import { MissionCommandDashboard } from './mission/dashboard/mission-command-dashboard';
+
+function prefillRole(globalRole: string): Role {
+  return (roles as readonly string[]).includes(globalRole) ? (globalRole as Role) : 'mannskap';
+}
 
 function operationalPrivacyErrorMessage(context: string) {
   return `${context}: Lokal tekst ble stoppet fordi den kan inneholde persondata, pasientdata, skjermet informasjon eller private lokasjoner. Bruk ordinære systemer for slike opplysninger.`;
@@ -20,10 +25,11 @@ function formatUpdatedAt(value: string) {
 }
 
 
-function matchingChecklist(checklists: OperationalChecklist[], mission: MissionContext) {
+function matchingChecklist(checklists: OperationalChecklist[], mission: MissionContext): OperationalChecklist | undefined {
   return checklists.find((checklist) => checklist.scenarios.includes(mission.scenario) && checklist.phase === mission.phase)
     ?? checklists.find((checklist) => checklist.scenarios.includes(mission.scenario))
-    ?? checklists[0];
+    ?? checklists.find((checklist) => checklist.scenarios.includes('generelt') && checklist.phase === mission.phase)
+    ?? checklists.find((checklist) => checklist.scenarios.includes('generelt'));
 }
 
 type MissionUpdate = (mission: MissionContext) => MissionContext;
@@ -36,6 +42,9 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
   const [archiveSearch, setArchiveSearch] = useState('');
   const [privacyMessage, setPrivacyMessage] = useState('Lagres bare lokalt i denne nettleseren');
   const [createPrivacyError, setCreatePrivacyError] = useState('');
+  const [createError, setCreateError] = useState('');
+  const { role: globalRole } = useRole();
+  const [selectedRole, setSelectedRole] = useState<Role>(() => prefillRole(globalRole));
   const latestMissionsRef = useRef<MissionContext[]>([]);
   const missionWriteQueueRef = useRef<Promise<void>>(Promise.resolve());
   const archiveSearchRequestRef = useRef(0);
@@ -99,7 +108,12 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
       return;
     }
     setCreatePrivacyError('');
-    await saveMission(mission);
+    try {
+      await saveMission(mission);
+    } catch {
+      setCreateError('Kunne ikke lagre oppdraget lokalt. Kontroller feltene og prøv igjen.');
+      return;
+    }
     appendLocalAuditEntry('order-created', { missionId: mission.id, orderType: 'local-mission' });
     router.push('/oppdrag');
   }
@@ -178,16 +192,17 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
           <h1 className="text-3xl font-black">Opprett lokalt oppdrag</h1>
           {createPrivacyError ? <p role="alert" aria-label="oppdrag personvern" className="mt-2 rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{createPrivacyError}</p> : null}
         </div>
-        <label className="block text-sm font-bold">Tittel<input name="title" required className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3" placeholder="Eksempel: Tilfluktsrom sentrum" /></label>
+        <label className="block text-sm font-bold">Tittel <span className="text-red-600" aria-label="påkrevd">*</span><input name="title" required aria-required="true" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3" placeholder="Eksempel: Tilfluktsrom sentrum" /></label>
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block text-sm font-bold">Rolle<select name="role" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{roles.map((role) => <option key={role} value={role}>{roleLabels[role]}</option>)}</select></label>
+          <label className="block text-sm font-bold">Rolle<select name="role" value={selectedRole} onChange={(event) => setSelectedRole(event.target.value as Role)} className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{roles.map((role) => <option key={role} value={role}>{roleLabels[role]}</option>)}</select></label>
           <label className="block text-sm font-bold">Fase<select name="phase" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{phases.map((phase) => <option key={phase} value={phase}>{phaseLabels[phase]}</option>)}</select></label>
         </div>
         <label className="block text-sm font-bold">Scenario<select name="scenario" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{scenarios.map((scenario) => <option key={scenario} value={scenario}>{scenarioLabels[scenario]}</option>)}</select></label>
         <div>
-          <label className="block text-sm font-bold">Sted/lokasjon<input name="locationText" required className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3" placeholder="Kun sted, ikke persondata" /></label>
+          <label className="block text-sm font-bold">Sted/lokasjon <span className="font-semibold text-slate-500">(valgfritt)</span><input name="locationText" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3" placeholder="Kun sted, ikke persondata" /></label>
           <p className="mt-1 text-xs text-slate-600">Offentlig kontekst bruker bare valgt posisjon eller søketekst når du åpner egne kontekstverktøy. Oppdragsnotater og privat tekst forblir lokalt på enheten.</p>
         </div>
+        {createError ? <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{createError}</p> : null}
         <button type="submit" className="min-h-12 w-full rounded-xl bg-slate-950 px-5 font-bold text-white">Lagre oppdrag</button>
       </form>
     );

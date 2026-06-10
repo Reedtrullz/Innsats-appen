@@ -14,6 +14,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="no" suppressHydrationWarning>
       <body>
+        {/*
+          No-flash theme init: must run before paint, so it is an inline script in the
+          root layout (the standard Next.js pattern). In development, React logs
+          "Encountered a script tag while rendering React component" on client navigations;
+          this is a dev-only console warning (stripped from production builds, same as the
+          React eval()/CSP dev warnings) and does not affect the deployed app.
+        */}
         <script dangerouslySetInnerHTML={{ __html: getThemeInitScript() }} />
         <ThemeRuntime />
         <ServiceWorkerRegistration />

@@ -129,8 +129,7 @@ export function ActionCardDetail({ card, sources }: { card: ActionCard; sources:
           </span>
         </div>
       ) : null}
-      {card.warning ? <WarningBanner>{card.warning}</WarningBanner> : null}
-      {linkedSources.flatMap((source) => source.warnings).map((warning) => <WarningBanner key={warning}>{warning}</WarningBanner>)}
+      {Array.from(new Set([card.warning, ...linkedSources.flatMap((source) => source.warnings)].filter((warning): warning is string => Boolean(warning)))).map((warning) => <WarningBanner key={warning}>{warning}</WarningBanner>)}
       {(card.doNot ?? []).length > 0 ? (
         <section className="rounded-3xl border-2 border-red-300 bg-red-50 p-5 text-red-950 shadow-sm">
           <h2 className="flex items-center gap-2 text-xl font-black">

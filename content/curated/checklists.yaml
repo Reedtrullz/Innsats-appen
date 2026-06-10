@@ -586,3 +586,93 @@
       sourceIds: [src-sjekkliste-fig-og-figp]
   sourceIds: [src-sjekkliste-fig-og-figp, src-tiltakskort-etter-innsats, src-renhold-etter-branninnsats]
   warning: Lokal MBK-støtte. Ikke offisiell inventarliste; ingen persondata eller helsedata.
+
+- slug: brann-for-innsats
+  title: Brann/skogbrann før innsats
+  phase: for
+  roles: [leder, lagforer, mannskap]
+  scenarios: [brann, skogbrann]
+  equipmentRequired: [pumpe, slangeutlegg, vann, samband, personlig-utrustning, verneutstyr, kjoretoy]
+  items:
+    - id: ordre-og-oppdrag
+      label: Oppdrag, oppmøte og rapporteringslinje bekreftet med beredskapsvakt eller innsatsleder
+      required: true
+      sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre]
+    - id: verneutstyr-brann
+      label: Personlig verneutstyr mot brann og varme kontrollert og tilpasset oppdraget
+      required: true
+      sourceIds: [src-tiltakskort-for-innsats]
+    - id: pumpe-og-slangeutlegg
+      label: Pumpe, slangeutlegg og vanntilførsel planlagt og kontrollert mot forventet utlegg
+      required: true
+      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+    - id: drivstoff-og-vann
+      label: Drivstoff til pumpe/kjøretøy og tilgang til vannkilde vurdert for forventet varighet
+      required: false
+      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+    - id: vaer-vind-spredning
+      label: Vær, vind og spredningsfare vurdert manuelt; retrett- og sikringstiltak avklart
+      required: true
+      sourceIds: [src-tiltakskort-for-innsats]
+    - id: samband-brann
+      label: Samband og rapporteringslinje mot nødetater/innsatsleder kontrollert
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram]
+  sourceIds: [src-tiltakskort-for-innsats, src-eksempler-pa-utlegg-fra-pumpe]
+  warning: Lokal beslutningsstøtte. Følg innsatsleders føringer og offisielt planverk; ingen persondata.
+
+- slug: skogbrann-under-innsats
+  title: Brann/skogbrann under innsats
+  phase: under
+  roles: [leder, lagforer, mannskap]
+  scenarios: [skogbrann, brann]
+  equipmentRequired: [pumpe, slangeutlegg, vann, samband, verneutstyr]
+  items:
+    - id: situasjon-og-ordre
+      label: Situasjon, sektor/teig og oppdrag avklart mot innsatsleders ordre før tiltak starter
+      required: true
+      sourceIds: [src-tiltakskort-under-innsats, src-5-punktsordre]
+    - id: sikkerhet-retrett
+      label: Retrettveier, sikker sone og varsling ved rask spredning er avtalt og kjent for laget
+      required: true
+      sourceIds: [src-tiltakskort-under-innsats]
+    - id: vannforsyning-utlegg
+      label: Vannforsyning og slangeutlegg etablert og overvåket mot trykk og rekkevidde
+      required: true
+      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+    - id: samband-statusrapport
+      label: Jevnlig statusrapport gitt på avtalt samband; endringer i fare meldt umiddelbart
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram, src-tiltakskort-under-innsats]
+    - id: mannskapsivaretakelse
+      label: Mannskapets utholdenhet, væske og rotasjon fulgt opp; tegn på overoppheting fanget opp
+      required: true
+      sourceIds: [src-tiltakskort-under-innsats]
+  sourceIds: [src-tiltakskort-under-innsats, src-eksempler-pa-utlegg-fra-pumpe]
+  warning: Lokal beslutningsstøtte. Kontroller alltid mot innsatsleders ordre og samband; ingen persondata.
+
+- slug: brann-etter-innsats
+  title: Brann/skogbrann etter innsats
+  phase: etter
+  roles: [leder, lagforer, mannskap]
+  scenarios: [brann, skogbrann]
+  equipmentRequired: [pumpe, slangeutlegg, verneutstyr, kjoretoy]
+  items:
+    - id: avslutning-mot-innsatsleder
+      label: Innsats avsluttet og overlevert i tråd med innsatsleders føringer
+      required: true
+      sourceIds: [src-tiltakskort-etter-innsats]
+    - id: renhold-etter-brann
+      label: Innsatsuniform, verneutstyr og materiell rengjort etter rutine for branninnsats
+      required: true
+      sourceIds: [src-renhold-etter-branninnsats]
+    - id: materiellkontroll-brann
+      label: Pumpe, slanger og kjøretøy kontrollert og klargjort; mangler/skade notert lokalt
+      required: true
+      sourceIds: [src-tiltakskort-etter-innsats, src-eksempler-pa-utlegg-fra-pumpe]
+    - id: ivaretakelse-og-debrief
+      label: Mannskap ivaretatt og kort lokal gjennomgang/erfaring gjennomført uten persondata
+      required: true
+      sourceIds: [src-tiltakskort-etter-innsats]
+  sourceIds: [src-tiltakskort-etter-innsats, src-renhold-etter-branninnsats]
+  warning: Lokal dokumentasjon, ikke offisiell innsending. Ingen persondata eller helsedata.

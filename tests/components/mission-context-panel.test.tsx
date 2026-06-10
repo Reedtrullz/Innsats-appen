@@ -153,6 +153,58 @@ it('stores the checklist that matches the selected mission scenario and phase', 
   });
 });
 
+it('saves a local mission without a location since the field is optional', async () => {
+  await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} />);
+
+  await userEvent.type(screen.getByLabelText(/Tittel/i), 'Oppdrag uten sted');
+  // Intentionally leave Sted/lokasjon empty — submit must still succeed.
+  await userEvent.click(screen.getByRole('button', { name: /Lagre oppdrag/i }));
+
+  await waitFor(async () => {
+    const [mission] = await listMissions();
+    expect(mission?.title).toBe('Oppdrag uten sted');
+    expect(mission?.locationText).toBe('');
+  });
+});
+
+it('matches a brann/skogbrann checklist for a skogbrann mission instead of an unrelated fallback', async () => {
+  const fireChecklists = [
+    { slug: 'tilfluktsrom-teknisk-status', title: 'Tilfluktsrom teknisk status', phase: 'for', roles: ['beredskapsvakt'], scenarios: ['tilfluktsrom'], sourceIds: ['src-operativt-konsept-for-sivilforsvaret'], items: [] },
+    { slug: 'skogbrann-under-innsats', title: 'Brann/skogbrann under innsats', phase: 'under', roles: ['leder'], scenarios: ['skogbrann', 'brann'], sourceIds: ['src-tiltakskort-under-innsats'], items: [] },
+  ] as OperationalChecklist[];
+
+  await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={fireChecklists} />);
+
+  await userEvent.type(screen.getByLabelText(/Tittel/i), 'Skogbrann sektor 3');
+  await userEvent.selectOptions(screen.getByLabelText(/Fase/i), 'under');
+  await userEvent.selectOptions(screen.getByLabelText(/Scenario/i), 'skogbrann');
+  await userEvent.click(screen.getByRole('button', { name: /Lagre oppdrag/i }));
+
+  await waitFor(async () => {
+    const [mission] = await listMissions();
+    expect(mission?.activeChecklistIds).toEqual(['skogbrann-under-innsats']);
+  });
+});
+
+it('leaves the active checklist empty when no scenario or generelt checklist matches', async () => {
+  const onlyTilfluktsrom = [
+    { slug: 'tilfluktsrom-teknisk-status', title: 'Tilfluktsrom teknisk status', phase: 'for', roles: ['beredskapsvakt'], scenarios: ['tilfluktsrom'], sourceIds: ['src-operativt-konsept-for-sivilforsvaret'], items: [] },
+  ] as OperationalChecklist[];
+
+  await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={onlyTilfluktsrom} />);
+
+  await userEvent.type(screen.getByLabelText(/Tittel/i), 'Skogbrann uten sjekkliste');
+  await userEvent.selectOptions(screen.getByLabelText(/Fase/i), 'under');
+  await userEvent.selectOptions(screen.getByLabelText(/Scenario/i), 'skogbrann');
+  await userEvent.click(screen.getByRole('button', { name: /Lagre oppdrag/i }));
+
+  await waitFor(async () => {
+    const [mission] = await listMissions();
+    expect(mission?.title).toBe('Skogbrann uten sjekkliste');
+    expect(mission?.activeChecklistIds).toEqual([]);
+  });
+});
+
 it('blocks sensitive mission creation text in the UI before saving locally', async () => {
   await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} />);
 

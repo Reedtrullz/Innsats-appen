@@ -24,12 +24,12 @@ type OfflineStatusState = {
 };
 
 function warningText(state: OfflineStatusState) {
-  if (state.fallbackGeneratedContent) return 'Fallback for generert innhold er aktiv — kontroller mot gjeldende ordre når du er online.';
-  if (state.staleGeneratedContent) return 'Stale innhold fra cache — kontroller mot gjeldende ordre når du er online.';
+  if (state.fallbackGeneratedContent) return 'Reserveinnhold er aktivt — kontroller mot gjeldende ordre når du er tilkoblet.';
+  if (state.staleGeneratedContent) return 'Innhold fra buffer kan være utdatert — kontroller mot gjeldende ordre når du er tilkoblet.';
   return null;
 }
 
-export function OfflineStatus() {
+export function OfflineStatus({ compact = false }: { compact?: boolean }) {
   const [state, setState] = useState<OfflineStatusState>({
     online: true,
     ready: false,
@@ -101,17 +101,23 @@ export function OfflineStatus() {
   }, []);
 
   const warning = warningText(state);
+  const connectivityLabel = state.online ? 'Tilkoblet' : 'Frakoblet – bufret innhold kan brukes';
 
   return (
-    <div data-testid="offline-status" className="border-b border-slate-200 bg-white px-4 py-2 text-center text-xs font-semibold text-slate-700" aria-live="polite">
-      <div>
-        {state.online ? 'Online' : 'Offline / frakoblet — cached/stale content allowed'} · SW {state.ready ? 'klar' : 'starter'} · cache {shortOfflineVersion(state.cacheVersion || SW_CACHE_NAME)}
-      </div>
+    <div data-testid="offline-status" aria-live="polite" className={compact ? 'text-[0.7rem] font-semibold text-slate-600' : 'text-xs font-semibold text-slate-700'}>
+      <span className="inline-flex items-center gap-1.5">
+        <span aria-hidden className={`h-2 w-2 rounded-full ${state.online ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+        {connectivityLabel}
+      </span>
       {warning ? (
-        <div data-testid="content-cache-stale-warning" className="mt-1 font-black text-amber-800">
+        <span data-testid="content-cache-stale-warning" className="ml-2 font-black text-amber-800">
           {warning}{state.lastFallbackUrl ? ` (${new URL(state.lastFallbackUrl, window.location.href).pathname})` : ''}
-        </div>
+        </span>
       ) : null}
+      <details className="mt-0.5">
+        <summary className="cursor-pointer list-none text-[0.66rem] font-bold text-slate-500">Diagnostikk</summary>
+        <span className="text-[0.66rem] font-semibold text-slate-500">Tjenestearbeider {state.ready ? 'klar' : 'starter'} · buffer {shortOfflineVersion(state.cacheVersion || SW_CACHE_NAME)}</span>
+      </details>
     </div>
   );
 }

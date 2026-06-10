@@ -16,6 +16,7 @@ export function RoleSelector() {
   const { roleGroup, roleGroupLabel, setPreferredRole } = useRole();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const buttonLabel = roleGroup === 'ikke-valgt' ? 'Velg rolle' : roleGroupLabel;
 
   useEffect(() => {
     if (!open) return;
@@ -37,10 +38,10 @@ export function RoleSelector() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex min-h-11 items-center gap-1 rounded-full bg-white/10 px-3 py-2 text-xs font-black text-white ring-1 ring-white/15 hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        className="inline-flex min-h-11 max-w-[8.5rem] items-center gap-1 rounded-full bg-white/10 px-3 py-2 text-xs font-black text-white ring-1 ring-white/15 hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         aria-label={`Rolle: ${roleGroupLabel}. Klikk for å bytte.`}
       >
-        {roleGroupLabel}
+        <span className="truncate">{buttonLabel}</span>
         <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" aria-hidden="true">
           <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>

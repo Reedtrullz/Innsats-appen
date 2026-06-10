@@ -1,7 +1,7 @@
 import { StatusPill } from './ui/operational-primitives';
 
 const defaultPills = [
-  { label: 'Offline-klar', compactLabel: 'Offline', tone: 'success' },
+  { label: 'Offline-klar', compactLabel: 'Offline-klar', tone: 'success' },
   { label: 'Lagres lokalt', compactLabel: 'Lokalt', tone: 'sky' },
   { label: 'Kildebelagt', compactLabel: 'Kilde', tone: 'slate' },
   { label: 'Ikke offisielt kommandosystem', compactLabel: 'Ikke kommando', tone: 'warning' },

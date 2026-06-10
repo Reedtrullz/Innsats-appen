@@ -16,19 +16,16 @@ export default function SokPage() {
   const searchIndexGeneratedAt = getSearchIndexGeneratedAt();
 
   return (
-    <div className="space-y-5">
-      <section className="rounded-2xl bg-[#082F49] p-5 text-white shadow-sm">
-        <div className="flex items-start gap-3">
-          <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/15">
-            <OperationalIcon name="search" className="h-6 w-6 text-sky-100" />
-          </span>
-          <div>
-            <p className="text-xs font-black uppercase tracking-wide text-sky-200">Operativt søk</p>
-            <h1 className="mt-1 text-3xl font-black tracking-tight">Søk i tiltak, kilder og moduler</h1>
-            <p className="mt-2 text-sm font-semibold text-sky-100">Filtrer lokale treff etter fase, type og kildestatus.</p>
-          </div>
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#082F49] text-sky-100">
+          <OperationalIcon name="search" className="h-5 w-5" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-xs font-black uppercase tracking-wide text-sky-700">Operativt søk</p>
+          <h1 className="text-2xl font-black tracking-tight text-slate-950">Søk i tiltak, kilder og moduler</h1>
         </div>
-      </section>
+      </div>
       <SearchBox
         documents={searchDocuments}
         generatedAt={searchIndexGeneratedAt}

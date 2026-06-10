@@ -3,6 +3,7 @@ import { TiltakCardRow } from '@/components/tiltak-card';
 import { getActionCards, getContentManifest, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSearchSynonyms, getSourceDocuments, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
 import { buildSearchDocuments } from '@/lib/content/search-documents';
 import { sortActionCards } from '@/lib/content/filters';
+import { formatNbDateTime } from '@/lib/formatting/format-date';
 
 export default function HurtigkortPage() {
   const cards = getActionCards();
@@ -27,7 +28,7 @@ export default function HurtigkortPage() {
       <section className="rounded-3xl bg-sky-950 p-5 text-white shadow-sm">
         <h1 className="text-3xl font-black">Hurtigkort</h1>
         <p className="mt-1 text-sm font-semibold text-sky-100">Søk først. Bla kompakt når du ikke vet nøyaktig hva du trenger.</p>
-        <p className="mt-3 text-xs font-bold text-sky-200">Innhold: <span data-testid="content-version">{manifest.contentVersion}</span></p>
+        <p className="mt-3 text-xs font-bold text-sky-200">Innhold oppdatert: <span data-testid="content-version">{formatNbDateTime(manifest.contentVersion)}</span></p>
       </section>
       <SearchBox documents={searchDocuments} generatedAt={searchIndexGeneratedAt} showFreshnessIndicator />
 

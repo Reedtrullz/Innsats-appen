@@ -117,7 +117,7 @@ function QuickActions({ gloveMode }: { gloveMode: boolean }) {
           <p className="text-sm font-black uppercase tracking-wide text-sky-700">Hurtighandlinger</p>
           <h2 id="field-quick-actions" className="text-2xl font-black">Én trykkflate til operativt arbeid</h2>
         </div>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">min {MIN_TOUCH_TARGET_PX}x{MIN_TOUCH_TARGET_PX} px</span>
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">Store trykkflater for hansker</span>
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {QUICK_ACTIONS.map((action) => (

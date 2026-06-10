@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo } from 'react';
-import { OperationalStatusPills } from '@/components/operational-status-pills';
+import { OperationalStatus } from '@/components/operational-status';
 import { QuickActionButton, SectionCard } from '@/components/ui/operational-primitives';
 import { OperationalIcon } from '@/components/ui/operational-icons';
 import { useRole } from '@/lib/role/role-context';
@@ -208,7 +208,7 @@ export function HomeRoleContent() {
     <div>
       {statusPillsAbove ? (
         <div className="mb-4 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
-          <OperationalStatusPills className="justify-between gap-1" />
+          <OperationalStatus showConnectivity={false} />
         </div>
       ) : null}
 
@@ -233,7 +233,7 @@ export function HomeRoleContent() {
 
       {!statusPillsAbove ? (
         <div className="mt-4 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
-          <OperationalStatusPills className="justify-between gap-1" />
+          <OperationalStatus showConnectivity={false} />
         </div>
       ) : null}
 

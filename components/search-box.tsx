@@ -88,7 +88,10 @@ function chipClass(active: boolean) {
 }
 
 function termsLabel(terms: string[] | undefined) {
-  return (terms ?? []).slice(0, 6).join(', ');
+  const list = terms ?? [];
+  const shown = list.slice(0, 3);
+  const extra = list.length - shown.length;
+  return extra > 0 ? `${shown.join(', ')} +${extra}` : shown.join(', ');
 }
 
 function typeMetadataLabel(type: string) {
