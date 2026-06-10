@@ -8,6 +8,15 @@ test.beforeEach(async ({ page }) => {
   await clearBrowserLocalState(page);
 });
 
+test('direct route load applies system dark mode before visiting Mer', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto('/');
+
+  await expectDarkMode(page);
+  await expect.poll(() => page.evaluate(() => document.documentElement.dataset.themePreference)).toBe('system');
+  await expect(page.getByRole('heading', { name: /Hva trenger du nå/i })).toBeVisible();
+});
+
 async function chooseTheme(page: import('@playwright/test').Page, label: 'System' | 'Lys' | 'Mørk') {
   await page.goto('/mer');
   const themeGroup = page.getByRole('radiogroup', { name: /Fargemodus/i });

@@ -12,6 +12,23 @@ export function resolveThemePreference(preference: ThemePreference, systemPrefer
   return systemPrefersDark ? 'dark' : 'light';
 }
 
+export function readThemePreference(storage: Pick<Storage, 'getItem'> | null | undefined): ThemePreference {
+  try {
+    const value = storage?.getItem(THEME_STORAGE_KEY);
+    return isThemePreference(value) ? value : 'system';
+  } catch {
+    return 'system';
+  }
+}
+
+export function applyResolvedTheme(root: HTMLElement, preference: ThemePreference, systemPrefersDark: boolean) {
+  const resolved = resolveThemePreference(preference, systemPrefersDark);
+  root.classList.toggle('dark', resolved === 'dark');
+  root.dataset.themePreference = preference;
+  root.dataset.themeResolved = resolved;
+  root.style.colorScheme = resolved;
+}
+
 export function getThemeInitScript() {
   return `
 (function () {

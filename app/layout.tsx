@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { RoleProviderWrapper } from '@/components/role-provider-wrapper';
 import { ServiceWorkerRegistration } from '@/components/service-worker-registration';
+import { ThemeRuntime } from '@/components/theme-runtime';
 import { getThemeInitScript } from '@/lib/theme';
 import './globals.css';
 
@@ -14,6 +15,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="no" suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: getThemeInitScript() }} />
+        <ThemeRuntime />
         <ServiceWorkerRegistration />
         <RoleProviderWrapper>{children}</RoleProviderWrapper>
       </body>

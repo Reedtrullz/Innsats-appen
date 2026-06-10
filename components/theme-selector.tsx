@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useSyncExternalStore } from 'react';
 
-import { isThemePreference, resolveThemePreference, THEME_STORAGE_KEY, type ThemePreference } from '@/lib/theme';
+import { applyResolvedTheme, readThemePreference, THEME_STORAGE_KEY, type ThemePreference } from '@/lib/theme';
 
 const options: Array<{ value: ThemePreference; label: string; description: string }> = [
   { value: 'system', label: 'System', description: 'Følg enhetens innstilling.' },
@@ -12,8 +12,7 @@ const options: Array<{ value: ThemePreference; label: string; description: strin
 
 function readStoredPreference(): ThemePreference {
   if (typeof window === 'undefined') return 'system';
-  const value = window.localStorage.getItem(THEME_STORAGE_KEY);
-  return isThemePreference(value) ? value : 'system';
+  return readThemePreference(window.localStorage);
 }
 
 function subscribeThemePreference(onStoreChange: () => void) {
@@ -27,12 +26,7 @@ function subscribeThemePreference(onStoreChange: () => void) {
 
 function applyThemePreference(preference: ThemePreference) {
   const systemPrefersDark = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const resolved = resolveThemePreference(preference, systemPrefersDark);
-  const root = document.documentElement;
-  root.classList.toggle('dark', resolved === 'dark');
-  root.dataset.themePreference = preference;
-  root.dataset.themeResolved = resolved;
-  root.style.colorScheme = resolved;
+  applyResolvedTheme(document.documentElement, preference, systemPrefersDark);
 }
 
 export function ThemeSelector() {
