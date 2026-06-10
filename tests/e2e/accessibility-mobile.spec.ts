@@ -5,7 +5,7 @@ import { clearBrowserLocalState, createLocalMission, openMissionDetails, openMis
 
 test.use({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
 
-const mobileLayoutRoutes = ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/under', '/etter', '/feltmodus', '/moduler/tilfluktsrom', '/release'];
+const mobileLayoutRoutes = ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/hjelp', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/under', '/etter', '/feltmodus', '/moduler/tilfluktsrom', '/release'];
 
 async function expectNoHorizontalOverflow(page: import('@playwright/test').Page) {
   const overflow = await page.evaluate(() => ({
@@ -40,7 +40,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('critical mobile routes have no automated WCAG A/AA accessibility violations', async ({ page }) => {
-  for (const route of ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/feltmodus', '/release']) {
+  for (const route of ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/hjelp', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/feltmodus', '/release']) {
     await page.goto(route);
     if (route === '/release') {
       await expect(page.getByRole('heading', { name: /Pilotklar sjekkliste/i })).toBeVisible();

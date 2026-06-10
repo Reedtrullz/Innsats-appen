@@ -9,6 +9,7 @@ it('groups secondary and admin routes under Mer', () => {
   expect(screen.getByTestId('more-content-version')).toBeInTheDocument();
   expect(screen.getByText('Offline-klar')).toBeInTheDocument();
   expect(screen.getByText('Lagres lokalt')).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /Hjelp og demo/i })).toHaveAttribute('href', '/hjelp');
   expect(screen.getByRole('link', { name: /^Kilder$/i })).toHaveAttribute('href', '/kilder');
   expect(screen.getByRole('link', { name: /Moduler/i })).toHaveAttribute('href', '/laering');
   expect(screen.getByRole('link', { name: /Feltmodus/i })).toHaveAttribute('href', '/feltmodus');

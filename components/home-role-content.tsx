@@ -269,6 +269,7 @@ export function HomeRoleContent() {
             </Link>
           ))}
           <Link className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-base font-black text-slate-900" href="/kilder">Kilder</Link>
+          <Link className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-base font-black text-slate-900" href="/hjelp">Hjelp og demo</Link>
         </div>
       </details>
     </div>

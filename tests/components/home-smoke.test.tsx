@@ -21,6 +21,7 @@ it('shows the operational command-surface landing page', async () => {
   expect(screen.getByRole('link', { name: /^Under innsats$/i })).toHaveAttribute('href', '/under');
   expect(screen.getByRole('link', { name: /^Etter innsats$/i })).toHaveAttribute('href', '/etter');
   expect(screen.getAllByRole('link', { name: /Kilder/i }).some((link) => link.getAttribute('href') === '/kilder')).toBe(true);
+  expect(screen.getByRole('link', { name: /Hjelp og demo/i })).toHaveAttribute('href', '/hjelp');
   expect(screen.getByRole('link', { name: /Alvorlig ulykke/i })).toHaveAttribute('href', '/kort/alvorlig-ulykke-dod-eget-personell');
   expect(screen.getByRole('link', { name: /Psykologisk førstehjelp/i })).toHaveAttribute('href', '/kort/psykologisk-forstehjelp-sekvens');
   expect(screen.getByRole('link', { name: /Samband \/ ordre/i })).toHaveAttribute('href', '/kort/sambandsplan-start');

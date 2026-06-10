@@ -5,6 +5,11 @@ import { getContentManifest } from '@/lib/content/load-content';
 
 const operationalLinks = [
   {
+    href: '/hjelp',
+    label: 'Hjelp og demo',
+    description: 'Lær flytene og start en trygg demohendelse med lokale øvingsdata.',
+  },
+  {
     href: '/kilder',
     label: 'Kilder',
     description: 'Kildebank og kildevarsler for innholdet i Beredskapsboka.',
@@ -27,7 +32,7 @@ const operationalLinks = [
   {
     href: '/personvern',
     label: 'Personvern',
-    description: 'Hva MVP-en samler inn, ikke samler inn og hvordan data holdes lokalt.',
+    description: 'Hva appen samler inn, ikke samler inn og hvordan data holdes lokalt.',
   },
   {
     href: '/data-pa-enheten',

@@ -5,6 +5,7 @@ export const APP_SHELL_ROUTES = [
   '/for',
   '/under',
   '/etter',
+  '/hjelp',
   '/kilder',
   '/kildegjennomgang',
   '/faq',
