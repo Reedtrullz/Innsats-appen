@@ -44,6 +44,7 @@ describe('FieldModePanel', () => {
     expect(quickActions.getByRole('link', { name: 'Sambandsplan' })).toHaveAttribute('href', '/oppdrag#sambandsplan');
     expect(quickActions.getByRole('link', { name: 'Eksporter status' })).toHaveAttribute('href', '/oppdrag#statusrapport');
     expect(quickActions.getByRole('link', { name: 'Søk' })).toHaveAttribute('href', '/sok#stress-search');
+    expect(Boolean(screen.getByRole('region', { name: /Én trykkflate/i }).compareDocumentPosition(screen.getByLabelText(/Slå på feltmodus/i)) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
   });
 
   it('loads persisted field settings after mount without making first render depend on localStorage', async () => {
@@ -149,10 +150,10 @@ describe('FieldModePanel', () => {
     expect(screen.getByRole('button', { name: /Stopp diktering/i })).toBeDisabled();
   });
 
-  it('captures field testing feedback locally with sanitization and no backend claim', async () => {
+  it('captures field testing feedback locally with sanitization and no automatic sending claim', async () => {
     await renderFieldModePanel();
 
-    expect(screen.getAllByText(/ingen backend/i).length).toBeGreaterThan(0);
+    expect(document.body).not.toHaveTextContent(/backend|MVP|post-MVP|service worker/i);
     expect(screen.getByText(/Ingen lokale feltfeedback-notater ennå/i)).toBeInTheDocument();
 
     await userEvent.type(screen.getByLabelText(/Hva fungerte/i), 'Store knapper fungerte. Kontakt test@example.com eller 99999999');
@@ -162,6 +163,7 @@ describe('FieldModePanel', () => {
     await userEvent.click(screen.getByRole('button', { name: /Lagre lokal feedback/i }));
 
     expect(await screen.findByRole('status')).toHaveTextContent(/lagret lokalt/i);
+    expect(screen.getByRole('status')).toHaveTextContent(/Ingen automatisk innsending/i);
     const entries = readFieldFeedbackEntries();
     expect(entries).toHaveLength(1);
     expect(entries[0].observations).toContain('[fjernet e-post]');

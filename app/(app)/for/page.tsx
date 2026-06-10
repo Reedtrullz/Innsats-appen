@@ -20,8 +20,14 @@ export default function Page() {
   const latestChange = getContentChangelog().find((entry) => entry.contentRefs.some((ref) => ref.kind === 'checklist' && ['fig-for-innsats', 'for-utrykning-samlet'].includes(ref.id)));
   return (
     <div className="space-y-5">
-      <PhasePageContent phase="for" cards={getActionCards()} checklists={getChecklists()} latestChange={latestChange} mustRead={getMustReadNotices()} />
-      <ForPreparationEntryPoints />
+      <PhasePageContent
+        phase="for"
+        cards={getActionCards()}
+        checklists={getChecklists()}
+        latestChange={latestChange}
+        mustRead={getMustReadNotices()}
+        primaryOperationalContent={<ForPreparationEntryPoints />}
+      />
     </div>
   );
 }

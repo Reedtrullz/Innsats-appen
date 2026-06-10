@@ -10,6 +10,7 @@ import {
   isGeneratedContentStale,
   parseServiceWorkerClientMessage,
 } from '@/lib/offline/service-worker-metadata';
+import { buildServiceWorkerSource } from '../../scripts/build-service-worker';
 
 function extractStaticAppShell(sw: string) {
   const match = sw.match(/const STATIC_APP_SHELL = \[([\s\S]*?)\];/);
@@ -24,6 +25,8 @@ describe('service worker metadata helpers', () => {
     expect(manifest().start_url).toBe('/');
     expect(manifest().display).toBe('standalone');
     expect(sw).toContain(`const SW_CACHE_VERSION = '${SW_CACHE_VERSION}'`);
+    expect(sw).toContain('// BEGIN GENERATED SERVICE WORKER METADATA');
+    expect(buildServiceWorkerSource(sw)).toBe(sw);
     expect(sw).toContain('BEREDSKAPSBOKA_GET_SW_STATUS');
     expect(sw).toContain('BEREDSKAPSBOKA_SKIP_WAITING');
     expect(staticAppShell).toEqual([...STATIC_APP_SHELL_ROUTES]);

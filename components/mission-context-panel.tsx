@@ -9,7 +9,6 @@ import { readSelectedActiveMissionId, saveSelectedActiveMissionId, selectActiveM
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import type { MissionContext } from '@/lib/mission/schemas';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
-import { DecisionSupportNotice } from './decision-support-notice';
 import { MissionCommandDashboard } from './mission/dashboard/mission-command-dashboard';
 
 function operationalPrivacyErrorMessage(context: string) {
@@ -113,7 +112,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
     setSelectedActiveMissionId(null);
     setMissions([]);
     setArchivedMissions([]);
-    setPrivacyMessage('Dette sletter bare data i denne nettleseren. Beredskapsboka sender ikke oppdrag, sjekklister eller notater til en server i MVP.');
+    setPrivacyMessage('Dette sletter bare data i denne nettleseren. Beredskapsboka sender ikke oppdrag, sjekklister eller notater til en server.');
   }
 
   async function updateMission(missionId: string, update: MissionUpdate) {
@@ -177,7 +176,6 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
         <div>
           <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Nytt oppdrag</p>
           <h1 className="text-3xl font-black">Opprett lokalt oppdrag</h1>
-          <DecisionSupportNotice compact />
           {createPrivacyError ? <p role="alert" aria-label="oppdrag personvern" className="mt-2 rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{createPrivacyError}</p> : null}
         </div>
         <label className="block text-sm font-bold">Tittel<input name="title" required className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3" placeholder="Eksempel: Tilfluktsrom sentrum" /></label>
@@ -188,7 +186,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
         <label className="block text-sm font-bold">Scenario<select name="scenario" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{scenarios.map((scenario) => <option key={scenario} value={scenario}>{scenarioLabels[scenario]}</option>)}</select></label>
         <div>
           <label className="block text-sm font-bold">Sted/lokasjon<input name="locationText" required className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3" placeholder="Kun sted, ikke persondata" /></label>
-          <p className="mt-1 text-xs text-slate-600">Når offentlig kontekst legges til post-MVP: bare valgt posisjon eller søketekst vil bli sendt til offentlige API-er hos MET/Kartverket/NVE. Dine oppdragsnotater og privat tekst forblir lokalt på enheten.</p>
+          <p className="mt-1 text-xs text-slate-600">Offentlig kontekst bruker bare valgt posisjon eller søketekst når du åpner egne kontekstverktøy. Oppdragsnotater og privat tekst forblir lokalt på enheten.</p>
         </div>
         <button type="submit" className="min-h-12 w-full rounded-xl bg-slate-950 px-5 font-bold text-white">Lagre oppdrag</button>
       </form>
@@ -272,7 +270,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
         )}
       </section>
       <button type="button" onClick={() => void reset()} className="min-h-12 w-full rounded-xl border border-red-300 bg-red-50 px-5 font-bold text-red-900">Slett lokale data</button>
-      <p className="text-sm text-slate-600">Dette sletter bare data i denne nettleseren. Beredskapsboka sender ikke oppdrag, sjekklister eller notater til en server i MVP.</p>
+      <p className="text-sm text-slate-600">Dette sletter bare data i denne nettleseren. Beredskapsboka sender ikke oppdrag, sjekklister eller notater til en server.</p>
     </div>
   );
 }

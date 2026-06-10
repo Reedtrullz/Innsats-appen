@@ -19,8 +19,11 @@ function EtterReportingEntryPoints() {
 export default function Page() {
   return (
     <div className="space-y-5">
-      <PhasePageContent phase="etter" cards={getActionCards()} />
-      <EtterReportingEntryPoints />
+      <PhasePageContent
+        phase="etter"
+        cards={getActionCards()}
+        primaryOperationalContent={<EtterReportingEntryPoints />}
+      />
     </div>
   );
 }

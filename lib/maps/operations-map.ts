@@ -67,20 +67,20 @@ export const LOCATION_EXPORT_PRIVACY_WARNING = 'Lokale kartmarkører og sektorer
 
 export const KML_IMPORT_EVALUATION = {
   status: 'post-mvp-research-only',
-  decision: 'KML-import er ikke implementert i MVP. GeoJSON med skjematiske 0-100 koordinater er eneste støttede import nå.',
+  decision: 'KML-import er ikke aktivert. GeoJSON med skjematiske 0-100 koordinater er eneste støttede import nå.',
   blockers: ['KML kan inneholde ekte koordinater og private stedsnavn.', 'KML-parser ville øke angrepsflate og pakkestørrelse.', 'KML må ha egen governance for sanitert øvingsbruk før aktivering.'],
 } as const;
 
 export const QR_SECTOR_IMPORT_DESIGN = {
   status: 'designed-not-synced',
-  summary: 'Sektor/teig kan deles post-MVP som signert fil eller QR-tekst som brukeren importerer manuelt på enheten. Ingen backend sync eller automatisk ordreoverføring.',
+  summary: 'Sektor/teig kan senere deles som signert fil eller QR-tekst som brukeren importerer manuelt på enheten. Ingen skysynkronisering eller automatisk ordreoverføring.',
   safeguards: ['Vis importforhåndsvisning før lagring.', 'Behold alt lokalt i nettleseren.', 'Forkast ukjente felter og ekte identifikatorer.', 'Merk importert innhold som uverifisert beslutningsstøtte.'],
 } as const;
 
 export const BLUE_FORCE_TRACKING_RESEARCH = {
   status: 'post-mvp-only',
-  decision: 'Delt live posisjon/blue-force tracking skal ikke bygges i MVP.',
-  reasons: ['Krever personvern-/sikkerhetsvurdering.', 'Kan røpe mannskaps- og ressursposisjoner.', 'Krever autorisasjon, nøkkelstyring og operativ governance som ikke finnes i lokal MVP.'],
+  decision: 'Delt live posisjon/blue-force tracking er ikke aktivert.',
+  reasons: ['Krever personvern-/sikkerhetsvurdering.', 'Kan røpe mannskaps- og ressursposisjoner.', 'Krever autorisasjon, nøkkelstyring og operativ governance som ikke finnes i lokal app.'],
 } as const;
 
 function emptyMissionMapState(): MissionMapState {

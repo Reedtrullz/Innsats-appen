@@ -109,7 +109,7 @@ export function ServiceWorkerRegistration() {
         });
         requestServiceWorkerStatus(registration);
       })
-      .catch(() => setMessage('Service worker kunne ikke startes. Appen virker fortsatt uten offline-cache.'));
+      .catch(() => setMessage('Offline-lagring kunne ikke startes. Appen virker fortsatt når nett er tilgjengelig.'));
 
     return () => {
       mounted = false;
@@ -130,14 +130,14 @@ export function ServiceWorkerRegistration() {
     <div className="fixed inset-x-3 top-3 z-50 mx-auto max-w-3xl rounded-2xl border border-sky-200 bg-white p-3 text-sm font-semibold text-slate-900 shadow-xl" role="status" aria-live="polite">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="font-black">Ny offline-versjon klar – oppdater cache</p>
+          <p className="font-black">Ny offline-versjon klar</p>
           <p className="text-xs text-slate-600">
-            Aktiv cache {shortOfflineVersion(state.cacheVersion || SW_CACHE_NAME)}. Oppdaterer bare lokale app-shell/generated-content filer.
+            Aktiv lokal versjon {shortOfflineVersion(state.cacheVersion || SW_CACHE_NAME)}. Oppdaterer bare appens offline-kopi på denne enheten.
           </p>
           {message ? <p className="mt-1 text-xs text-slate-600">{message}</p> : null}
         </div>
         <button type="button" onClick={activateUpdate} className="min-h-12 rounded-xl bg-sky-700 px-4 py-2 text-sm font-black text-white">
-          Oppdater cache
+          Oppdater offline-kopi
         </button>
       </div>
     </div>

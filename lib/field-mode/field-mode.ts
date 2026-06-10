@@ -55,7 +55,7 @@ export const VOICE_INPUT_EVALUATION = {
 
 export const FIELD_TESTING_PROCESS = {
   title: 'Feltprøving med mannskaper',
-  localOnlyScope: 'Prosessen beskriver test og lokal tilbakemelding. Den etablerer ingen backend, synk, personregister eller offisiell innsending.',
+  localOnlyScope: 'Prosessen beskriver test og lokal tilbakemelding. Den sender ikke inn data, oppretter ikke personregister og erstatter ikke offisiell rapportering.',
   steps: [
     'Gjennomfør kort scenario med regn-/hanske-/nattforhold og offline nettleser.',
     'Observer om mannskap finner Oppdrag, Feltmodus, sjekkliste, 5-punktsordre, sambandsplan, eksport og søk uten forklaring.',

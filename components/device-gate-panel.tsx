@@ -7,7 +7,7 @@ import {
   type CheckId,
   type CheckStatus,
   type DeviceGateCheck,
-  type DeviceGateState,
+  initialDeviceGateChecks,
   loadPersistedGate,
   runAutoDetect,
   runDataRetentionWipeTest,
@@ -20,21 +20,30 @@ import type { OperationalIconName } from '@/components/ui/operational-icons';
 
 function statusIcon(status: CheckStatus, manualConfirmed: boolean): { icon: OperationalIconName; tone: string; label: string } {
   const effective = manualConfirmed ? 'pass' : status;
-  if (effective === 'pass') return { icon: 'shield', tone: 'text-emerald-600 border-emerald-200 bg-emerald-50', label: 'Bestått' };
-  if (effective === 'fail') return { icon: 'alert', tone: 'text-red-600 border-red-200 bg-red-50', label: 'Ikke bestått' };
+  if (effective === 'pass') return { icon: 'shield', tone: 'text-emerald-700 border-emerald-200 bg-emerald-50', label: 'Bestått' };
+  if (effective === 'fail') return { icon: 'alert', tone: 'text-red-700 border-red-200 bg-red-50', label: 'Ikke bestått' };
   return { icon: 'chevron', tone: 'text-amber-600 border-amber-200 bg-amber-50', label: 'Venter' };
 }
 
 export function DeviceGatePanel() {
-  const [checks, setChecks] = useState<DeviceGateCheck[]>(() => {
-    const persisted = loadPersistedGate();
-    return CHECK_DEFS.map((def) => {
-      const auto = runAutoDetect(def.id);
-      return { ...def, autoDetected: auto.status, manualConfirmed: persisted.confirmed[def.id] ?? false, detail: auto.detail };
+  const [checks, setChecks] = useState<DeviceGateCheck[]>(initialDeviceGateChecks);
+  const [sha, setSha] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      const persisted = loadPersistedGate();
+      setSha(persisted.sha);
+      setChecks(CHECK_DEFS.map((def) => {
+        const auto = runAutoDetect(def.id);
+        return { ...def, autoDetected: auto.status, manualConfirmed: persisted.confirmed[def.id] ?? false, detail: auto.detail };
+      }));
     });
-  });
-  const [sha, setSha] = useState<string | null>(() => loadPersistedGate().sha);
-  const [shaFetchedAt, setShaFetchedAt] = useState<string | null>(() => loadPersistedGate().shaFetchedAt);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     fetch('/api/health', { cache: 'no-store' })
@@ -125,7 +134,7 @@ export function DeviceGatePanel() {
                       : check.detail}
                   </p>
                 </div>
-                <label className="flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-black ring-1 ring-slate-200">
+                <label className="flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-xs font-black ring-1 ring-slate-200">
                   <input
                     type="checkbox"
                     checked={check.manualConfirmed}

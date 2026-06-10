@@ -63,9 +63,8 @@ test('offline map page is local-only, schematic and tile-free', async ({ page, c
   await expect(page.getByText(/offline|frakoblet/i).first()).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Kart', exact: true })).toBeVisible();
   await expect(page.getByText(/Schematic local map package, not authoritative navigation/i).first()).toBeVisible();
-  await expect(page.getByText(/Ingen eksterne kartfliser/i).first()).toBeVisible();
-  await expect(page.getByText(/CacheStorage for offline bruk/i)).toBeVisible();
-  await expect(page.getByText(/Ingen ekstern tile-provider, backend-sync/i).first()).toBeVisible();
+  await expect(page.getByText(/Kart, markører og logger blir på enheten/i)).toBeVisible();
+  await expect(page.getByText(/Ingen kart deles med oppdrag eller andre enheter/i)).toBeVisible();
   await expect(page.getByTestId('offline-map-cache-status')).toContainText(/Ingen kartpakke/i);
 
   if (!hasLocalMapPackageFixtures()) {
@@ -81,7 +80,7 @@ test('offline map page is local-only, schematic and tile-free', async ({ page, c
   await page.getByRole('combobox', { name: /Velg skjematisk kartpakke/i }).selectOption('trondelag-oversikt');
   await expect(page.getByTestId('map-performance-guard')).toContainText(/viser maks 12/i);
   await expect(page.getByTestId('map-performance-guard')).toContainText(/2 skjult/i);
-  await expect(page.getByText(/Ingen godkjente PMTiles-pakker er tilgjengelige/i)).toBeVisible();
+  await expect(page.getByText(/Ingen godkjente lokale kartpakker er tilgjengelige/i)).toBeVisible();
   await expect(page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Tilbakestill kartcache/i })).toHaveCount(0);
   await expect(page.getByTestId('offline-map-cache-status')).toContainText(/Ingen kartpakke/i);
@@ -101,8 +100,8 @@ test('offline map page is local-only, schematic and tile-free', async ({ page, c
   await expect(page.getByLabel(/GeoJSON eksport/i)).toContainText(/schematic-0-100-local-only/i);
   await page.getByRole('button', { name: /Lag kartbilde/i }).click();
   await expect(page.getByLabel(/Kartbilde SVG/i)).toContainText(/Sanitert lokalt kartbilde/i);
-  await expect(page.getByText(/KML-import er ikke implementert i MVP/i)).toBeVisible();
-  await expect(page.getByText(/Delt live posisjon\/blue-force tracking skal ikke bygges i MVP/i)).toBeVisible();
+  await expect(page.getByText(/KML-import er ikke aktivert/i)).toBeVisible();
+  await expect(page.getByText(/Delt live posisjon\/blue-force tracking er ikke aktivert/i)).toBeVisible();
 
   const forbiddenTileProviderUrls = requestedUrls.filter((url) => isForbiddenTileProviderRequest(url, baseOrigin));
   expect(forbiddenTileProviderUrls).toEqual([]);

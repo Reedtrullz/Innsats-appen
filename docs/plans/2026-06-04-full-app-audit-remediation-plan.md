@@ -21,6 +21,16 @@
   - `/api/context/geocode?q=Trondheim` -> `Cache-Control: s-maxage=3600, stale-while-revalidate=86400`
   - `/api/context/weather?lat=63.43&lon=10.39` -> `Cache-Control: s-maxage=900, stale-while-revalidate=3600`
 
+## UI/UX flow audit addendum
+
+- Added from local live-app review on 2026-06-10 using the current worktree and local dev server.
+- Viewports checked: mobile `360x740` and desktop `1280x800`.
+- Routes checked: `/`, `/sok`, `/hurtigkort`, `/for`, `/under`, `/etter`, `/oppdrag`, `/oppdrag/ny`, `/kart`, `/feltmodus`, `/mer`, and `/release`.
+- Search interaction checked with `tilfluktsrom`; results are relevant, but filters consume too much first-viewport space on mobile before the actual answers.
+- The generic mobile accessibility test passed for product routes, but local dev execution was polluted by injected Next.js dev overlay controls. Production-mode Playwright should be used for final claims.
+- `/release` emitted a hydration mismatch in development because the device gate derives browser/device state during initial render.
+- The main product issue is priority, not missing capability: field-critical actions often exist, but are pushed below notices, settings, cache/package controls, or filter controls.
+
 ## Confirmed findings to fix
 
 ### High
@@ -95,6 +105,36 @@
 21. Content import fallback can make stale private-vault snapshots look freshly generated.
     - Evidence: CI/Docker set `ALLOW_PREGENERATED_CONTENT=1`; `scripts/import-obsidian.ts` fallback rewrites manifest timestamps.
 
+### Operational UX addendum
+
+22. Primary operational actions are crowded below global safety/update chrome.
+    - Evidence: `components/app-shell.tsx` renders `OfflineStatus`, `ActiveMissionShortcut`, and `DecisionSupportNotice` before each app-shell child; `components/mission-context-panel.tsx` also renders another compact `DecisionSupportNotice` inside the new-mission form.
+    - Risk: first-time and mobile users must scroll past repeated explanatory chrome before they can create, open, log, or export an operational task.
+
+23. Search answers are pushed below filter controls on mobile.
+    - Evidence: `components/search-box.tsx` renders query input, phase/role/type/scenario filters, and then top hits/results.
+    - Risk: search feels slower and less direct during stressful lookup, even when the engine has good hits.
+
+24. Map and field mode defer field-critical actions.
+    - Evidence: `components/offline-map-panel.tsx` shows map package/cache and privacy sections before marker/log workflows; `components/field-mode-panel.tsx` shows settings/theme controls before quick actions.
+    - Risk: the routes named `Kart` and `Feltmodus` do not immediately expose the most likely in-field actions.
+
+25. Phase pages put operational CTAs below generic content.
+    - Evidence: `/for`, `/under`, and `/etter` append operational entrypoint sections after `PhasePageContent`.
+    - Risk: the intended flow `Situation -> Phase -> Next action -> Checklist -> Export -> Source` is visually weakened.
+
+26. `/release` device gate needs hydration-safe rendering and touch-target coverage.
+    - Evidence: `components/device-gate-panel.tsx` initializes checks from browser-only state; small native checkbox controls are not covered by the current mobile route list in `tests/e2e/accessibility-mobile.spec.ts`.
+    - Risk: release/admin users can see client/server mismatch noise and mobile controls that are harder to use.
+
+27. Role personalization is useful but under-discoverable.
+    - Evidence: home content adapts by role, but the role choice is not a first-viewport decision point for new users.
+    - Risk: users may never realize the app can prioritize content for lagforer/leder/mannskap-style workflows.
+
+28. Some operational copy exposes implementation details instead of field meaning.
+    - Evidence: operational surfaces include terms such as service worker, MVP, post-MVP, backend sync, and generated artifacts.
+    - Risk: field users get engineering vocabulary where they need plain operational consequence and trust boundaries.
+
 ---
 
 ## Architecture and runtime dependency audit
@@ -103,6 +143,30 @@
 - There is no plugin-style silent import chain, but service-worker install/fetch failures can silently degrade offline behavior. Tasks touching `public/sw.js`, generated-content manifests, or local storage migration must include production-mode Playwright verification.
 - Any task touching context APIs must verify both direct route-handler tests and live/production-mode route behavior, because CDN/shared caching semantics are not visible in component tests.
 - Any task touching deployment must include exact-SHA GitHub Actions verification and live `/api/health` verification before claiming deployed.
+
+## Current execution status audit
+
+Status checked against the current worktree on 2026-06-10 by code/test inspection, not by rerunning the full `npm run check:ci` gate. Treat `Done` as implemented in the current tree with local tests or code evidence present; still rerun the task-specific verification before committing further changes.
+
+| Task(s) | Status | Current evidence / remaining work |
+| --- | --- | --- |
+| 1-8 | Done | Source confidence now requires `status === 'verified'`; map objects carry `missionId`; `mapStateForMission`, active mission selection, `/kart` mission targeting, export filtering, and multi-mission E2E exist in `components/action-card-detail.tsx`, `lib/maps/operations-map.ts`, `lib/mission/active-mission-selection.ts`, `components/offline-map-panel.tsx`, and `tests/e2e/map-log-mission-flow.spec.ts`. |
+| 9-15 | Done | Context APIs use `private, no-store`, errors are redacted, MET/NVE use `fetchJsonWithTimeout`, local import limits and sensitive-text guards exist, security headers are configured, and visible shell routes are in `lib/offline/static-app-shell.ts` / `public/sw.js`. |
+| 16-19 | Done | Disabled context sources render with no signals, Etter deep links target exact dashboard sections, Må leses/Nødvarsel wording is present, and filtered-search empty state shows hidden-hit copy plus reset. |
+| 19A | Open | `components/search-box.tsx` still renders the filter fieldset before `Topptreff`; answer-first mobile search has not been implemented. |
+| 20 | Partial / open | `/release` has dedicated E2E coverage, but `components/device-gate-panel.tsx` still runs `loadPersistedGate()` and `runAutoDetect()` in `useState` initializers, and `/release` is still absent from `mobileLayoutRoutes` in `tests/e2e/accessibility-mobile.spec.ts`. Hydration-safe rendering and touch-route coverage remain open. |
+| 21 | Done | Release/workplan wording now says generated local artifact, `/generated-content/workplans.json`, and `ingen backend-synk` in `components/release-readiness-tool.tsx`, `README.md`, and `docs/ui-operational-command-surface.md`. |
+| 21A | Open | `/kart` still places local map package/cache controls before local markers and map-to-log; `/feltmodus` still places settings/theme controls before `QuickActions`. |
+| 21B | Open | `/for`, `/under`, and `/etter` still render `PhasePageContent` before their phase-specific operational entrypoint sections. |
+| 21C | Open | The global app shell still renders `DecisionSupportNotice compact`, and `/oppdrag/ny` still renders another compact notice inside the form. There is no acknowledgement/compaction helper yet. |
+| 21D | Open | Primary operational surfaces still use implementation-heavy wording such as `MVP`, `post-MVP`, `backend sync`, and service-worker/cache language in user-facing copy. |
+| 21E | Open | Home content adapts to role, and role can be stored through local profile, but there is no first-viewport home role lens/segmented control or `home-role-content` test for it. |
+| 22 | Done | Current generated coverage has no `content-orphan-sources` gap; `tests/content/coverage.test.ts` asserts orphan count `0`. |
+| 23-26 | Done | Mission dashboard components have been extracted, `tests/setup.ts` fails on React `act` warnings and clears browser storage, and service-worker behavior/static shell tests exist. |
+| 27-32 | Done | Deploy rollback, immutable deploy inputs, pinned Docker runtime/version, pinned SSH host key, pregenerated source-snapshot metadata, and workplan drift check mode are implemented and covered by static/unit tests. |
+| 33 | Pending | Final full gate, focused production E2E, post-implementation audit, CI/deploy, and live exact-SHA verification have not been run for the still-open UI tasklets. |
+
+Execution guidance from this status audit: do not reimplement Tasks 1-19, 21, or 22-32 unless regression tests prove drift. The remaining implementation work is Tasks 19A, 20, 21A, 21B, 21C, 21D, 21E, then Task 33 after those pass.
 
 ---
 
@@ -1115,19 +1179,73 @@ git add components/search-box.tsx tests/components/search-box.test.tsx tests/e2e
 git commit -S -m "fix: explain search results hidden by filters"
 ```
 
-### Task 20: Make release page mobile-safe and touch-target tested
+### Task 19A: Put search answers before advanced filters on mobile
 
-**Objective:** Ensure `/release` works on 360px mobile if it remains linked from `/mer`.
+**Objective:** Make local search feel answer-first under stress: once a query exists, show top hits/results before dense filter controls on mobile while preserving filter discoverability.
 
 **Files:**
+- Modify: `components/search-box.tsx`
+- Test: `tests/components/search-box.test.tsx`
+- Test: `tests/e2e/critical-search.spec.ts`
+- Test: `tests/e2e/accessibility-mobile.spec.ts`
+
+**Step 1: Write failing test**
+
+```tsx
+it('shows top hits before filters after the user enters a query', async () => {
+  render(<SearchBox documents={docsWithShelterHit} generatedAt="2026-06-10T00:00:00.000Z" enableFilters />);
+  await userEvent.type(screen.getByLabelText(/Søk lokalt/i), 'tilfluktsrom');
+  const firstResult = screen.getByRole('link', { name: /tilfluktsrom/i });
+  const filters = screen.getByRole('group', { name: /filtre/i });
+  expect(firstResult.compareDocumentPosition(filters) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+```
+
+**Step 2: Run test to verify failure**
+
+Run:
+```bash
+npm run test -- tests/components/search-box.test.tsx -t "top hits before filters"
+```
+Expected: FAIL because filters currently render before results.
+
+**Step 3: Implement answer-first layout**
+
+When `query.trim().length > 0`, render top hits/results immediately after the input. Move filters into a collapsible/secondary section below the first result group on mobile, while keeping filters visible or expanded on wider screens if that matches the existing desktop layout.
+
+**Step 4: Run test to verify pass**
+
+Run:
+```bash
+npm run test -- tests/components/search-box.test.tsx
+npm run build:app
+PLAYWRIGHT_PROD=1 PLAYWRIGHT_PORT=3057 npx playwright test tests/e2e/critical-search.spec.ts tests/e2e/accessibility-mobile.spec.ts --workers=1 --timeout=120000
+```
+Expected: PASS and no horizontal overflow at `360px`.
+
+**Step 5: Commit**
+
+```bash
+git add components/search-box.tsx tests/components/search-box.test.tsx tests/e2e/critical-search.spec.ts tests/e2e/accessibility-mobile.spec.ts
+git commit -S -m "fix: show search answers before mobile filters"
+```
+
+### Task 20: Make release page hydration-safe, mobile-safe and touch-target tested
+
+**Objective:** Ensure `/release` works on 360px mobile if it remains linked from `/mer`, and avoid server/client render drift in the device gate.
+
+**Files:**
+- Modify: `components/device-gate-panel.tsx`
+- Modify: `lib/release/device-gate.ts`
 - Modify: `components/release-readiness-tool.tsx`
 - Modify: `tests/e2e/accessibility-mobile.spec.ts`
 - Modify: `tests/e2e/mobile-offline-performance.spec.ts` if `/release` should be cached/covered
+- Test: `tests/components/device-gate-panel.test.tsx` if created
 - Test: `tests/components/release-readiness-tool.test.tsx`
 
 **Step 1: Write failing E2E**
 
-Add `/release` to no-horizontal-overflow route list and add a generic visible-control touch target check for `button`, `a`, `input`, `select`, and `textarea` on critical routes.
+Add `/release` to no-horizontal-overflow route list and add a generic visible-control touch target check for `button`, `a`, `input`, `select`, `textarea`, and labeled checkbox rows on critical routes.
 
 **Step 2: Run test to verify failure**
 
@@ -1138,24 +1256,28 @@ PLAYWRIGHT_PROD=1 PLAYWRIGHT_PORT=3051 npx playwright test tests/e2e/accessibili
 ```
 Expected: likely FAIL on `/release` layout/control sizes.
 
-**Step 3: Implement responsive release layout**
+**Step 3: Implement hydration-safe device detection**
 
-Convert fixed grid/table-like rows into stacked cards under `sm`. Ensure all interactive controls have `min-h-11` or larger.
+Render a stable initial device-gate state on the server and first client pass. Move `loadPersistedGate()` and `runAutoDetect()` into `useEffect`, then update the visible score/checks after hydration. Add a test or production browser assertion that `/release` does not log hydration mismatch text.
 
-**Step 4: Run test to verify pass**
+**Step 4: Implement responsive release layout**
+
+Convert fixed grid/table-like rows into stacked cards under `sm`. Ensure all interactive controls and their labels have `min-h-11` or larger, including the DeviceGatePanel confirm checkboxes.
+
+**Step 5: Run test to verify pass**
 
 Run:
 ```bash
-npm run test -- tests/components/release-readiness-tool.test.tsx
+npm run test -- tests/components/release-readiness-tool.test.tsx tests/components/device-gate-panel.test.tsx
 npm run build:app
 PLAYWRIGHT_PROD=1 PLAYWRIGHT_PORT=3051 npx playwright test tests/e2e/accessibility-mobile.spec.ts --workers=1 --timeout=120000
 ```
 Expected: PASS.
 
-**Step 5: Commit**
+**Step 6: Commit**
 
 ```bash
-git add components/release-readiness-tool.tsx tests/components/release-readiness-tool.test.tsx tests/e2e/accessibility-mobile.spec.ts
+git add components/device-gate-panel.tsx lib/release/device-gate.ts components/release-readiness-tool.tsx tests/components/device-gate-panel.test.tsx tests/components/release-readiness-tool.test.tsx tests/e2e/accessibility-mobile.spec.ts
 git commit -S -m "fix: make release board mobile safe"
 ```
 
@@ -1206,6 +1328,256 @@ Expected: PASS.
 ```bash
 git add components/release-readiness-tool.tsx docs/ui-operational-command-surface.md README.md tests/components/release-readiness-tool.test.tsx tests/docs/group-14-docs.test.ts
 git commit -S -m "docs: clarify generated workplan artifact wording"
+```
+
+### Task 21A: Reprioritize map and field-mode first-screen actions
+
+**Objective:** Make `/kart` and `/feltmodus` start with the actions field users are most likely to need: active mission target, add marker, write log, open checklist, export status, and search.
+
+**Files:**
+- Modify: `components/offline-map-panel.tsx`
+- Modify: `components/field-mode-panel.tsx`
+- Modify: `lib/field-mode/field-mode.ts` if quick-action ordering changes
+- Test: `tests/components/offline-map-panel.test.tsx`
+- Test: `tests/components/field-mode-panel.test.tsx` if created
+- Test: `tests/e2e/map-log-mission-flow.spec.ts`
+- Test: `tests/e2e/core-mobile-journey.spec.ts`
+
+**Step 1: Write failing tests**
+
+Add component or E2E assertions that, at `360px`, the first mobile viewport exposes the primary action group before local map package/cache controls and before field-mode settings.
+
+```tsx
+it('shows field map actions before package management controls', () => {
+  render(<OfflineMapPanel />);
+  const addMarker = screen.getByRole('button', { name: /Legg til lokal markør/i });
+  const packageControls = screen.getByText(/kartpakke|offline-kart/i);
+  expect(addMarker.compareDocumentPosition(packageControls) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+```
+
+**Step 2: Run test to verify failure**
+
+Run:
+```bash
+npm run test -- tests/components/offline-map-panel.test.tsx tests/components/field-mode-panel.test.tsx
+```
+Expected: FAIL where current layout puts package/settings content before the action group.
+
+**Step 3: Implement layout-only reprioritization**
+
+On `/kart`, keep the schematic map near the top, then place the active-mission target, marker form, and map-to-log action before package/cache controls. On `/feltmodus`, place quick actions before settings/theme controls. Move secondary controls under an “Avansert” or lower-priority section without changing persistence semantics.
+
+**Step 4: Run test to verify pass**
+
+Run:
+```bash
+npm run test -- tests/components/offline-map-panel.test.tsx tests/components/field-mode-panel.test.tsx
+npm run build:app
+PLAYWRIGHT_PROD=1 PLAYWRIGHT_PORT=3058 npx playwright test tests/e2e/map-log-mission-flow.spec.ts tests/e2e/core-mobile-journey.spec.ts tests/e2e/accessibility-mobile.spec.ts --workers=1 --timeout=120000
+```
+Expected: PASS.
+
+**Step 5: Commit**
+
+```bash
+git add components/offline-map-panel.tsx components/field-mode-panel.tsx lib/field-mode/field-mode.ts tests/components/offline-map-panel.test.tsx tests/components/field-mode-panel.test.tsx tests/e2e/map-log-mission-flow.spec.ts tests/e2e/core-mobile-journey.spec.ts tests/e2e/accessibility-mobile.spec.ts
+git commit -S -m "fix: prioritize field actions on map and field mode"
+```
+
+### Task 21B: Lift phase-specific operational CTAs above generic card content
+
+**Objective:** Make `/for`, `/under`, and `/etter` follow the intended operational flow: phase context, next action, checklist/export/source controls, then deeper reading.
+
+**Files:**
+- Modify: `components/action-card-list.tsx` if PhasePageContent needs slots
+- Modify: `app/(app)/for/page.tsx`
+- Modify: `app/(app)/under/page.tsx`
+- Modify: `app/(app)/etter/page.tsx`
+- Test: `tests/components/phase-pages.test.tsx`
+- Test: `tests/e2e/full-for-under-etter-journey.spec.ts`
+
+**Step 1: Write failing test**
+
+```tsx
+it('renders phase operational actions before generic phase cards', () => {
+  render(<ForPage />);
+  const primaryAction = screen.getByRole('link', { name: /opprett|åpne oppdrag|sjekkliste/i });
+  const cardSection = screen.getByRole('region', { name: /tiltakskort|kort/i });
+  expect(primaryAction.compareDocumentPosition(cardSection) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+```
+
+**Step 2: Run test to verify failure**
+
+Run:
+```bash
+npm run test -- tests/components/phase-pages.test.tsx -t "operational actions before"
+```
+Expected: FAIL if page-specific actions are still appended after `PhasePageContent`.
+
+**Step 3: Implement slots or reorder page composition**
+
+Prefer a small `PhasePageContent` slot/prop for `primaryOperationalContent` so each phase can inject CTAs above long card/checklist lists without duplicating the whole phase layout. Keep source and caution copy intact.
+
+**Step 4: Run test to verify pass**
+
+Run:
+```bash
+npm run test -- tests/components/phase-pages.test.tsx
+npm run build:app
+PLAYWRIGHT_PROD=1 PLAYWRIGHT_PORT=3059 npx playwright test tests/e2e/full-for-under-etter-journey.spec.ts tests/e2e/accessibility-mobile.spec.ts --workers=1 --timeout=120000
+```
+Expected: PASS.
+
+**Step 5: Commit**
+
+```bash
+git add components/action-card-list.tsx 'app/(app)/for/page.tsx' 'app/(app)/under/page.tsx' 'app/(app)/etter/page.tsx' tests/components/phase-pages.test.tsx tests/e2e/full-for-under-etter-journey.spec.ts tests/e2e/accessibility-mobile.spec.ts
+git commit -S -m "fix: lift phase operational actions"
+```
+
+### Task 21C: Reduce repeated safety chrome without weakening boundaries
+
+**Objective:** Keep the MVP/local/offline/no-official-command warnings available, but stop repeated notices from crowding first-screen operational actions after a user has already acknowledged them.
+
+**Files:**
+- Modify: `components/app-shell.tsx`
+- Modify: `components/decision-support-notice.tsx`
+- Modify: `components/service-worker-registration.tsx`
+- Modify: `components/mission-context-panel.tsx`
+- Create or modify: `lib/ui/acknowledged-notices.ts`
+- Test: `tests/components/decision-support-notice.test.tsx`
+- Test: `tests/components/mission-context-panel.test.tsx`
+- Test: `tests/e2e/core-mobile-journey.spec.ts`
+
+**Step 1: Write failing tests**
+
+Assert that the global decision-support notice renders in full for a first-time user, can be acknowledged locally, then returns as a compact link/banner instead of a full repeated block. Assert that `/oppdrag/ny` does not render a second full notice when the global shell has already provided it.
+
+**Step 2: Run test to verify failure**
+
+Run:
+```bash
+npm run test -- tests/components/decision-support-notice.test.tsx tests/components/mission-context-panel.test.tsx
+```
+Expected: FAIL because acknowledgement/compaction is not wired yet.
+
+**Step 3: Implement local-only acknowledgement**
+
+Use localStorage only, with copy that says the warning remains available. Keep the compact notice accessible from every operational route and preserve links to limitations, privacy, and sources. Do not remove the first-run warning, and do not hide legal/trust boundaries permanently.
+
+**Step 4: Run test to verify pass**
+
+Run:
+```bash
+npm run test -- tests/components/decision-support-notice.test.tsx tests/components/mission-context-panel.test.tsx
+npm run build:app
+PLAYWRIGHT_PROD=1 PLAYWRIGHT_PORT=3060 npx playwright test tests/e2e/core-mobile-journey.spec.ts tests/e2e/accessibility-mobile.spec.ts --workers=1 --timeout=120000
+```
+Expected: PASS.
+
+**Step 5: Commit**
+
+```bash
+git add components/app-shell.tsx components/decision-support-notice.tsx components/service-worker-registration.tsx components/mission-context-panel.tsx lib/ui/acknowledged-notices.ts tests/components/decision-support-notice.test.tsx tests/components/mission-context-panel.test.tsx tests/e2e/core-mobile-journey.spec.ts tests/e2e/accessibility-mobile.spec.ts
+git commit -S -m "fix: compact acknowledged operational notices"
+```
+
+### Task 21D: Hide implementation-heavy operational copy behind plain-language disclosure
+
+**Objective:** Keep transparency about offline/cache/generated artifacts, but make primary operational surfaces describe consequences in field language.
+
+**Files:**
+- Modify: `components/service-worker-registration.tsx`
+- Modify: `components/decision-support-notice.tsx`
+- Modify: `components/offline-map-panel.tsx`
+- Modify: `components/field-mode-panel.tsx`
+- Modify: `components/release-readiness-tool.tsx` only for release/admin wording that leaks into linked user flows
+- Test: `tests/components/decision-support-notice.test.tsx`
+- Test: `tests/components/offline-map-panel.test.tsx`
+- Test: `tests/components/field-mode-panel.test.tsx` if created
+- Test: `tests/docs/group-14-docs.test.ts`
+
+**Step 1: Write failing tests**
+
+Add copy tests for primary operational surfaces that reject terms such as `MVP`, `post-MVP`, `backend sync`, and raw `service worker` wording outside technical/release contexts. The replacement copy should explain what the user needs to know: local data, cache update available, no cloud sync, and manual export.
+
+**Step 2: Run test to verify failure**
+
+Run:
+```bash
+npm run test -- tests/components/decision-support-notice.test.tsx tests/components/offline-map-panel.test.tsx tests/components/field-mode-panel.test.tsx tests/docs/group-14-docs.test.ts
+```
+Expected: FAIL where primary UI still uses implementation vocabulary.
+
+**Step 3: Implement disclosure copy**
+
+Use plain-language labels in the first line. Put implementation detail in an expandable “Hva betyr dette?” or in release/admin pages. Keep exact no-backend/no-official-system boundaries visible enough for trust and safety.
+
+**Step 4: Run test to verify pass**
+
+Run:
+```bash
+npm run test -- tests/components/decision-support-notice.test.tsx tests/components/offline-map-panel.test.tsx tests/components/field-mode-panel.test.tsx tests/docs/group-14-docs.test.ts
+npm run typecheck
+```
+Expected: PASS.
+
+**Step 5: Commit**
+
+```bash
+git add components/service-worker-registration.tsx components/decision-support-notice.tsx components/offline-map-panel.tsx components/field-mode-panel.tsx components/release-readiness-tool.tsx tests/components/decision-support-notice.test.tsx tests/components/offline-map-panel.test.tsx tests/components/field-mode-panel.test.tsx tests/docs/group-14-docs.test.ts
+git commit -S -m "docs: use field-language for operational copy"
+```
+
+### Task 21E: Make role personalization discoverable
+
+**Objective:** Let new users understand and choose the role lens that changes home/nav priorities without turning the app into onboarding theatre.
+
+**Files:**
+- Modify: `components/home-role-content.tsx`
+- Modify: `components/role-provider-wrapper.tsx` or the existing role provider component
+- Test: `tests/components/home-role-content.test.tsx`
+- Test: `tests/e2e/core-mobile-journey.spec.ts`
+
+**Step 1: Write failing test**
+
+```tsx
+it('offers a first-viewport role lens control on home', () => {
+  render(<HomeRoleContent />);
+  expect(screen.getByRole('radiogroup', { name: /rolle|visning/i })).toBeInTheDocument();
+  expect(screen.getByRole('radio', { name: /lagfører|leder|mannskap/i })).toBeInTheDocument();
+});
+```
+
+**Step 2: Run test to verify failure**
+
+Run:
+```bash
+npm run test -- tests/components/home-role-content.test.tsx -t "role lens"
+```
+Expected: FAIL if the role selector is not directly discoverable on home.
+
+**Step 3: Implement restrained selector**
+
+Use a compact segmented control or radio group near the home hero/actions. Persist the choice with the existing role storage/provider and ensure bottom-nav ordering updates consistently.
+
+**Step 4: Run test to verify pass**
+
+Run:
+```bash
+npm run test -- tests/components/home-role-content.test.tsx
+npm run build:app
+PLAYWRIGHT_PROD=1 PLAYWRIGHT_PORT=3061 npx playwright test tests/e2e/core-mobile-journey.spec.ts tests/e2e/accessibility-mobile.spec.ts --workers=1 --timeout=120000
+```
+Expected: PASS.
+
+**Step 5: Commit**
+
+```bash
+git add components/home-role-content.tsx components/role-provider-wrapper.tsx tests/components/home-role-content.test.tsx tests/e2e/core-mobile-journey.spec.ts tests/e2e/accessibility-mobile.spec.ts
+git commit -S -m "feat: expose role lens on home"
 ```
 
 ### Task 22: Resolve orphan source coverage
@@ -1697,6 +2069,8 @@ Expected: PASS.
 Run:
 ```bash
 PLAYWRIGHT_PROD=1 PLAYWRIGHT_PORT=3053 npx playwright test \
+  tests/e2e/core-mobile-journey.spec.ts \
+  tests/e2e/critical-search.spec.ts \
   tests/e2e/map-log-mission-flow.spec.ts \
   tests/e2e/offline.spec.ts \
   tests/e2e/accessibility-mobile.spec.ts \
@@ -1707,7 +2081,7 @@ Expected: PASS.
 
 **Step 3: Post-implementation audit**
 
-Use `subagent-driven-development/references/post-implementation-audit.md` and `software-development/writing-plans/references/provenance-ui-post-implementation-audit.md`. Re-read changed files; verify no cross-mission leaks, no export privacy leaks, no context cache leakage, no official-authority wording regressions.
+Use `subagent-driven-development/references/post-implementation-audit.md` and `software-development/writing-plans/references/provenance-ui-post-implementation-audit.md`. Re-read changed files; verify no cross-mission leaks, no export privacy leaks, no context cache leakage, no official-authority wording regressions, and no regression to answer-first search or first-screen field actions.
 
 **Step 4: Commit final generated docs if any**
 
@@ -1743,6 +2117,8 @@ If this plan is mirrored to a workplan/release board later, update source metada
 - Controller adjustments before writing plan: removed an unverified claim that role/scenario coverage had zero-count gaps after direct JSON inspection showed no role/scenario zero counts in the current report; kept the confirmed orphan-source gap.
 - Independent plan review #1: NOT APPROVED. Blockers found: context API tasks lacked production-route verification, some Playwright commands could use stale/missing `.next`, map-scope tasks needed explicit no-mission guards and library-level export filtering, Task 13 omitted local import/folder export privacy files, and review history was pending. This revision patches those blockers and also fixes non-blocking issues around missing imports, MET `304`/headers in timeout helper guidance, and production CSP `'unsafe-eval'`.
 - Independent plan review #2: APPROVED. Focused re-review confirmed the blocker patches: context API production E2E added, production Playwright commands build first, map scoping is guarded at save and library export layers, privacy guards cover import/folder export files, review history is complete, and no new command/path blockers were found.
+- UI/UX flow audit addendum: added 2026-06-10 local browser review findings and lettered Phase 3 tasklets for answer-first search, first-screen field actions, phase CTA priority, repeated safety chrome, implementation-heavy copy, role discoverability, and `/release` hydration/touch safety.
+- Current status audit: rechecked the plan against the current worktree on 2026-06-10. Tasks 1-19, 21, and 22-32 are already implemented in the current tree; remaining implementation work is 19A, 20, 21A, 21B, 21C, 21D, 21E, then final closeout Task 33.
 
 ## Execution handoff
 

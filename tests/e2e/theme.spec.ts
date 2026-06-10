@@ -66,7 +66,7 @@ test('dark mode keeps quick cards, map and field log controls usable', async ({ 
   await page.goto('/kart');
   await expectDarkMode(page);
   await expect(page.getByRole('heading', { name: 'Kart', exact: true })).toBeVisible();
-  await expect(page.getByText(/Statisk, lokal og skjematisk/i)).toBeVisible();
+  await expect(page.getByText(/Lokal kartflate for innsatsstøtte/i)).toBeVisible();
 
   await createLocalMission(page, { title: `Dark field log ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Field Log Dark QA' });
   await page.goto('/oppdrag#feltlogg');

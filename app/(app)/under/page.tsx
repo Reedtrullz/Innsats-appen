@@ -19,8 +19,12 @@ function UnderOperationalEntryPoints() {
 export default function Page() {
   return (
     <div className="space-y-5">
-      <PhasePageContent phase="under" cards={getActionCards()} checklists={getChecklists()} />
-      <UnderOperationalEntryPoints />
+      <PhasePageContent
+        phase="under"
+        cards={getActionCards()}
+        checklists={getChecklists()}
+        primaryOperationalContent={<UnderOperationalEntryPoints />}
+      />
     </div>
   );
 }

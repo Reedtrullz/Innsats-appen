@@ -130,16 +130,16 @@ function ownerColor(owner: string) {
 }
 
 function statusTone(status: WorkStatus) {
-  if (status === 'completed') return 'text-emerald-600';
-  if (status === 'blocked') return 'text-red-600';
-  if (status === 'in-progress') return 'text-blue-600';
-  return 'text-orange-600';
+  if (status === 'completed') return 'text-emerald-700';
+  if (status === 'blocked') return 'text-red-700';
+  if (status === 'in-progress') return 'text-blue-700';
+  return 'text-orange-700';
 }
 
 function attentionTone(item: ReleaseItem) {
-  if (item.status === 'blocked' || item.risk === 'high') return { ring: 'border-red-500 text-red-600', label: '!', text: 'text-red-600' };
-  if (item.risk === 'medium') return { ring: 'border-orange-500 text-orange-600', label: '?', text: 'text-orange-600' };
-  return { ring: 'border-blue-500 text-blue-600', label: 'i', text: 'text-blue-600' };
+  if (item.status === 'blocked' || item.risk === 'high') return { ring: 'border-red-600 text-red-700', label: '!', text: 'text-red-700' };
+  if (item.risk === 'medium') return { ring: 'border-orange-600 text-orange-700', label: '?', text: 'text-orange-700' };
+  return { ring: 'border-blue-600 text-blue-700', label: 'i', text: 'text-blue-700' };
 }
 
 function stageProgress(status: StageStatus) {
@@ -368,7 +368,7 @@ export function ReleaseReadinessTool() {
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {stages.filter((stage) => stage.id !== 'scope').map((stage) => (
                   <div key={stage.id} className="flex items-center gap-4">
-                    <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 font-black ${stage.color === 'green' ? 'border-emerald-500 text-emerald-600' : stage.color === 'orange' ? 'border-orange-500 text-orange-600' : 'border-blue-600 text-blue-600'}`}>
+                    <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 font-black ${stage.color === 'green' ? 'border-emerald-600 text-emerald-700' : stage.color === 'orange' ? 'border-orange-600 text-orange-700' : 'border-blue-600 text-blue-700'}`}>
                       {stage.shortTitle.slice(0, 1)}
                     </div>
                     <div>
@@ -393,12 +393,12 @@ export function ReleaseReadinessTool() {
                         <button
                           type="button"
                           onClick={() => setStageStatus(stage.id, status === 'ready' ? 'in-progress' : status === 'in-progress' ? 'not-started' : 'ready')}
-                          className={`grid h-11 w-11 place-items-center rounded-full border-4 bg-white text-sm font-black ${status === 'ready' ? 'border-blue-600 text-blue-600' : status === 'in-progress' ? 'border-orange-500 text-orange-500' : 'border-slate-400 text-slate-500'}`}
+                          className={`grid h-11 w-11 place-items-center rounded-full border-4 bg-white text-sm font-black ${status === 'ready' ? 'border-blue-600 text-blue-700' : status === 'in-progress' ? 'border-orange-600 text-orange-700' : 'border-slate-400 text-slate-500'}`}
                           aria-label={`${stage.title} status`}
                         >
                           {status === 'ready' ? '✓' : index + 1}
                         </button>
-                        {status === 'in-progress' ? <span className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap rounded-md border border-orange-300 bg-orange-50 px-3 py-1 text-xs font-black text-orange-600">You are here</span> : null}
+                        {status === 'in-progress' ? <span className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap rounded-md border border-orange-300 bg-orange-50 px-3 py-1 text-xs font-black text-orange-700">You are here</span> : null}
                       </div>
                     );
                   })}
@@ -453,7 +453,7 @@ export function ReleaseReadinessTool() {
                         <p className="text-sm font-semibold text-slate-500">{stage.description}</p>
                       </div>
                       <span className={`inline-grid h-11 w-11 place-items-center rounded-full text-sm font-black ${ownerColor(owner)}`}>{owner}</span>
-                      <p className={`font-black ${hasPilotBlockingCoverageGaps ? 'text-red-700' : atRisk ? 'text-orange-600' : 'text-emerald-600'}`}>{stageRiskLabel}</p>
+                      <p className={`font-black ${hasPilotBlockingCoverageGaps ? 'text-red-700' : atRisk ? 'text-orange-700' : 'text-emerald-700'}`}>{stageRiskLabel}</p>
                     </article>
                   );
                 })}
@@ -547,7 +547,7 @@ export function ReleaseReadinessTool() {
             <section id="release-export" className="mt-6 rounded-2xl bg-slate-100 p-4">
               <h2 className="text-xl font-black">Local export</h2>
               <p className="mt-1 text-sm font-semibold text-slate-600">Stored only in this browser. Copy this snapshot into a release issue or planning note when needed. Exported snapshots may contain operationally sensitive planning information; handle them according to local routines.</p>
-              <pre className="mt-3 max-h-56 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-xl bg-slate-950 p-3 text-xs text-slate-100">{exportText}</pre>
+              <pre tabIndex={0} aria-label="Lokal release-eksport" className="mt-3 max-h-56 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-xl bg-slate-950 p-3 text-xs text-slate-100">{exportText}</pre>
             </section>
           </main>
 

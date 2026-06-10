@@ -133,9 +133,9 @@ it('discloses the outbound boundary for public context lookups in mission creati
   await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} actionCards={[]} />);
 
   const text = document.body.textContent ?? '';
-  expect(text).toContain('MET/Kartverket/NVE');
-  expect(text).toContain('posisjon eller søketekst vil bli sendt til offentlige API-er');
-  expect(text).toContain('oppdragsnotater og privat tekst forblir lokalt');
+  expect(text).toContain('Offentlig kontekst bruker bare valgt posisjon eller søketekst');
+  expect(text).toContain('Oppdragsnotater og privat tekst forblir lokalt');
+  expect(screen.queryByRole('region', { name: /Operativ grense og lokal datalagring/i })).not.toBeInTheDocument();
 });
 
 it('stores the checklist that matches the selected mission scenario and phase', async () => {

@@ -267,7 +267,7 @@ function SchematicMap({ packageId, state, enabledLayers }: { packageId: string; 
     <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 text-white shadow-sm" aria-label="Skjematisk lokalkart">
       <svg viewBox="0 0 100 100" role="img" aria-labelledby="offline-map-title offline-map-desc" className="h-72 w-full bg-slate-900">
         <title id="offline-map-title">{`Skjematisk lokalt kart for ${selectedPackage.title}`}</title>
-        <desc id="offline-map-desc">Statisk SVG-kart uten eksterne kartfliser eller nettverkskall.</desc>
+        <desc id="offline-map-desc">Statisk kartbilde uten eksterne kartkall.</desc>
         <defs>
           <pattern id="offline-map-grid" width="10" height="10" patternUnits="userSpaceOnUse">
             <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.35" />
@@ -308,7 +308,7 @@ function SchematicMap({ packageId, state, enabledLayers }: { packageId: string; 
         <p>{OFFLINE_MAP_ATTRIBUTION}</p>
         <p>{OFFLINE_MAP_LIMITATION_COPY}</p>
         <p data-testid="map-performance-guard">
-          Ytelsesvern: viser maks {renderedFeatures.length} skjematiske markører i SVG-et{hiddenFeatureCount ? ` (${hiddenFeatureCount} skjult)` : ''}. Operative lokale lag: {renderedOperations.length}{hiddenOperationCount > 0 ? ` (${hiddenOperationCount} skjult)` : ''}.
+          Ytelsesvern: viser maks {renderedFeatures.length} skjematiske markører i kartbildet{hiddenFeatureCount ? ` (${hiddenFeatureCount} skjult)` : ''}. Operative lokale lag: {renderedOperations.length}{hiddenOperationCount > 0 ? ` (${hiddenOperationCount} skjult)` : ''}.
         </p>
       </figcaption>
     </figure>
@@ -464,7 +464,7 @@ export function OfflineMapPanel() {
 
     mapPackageCacheSavingRef.current = true;
     setMapPackageCacheSaving(true);
-    setStatusMessage('Forhåndscacher lokal PMTiles-kartpakke til CacheStorage.');
+    setStatusMessage('Lagrer lokal kartpakke på denne enheten.');
     const localPackage = localMapPackageForId(packageToCache.id);
     if (!localPackage) {
       setStatusMessage('Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline.');
@@ -483,7 +483,7 @@ export function OfflineMapPanel() {
         return;
       }
       writeCachedOfflineMapPackage(packageToCache.id);
-      setStatusMessage('Lokal PMTiles-kartpakke er forhåndscachet og aktivert offline.');
+      setStatusMessage('Lokal kartpakke er lagret og aktivert offline.');
     } catch {
       setStatusMessage('Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline.');
     } finally {
@@ -788,7 +788,7 @@ export function OfflineMapPanel() {
         <p className="text-sm font-semibold uppercase tracking-wide text-sky-200">Offline kart</p>
         <h1 className="text-3xl font-black">Kart</h1>
         <p className="mt-2 text-sm text-sky-100">
-          Statisk, lokal og skjematisk kartflate for innsatsstøtte. Ingen eksterne kartfliser, kart-API-er, backend sync eller persondata.
+          Lokal kartflate for innsatsstøtte. Kart, markører og logger blir på enheten; ikke legg inn persondata eller skjermede posisjoner.
         </p>
       </div>
 
@@ -807,76 +807,6 @@ export function OfflineMapPanel() {
         <SchematicMap packageId={selectedSchematicPackage.id} state={filteredState} enabledLayers={enabledLayers} />
       )}
 
-      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Lokale kartpakker">
-        <div>
-          <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Lokale kartpakker</p>
-          <h2 className="text-2xl font-black">Velg skjematisk område og godkjent PMTiles-cache</h2>
-          <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">
-            Skjematiske lokalkart fungerer alltid offline i appen. App-lokale PMTiles- og stilfiler kan bare forhåndscaches til CacheStorage for offline bruk når en egen kilde-, lisens- og pilotgodkjent pakke finnes i manifestet. Ingen ekstern tile-provider, backend-sync eller deling med oppdrag eller andre enheter brukes.
-          </p>
-        </div>
-        <label className="block text-sm font-black text-slate-800" htmlFor="offline-schematic-map-package">Velg skjematisk kartpakke</label>
-        <select id="offline-schematic-map-package" aria-label="Velg skjematisk kartpakke" value={selectedSchematicPackage.id} onChange={(event) => selectSchematicPackage(event.target.value)} className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-3 text-base font-semibold text-slate-950">
-          {OFFLINE_MAP_PACKAGES.map((mapPackage) => (
-            <option key={mapPackage.id} value={mapPackage.id}>
-              {mapPackage.title} ({mapPackage.estimatedSizeMb} MB skjematisk)
-            </option>
-          ))}
-        </select>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700">
-          <p className="font-black text-slate-950">{selectedSchematicPackage.title}</p>
-          <p className="mt-1">Område: {selectedSchematicPackage.district}</p>
-          <p className="mt-1">{selectedSchematicPackage.description}</p>
-          <p className="mt-1">Skjematisk anslag: {selectedSchematicPackage.estimatedSizeMb} MB. Versjon: {selectedSchematicPackage.version}.</p>
-          <p className="mt-3 rounded-xl bg-sky-50 p-3 font-black text-sky-950">Skjematisk kart beholdes som fallback når PMTiles ikke finnes, ikke er cachet eller ikke er aktivert.</p>
-        </div>
-
-        {hasApprovedPmtilesPackages && selectedPmtilesPackage ? (
-          <>
-            <label className="block text-sm font-black text-slate-800" htmlFor="offline-map-package">Velg lokal kartpakke</label>
-            <select id="offline-map-package" aria-label="Velg lokal kartpakke" value={selectedPmtilesPackage.id} onChange={(event) => selectPmtilesPackage(event.target.value)} className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-3 text-base font-semibold text-slate-950">
-              {approvedLocalMapPackages.map((mapPackage) => (
-                <option key={mapPackage.id} value={mapPackage.id}>
-                  {mapPackage.title} (lokal PMTiles)
-                </option>
-              ))}
-            </select>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700">
-              <p className="font-black text-slate-950">{selectedPmtilesPackage.title}</p>
-              <p className="mt-1">Godkjent lokal PMTiles-pakke fra app-lokal fil.</p>
-              <p className="mt-1">PMTiles: {selectedPmtilesPackage.url}. Stil: {selectedPmtilesPackage.styleUrl}.</p>
-              <p className="mt-1">Skjematisk kart beholdes som fallback når PMTiles ikke er cachet eller aktivert.</p>
-              <p className="mt-1">Anslått lokal cache: {selectedPmtilesPackage.estimatedSizeMb} MB. Versjon: {selectedPmtilesPackage.version}.</p>
-              {selectedWarning ? <p className="mt-3 rounded-xl bg-orange-100 p-3 font-black text-orange-950">{selectedWarning}</p> : null}
-              <p className="mt-3 rounded-xl bg-sky-50 p-3 font-black text-sky-950" data-testid="offline-map-quota-copy">{selectedQuotaCopy}</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <button type="button" onClick={() => void cacheSelectedPackage()} disabled={mapPackageCacheSaving} className="min-h-11 rounded-xl bg-sky-900 px-4 font-black text-white disabled:cursor-wait disabled:bg-slate-500">{mapPackageCacheSaving ? 'Forhåndscacher kartpakke lokalt…' : 'Lagre valgt kartpakke lokalt'}</button>
-              <button type="button" onClick={resetCache} className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 font-black text-slate-950">Tilbakestill kartcache</button>
-            </div>
-          </>
-        ) : (
-          <p className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm font-semibold text-amber-950">
-            Ingen godkjente PMTiles-pakker er tilgjengelige ennå. Det skjematiske lokalkartet fungerer fortsatt offline; ekte PMTiles-pakker krever egen kilde-, lisens- og pilotgodkjenning før caching.
-          </p>
-        )}
-
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700" data-testid="offline-map-cache-status">
-          {cachedPackage ? (
-            <>
-              <p>Cachet lokalt: {cachedPackage.title} ({cachedPackage.estimatedSizeMb} MB), versjon {cachedPackage.version}. Lagret {cachedPackage.cachedAt.slice(0, 10)}.</p>
-              <p>Lokal kartpakke aktiv: {cachedPackage.title}{cachedPackage.runtimeFormat === 'pmtiles' ? ' (lokal PMTiles)' : ' (skjematisk fallback)'}</p>
-            </>
-          ) : <p>Ingen kartpakke er cachet lokalt.</p>}
-        </div>
-      </section>
-
-      <section className="space-y-4 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-sm font-semibold text-amber-950" aria-label="Personvern ved kartdata">
-        <h2 className="text-xl font-black">Personvernvarsel for lokasjonsdata</h2>
-        <p>{LOCATION_EXPORT_PRIVACY_WARNING}</p>
-        <p>Bruk skjematiske 0-100-koordinater. Ikke skriv ekte adresser, personnavn, pasientdata eller skjermede posisjoner.</p>
-      </section>
-
       <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Lokale markører og lag">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -885,6 +815,9 @@ export function OfflineMapPanel() {
           </div>
           <p className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700" data-testid="operations-map-status">{statusMessage}</p>
         </div>
+        <p className="rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">
+          Kartarbeid for: {activeMission ? activeMission.title : 'Ingen aktivt lokalt oppdrag funnet'}. Bruk skjematiske 0-100-koordinater. Ikke skriv ekte adresser, personnavn, pasientdata eller skjermede posisjoner.
+        </p>
         {mapPrivacyError ? (
           <p role="alert" className="rounded-2xl border border-rose-200 bg-rose-50 p-3 text-sm font-semibold text-rose-900">
             {mapPrivacyError}
@@ -1014,6 +947,76 @@ export function OfflineMapPanel() {
         </div>
       </section>
 
+      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Lokale kartpakker">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Avansert kartoppsett</p>
+          <h2 className="text-2xl font-black">Velg skjematisk område og lokal kartpakke</h2>
+          <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">
+            Skjematiske lokalkart fungerer alltid offline i appen. Godkjente lokale kartpakker kan lagres på enheten for bruk uten nett. Ingen kart deles med oppdrag eller andre enheter.
+          </p>
+        </div>
+        <label className="block text-sm font-black text-slate-800" htmlFor="offline-schematic-map-package">Velg skjematisk kartpakke</label>
+        <select id="offline-schematic-map-package" aria-label="Velg skjematisk kartpakke" value={selectedSchematicPackage.id} onChange={(event) => selectSchematicPackage(event.target.value)} className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-3 text-base font-semibold text-slate-950">
+          {OFFLINE_MAP_PACKAGES.map((mapPackage) => (
+            <option key={mapPackage.id} value={mapPackage.id}>
+              {mapPackage.title} ({mapPackage.estimatedSizeMb} MB skjematisk)
+            </option>
+          ))}
+        </select>
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700">
+          <p className="font-black text-slate-950">{selectedSchematicPackage.title}</p>
+          <p className="mt-1">Område: {selectedSchematicPackage.district}</p>
+          <p className="mt-1">{selectedSchematicPackage.description}</p>
+          <p className="mt-1">Skjematisk anslag: {selectedSchematicPackage.estimatedSizeMb} MB. Versjon: {selectedSchematicPackage.version}.</p>
+          <p className="mt-3 rounded-xl bg-sky-50 p-3 font-black text-sky-950">Skjematisk kart beholdes som reserve når lokal kartpakke ikke er lagret eller aktivert.</p>
+        </div>
+
+        {hasApprovedPmtilesPackages && selectedPmtilesPackage ? (
+          <>
+            <label className="block text-sm font-black text-slate-800" htmlFor="offline-map-package">Velg lokal kartpakke</label>
+            <select id="offline-map-package" aria-label="Velg lokal kartpakke" value={selectedPmtilesPackage.id} onChange={(event) => selectPmtilesPackage(event.target.value)} className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-3 text-base font-semibold text-slate-950">
+              {approvedLocalMapPackages.map((mapPackage) => (
+                <option key={mapPackage.id} value={mapPackage.id}>
+                  {mapPackage.title} (lokal PMTiles)
+                </option>
+              ))}
+            </select>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700">
+              <p className="font-black text-slate-950">{selectedPmtilesPackage.title}</p>
+              <p className="mt-1">Godkjent lokal kartpakke fra app-lokal fil.</p>
+              <p className="mt-1">PMTiles: {selectedPmtilesPackage.url}. Stil: {selectedPmtilesPackage.styleUrl}.</p>
+              <p className="mt-1">Skjematisk kart beholdes som reserve når lokal kartpakke ikke er lagret eller aktivert.</p>
+              <p className="mt-1">Anslått lokal lagring: {selectedPmtilesPackage.estimatedSizeMb} MB. Versjon: {selectedPmtilesPackage.version}.</p>
+              {selectedWarning ? <p className="mt-3 rounded-xl bg-orange-100 p-3 font-black text-orange-950">{selectedWarning}</p> : null}
+              <p className="mt-3 rounded-xl bg-sky-50 p-3 font-black text-sky-950" data-testid="offline-map-quota-copy">{selectedQuotaCopy}</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button type="button" onClick={() => void cacheSelectedPackage()} disabled={mapPackageCacheSaving} className="min-h-11 rounded-xl bg-sky-900 px-4 font-black text-white disabled:cursor-wait disabled:bg-slate-500">{mapPackageCacheSaving ? 'Lagrer kartpakke lokalt...' : 'Lagre valgt kartpakke lokalt'}</button>
+              <button type="button" onClick={resetCache} className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 font-black text-slate-950">Tilbakestill kartcache</button>
+            </div>
+          </>
+        ) : (
+          <p className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm font-semibold text-amber-950">
+            Ingen godkjente lokale kartpakker er tilgjengelige ennå. Det skjematiske lokalkartet fungerer fortsatt offline; full kartpakke krever egen kilde-, lisens- og pilotgodkjenning før lokal lagring.
+          </p>
+        )}
+
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700" data-testid="offline-map-cache-status">
+          {cachedPackage ? (
+            <>
+              <p>Lagret lokalt: {cachedPackage.title} ({cachedPackage.estimatedSizeMb} MB), versjon {cachedPackage.version}. Lagret {cachedPackage.cachedAt.slice(0, 10)}.</p>
+              <p>Lokal kartpakke aktiv: {cachedPackage.title}{cachedPackage.runtimeFormat === 'pmtiles' ? ' (lokal PMTiles)' : ' (skjematisk reserve)'}</p>
+            </>
+          ) : <p>Ingen kartpakke er lagret lokalt.</p>}
+        </div>
+      </section>
+
+      <section className="space-y-4 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-sm font-semibold text-amber-950" aria-label="Personvern ved kartdata">
+        <h2 className="text-xl font-black">Personvern ved kartdata</h2>
+        <p>{LOCATION_EXPORT_PRIVACY_WARNING}</p>
+        <p>Bruk skjematiske 0-100-koordinater. Ikke skriv ekte adresser, personnavn, pasientdata eller skjermede posisjoner.</p>
+      </section>
+
       <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Kart eksport og import">
         <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Eksport/import</p>
         <h2 className="text-2xl font-black">Lokal SVG og GeoJSON</h2>
@@ -1028,8 +1031,8 @@ export function OfflineMapPanel() {
         <button type="button" onClick={importGeoJson} className="min-h-11 rounded-xl border border-slate-300 px-4 font-black text-slate-950">Importer GeoJSON lokalt</button>
       </section>
 
-      <section className="space-y-3 rounded-3xl border border-slate-200 bg-white p-5 text-sm font-semibold text-slate-700" aria-label="Post-MVP kartintegrasjoner">
-        <h2 className="text-xl font-black text-slate-950">Post-MVP vurderinger</h2>
+      <section className="space-y-3 rounded-3xl border border-slate-200 bg-white p-5 text-sm font-semibold text-slate-700" aria-label="Fremtidige kartvalg">
+        <h2 className="text-xl font-black text-slate-950">Fremtidige kartvalg</h2>
         <p><span className="font-black">KML:</span> {KML_IMPORT_EVALUATION.decision}</p>
         <p><span className="font-black">QR/fil for sektor:</span> {QR_SECTOR_IMPORT_DESIGN.summary}</p>
         <p><span className="font-black">Blue-force/live posisjon:</span> {BLUE_FORCE_TRACKING_RESEARCH.decision}</p>
@@ -1039,7 +1042,7 @@ export function OfflineMapPanel() {
         <h2 className="text-xl font-black text-slate-950">Attribusjon og begrensninger</h2>
         <p className="mt-2">{OFFLINE_MAP_ATTRIBUTION}</p>
         <p className="mt-2">{OFFLINE_MAP_LIMITATION_COPY}</p>
-        <p className="mt-2">MVP-en bruker bare godkjente app-lokale PMTiles/MapLibre-pakker når de er cachet; ingen MBTiles-runtime, Leaflet, OpenStreetMap-fliser, rå oppstrømsgeometri eller delt live-posisjon.</p>
+        <p className="mt-2">Appen bruker bare godkjente lokale kartpakker når de er lagret på enheten. Den bruker ikke rå kartdata fra eksterne kilder eller delt live-posisjon.</p>
       </section>
     </section>
   );

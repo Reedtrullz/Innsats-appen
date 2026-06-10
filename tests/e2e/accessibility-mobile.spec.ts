@@ -5,7 +5,7 @@ import { clearBrowserLocalState, createLocalMission, openMissionDetails, openMis
 
 test.use({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
 
-const mobileLayoutRoutes = ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/under', '/etter', '/feltmodus', '/moduler/tilfluktsrom'];
+const mobileLayoutRoutes = ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/under', '/etter', '/feltmodus', '/moduler/tilfluktsrom', '/release'];
 
 async function expectNoHorizontalOverflow(page: import('@playwright/test').Page) {
   const overflow = await page.evaluate(() => ({
@@ -40,14 +40,34 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('critical mobile routes have no automated WCAG A/AA accessibility violations', async ({ page }) => {
-  for (const route of ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/feltmodus']) {
+  for (const route of ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/feltmodus', '/release']) {
     await page.goto(route);
-    await expect(page.getByRole('navigation', { name: /Hovednavigasjon/i })).toBeVisible();
+    if (route === '/release') {
+      await expect(page.getByRole('heading', { name: /Pilotklar sjekkliste/i })).toBeVisible();
+    } else {
+      await expect(page.getByRole('navigation', { name: /Hovednavigasjon/i })).toBeVisible();
+    }
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .analyze();
     expect(results.violations, `${route} accessibility violations: ${JSON.stringify(results.violations, null, 2)}`).toEqual([]);
   }
+});
+
+test('release route has no hydration mismatch console errors', async ({ page }) => {
+  const hydrationMessages: string[] = [];
+  page.on('console', (message) => {
+    const text = message.text();
+    if (/hydration|server rendered html|did not match/i.test(text)) hydrationMessages.push(text);
+  });
+  page.on('pageerror', (error) => {
+    const text = error.message;
+    if (/hydration|server rendered html|did not match/i.test(text)) hydrationMessages.push(text);
+  });
+
+  await page.goto('/release');
+  await expect(page.getByRole('heading', { name: /Pilotklar sjekkliste/i })).toBeVisible();
+  expect(hydrationMessages).toEqual([]);
 });
 
 test('mobile layout has no horizontal overflow and visible controls have large enough touch targets', async ({ page }) => {
@@ -160,7 +180,7 @@ test('map and field-mode controls expose screen-reader labels', async ({ page })
   await page.goto('/kart');
   const mapPackageRegion = page.getByRole('region', { name: /Lokale kartpakker/i });
   await expect(mapPackageRegion.getByRole('combobox', { name: /Velg skjematisk kartpakke/i })).toBeVisible();
-  await expect(mapPackageRegion.getByText(/Ingen godkjente PMTiles-pakker er tilgjengelige/i)).toBeVisible();
+  await expect(mapPackageRegion.getByText(/Ingen godkjente lokale kartpakker er tilgjengelige/i)).toBeVisible();
   await expect(page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Tilbakestill kartcache/i })).toHaveCount(0);
 

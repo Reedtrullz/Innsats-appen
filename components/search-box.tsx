@@ -195,6 +195,131 @@ export function SearchBox({
     resetFilters();
     window.history.pushState(null, '', resetFiltersHref);
   }
+
+  const filterControls = enableFilters ? (
+    <fieldset className="mt-4 space-y-3 rounded-2xl bg-slate-50 p-3" aria-label="Søkefiltre">
+      <legend className="sr-only">Søkefiltre</legend>
+      <div className="flex flex-wrap gap-2">
+        {PHASE_FILTERS.map((phase) => (
+          <button
+            key={phase.value}
+            type="button"
+            className={chipClass(activePhase === phase.value)}
+            aria-pressed={activePhase === phase.value}
+            onClick={() => setActivePhase((current) => (current === phase.value ? null : phase.value))}
+          >
+            Fase: {phase.label}
+          </button>
+        ))}
+      </div>
+      {typeFilters.length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          {typeFilters.map((type) => (
+            <button
+              key={type}
+              type="button"
+              className={chipClass(activeType === type)}
+              aria-pressed={activeType === type}
+              onClick={() => setActiveType((current) => (current === type ? null : type))}
+            >
+              Type: {type}
+            </button>
+          ))}
+        </div>
+      ) : null}
+      {sourceStatusFilters.length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          {sourceStatusFilters.map((status) => (
+            <button
+              key={status}
+              type="button"
+              className={chipClass(activeSourceStatus === status)}
+              aria-pressed={activeSourceStatus === status}
+              onClick={() => setActiveSourceStatus((current) => (current === status ? null : status))}
+            >
+              Kilde: {status}
+            </button>
+          ))}
+        </div>
+      ) : null}
+      {hasActiveFilters ? (
+        <button
+          type="button"
+          className="min-h-11 rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700"
+          onClick={resetFilters}
+        >
+          Fjern aktive filtre
+        </button>
+      ) : null}
+    </fieldset>
+  ) : null;
+
+  const emptyState = query && results.length === 0 ? (
+    <div className="mt-3 space-y-2 text-sm text-slate-700">
+      {filtersHideResults ? (
+        <>
+          <p className="font-semibold">{rawResults.length} treff skjult av filtre.</p>
+          <Link
+            className="inline-flex min-h-11 items-center rounded-full bg-[#082F49] px-4 text-sm font-black text-white"
+            href={resetFiltersHref}
+            onClick={resetFiltersAndPreserveQuery}
+          >
+            Nullstill filtre
+          </Link>
+        </>
+      ) : (
+        <p className="font-semibold">Ingen treff. Prøv et kjent fagord.</p>
+      )}
+      {!filtersHideResults && suggestions.length > 0 ? (
+        <div>
+          <p className="text-slate-600">Mente du:</p>
+          <ul className="mt-1 flex flex-wrap gap-2">
+            {suggestions.map((suggestion) => (
+              <li key={suggestion}>
+                <Link
+                  className="inline-flex min-h-11 items-center rounded-full bg-sky-50 px-3 py-1 font-bold text-sky-900"
+                  href={searchPath(suggestionBasePath, suggestion)}
+                  onClick={() => setManualQuery(null)}
+                >
+                  {suggestion}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  ) : null;
+
+  const resultsContent = (
+    <div className="mt-3 space-y-3">
+      {topHits.length > 0 ? (
+        <div>
+          <h2 className="text-sm font-black uppercase tracking-wide text-slate-500">Topptreff</h2>
+          <ul className="mt-2 space-y-2">
+            {topHits.map((doc) => (
+              <li key={doc.id}>
+                <SearchResultRow doc={doc} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      {Object.entries(grouped).map(([type, docs]) => (
+        <div key={type}>
+          <h2 className="text-sm font-black uppercase tracking-wide text-slate-500">{topHits.length > 0 ? `Andre treff · ${type}` : type}</h2>
+          <ul className="mt-2 space-y-2">
+            {docs.map((doc) => (
+              <li key={doc.id}>
+                <SearchResultRow doc={doc} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Lokalt søk">
       <label className="text-sm font-black text-slate-800" htmlFor="stress-search">Søk lokalt i tiltak, kilder og moduler</label>
@@ -211,125 +336,18 @@ export function SearchBox({
       </div>
       {freshnessLabel ? <p className="mt-2 text-xs font-semibold text-slate-600">{freshnessLabel}</p> : null}
       {!query ? <p className="mt-3 text-sm text-slate-600">Vanlige stressord: jod, rens, MFE, samband, dose, tilfluktsrom, FIG10.</p> : null}
-      {enableFilters ? (
-        <fieldset className="mt-4 space-y-3 rounded-2xl bg-slate-50 p-3">
-          <legend className="sr-only">Søkefiltre</legend>
-          <div className="flex flex-wrap gap-2">
-            {PHASE_FILTERS.map((phase) => (
-              <button
-                key={phase.value}
-                type="button"
-                className={chipClass(activePhase === phase.value)}
-                aria-pressed={activePhase === phase.value}
-                onClick={() => setActivePhase((current) => (current === phase.value ? null : phase.value))}
-              >
-                Fase: {phase.label}
-              </button>
-            ))}
-          </div>
-          {typeFilters.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {typeFilters.map((type) => (
-                <button
-                  key={type}
-                  type="button"
-                  className={chipClass(activeType === type)}
-                  aria-pressed={activeType === type}
-                  onClick={() => setActiveType((current) => (current === type ? null : type))}
-                >
-                  Type: {type}
-                </button>
-              ))}
-            </div>
-          ) : null}
-          {sourceStatusFilters.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {sourceStatusFilters.map((status) => (
-                <button
-                  key={status}
-                  type="button"
-                  className={chipClass(activeSourceStatus === status)}
-                  aria-pressed={activeSourceStatus === status}
-                  onClick={() => setActiveSourceStatus((current) => (current === status ? null : status))}
-                >
-                  Kilde: {status}
-                </button>
-              ))}
-            </div>
-          ) : null}
-          {hasActiveFilters ? (
-            <button
-              type="button"
-              className="min-h-11 rounded-full border border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700"
-              onClick={resetFilters}
-            >
-              Fjern aktive filtre
-            </button>
-          ) : null}
-        </fieldset>
-      ) : null}
-      {query && results.length === 0 ? (
-        <div className="mt-3 space-y-2 text-sm text-slate-700">
-          {filtersHideResults ? (
-            <>
-              <p className="font-semibold">{rawResults.length} treff skjult av filtre.</p>
-              <Link
-                className="inline-flex min-h-11 items-center rounded-full bg-[#082F49] px-4 text-sm font-black text-white"
-                href={resetFiltersHref}
-                onClick={resetFiltersAndPreserveQuery}
-              >
-                Nullstill filtre
-              </Link>
-            </>
-          ) : (
-            <p className="font-semibold">Ingen treff. Prøv et kjent fagord.</p>
-          )}
-          {!filtersHideResults && suggestions.length > 0 ? (
-            <div>
-              <p className="text-slate-600">Mente du:</p>
-              <ul className="mt-1 flex flex-wrap gap-2">
-                {suggestions.map((suggestion) => (
-                  <li key={suggestion}>
-                    <Link
-                      className="inline-flex min-h-11 items-center rounded-full bg-sky-50 px-3 py-1 font-bold text-sky-900"
-                      href={searchPath(suggestionBasePath, suggestion)}
-                      onClick={() => setManualQuery(null)}
-                    >
-                      {suggestion}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-      <div className="mt-3 space-y-3">
-        {topHits.length > 0 ? (
-          <div>
-            <h2 className="text-sm font-black uppercase tracking-wide text-slate-500">Topptreff</h2>
-            <ul className="mt-2 space-y-2">
-              {topHits.map((doc) => (
-                <li key={doc.id}>
-                  <SearchResultRow doc={doc} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-        {Object.entries(grouped).map(([type, docs]) => (
-          <div key={type}>
-            <h2 className="text-sm font-black uppercase tracking-wide text-slate-500">{topHits.length > 0 ? `Andre treff · ${type}` : type}</h2>
-            <ul className="mt-2 space-y-2">
-              {docs.map((doc) => (
-                <li key={doc.id}>
-                  <SearchResultRow doc={doc} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+      {query.trim() ? (
+        <>
+          {emptyState}
+          {resultsContent}
+          {filterControls}
+        </>
+      ) : (
+        <>
+          {filterControls}
+          {resultsContent}
+        </>
+      )}
     </section>
   );
 }

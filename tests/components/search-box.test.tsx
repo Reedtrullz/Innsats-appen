@@ -151,3 +151,13 @@ it('explains when filters hide search results and lets users reset filters', asy
   expect(screen.getByRole('link', { name: 'Pumpe og vannforsyning' })).toBeInTheDocument();
   expect(screen.queryByText(/treff skjult av filtre/i)).not.toBeInTheDocument();
 });
+
+it('shows answers before filters after the user enters a query', async () => {
+  render(<SearchBox documents={docs} enableFilters />);
+
+  await userEvent.type(screen.getByRole('searchbox'), 'tilfluktsrom');
+
+  const firstResult = screen.getByRole('link', { name: 'Rens CBRN' });
+  const filters = screen.getByRole('group', { name: /Søkefiltre/i });
+  expect(Boolean(firstResult.compareDocumentPosition(filters) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+});

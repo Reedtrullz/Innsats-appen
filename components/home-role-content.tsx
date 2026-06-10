@@ -6,7 +6,8 @@ import { OperationalStatusPills } from '@/components/operational-status-pills';
 import { QuickActionButton, SectionCard } from '@/components/ui/operational-primitives';
 import { OperationalIcon } from '@/components/ui/operational-icons';
 import { useRole } from '@/lib/role/role-context';
-import type { RoleGroup } from '@/lib/role/role-groups';
+import { ROLE_GROUP_CANONICAL_ROLE, ROLE_GROUP_LABELS, type RoleGroup } from '@/lib/role/role-groups';
+import type { LocalProfileRole } from '@/lib/privacy/local-profile';
 
 const phaseLinks = [
   { label: 'Før innsats', href: '/for', description: 'Avklar risiko, kilder og første tiltak før oppstart.' },
@@ -116,6 +117,40 @@ function HeroButtons({ roleGroup }: { roleGroup: RoleGroup }) {
   );
 }
 
+const roleLensOptions: RoleGroup[] = ['leder', 'lagforer', 'mannskap', 'ikke-valgt'];
+
+function HomeRoleLens() {
+  const { roleGroup, setPreferredRole } = useRole();
+
+  function selectRoleLens(group: RoleGroup) {
+    setPreferredRole((ROLE_GROUP_CANONICAL_ROLE[group] ?? 'ikke-valgt') as LocalProfileRole);
+  }
+
+  return (
+    <fieldset role="radiogroup" className="rounded-2xl bg-white/10 p-2 ring-1 ring-white/15" aria-label="Rollevisning">
+      <legend className="sr-only">Rollevisning</legend>
+      <div className="grid gap-2 sm:grid-cols-4">
+        {roleLensOptions.map((group) => (
+          <label
+            key={group}
+            className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl px-3 py-2 text-center text-xs font-black ring-1 ${roleGroup === group ? 'bg-white text-[#082F49] ring-white' : 'bg-white/5 text-white ring-white/15 hover:bg-white/15'}`}
+          >
+            <input
+              type="radio"
+              name="home-role-lens"
+              value={group}
+              checked={roleGroup === group}
+              onChange={() => selectRoleLens(group)}
+              className="sr-only"
+            />
+            {ROLE_GROUP_LABELS[group]}
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
 function CriticalNowSection({ roleGroup }: { roleGroup: RoleGroup }) {
   const links = useMemo(() => {
     switch (roleGroup) {
@@ -191,6 +226,7 @@ export function HomeRoleContent() {
           <div>
             <h2 className="text-3xl font-black tracking-tight">{heroTitle}</h2>
           </div>
+          <HomeRoleLens />
         </div>
         <HeroButtons roleGroup={roleGroup} />
       </section>

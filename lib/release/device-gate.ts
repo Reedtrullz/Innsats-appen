@@ -28,6 +28,8 @@ export interface DeviceGateState {
   shaFetchedAt: string | null;
 }
 
+export const DEVICE_GATE_PENDING_DETAIL = 'Sjekkes på enheten etter innlasting.';
+
 export const CHECK_DEFS: Array<{
   id: CheckId;
   label: string;
@@ -65,9 +67,18 @@ export const CHECK_DEFS: Array<{
   },
 ];
 
+export function initialDeviceGateChecks(): DeviceGateCheck[] {
+  return CHECK_DEFS.map((def) => ({
+    ...def,
+    autoDetected: 'skip',
+    manualConfirmed: false,
+    detail: DEVICE_GATE_PENDING_DETAIL,
+  }));
+}
+
 function detectPwaInstalled(): { status: CheckStatus; detail: string } {
   const standalone =
-    (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches)
+    (typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches)
     || (typeof navigator !== 'undefined' && (navigator as unknown as Record<string, unknown>).standalone === true);
 
   return standalone

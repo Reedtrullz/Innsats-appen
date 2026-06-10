@@ -51,7 +51,7 @@ describe('ServiceWorkerRegistration', () => {
     await expect.poll(() => sw.serviceWorker.register.mock.calls.length).toBe(1);
     expect(await screen.findByText(/Ny offline-versjon klar/i)).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: /Oppdater cache/i }));
+    await userEvent.click(screen.getByRole('button', { name: /Oppdater offline-kopi/i }));
 
     expect(sw.waiting.postMessage).toHaveBeenCalledWith({ type: SW_MESSAGE_TYPES.skipWaiting });
   });

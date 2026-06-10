@@ -47,9 +47,9 @@ it('keeps a visible decision-support and local-only disclaimer in the persistent
   expect(screen.getByText(/ikke et offisielt kommando/i)).toBeInTheDocument();
   expect(screen.getByText(/lagres bare lokalt/i)).toBeInTheDocument();
   expect(screen.getByText(/ikke legg inn persondata/i)).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: /grenser/i })).toHaveAttribute('href', '/begrensninger');
-  expect(screen.getByRole('link', { name: /kjente begrensninger/i })).toHaveAttribute('href', '/kjente-begrensninger');
-  expect(screen.getByRole('link', { name: /data på enheten/i })).toHaveAttribute('href', '/data-pa-enheten');
+  expect(screen.getByRole('link', { name: /^Grenser$/i })).toHaveAttribute('href', '/begrensninger');
+  expect(screen.getByRole('link', { name: /^Kjente begrensninger$/i })).toHaveAttribute('href', '/kjente-begrensninger');
+  expect(screen.getByRole('link', { name: /^Data på enheten$/i })).toHaveAttribute('href', '/data-pa-enheten');
 });
 
 it('applies field mode runtime CSS for night mode and 48x48 touch targets', async () => {

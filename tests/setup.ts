@@ -26,9 +26,13 @@ function normalizeMockHref(href: MockLinkProps['href']) {
 }
 
 vi.mock('next/link', () => ({
-  default: ({ href, children, ...props }: MockLinkProps) => {
+  default: ({ href, children, onClick, ...props }: MockLinkProps) => {
     const normalizedHref = normalizeMockHref(href);
-    return createElement('a', { href: normalizedHref, ...props }, children);
+    const handleClick: AnchorHTMLAttributes<HTMLAnchorElement>['onClick'] = (event) => {
+      onClick?.(event);
+      if (!event.defaultPrevented) event.preventDefault();
+    };
+    return createElement('a', { href: normalizedHref, onClick: handleClick, ...props }, children);
   },
 }));
 
@@ -76,6 +80,9 @@ async function cleanupBrowserState() {
 
 beforeEach(() => {
   allowedConsoleMessages.length = 0;
+  if (typeof HTMLCanvasElement !== 'undefined' && typeof HTMLCanvasElement.prototype.getContext === 'function') {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => null);
+  }
   const originalConsoleError = console.error.bind(console);
   const originalConsoleWarn = console.warn.bind(console);
   consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {

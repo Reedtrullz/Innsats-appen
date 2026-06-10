@@ -158,11 +158,19 @@ it('renders a static offline map with attribution and local-only limitations', a
 
   expect(screen.getByRole('heading', { name: 'Kart' })).toBeInTheDocument();
   expect(screen.getAllByText(/Schematic local map package, not authoritative navigation/i).length).toBeGreaterThan(0);
-  expect(screen.getByText(/CacheStorage/i)).toBeInTheDocument();
-  expect(screen.getByText(/Ingen ekstern tile-provider/i)).toBeInTheDocument();
-  expect(screen.getAllByText(/ingen backend sync|backend-sync/i).length).toBeGreaterThan(0);
+  expect(screen.getByText(/Kart, markører og logger blir på enheten/i)).toBeInTheDocument();
+  expect(screen.getByText(/Ingen kart deles med oppdrag eller andre enheter/i)).toBeInTheDocument();
+  expect(document.body).not.toHaveTextContent(/backend sync|backend-sync|CacheStorage|post-MVP|MVP/i);
   expect(screen.getByTestId('map-performance-guard')).toHaveTextContent(/Ytelsesvern/i);
   expect(screen.getByTestId('offline-map-cache-status')).toHaveTextContent(/Ingen kartpakke/i);
+});
+
+it('shows map work actions before advanced local map package controls', async () => {
+  await renderOfflineMapPanel();
+
+  const markerButton = screen.getByRole('button', { name: /Legg til lokal markør/i });
+  const packageRegion = screen.getByRole('region', { name: /Lokale kartpakker/i });
+  expect(Boolean(markerButton.compareDocumentPosition(packageRegion) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
 });
 
 it('uses larger map controls when field glove mode is enabled', async () => {
@@ -285,7 +293,7 @@ it('separates schematic map choices from approved PMTiles packages', async () =>
   await renderOfflineMapPanel();
 
   expect(screen.getByRole('img', { name: /Skjematisk lokalt kart for/i })).toBeInTheDocument();
-  expect(screen.getByText(/Ingen godkjente PMTiles-pakker er tilgjengelige/i)).toBeInTheDocument();
+  expect(screen.getByText(/Ingen godkjente lokale kartpakker er tilgjengelige/i)).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).not.toBeInTheDocument();
 });
 
@@ -357,7 +365,7 @@ it('prevents duplicate PMTiles precache writes while one save is in progress', a
 
   expect(cacheLocalMapPackageAssets).toHaveBeenCalledTimes(1);
   expect(saveButton).toBeDisabled();
-  expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Forhåndscacher lokal PMTiles-kartpakke/i);
+  expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Lagrer lokal kartpakke på denne enheten/i);
 
   await act(async () => {
     resolveCache({ cached: 2 });
@@ -1088,7 +1096,7 @@ it('blocks local drawing saves when no active mission exists', async () => {
   });
 });
 
-it('imports supported schematic GeoJSON into the active mission and documents KML and blue-force as post-MVP', async () => {
+it('imports supported schematic GeoJSON into the active mission and documents future KML and blue-force choices', async () => {
   const user = userEvent.setup();
   await saveMission(activeMission);
   await renderOfflineMapPanel();
@@ -1107,8 +1115,8 @@ it('imports supported schematic GeoJSON into the active mission and documents KM
   expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toContain('il-ko');
   expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).toContain('"missionId":"mission-map-log"');
   expect(localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY)).not.toContain('drop');
-  expect(screen.getByText(/KML-import er ikke implementert i MVP/i)).toBeInTheDocument();
-  expect(screen.getByText(/Delt live posisjon\/blue-force tracking skal ikke bygges i MVP/i)).toBeInTheDocument();
+  expect(screen.getByText(/KML-import er ikke aktivert/i)).toBeInTheDocument();
+  expect(screen.getByText(/Delt live posisjon\/blue-force tracking er ikke aktivert/i)).toBeInTheDocument();
 });
 
 it('blocks GeoJSON import when no active mission exists', async () => {

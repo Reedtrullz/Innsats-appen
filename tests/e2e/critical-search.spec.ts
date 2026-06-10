@@ -51,6 +51,12 @@ test('search tab opens first-class operational search', async ({ page }) => {
   await page.getByRole('searchbox').fill('pumpe');
   await expect(page.getByText(/Søkeord:/i).first()).toBeVisible();
   await expect(page.getByText(/Kilde:/i).first()).toBeVisible();
+  const order = await page.getByLabel('Lokalt søk').evaluate((section) => {
+    const firstResult = section.querySelector('a');
+    const filters = section.querySelector('fieldset');
+    return Boolean(firstResult && filters && (firstResult.compareDocumentPosition(filters) & Node.DOCUMENT_POSITION_FOLLOWING));
+  });
+  expect(order).toBe(true);
 });
 
 test('search explains when filters hide otherwise matching results', async ({ page }) => {

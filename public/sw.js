@@ -1,13 +1,14 @@
+// BEGIN GENERATED SERVICE WORKER METADATA
 const SW_CACHE_VERSION = 'v4';
 const CACHE_NAME = `beredskapsboka-${SW_CACHE_VERSION}`;
 const MAP_PACKAGE_CACHE_NAME = 'beredskapsboka-map-packages';
-const GENERATED_CONTENT_STALE_MS = 7 * 24 * 60 * 60 * 1000;
+const GENERATED_CONTENT_STALE_MS = 604800000;
 const MESSAGE_TYPES = {
-  getStatus: 'BEREDSKAPSBOKA_GET_SW_STATUS',
-  skipWaiting: 'BEREDSKAPSBOKA_SKIP_WAITING',
-  status: 'BEREDSKAPSBOKA_SW_STATUS',
-  cacheFallback: 'BEREDSKAPSBOKA_SW_CACHE_FALLBACK',
-  generatedFallback: 'BEREDSKAPSBOKA_SW_GENERATED_FALLBACK',
+  'getStatus': 'BEREDSKAPSBOKA_GET_SW_STATUS',
+  'skipWaiting': 'BEREDSKAPSBOKA_SKIP_WAITING',
+  'status': 'BEREDSKAPSBOKA_SW_STATUS',
+  'cacheFallback': 'BEREDSKAPSBOKA_SW_CACHE_FALLBACK',
+  'generatedFallback': 'BEREDSKAPSBOKA_SW_GENERATED_FALLBACK'
 };
 
 self.__BEREDSKAPSBOKA_SW_META__ = {
@@ -62,8 +63,9 @@ const STATIC_APP_SHELL = [
   '/generated-content/source-documents.json',
   '/generated-content/search-index.json',
   '/generated-content/workplans.json',
-  '/generated-content/content-coverage-report.json',
+  '/generated-content/content-coverage-report.json'
 ];
+// END GENERATED SERVICE WORKER METADATA
 
 function swStatus(state = 'active') {
   return {

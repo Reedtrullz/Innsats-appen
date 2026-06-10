@@ -112,7 +112,8 @@ describe('field mode helpers', () => {
 
   it('defines field test process and all required quick actions as local routes', () => {
     expect(FIELD_TESTING_PROCESS.steps.join(' ')).toMatch(/mannskap/i);
-    expect(FIELD_TESTING_PROCESS.localOnlyScope).toMatch(/ingen backend/i);
+    expect(FIELD_TESTING_PROCESS.localOnlyScope).toMatch(/sender ikke inn data/i);
+    expect(FIELD_TESTING_PROCESS.localOnlyScope).toMatch(/oppretter ikke personregister/i);
     expect(QUICK_ACTIONS.map((action) => action.id)).toEqual(['map', 'quick-log', 'active-mission', 'run-checklist', 'five-point-order', 'comms-plan', 'export-status', 'search']);
     expect(QUICK_ACTIONS.every((action) => action.href.startsWith('/'))).toBe(true);
     expect(QUICK_ACTIONS.find((action) => action.id === 'five-point-order')?.href).toContain('5-punktsordre');

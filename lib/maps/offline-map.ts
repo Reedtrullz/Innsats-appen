@@ -41,10 +41,10 @@ export const MAX_RENDERED_MAP_FEATURES = 12;
 export const OFFLINE_MAP_APPROACH = {
   decision: 'Static schematic local map package remains the fallback; governed MapLibre/PMTiles packages may be used only from approved app-local files.',
   adr: 'docs/adr/2026-06-04-offline-map-architecture.md',
-  networkPolicy: 'No tile URLs, external map APIs or backend sync are used by the MVP map page.',
+  networkPolicy: 'No tile URLs, external map APIs or cloud synchronization are used by the map page.',
 } as const;
 
-export const OFFLINE_MAP_ATTRIBUTION = 'Schematic local map package, not authoritative navigation. © Beredskapsboka MVP.';
+export const OFFLINE_MAP_ATTRIBUTION = 'Schematic local map package, not authoritative navigation. © Beredskapsboka.';
 export const OFFLINE_MAP_LIMITATION_COPY = 'Skjematisk lokalkart for øvelse og beslutningsstøtte. Ikke bruk som autoritativ navigasjon, posisjonering eller offisielt kommandosystem.';
 
 export const OFFLINE_MAP_PACKAGES: OfflineMapPackage[] = [

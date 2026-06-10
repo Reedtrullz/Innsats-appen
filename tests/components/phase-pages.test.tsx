@@ -20,6 +20,20 @@ it('shows correct cards for each phase', () => {
   expect(screen.queryByText('Under kort')).not.toBeInTheDocument();
 });
 
+it('renders primary operational phase actions before generic phase cards', () => {
+  render(
+    <PhasePageContent
+      phase="for"
+      cards={cards}
+      primaryOperationalContent={<section aria-label="Fasehandlinger"><a href="/oppdrag/ny">Start lokalt oppdrag</a></section>}
+    />,
+  );
+
+  const primaryAction = screen.getByRole('link', { name: /Start lokalt oppdrag/i });
+  const firstCard = screen.getByText('Før kort');
+  expect(Boolean(primaryAction.compareDocumentPosition(firstCard) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+});
+
 it('shows før utrykning combined workflow, latest procedure notice, and must-read deployment notices', () => {
   const checklists = [
     {

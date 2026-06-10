@@ -101,7 +101,7 @@ function OfflineIndicator() {
         <div>
           <p className="text-sm font-black uppercase tracking-wide text-sky-700">Alltid synlig offline-indikator</p>
           <h2 className="text-2xl font-black">{online ? 'Online nå' : 'Offline / frakoblet nå'}</h2>
-          <p className="mt-1 text-sm font-semibold text-slate-700">App-skallet viser også status persistent. Offline betyr at lokalt cachet innhold kan brukes, men fersk ekstern kontekst kan være stale.</p>
+          <p className="mt-1 text-sm font-semibold text-slate-700">App-skallet viser også status. Offline betyr at lokalt lagret innhold kan brukes, mens fersk ekstern kontekst kan være utdatert.</p>
         </div>
         <span className={`rounded-full px-4 py-2 text-sm font-black ${online ? 'bg-emerald-100 text-emerald-950' : 'bg-amber-100 text-amber-950'}`}>{online ? 'ONLINE' : 'OFFLINE'}</span>
       </div>
@@ -294,7 +294,7 @@ function FieldFeedbackCapture() {
       suggestedChange: form.get('suggestedChange'),
     }, new Date(), randomId('field-feedback'));
     setEntries(appendFieldFeedbackEntry(entry));
-    setSavedMessage('Tilbakemelding lagret lokalt i denne nettleseren. Ingen backend eller innsending.');
+    setSavedMessage('Tilbakemelding lagret lokalt i denne nettleseren. Ingen automatisk innsending.');
     formElement.reset();
   }
 
@@ -364,7 +364,16 @@ export function FieldModePanel() {
       <section className={`rounded-3xl border p-5 shadow-sm ${previewClass}`} aria-labelledby="field-mode-heading">
         <p className="text-sm font-black uppercase tracking-wide">Feltmodus</p>
         <h1 id="field-mode-heading" className="text-3xl font-black">Feltmodus for hansker, natt, ute og offline</h1>
-        <p className="mt-2 text-sm font-semibold opacity-90">Dedikert lokal/offline UX-flate. Ingen backend, synk, persondata, pasientdata eller offisiell kommando-systemfunksjon.</p>
+        <p className="mt-2 text-sm font-semibold opacity-90">Stor, lokal arbeidsflate for feltbruk. Data blir på enheten; ikke legg inn persondata, pasientdata eller offisiell ordretekst.</p>
+      </section>
+
+      <OfflineIndicator />
+      <ActiveMissionPanel />
+      <QuickActions gloveMode={settings.gloveMode} />
+
+      <section className={`rounded-3xl border p-5 shadow-sm ${previewClass}`} aria-labelledby="field-mode-settings-heading">
+        <p className="text-sm font-black uppercase tracking-wide">Tilpass feltmodus</p>
+        <h2 id="field-mode-settings-heading" className="text-2xl font-black">Innstillinger for denne enheten</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <label className={`flex items-center gap-3 rounded-2xl border border-current/20 p-3 font-bold ${buttonClass}`}>
             <input type="checkbox" checked={settings.enabled} onChange={(event) => updateSettings({ enabled: event.target.checked })} className="h-6 w-6" />
@@ -387,10 +396,6 @@ export function FieldModePanel() {
           </div>
         </fieldset>
       </section>
-
-      <OfflineIndicator />
-      <ActiveMissionPanel />
-      <QuickActions gloveMode={settings.gloveMode} />
 
       <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200" aria-labelledby="outdoor-review">
         <p className="text-sm font-black uppercase tracking-wide text-sky-700">Utendørs lesbarhet og scroll</p>

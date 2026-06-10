@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import type { ActionCard, ContentChangelogEntry, MustReadNotice, OperationalChecklist } from '@/lib/content/schemas';
 import type { CardFilter } from '@/lib/content/filters';
 import { filterActionCards, sortActionCards } from '@/lib/content/filters';
@@ -56,7 +56,7 @@ function PhaseChecklistSummary({ checklists }: { checklists: OperationalChecklis
       <div>
         <p className="text-xs font-black uppercase tracking-wide text-sky-700">Sjekkliste/workflow</p>
         <h2 className="text-2xl font-black">Fasekontroller</h2>
-        <p className="mt-1 text-sm font-semibold text-slate-700">Kildebelagte sjekklister kan kjøres på lokal oppdragstavle og eksporteres uten remote sync.</p>
+        <p className="mt-1 text-sm font-semibold text-slate-700">Kildebelagte sjekklister kan kjøres på lokal oppdragstavle og eksporteres manuelt uten skykobling.</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         {checklists.map((checklist) => (
@@ -104,7 +104,7 @@ function MustReadBeforeDeployment({ notices }: { notices: MustReadNotice[] }) {
   );
 }
 
-export function PhasePageContent({ phase, cards, checklists = [], latestChange, mustRead = [] }: { phase: Phase; cards: ActionCard[]; checklists?: OperationalChecklist[]; latestChange?: ContentChangelogEntry; mustRead?: MustReadNotice[] }) {
+export function PhasePageContent({ phase, cards, checklists = [], latestChange, mustRead = [], primaryOperationalContent }: { phase: Phase; cards: ActionCard[]; checklists?: OperationalChecklist[]; latestChange?: ContentChangelogEntry; mustRead?: MustReadNotice[]; primaryOperationalContent?: ReactNode }) {
   const phaseChecklists = checklists.filter((checklist) => checklist.phase === phase);
   return (
     <div className="space-y-5">
@@ -115,6 +115,7 @@ export function PhasePageContent({ phase, cards, checklists = [], latestChange, 
       </div>
       <LatestProcedureNotice latestChange={latestChange} />
       <MustReadBeforeDeployment notices={phase === 'for' ? mustRead : []} />
+      {primaryOperationalContent}
       <PhaseChecklistSummary checklists={phaseChecklists} />
       <div className="space-y-3">
         {sortActionCards(filterActionCards(cards, { phase })).slice(0, 6).map((card) => <TiltakCardRow key={card.slug} card={card} />)}
