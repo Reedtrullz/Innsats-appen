@@ -215,6 +215,7 @@ export const ChecklistRunSchema = z
     missionId: z.string().min(1),
     templateSlug: z.string().min(1),
     checkedItemIds: z.array(z.string()).default([]),
+    skippedItemIds: z.array(z.string()).optional(),
     notesByItemId: z.record(z.string(), sensitiveText('checklistRun.notesByItemId')).default({}),
     equipmentStatusByItemId: z.record(z.string(), EquipmentStatusSchema).default({}),
     updatedAt: z.string().datetime(),

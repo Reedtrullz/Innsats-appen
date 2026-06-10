@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { OperationalStatus } from '@/components/operational-status';
 import { ThemeSelector } from '@/components/theme-selector';
+import { RunbookBetaToggle } from '@/components/runbook/runbook-beta-toggle';
 import { getContentManifest } from '@/lib/content/load-content';
 import { formatNbDateTime } from '@/lib/formatting/format-date';
 
@@ -113,6 +114,13 @@ export default function MorePage() {
       </section>
 
       <ThemeSelector />
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" aria-labelledby="more-runbook-heading">
+        <p className="text-sm font-black uppercase tracking-wide text-sky-800">Beta</p>
+        <h2 id="more-runbook-heading" className="text-2xl font-black text-slate-950">Veiledet runbook</h2>
+        <p className="mt-1 mb-3 text-sm font-semibold text-slate-700">Prøv en steg-for-steg arbeidsflate for aktivt oppdrag. Anbefalt rekkefølge, ikke en kommando.</p>
+        <RunbookBetaToggle />
+      </section>
 
       <section className="space-y-3" aria-labelledby="more-operational-heading">
         <div>

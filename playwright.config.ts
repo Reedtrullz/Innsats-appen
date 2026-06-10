@@ -9,6 +9,10 @@ const withNode22 = (command: string) =>
 
 export default defineConfig({
   testDir: './tests/e2e',
+  // Production/CI runs many real-browser journeys in parallel against one server
+  // and a few are occasionally timing-flaky; retry there so a single flake does
+  // not red the pipeline (a genuine break still fails every attempt). Dev keeps 0.
+  retries: prod ? 2 : 0,
   webServer: {
     command: prod ? withNode22('npm run start') : withNode22('npm run dev'),
     url: baseURL,

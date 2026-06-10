@@ -57,8 +57,15 @@ test('mannskap role shows simplified hero and mannskap nav order', async ({ page
 test('role selector switches and reorders nav without page reload', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   const selector = page.getByTestId('role-selector');
-  await selector.getByRole('button', { name: /Rolle: Ingen/ }).click();
+  // Retry opening the dropdown: a click landing before React hydration is lost,
+  // so keep clicking the trigger until the option is actually visible.
+  await expect(async () => {
+    await selector.getByRole('button', { name: /Rolle: Ingen/ }).click();
+    await expect(page.getByRole('button', { name: 'Lagfører' })).toBeVisible({ timeout: 1000 });
+  }).toPass({ timeout: 15000 });
   await page.getByRole('button', { name: 'Lagfører' }).click();
   await expect(page.getByTestId('role-selector').getByRole('button').first()).toContainText('Lagfører');
-  expect(await navLabels(page)).toEqual(['Oppdrag', 'Kort', 'Hjem', 'Søk', 'Mer']);
+  // Nav reorders on the client after the role context updates; poll so the
+  // assertion waits for the re-render instead of racing it (one-shot read flakes).
+  await expect.poll(() => navLabels(page)).toEqual(['Oppdrag', 'Kort', 'Hjem', 'Søk', 'Mer']);
 });

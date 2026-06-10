@@ -19,6 +19,7 @@ export const APP_SHELL_ROUTES = [
   '/ma-leses',
   '/oppdrag',
   '/oppdrag/ny',
+  '/na',
   '/mer',
   '/laering',
   '/kart',

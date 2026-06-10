@@ -10,6 +10,7 @@ import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import type { MissionContext } from '@/lib/mission/schemas';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
 import { useRole } from '@/lib/role/role-context';
+import { selectRunbookChecklist } from '@/lib/mission/runbook';
 import { MissionCommandDashboard } from './mission/dashboard/mission-command-dashboard';
 
 function prefillRole(globalRole: string): Role {
@@ -24,13 +25,6 @@ function formatUpdatedAt(value: string) {
   return new Intl.DateTimeFormat('nb-NO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
 }
 
-
-function matchingChecklist(checklists: OperationalChecklist[], mission: MissionContext): OperationalChecklist | undefined {
-  return checklists.find((checklist) => checklist.scenarios.includes(mission.scenario) && checklist.phase === mission.phase)
-    ?? checklists.find((checklist) => checklist.scenarios.includes(mission.scenario))
-    ?? checklists.find((checklist) => checklist.scenarios.includes('generelt') && checklist.phase === mission.phase)
-    ?? checklists.find((checklist) => checklist.scenarios.includes('generelt'));
-}
 
 type MissionUpdate = (mission: MissionContext) => MissionContext;
 
@@ -99,7 +93,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
       contentVersion,
       schemaVersion: 1,
     };
-    const activeChecklist = matchingChecklist(checklists, missionDraft);
+    const activeChecklist = selectRunbookChecklist(checklists, missionDraft);
     const mission = { ...missionDraft, activeChecklistIds: activeChecklist ? [activeChecklist.slug] : [] };
     try {
       assertNoSensitiveOperationalTextInValue({ title: mission.title, locationText: mission.locationText }, 'missionCreate');
@@ -210,7 +204,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
 
   const activeMission = selectActiveMission(missions, selectedActiveMissionId);
   const otherMissions = activeMission ? missions.filter((mission) => mission.id !== activeMission.id) : [];
-  const activeChecklist = activeMission ? matchingChecklist(checklists, activeMission) : undefined;
+  const activeChecklist = activeMission ? selectRunbookChecklist(checklists, activeMission) : undefined;
   const archiveSearchActive = archiveSearch.trim().length > 0;
   return (
     <div className="space-y-4">
