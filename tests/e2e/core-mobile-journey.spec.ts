@@ -49,8 +49,8 @@ test('mobile user can search, open source-backed card, create mission, run check
   await page.getByLabel(/Søk lokalt/i).fill('tilfluktsrom');
   await page.getByLabel('Lokalt søk').getByRole('link', { name: /Klargjør.*tilfluktsrom/i }).click();
   await expect(page.getByRole('heading', { name: /Klargjør.*tilfluktsrom/i })).toBeVisible();
-  await expect(page.getByText('Ikke offisiell ordre eller fullstendig oversikt. Bruk bare godkjent informasjon; ikke publiser private eller skjermede tilfluktsromdata.')).toBeVisible();
-  await expect(page.getByText('Ikke publiser private eller skjermede tilfluktsromdata i appen.')).toBeVisible();
+  await expect(page.getByRole('note').filter({ hasText: 'Ikke offisiell ordre eller fullstendig oversikt' })).toBeVisible();
+  await expect(page.getByRole('note').filter({ hasText: 'skjermede tilfluktsromdata' })).toBeVisible();
   await expect(page.getByText(/Ikke kildegodkjent for pilot/i)).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Kilder' })).toBeVisible();
   const sourceLink = page.getByRole('link', { name: /SRC - Operativt konsept for Sivilforsvaret/i });
@@ -61,7 +61,7 @@ test('mobile user can search, open source-backed card, create mission, run check
 
   await page.goto('/oppdrag/ny');
   await page.getByLabel('Tittel').fill(missionTitle);
-  await page.getByLabel('Rolle', { exact: true }).selectOption('beredskapsvakt');
+  await page.locator('select[name="role"]').selectOption('beredskapsvakt');
   await page.getByLabel('Fase').selectOption('for');
   await page.getByLabel('Scenario').selectOption('tilfluktsrom');
   await page.getByLabel('Sted/lokasjon').fill('Trondheim sentrum');

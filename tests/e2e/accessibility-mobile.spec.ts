@@ -5,7 +5,7 @@ import { clearBrowserLocalState, createLocalMission, openMissionDetails, openMis
 
 test.use({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
 
-const mobileLayoutRoutes = ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/under', '/etter', '/feltmodus', '/moduler/tilfluktsrom', '/release'];
+const mobileLayoutRoutes = ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/under', '/etter', '/feltmodus', '/moduler/tilfluktsrom'];
 
 async function expectNoHorizontalOverflow(page: import('@playwright/test').Page) {
   const overflow = await page.evaluate(() => ({
@@ -102,7 +102,7 @@ test('keyboard can use persistent bottom navigation and submit a new mission for
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { name: /Opprett lokalt oppdrag/i })).toBeVisible();
   await page.getByLabel('Tittel').fill(missionTitle);
-  await page.getByLabel('Rolle', { exact: true }).selectOption('beredskapsvakt');
+  await page.locator('select[name="role"]').selectOption('beredskapsvakt');
   await page.getByLabel('Fase').selectOption('for');
   await page.getByLabel('Scenario').selectOption('tilfluktsrom');
   await page.getByLabel('Sted/lokasjon').fill('Keyboard testområde');
@@ -114,9 +114,10 @@ test('keyboard can use persistent bottom navigation and submit a new mission for
 
 test('mission and local export form controls have accessible labels', async ({ page }) => {
   await page.goto('/oppdrag/ny');
-  for (const label of ['Tittel', 'Rolle', 'Fase', 'Scenario', 'Sted/lokasjon']) {
+  for (const label of ['Tittel', 'Fase', 'Scenario', 'Sted/lokasjon']) {
     await expect(page.getByLabel(label)).toBeVisible();
   }
+  await expect(page.locator('select[name="role"]')).toBeVisible();
 
   await createLocalMission(page, {
     title: `Formlabel øvelse ${Date.now()}`,

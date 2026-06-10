@@ -42,6 +42,7 @@ test('leder role shows Lederoversikt and leder nav order', async ({ page }) => {
 test('lagforer role shows lagforer nav order', async ({ page }) => {
   await setProfileRole(page, 'lagforer');
   await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByTestId('role-selector').getByRole('button').first()).toContainText('Lagfører', { timeout: 5000 });
   expect(await navLabels(page)).toEqual(['Oppdrag', 'Kort', 'Hjem', 'Søk', 'Mer']);
 });
 

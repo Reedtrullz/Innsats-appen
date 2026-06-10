@@ -14,7 +14,7 @@ test('renders six checks and computes NOT READY when one fails', async ({ page }
   await expect(page.getByText('Pilotklar sjekkliste')).toBeVisible();
   await expect(page.getByText('VENT', { exact: true })).toBeVisible();
 
-  const checkArticles = page.getByRole('article');
+  const checkArticles = page.locator('section').first().getByRole('article');
   await expect(checkArticles).toHaveCount(6);
 
   await expect(page.getByText('Nullstill bekreftelser')).toBeVisible();
@@ -34,7 +34,7 @@ test('renders READY when all six checks pass via manual confirm', async ({ page 
   }
 
   await expect(page.getByText('KLAR', { exact: true })).toBeVisible();
-  await expect(page.getByText('6 / 6 bestått — PILOTKLAR')).toBeVisible();
+  await expect(page.getByText('6/6 bestått — PILOTKLAR')).toBeVisible();
   await expect(page.getByText('VENT', { exact: true })).toHaveCount(0);
 });
 
@@ -61,7 +61,7 @@ test('reset clears all manual confirms', async ({ page }) => {
   }
 
   await expect(page.getByText('KLAR', { exact: true })).toBeVisible();
-  await expect(page.getByText('6 / 6 bestått — PILOTKLAR')).toBeVisible();
+  await expect(page.getByText('6/6 bestått — PILOTKLAR')).toBeVisible();
 
   await page.getByText('Nullstill bekreftelser').click();
 

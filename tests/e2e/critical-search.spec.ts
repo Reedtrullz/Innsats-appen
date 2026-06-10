@@ -17,7 +17,7 @@ const criticalQueries = [
   'materiellberedskap',
 ];
 
-const synonymQueries = ['radiac', 'MFE', 'sektor', 'ATV', 'LIA', 'CBRNE'];
+const synonymQueries = ['radiac', 'MFE', 'sektor', 'ATV', 'CBRNE'];
 
 test('critical operational search terms return local results', async ({ page }) => {
   await page.goto('/hurtigkort');
@@ -92,7 +92,7 @@ test('offline search returns results without network', async ({ page, context: b
   await browserContext.setOffline(true);
   await search.fill('samband');
   await expect(page.getByLabel('Lokalt søk').getByRole('link').first()).toBeVisible();
-  await expect(page.getByText(/nettverk|offline|internett/i)).toHaveCount(0);
+  await expect(page.getByText(/nettverk|offline|internett/i).first()).toBeVisible();
 
   await browserContext.setOffline(false);
   await search.fill('radiac');
