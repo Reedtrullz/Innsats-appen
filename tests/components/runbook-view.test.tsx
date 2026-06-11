@@ -96,6 +96,9 @@ it('lets the user reopen (undo) a completed step', async () => {
     const [runRecord] = await listChecklistRuns('m-runbook');
     expect(runRecord?.checkedItemIds).toContain('ordre');
   });
+  // Wait for the reload to settle (the step renders its "Gjort" badge) before
+  // interacting, so the undo affordance is present.
+  await screen.findByText('Gjort');
 
   // Expand the now-completed step and undo it back to active.
   await userEvent.click(screen.getByText('Bekreft ordre og sikkerhet'));
