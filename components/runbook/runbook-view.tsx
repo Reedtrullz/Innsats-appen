@@ -16,12 +16,33 @@ const stepDotClass: Record<RunbookStep['status'], string> = {
   skipped: 'bg-amber-400',
 };
 
-export function RunbookView({ checklists }: { checklists: OperationalChecklist[] }) {
+const statusLabel: Record<RunbookStep['status'], string> = {
+  done: 'Gjort',
+  now: 'Nå',
+  upcoming: '',
+  skipped: 'Hoppet over',
+};
+
+const statusBadgeClass: Record<RunbookStep['status'], string> = {
+  done: 'bg-emerald-100 text-emerald-900',
+  now: 'bg-sky-100 text-sky-900',
+  upcoming: 'bg-slate-100 text-slate-600',
+  skipped: 'bg-amber-100 text-amber-900',
+};
+
+export function RunbookView({
+  checklists,
+  sourceTitleById = {},
+}: {
+  checklists: OperationalChecklist[];
+  sourceTitleById?: Record<string, string>;
+}) {
   const [mission, setMission] = useState<MissionContext | null>(null);
   const [run, setRun] = useState<ChecklistRun | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [openStepId, setOpenStepId] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -52,33 +73,38 @@ export function RunbookView({ checklists }: { checklists: OperationalChecklist[]
   const checklistSlug = runbook?.checklistSlug ?? null;
   const missionId = mission?.id ?? null;
   const activeChecklist = checklistSlug ? checklists.find((item) => item.slug === checklistSlug) : undefined;
+  const resolved = runbook ? runbook.doneCount + runbook.skippedCount : 0;
 
-  async function writeProgress(itemId: string, mark: 'done' | 'skip') {
-    if (!missionId || !checklistSlug) return;
-    const runs = await listChecklistRuns(missionId);
-    const existing = runs.find((item) => item.templateSlug === checklistSlug);
-    const checked = new Set(existing?.checkedItemIds ?? []);
-    const skipped = new Set(existing?.skippedItemIds ?? []);
-    if (mark === 'done') {
-      checked.add(itemId);
-      skipped.delete(itemId);
-    } else {
-      skipped.add(itemId);
+  // Serialized via the `saving` guard so rapid taps can't race the read-modify-write
+  // and silently drop progress. 'reopen' clears the step back to active.
+  async function writeProgress(itemId: string, mark: 'done' | 'skip' | 'reopen') {
+    if (!missionId || !checklistSlug || saving) return;
+    setSaving(true);
+    try {
+      const runs = await listChecklistRuns(missionId);
+      const existing = runs.find((item) => item.templateSlug === checklistSlug);
+      const checked = new Set(existing?.checkedItemIds ?? []);
+      const skipped = new Set(existing?.skippedItemIds ?? []);
       checked.delete(itemId);
+      skipped.delete(itemId);
+      if (mark === 'done') checked.add(itemId);
+      else if (mark === 'skip') skipped.add(itemId);
+      await saveChecklistRun({
+        id: existing?.id ?? crypto.randomUUID(),
+        missionId,
+        templateSlug: checklistSlug,
+        checkedItemIds: [...checked],
+        skippedItemIds: [...skipped],
+        notesByItemId: existing?.notesByItemId ?? {},
+        equipmentStatusByItemId: existing?.equipmentStatusByItemId ?? {},
+        updatedAt: new Date().toISOString(),
+        schemaVersion: 1,
+      });
+      setOpenStepId(null);
+      setRefreshKey((key) => key + 1);
+    } finally {
+      setSaving(false);
     }
-    await saveChecklistRun({
-      id: existing?.id ?? crypto.randomUUID(),
-      missionId,
-      templateSlug: checklistSlug,
-      checkedItemIds: [...checked],
-      skippedItemIds: [...skipped],
-      notesByItemId: existing?.notesByItemId ?? {},
-      equipmentStatusByItemId: existing?.equipmentStatusByItemId ?? {},
-      updatedAt: new Date().toISOString(),
-      schemaVersion: 1,
-    });
-    setOpenStepId(null);
-    setRefreshKey((key) => key + 1);
   }
 
   return (
@@ -104,10 +130,14 @@ export function RunbookView({ checklists }: { checklists: OperationalChecklist[]
             <p className="mt-1 text-sm font-semibold text-slate-600">{phaseLabels[mission.phase]} · {roleLabels[mission.role]} · {scenarioLabels[mission.scenario]}</p>
             {runbook.total > 0 ? (
               <div className="mt-3">
-                <div className="flex items-center justify-between text-sm font-semibold text-slate-600"><span>{runbook.title}</span><span>{runbook.doneCount}/{runbook.total}</span></div>
-                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-200"><div className="h-full bg-emerald-500" style={{ width: `${Math.round((runbook.doneCount / runbook.total) * 100)}%` }} /></div>
+                <div className="flex items-center justify-between text-sm font-semibold text-slate-600">
+                  <span>{runbook.title}</span>
+                  <span>{runbook.doneCount} gjort{runbook.skippedCount > 0 ? ` · ${runbook.skippedCount} hoppet over` : ''} av {runbook.total}</span>
+                </div>
+                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-200"><div className="h-full bg-emerald-500" style={{ width: `${Math.round((resolved / runbook.total) * 100)}%` }} /></div>
               </div>
             ) : null}
+            {activeChecklist?.warning ? <p className="mt-3 rounded-xl bg-amber-50 p-2 text-xs font-bold text-amber-900">{activeChecklist.warning}</p> : null}
           </section>
 
           {runbook.isEmpty || runbook.total === 0 ? (
@@ -122,23 +152,29 @@ export function RunbookView({ checklists }: { checklists: OperationalChecklist[]
             <section aria-label="Neste steg" className="space-y-2">
               {runbook.steps.map((step) => {
                 const isOpen = openStep?.id === step.id;
-                const done = step.status === 'done';
+                const resolvedStep = step.status === 'done' || step.status === 'skipped';
+                const badge = statusLabel[step.status] || (step.required ? 'Påkrevd' : '');
                 return (
                   <div key={step.id} className={`rounded-2xl border bg-white shadow-sm ${step.status === 'now' ? 'border-2 border-sky-400' : 'border-slate-200'}`}>
                     <button type="button" onClick={() => setOpenStepId(isOpen ? null : step.id)} className="flex w-full min-h-12 items-center gap-3 p-3 text-left" aria-expanded={isOpen}>
                       <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${stepDotClass[step.status]}`} aria-hidden="true" />
-                      <span className={`flex-1 text-sm font-bold ${done || step.status === 'skipped' ? 'text-slate-500 line-through' : 'text-slate-950'}`}>{step.title}</span>
-                      {step.required ? <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[0.66rem] font-bold text-slate-600">Påkrevd</span> : null}
+                      <span className={`flex-1 text-sm font-bold ${resolvedStep ? 'text-slate-500 line-through' : 'text-slate-950'}`}>{step.title}</span>
+                      {badge ? <span className={`shrink-0 rounded-full px-2 py-0.5 text-[0.66rem] font-bold ${statusBadgeClass[step.status]}`}>{badge}</span> : null}
                     </button>
-                    {isOpen && !done && step.status !== 'skipped' ? (
+                    {isOpen ? (
                       <div className="border-t border-slate-100 p-3">
                         {step.sourceIds.length > 0 ? (
-                          <p className="text-xs font-semibold text-slate-500">Kilder: {step.sourceIds.map((id) => id.replace(/^src-/, '')).join(', ')}</p>
+                          <p className="text-xs font-semibold text-slate-500">Kilder: {step.sourceIds.map((id) => sourceTitleById[id] ?? id.replace(/^src-/, '')).join(', ')}</p>
                         ) : null}
-                        {activeChecklist?.warning ? <p className="mt-2 rounded-xl bg-amber-50 p-2 text-xs font-bold text-amber-900">{activeChecklist.warning}</p> : null}
                         <div className="mt-3 flex gap-2">
-                          <button type="button" onClick={() => void writeProgress(step.itemId, 'done')} className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 text-sm font-bold text-white">Gjort · neste</button>
-                          <button type="button" onClick={() => void writeProgress(step.itemId, 'skip')} className="min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-semibold text-slate-700">Hopp over</button>
+                          {resolvedStep ? (
+                            <button type="button" onClick={() => void writeProgress(step.itemId, 'reopen')} disabled={saving} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 text-sm font-bold text-slate-800 disabled:opacity-50">Angre · sett aktiv igjen</button>
+                          ) : (
+                            <>
+                              <button type="button" onClick={() => void writeProgress(step.itemId, 'done')} disabled={saving} className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 text-sm font-bold text-white disabled:opacity-50">Gjort · neste</button>
+                              <button type="button" onClick={() => void writeProgress(step.itemId, 'skip')} disabled={saving} className="min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-semibold text-slate-700 disabled:opacity-50">Hopp over</button>
+                            </>
+                          )}
                         </div>
                       </div>
                     ) : null}

@@ -73,4 +73,28 @@ it('persists a skipped step without marking it done', async () => {
     expect(runRecord?.skippedItemIds).toContain('ordre');
     expect(runRecord?.checkedItemIds ?? []).not.toContain('ordre');
   });
+  // Skipped is distinguishable from done by text, not colour alone (a11y).
+  expect(await screen.findByText('Hoppet over')).toBeInTheDocument();
+});
+
+it('lets the user reopen (undo) a completed step', async () => {
+  await seedActiveMission();
+  render(<RunbookView checklists={checklists} />);
+  await flushAsyncEffects();
+
+  await userEvent.click(await screen.findByRole('button', { name: /Gjort · neste/i }));
+  await waitFor(async () => {
+    const [runRecord] = await listChecklistRuns('m-runbook');
+    expect(runRecord?.checkedItemIds).toContain('ordre');
+  });
+
+  // Expand the now-completed step and undo it back to active.
+  await userEvent.click(screen.getByText('Bekreft ordre og sikkerhet'));
+  await userEvent.click(await screen.findByRole('button', { name: /Angre/i }));
+
+  await waitFor(async () => {
+    const [runRecord] = await listChecklistRuns('m-runbook');
+    expect(runRecord?.checkedItemIds ?? []).not.toContain('ordre');
+    expect(runRecord?.skippedItemIds ?? []).not.toContain('ordre');
+  });
 });
