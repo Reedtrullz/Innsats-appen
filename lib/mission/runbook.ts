@@ -28,6 +28,8 @@ export interface MissionRunbook {
   allRequiredComplete: boolean;
   /** True when no checklist matched the mission (distinct from "all done"). */
   isEmpty: boolean;
+  /** True when the matched checklist is a generic fallback that does not cover the mission scenario. */
+  isGenericFallback: boolean;
 }
 
 /**
@@ -52,6 +54,7 @@ const EMPTY_RUNBOOK: MissionRunbook = {
   currentStepId: null,
   allRequiredComplete: false,
   isEmpty: true,
+  isGenericFallback: false,
 };
 
 /**
@@ -127,6 +130,7 @@ export function buildChecklistRunbook(
     currentStepId: current?.id ?? null,
     allRequiredComplete: steps.length > 0 && requiredRemaining === 0,
     isEmpty: false,
+    isGenericFallback: false,
   };
 }
 
@@ -136,5 +140,8 @@ export function buildMissionRunbook(
   mission: Pick<MissionContext, 'scenario' | 'phase'>,
   progress: RunbookProgressInput | null = null,
 ): MissionRunbook {
-  return buildChecklistRunbook(selectRunbookChecklist(checklists, mission), progress);
+  const checklist = selectRunbookChecklist(checklists, mission);
+  const runbook = buildChecklistRunbook(checklist, progress);
+  const isGenericFallback = Boolean(checklist) && !checklist!.scenarios.includes(mission.scenario);
+  return { ...runbook, isGenericFallback };
 }

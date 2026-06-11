@@ -110,4 +110,14 @@ describe('buildMissionRunbook', () => {
     const noGenerelt = checklists.filter((checklist) => !checklist.scenarios.includes('generelt'));
     expect(buildMissionRunbook(noGenerelt, { scenario: 'flom', phase: 'etter' }).isEmpty).toBe(true);
   });
+
+  it('flags a generic fallback when the scenario has no dedicated checklist', () => {
+    const runbook = buildMissionRunbook(checklists, { scenario: 'flom', phase: 'under' });
+    expect(runbook.checklistSlug).toBe('fig-generelt-under');
+    expect(runbook.isGenericFallback).toBe(true);
+  });
+
+  it('is not a generic fallback when the checklist covers the scenario', () => {
+    expect(buildMissionRunbook(checklists, { scenario: 'skogbrann', phase: 'under' }).isGenericFallback).toBe(false);
+  });
 });

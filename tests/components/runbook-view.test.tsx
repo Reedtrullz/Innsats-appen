@@ -77,6 +77,15 @@ it('persists a skipped step without marking it done', async () => {
   expect(await screen.findByText('Hoppet over')).toBeInTheDocument();
 });
 
+it('shows a per-step source-trust indicator for the current step', async () => {
+  await seedActiveMission();
+  render(<RunbookView checklists={checklists} sourceRiskById={{ 'src-5-punktsordre': 'caution' }} />);
+  await flushAsyncEffects();
+
+  // First step links src-5-punktsordre (flagged caution) and auto-expands as "now".
+  expect(await screen.findByText(/Vær varsom/)).toBeInTheDocument();
+});
+
 it('lets the user reopen (undo) a completed step', async () => {
   await seedActiveMission();
   render(<RunbookView checklists={checklists} />);

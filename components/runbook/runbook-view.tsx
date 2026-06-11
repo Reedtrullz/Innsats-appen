@@ -33,9 +33,11 @@ const statusBadgeClass: Record<RunbookStep['status'], string> = {
 export function RunbookView({
   checklists,
   sourceTitleById = {},
+  sourceRiskById = {},
 }: {
   checklists: OperationalChecklist[];
   sourceTitleById?: Record<string, string>;
+  sourceRiskById?: Record<string, 'caution' | 'ok'>;
 }) {
   const [mission, setMission] = useState<MissionContext | null>(null);
   const [run, setRun] = useState<ChecklistRun | null>(null);
@@ -137,6 +139,7 @@ export function RunbookView({
                 <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-200"><div className="h-full bg-emerald-500" style={{ width: `${Math.round((resolved / runbook.total) * 100)}%` }} /></div>
               </div>
             ) : null}
+            {runbook.isGenericFallback ? <p className="mt-3 rounded-xl bg-slate-100 p-2 text-xs font-semibold text-slate-700">Generell sjekkliste — ingen egen runbook for {scenarioLabels[mission.scenario].toLowerCase()} ennå.</p> : null}
             {activeChecklist?.warning ? <p className="mt-3 rounded-xl bg-amber-50 p-2 text-xs font-bold text-amber-900">{activeChecklist.warning}</p> : null}
           </section>
 
@@ -163,9 +166,15 @@ export function RunbookView({
                     </button>
                     {isOpen ? (
                       <div className="border-t border-slate-100 p-3">
-                        {step.sourceIds.length > 0 ? (
-                          <p className="text-xs font-semibold text-slate-500">Kilder: {step.sourceIds.map((id) => sourceTitleById[id] ?? id.replace(/^src-/, '')).join(', ')}</p>
-                        ) : null}
+                        {step.sourceIds.length > 0 ? (() => {
+                          const caution = step.sourceIds.some((id) => sourceRiskById[id] === 'caution');
+                          return (
+                            <p className="flex items-start gap-2 text-xs font-semibold text-slate-500">
+                              <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${caution ? 'bg-amber-500' : 'bg-emerald-500'}`} aria-hidden="true" />
+                              <span>{caution ? 'Vær varsom' : 'Verifisert'} · Kilder: {step.sourceIds.map((id) => sourceTitleById[id] ?? id.replace(/^src-/, '')).join(', ')}</span>
+                            </p>
+                          );
+                        })() : null}
                         <div className="mt-3 flex gap-2">
                           {resolvedStep ? (
                             <button type="button" onClick={() => void writeProgress(step.itemId, 'reopen')} disabled={saving} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 text-sm font-bold text-slate-800 disabled:opacity-50">Angre · sett aktiv igjen</button>

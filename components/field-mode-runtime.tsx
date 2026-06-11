@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
   DEFAULT_FIELD_MODE_SETTINGS,
@@ -92,6 +93,7 @@ export function FieldModeRuntime() {
 
 export function ActiveMissionShortcut() {
   const [mission, setMission] = useState<MissionContext | null>(null);
+  const pathname = usePathname() ?? '';
 
   useEffect(() => {
     let active = true;
@@ -107,7 +109,9 @@ export function ActiveMissionShortcut() {
     };
   }, []);
 
-  if (!mission) return null;
+  // Redundant on the mission surfaces it links into (the dashboard and the runbook).
+  const onMissionSurface = pathname === '/oppdrag' || pathname.startsWith('/oppdrag/') || pathname === '/na';
+  if (!mission || onMissionSurface) return null;
 
   return (
     <div className="border-b border-sky-200 bg-sky-50 px-3 py-2 text-sm font-bold text-sky-950" aria-label="Aktivt oppdrag">
