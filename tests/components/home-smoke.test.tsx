@@ -24,7 +24,8 @@ it('shows the operational command-surface landing page', async () => {
   expect(screen.getByRole('link', { name: /Hjelp og demo/i })).toHaveAttribute('href', '/hjelp');
   expect(screen.getByRole('link', { name: /Alvorlig ulykke/i })).toHaveAttribute('href', '/kort/alvorlig-ulykke-dod-eget-personell');
   expect(screen.getByRole('link', { name: /Psykologisk førstehjelp/i })).toHaveAttribute('href', '/kort/psykologisk-forstehjelp-sekvens');
-  expect(screen.getByRole('link', { name: /Samband \/ ordre/i })).toHaveAttribute('href', '/kort/sambandsplan-start');
+  // Lands on the actual order/comms forms (hash opens the export tools), not a card about them.
+  expect(screen.getByRole('link', { name: /Samband \/ ordre/i })).toHaveAttribute('href', '/oppdrag#5-punktsordre');
   // Capability pills now live once in the shell status strip (compact labels,
   // behind the Detaljer disclosure) instead of repeating as in-page cards.
   expect(screen.getAllByText('Offline-klar').length).toBeGreaterThan(0);

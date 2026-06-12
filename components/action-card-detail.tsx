@@ -1,6 +1,7 @@
 import type { ActionCard, SourceDocument } from '@/lib/content/schemas';
 import { sourceFreshness } from '@/lib/content/source-review';
 import { competenceLabels, phaseLabels, roleLabels, scenarioLabels } from '@/lib/content/taxonomy';
+import { RecordCardVisit } from './recent-cards';
 import { SourceBadge } from './source-badge';
 import { WarningBanner } from './warning-banner';
 import { OperationalIcon } from './ui/operational-icons';
@@ -169,6 +170,7 @@ export function ActionCardDetail({ card, sources }: { card: ActionCard; sources:
 
   return (
     <article className="space-y-3">
+      <RecordCardVisit slug={card.slug} />
       <div className="rounded-3xl bg-white p-5 shadow-sm">
         <p className="text-sm font-bold uppercase tracking-wide text-sky-700">{phaseLabels[card.phase]}</p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">{card.title}</h1>

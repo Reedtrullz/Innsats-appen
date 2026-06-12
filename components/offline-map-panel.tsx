@@ -873,7 +873,8 @@ export function OfflineMapPanel() {
               {editingMarkerId === marker.id ? (
                 <form onSubmit={(event) => saveMarkerEdit(event, marker)} className="mt-3 grid gap-3 md:grid-cols-2" aria-label={`Rediger markør ${marker.label}`}>
                   <label className="text-sm font-bold md:col-span-2">Rediger markøretikett
-                    <input value={markerEditDraft.label} onChange={(event) => setMarkerEditDraft((current) => ({ ...current, label: event.target.value }))} className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+                    {/* Focus follows the edit action so keyboard/screen-reader users land in the form. */}
+                    <input autoFocus value={markerEditDraft.label} onChange={(event) => setMarkerEditDraft((current) => ({ ...current, label: event.target.value }))} className="mt-1 min-h-11 w-full rounded-xl border px-3" />
                   </label>
                   <label className="text-sm font-bold">X 0-100
                     <input aria-label="Rediger markør X 0-100" type="number" min="0" max="100" value={markerEditDraft.x} onChange={(event) => setMarkerEditDraft((current) => ({ ...current, x: event.target.value }))} className="mt-1 min-h-11 w-full rounded-xl border px-3" />
@@ -939,7 +940,8 @@ export function OfflineMapPanel() {
               {editingDrawingId === drawing.id ? (
                 <form onSubmit={(event) => saveDrawingEdit(event, drawing)} className="mt-3 grid gap-3" aria-label={`Rediger sektor ${drawing.label}`}>
                   <label className="text-sm font-bold">Rediger sektoretikett
-                    <input value={drawingEditDraft.label} onChange={(event) => setDrawingEditDraft((current) => ({ ...current, label: event.target.value }))} className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+                    {/* Focus follows the edit action so keyboard/screen-reader users land in the form. */}
+                    <input autoFocus value={drawingEditDraft.label} onChange={(event) => setDrawingEditDraft((current) => ({ ...current, label: event.target.value }))} className="mt-1 min-h-11 w-full rounded-xl border px-3" />
                   </label>
                   <label className="text-sm font-bold">Rediger sektorkoordinater
                     <textarea aria-label="Rediger sektorkoordinater" value={drawingEditDraft.coordinates} onChange={(event) => setDrawingEditDraft((current) => ({ ...current, coordinates: event.target.value }))} className="mt-1 min-h-20 w-full rounded-xl border p-3 font-mono text-xs" />

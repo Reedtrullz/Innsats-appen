@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo } from 'react';
+import { FieldModeQuickToggle } from '@/components/field-mode-quick-toggle';
 import { QuickActionButton, SectionCard } from '@/components/ui/operational-primitives';
 import { OperationalIcon } from '@/components/ui/operational-icons';
 import { useRole } from '@/lib/role/role-context';
@@ -17,7 +18,7 @@ const phaseLinks = [
 const defaultCriticalLinks = [
   { label: 'Alvorlig ulykke / død', description: 'Sikring, varsling og ivaretakelse', href: '/kort/alvorlig-ulykke-dod-eget-personell', icon: 'alert', tone: 'critical' },
   { label: 'Psykologisk førstehjelp', description: 'Akutt støtte og oppfølging', href: '/kort/psykologisk-forstehjelp-sekvens', icon: 'shield', tone: 'sky' },
-  { label: 'Samband / ordre', description: 'Mal for 5-punktsordre og samband', href: '/kort/sambandsplan-start', icon: 'radio', tone: 'warning' },
+  { label: 'Samband / ordre', description: 'Mal for 5-punktsordre og samband', href: '/oppdrag#5-punktsordre', icon: 'radio', tone: 'warning' },
   { label: 'Søk i kildebelagte tiltak', description: 'Søk i alle tiltak og kilder', href: '/sok', icon: 'search', tone: 'slate' },
 ] as const;
 
@@ -82,7 +83,7 @@ function HeroButtons({ roleGroup }: { roleGroup: RoleGroup }) {
       case 'leder':
         return [
           { label: 'Fortsett/start oppdrag', sublabel: 'Oppdrag, sjekkliste og logg.', href: '/oppdrag', icon: 'chevron', tone: 'primary' },
-          { label: 'Samband / ordre', sublabel: 'Mal for 5-punktsordre og samband.', href: '/kort/sambandsplan-start', icon: 'radio', tone: 'white' },
+          { label: 'Samband / ordre', sublabel: 'Mal for 5-punktsordre og samband.', href: '/oppdrag#5-punktsordre', icon: 'radio', tone: 'white' },
           { label: 'Søk', sublabel: 'Kort, moduler og kilder.', href: '/sok', icon: 'search', tone: 'slate' },
         ];
       case 'lagforer':
@@ -166,7 +167,7 @@ function CriticalNowSection({ roleGroup }: { roleGroup: RoleGroup }) {
         return [
           { label: 'Alvorlig ulykke / død', description: 'Sikring, varsling og ivaretakelse', href: '/kort/alvorlig-ulykke-dod-eget-personell', icon: 'alert', tone: 'critical' },
           { label: 'Psykologisk førstehjelp', description: 'Akutt støtte og oppfølging', href: '/kort/psykologisk-forstehjelp-sekvens', icon: 'shield', tone: 'sky' },
-          { label: 'Samband / ordre', description: 'Mal for 5-punktsordre og samband', href: '/kort/sambandsplan-start', icon: 'radio', tone: 'warning' },
+          { label: 'Samband / ordre', description: 'Mal for 5-punktsordre og samband', href: '/oppdrag#5-punktsordre', icon: 'radio', tone: 'warning' },
           { label: 'Søk i kildebelagte tiltak', description: 'Søk i alle tiltak og kilder', href: '/sok', icon: 'search', tone: 'slate' },
         ] as const;
       default:
@@ -222,6 +223,8 @@ export function HomeRoleContent() {
         </div>
         <HeroButtons roleGroup={roleGroup} />
       </section>
+
+      <FieldModeQuickToggle />
 
       <div className="mt-5">
         <CriticalNowSection roleGroup={roleGroup} />

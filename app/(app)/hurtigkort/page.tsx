@@ -1,3 +1,4 @@
+import { RecentCardsRow } from '@/components/recent-cards';
 import { SearchBox } from '@/components/search-box';
 import { TiltakCardRow } from '@/components/tiltak-card';
 import { getActionCards, getContentManifest, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSearchSynonyms, getSourceDocuments, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
@@ -31,6 +32,7 @@ export default function HurtigkortPage() {
         <p className="mt-3 text-xs font-bold text-sky-200">Innhold oppdatert: <span data-testid="content-version">{formatNbDateTime(manifest.contentVersion)}</span></p>
       </section>
       <SearchBox documents={searchDocuments} generatedAt={searchIndexGeneratedAt} showFreshnessIndicator />
+      <RecentCardsRow cards={sortedCards} />
 
       {criticalCards.length > 0 ? (
         <section className="space-y-3" aria-labelledby="hurtigkort-critical-heading">
