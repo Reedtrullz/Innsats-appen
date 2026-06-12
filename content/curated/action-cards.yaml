@@ -467,18 +467,27 @@
   scenarios: [ generelt, psykososial ]
   priority: high
   steps:
-    - Sikre skadestedet, stans farlig arbeid og få oversikt over hvem som er
-      berørt.
-    - Varsle nødetater ved akutt fare og varsle distrikt/kommandolinje
-      umiddelbart.
-    - Skjerm personell, ivareta vitner og følg lokal varslings- og
-      oppfølgingsrutine.
+    - Ta ledelsen, sikre skadestedet, stans farlig arbeid og skaff oversikt
+      over hvem som er berørt.
+    - Varsle 113 og gi livreddende førstehjelp.
+    - Varsle beredskapsvakt/sivilforsvarsdistrikt umiddelbart.
+    - Hvis mulig, la noen følge syke/skadde til medisinsk
+      undersøkelse/behandling.
+    - Vurder, i samråd med innsatsleder, om personellet/laget skal tas ut av
+      innsats.
+    - Samle personellet i trygge omgivelser, gi informasjon og skjerm berørte
+      og vitner.
+    - Vurder behov for defuse/debrief etter innsatsen, og koordiner videre
+      oppfølging med beredskapsvakt/distrikt.
   safety:
     - Ikke flytt eller eksponer berørte mer enn nødvendig for livreddende tiltak
       og sikkerhet.
+    - Alt personell som er utsatt for akutt skade eller sykdom, eller mistanke
+      om dette, skal vurderes medisinsk av lege.
   reporting:
     - Rapporter kort status, tiltak, ressursbehov og hvem som håndterer videre
       varsling.
+    - Fyll ut avviksrapportering (RUH) etter hendelsen.
   sourceIds:
     [
       src-tiltakskort-alvorlig-ulykke-eller-dod-eget-personell,
