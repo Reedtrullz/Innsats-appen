@@ -1,7 +1,6 @@
 import Link from 'next/link';
 
 import { getMustReadNotices } from '@/lib/content/load-content';
-import { RoleSelector } from './role-selector';
 import { BottomNav } from './bottom-nav';
 import { DecisionSupportNotice } from './decision-support-notice';
 import { ActiveMissionShortcut, FieldModeRuntime } from './field-mode-runtime';
@@ -25,7 +24,6 @@ export function AppShell({ children, currentPath }: { children: React.ReactNode;
             </span>
           </Link>
           <div className="flex shrink-0 items-center justify-end gap-2">
-            <RoleSelector />
             <Link href="/ma-leses" aria-label={`Må leses ${mustReadCount}`} className="inline-flex min-h-11 items-center rounded-full bg-red-600 px-3 py-2 text-xs font-black text-white shadow-sm shadow-red-950/20">
               <span className="sm:hidden">Må {mustReadCount}</span>
               <span className="hidden sm:inline">Må leses {mustReadCount}</span>

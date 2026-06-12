@@ -50,8 +50,9 @@ it('shows trained-personnel-only treatment and fallback guidance for competence-
   render(<ActionCardDetail card={card} sources={sources} />);
 
   expect(screen.getByText(/Kun for trent personell/i)).toBeInTheDocument();
-  expect(screen.getByText(/RAD10/i)).toBeInTheDocument();
-  expect(screen.getByText(/RAD30/i)).toBeInTheDocument();
+  // The competence codes appear both in the compact strip and the expanded guidance.
+  expect(screen.getAllByText(/RAD10/i).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/RAD30/i).length).toBeGreaterThan(0);
   expect(screen.getByText(/appen gir ikke kompetanse/i)).toBeInTheDocument();
   expect(screen.getByText(/ikke utfør/i)).toBeInTheDocument();
   expect(screen.getByText(/avvent trent ressurs|lederordre/i)).toBeInTheDocument();
@@ -63,7 +64,7 @@ it('shows competence rationale when no explicit competence requirement exists', 
 
   render(<ActionCardDetail card={card} sources={sources} />);
 
-  expect(screen.getByText(/Kompetansevurdering/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/Kompetansevurdering/i).length).toBeGreaterThan(0);
   expect(screen.getByText(/Tilfluktsromstøtte styres av ansvarlig myndighet/i)).toBeInTheDocument();
 });
 

@@ -89,13 +89,23 @@ test('mobile layout has no horizontal overflow and visible controls have large e
   }
 });
 
-test('warning banners remain visible in card detail', async ({ page }) => {
+test('card-level warning stays visible; source warnings live in the governance panel', async ({ page }) => {
   await page.goto('/kort/tilfluktsrom-klargjoring');
   await expect(page.getByRole('heading', { name: /Klargjør.*tilfluktsrom/i })).toBeVisible();
+  // The card's own safety warning must be read before acting and stays a
+  // visible banner above the steps.
   await expect(page.getByRole('note').filter({ hasText: /Ikke offisiell ordre eller fullstendig oversikt/i })).toBeVisible();
   await expect(page.getByRole('note').filter({ hasText: /private eller skjermede tilfluktsromdata/i })).toBeVisible();
   await expect(page.getByRole('note').filter({ hasText: /Ikke kildegodkjent for pilot/i })).toHaveCount(0);
-  await expect(page.getByRole('note').filter({ hasText: /Kontroller alltid mot gjeldende offisielt planverk/i }).first()).toBeVisible();
+  // Source-derived boilerplate moved into the collapsed governance panel so
+  // the steps lead; the panel verdict is always visible and expanding it
+  // reveals the source warnings.
+  const governance = page.locator('details').filter({ hasText: /Kildestatus/ }).first();
+  await expect(governance.locator('summary')).toBeVisible();
+  if (!(await governance.evaluate((el) => (el as HTMLDetailsElement).open))) {
+    await governance.locator('summary').click();
+  }
+  await expect(governance.getByText(/Kontroller alltid mot gjeldende offisielt planverk/i).first()).toBeVisible();
 });
 
 test('keyboard can search and open a quick card', async ({ page }) => {

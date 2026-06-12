@@ -2,6 +2,10 @@ import { expect, test } from '@playwright/test';
 
 const PROFILE_KEY = 'beredskapsboka-local-profile-v1';
 
+// Navigation is deliberately identical for every role: spatial memory matters
+// more in the field than per-role ranking. Role adapts page content only.
+const STABLE_NAV = ['Hjem', 'Søk', 'Oppdrag', 'Kort', 'Mer'];
+
 function setProfileRole(page: import('@playwright/test').Page, role: string) {
   return page.addInitScript(([key, r]) => {
     localStorage.setItem(key, JSON.stringify({
@@ -26,46 +30,39 @@ async function navLabels(page: import('@playwright/test').Page) {
   return labels;
 }
 
-test('default home shows Hva trenger du nå and default nav order', async ({ page }) => {
+test('default home shows Hva trenger du nå and the stable nav order', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: /Hva trenger du nå/i })).toBeVisible();
-  expect(await navLabels(page)).toEqual(['Hjem', 'Søk', 'Oppdrag', 'Kort', 'Mer']);
+  expect(await navLabels(page)).toEqual(STABLE_NAV);
 });
 
-test('leder role shows Lederoversikt and leder nav order', async ({ page }) => {
+test('leder role adapts home content but keeps the same nav order', async ({ page }) => {
   await setProfileRole(page, 'leder');
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: /Lederoversikt/i })).toBeVisible();
-  expect(await navLabels(page)).toEqual(['Hjem', 'Oppdrag', 'Søk', 'Kort', 'Mer']);
+  expect(await navLabels(page)).toEqual(STABLE_NAV);
 });
 
-test('lagforer role shows lagforer nav order', async ({ page }) => {
-  await setProfileRole(page, 'lagforer');
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await expect(page.getByTestId('role-selector').getByRole('button').first()).toContainText('Lagfører', { timeout: 5000 });
-  expect(await navLabels(page)).toEqual(['Oppdrag', 'Kort', 'Hjem', 'Søk', 'Mer']);
-});
-
-test('mannskap role shows simplified hero and mannskap nav order', async ({ page }) => {
+test('mannskap role shows simplified hero and keeps the same nav order', async ({ page }) => {
   await setProfileRole(page, 'mannskap');
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: /Enkel tilgang/i })).toBeVisible();
   await expect(page.getByText(/Hurtigkort/i).first()).toBeVisible();
-  expect(await navLabels(page)).toEqual(['Kort', 'Søk', 'Oppdrag', 'Hjem', 'Mer']);
+  expect(await navLabels(page)).toEqual(STABLE_NAV);
 });
 
-test('role selector switches and reorders nav without page reload', async ({ page }) => {
+test('the home role lens is the single role picker and switches content without reload', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  const selector = page.getByTestId('role-selector');
-  // Retry opening the dropdown: a click landing before React hydration is lost,
-  // so keep clicking the trigger until the option is actually visible.
+  // The header has no role selector; the lens on home is the only picker.
+  await expect(page.getByTestId('role-selector')).toHaveCount(0);
+  const lens = page.getByRole('radiogroup', { name: 'Rollevisning' });
+  await expect(lens).toBeVisible();
+  // Retry the first click: one landing before React hydration is lost.
   await expect(async () => {
-    await selector.getByRole('button', { name: /Rolle: Ingen/ }).click();
-    await expect(page.getByRole('button', { name: 'Lagfører' })).toBeVisible({ timeout: 1000 });
+    await lens.getByText('Lagfører', { exact: true }).click();
+    await expect(lens.getByRole('radio', { name: 'Lagfører' })).toBeChecked({ timeout: 1000 });
   }).toPass({ timeout: 15000 });
-  await page.getByRole('button', { name: 'Lagfører' }).click();
-  await expect(page.getByTestId('role-selector').getByRole('button').first()).toContainText('Lagfører');
-  // Nav reorders on the client after the role context updates; poll so the
-  // assertion waits for the re-render instead of racing it (one-shot read flakes).
-  await expect.poll(() => navLabels(page)).toEqual(['Oppdrag', 'Kort', 'Hjem', 'Søk', 'Mer']);
+  // Lagfører keeps the default hero title; content adapts via hero buttons.
+  await expect(page.getByRole('heading', { name: /Hva trenger du nå/i })).toBeVisible();
+  expect(await navLabels(page)).toEqual(STABLE_NAV);
 });

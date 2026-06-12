@@ -1,14 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useRole } from '@/lib/role/role-context';
 import { OperationalIcon, type OperationalIconName } from './ui/operational-icons';
 
 type NavItem = { href: string; label: string; icon: OperationalIconName };
 
-const allItems: NavItem[] = [
+// The nav order is identical for every role: spatial memory matters more in
+// the field than per-role ranking. Role only adapts page content, never the
+// position of navigation targets.
+const navItems: NavItem[] = [
   { href: '/', label: 'Hjem', icon: 'home' },
   { href: '/sok', label: 'Søk', icon: 'search' },
   { href: '/oppdrag', label: 'Oppdrag', icon: 'briefcase' },
@@ -16,32 +17,15 @@ const allItems: NavItem[] = [
   { href: '/mer', label: 'Mer', icon: 'more' },
 ];
 
-const NAV_ORDER: Record<string, string[]> = {
-  leder: ['/', '/oppdrag', '/sok', '/hurtigkort', '/mer'],
-  lagforer: ['/oppdrag', '/hurtigkort', '/', '/sok', '/mer'],
-  mannskap: ['/hurtigkort', '/sok', '/oppdrag', '/', '/mer'],
-};
-
 export function BottomNav({ currentPath }: { currentPath?: string }) {
-  const { roleGroup } = useRole();
   const pathname = usePathname();
   const activePath = currentPath ?? pathname;
-
-  const items = useMemo(() => {
-    const order = NAV_ORDER[roleGroup] ?? null;
-    if (!order) return allItems;
-    const ordered = order
-      .map((href) => allItems.find((item) => item.href === href))
-      .filter((item): item is NavItem => Boolean(item));
-    const rest = allItems.filter((item) => !order.includes(item.href));
-    return [...ordered, ...rest];
-  }, [roleGroup]);
 
   if (activePath === '/release' || activePath.startsWith('/release/')) return null;
   return (
     <nav aria-label="Hovednavigasjon" className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.35rem)] pt-2 shadow-[0_-10px_30px_rgba(15,23,42,0.10)] backdrop-blur">
       <ul className="mx-auto grid max-w-3xl grid-cols-5 gap-1">
-        {items.map((item) => {
+        {navItems.map((item) => {
           const active = item.href === '/' ? activePath === '/' : activePath === item.href || activePath.startsWith(`${item.href}/`);
           return (
             <li key={item.href} className="min-w-0">
