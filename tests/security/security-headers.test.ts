@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import nextConfig from '@/next.config';
+import nextConfig, { buildContentSecurityPolicy } from '@/next.config';
 
 function headerMap(headers: Array<{ key: string; value: string }>) {
   return new Map(headers.map((header) => [header.key, header.value]));
@@ -33,5 +33,13 @@ describe('app-wide security headers', () => {
     expect(csp).toContain("base-uri 'self'");
     expect(csp).toContain("form-action 'self'");
     expect(csp).not.toContain('unsafe-eval');
+  });
+
+  it('allows eval only in the development CSP, never in production', () => {
+    expect(buildContentSecurityPolicy(false)).not.toContain('unsafe-eval');
+    const devCsp = buildContentSecurityPolicy(true);
+    expect(devCsp).toContain("script-src 'self' 'unsafe-inline' 'unsafe-eval'");
+    // The carve-out is script-src only.
+    expect(devCsp.match(/unsafe-eval/g)).toHaveLength(1);
   });
 });

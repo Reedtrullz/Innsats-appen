@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { InstallPrompt } from '@/components/install-prompt';
 import { OperationalStatus } from '@/components/operational-status';
 import { ThemeSelector } from '@/components/theme-selector';
 import { getContentManifest } from '@/lib/content/load-content';
@@ -113,6 +114,8 @@ export default function MorePage() {
       </section>
 
       <ThemeSelector />
+
+      <InstallPrompt />
 
       <section className="space-y-3" aria-labelledby="more-operational-heading">
         <div>

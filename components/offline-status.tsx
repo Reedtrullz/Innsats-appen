@@ -20,12 +20,28 @@ type OfflineStatusState = {
   cacheVersion: string;
   staleGeneratedContent: boolean;
   fallbackGeneratedContent: boolean;
+  generatedAt?: string | null;
   lastFallbackUrl?: string;
 };
 
+function contentAgeText(generatedAt: string | null | undefined, now = Date.now()) {
+  if (!generatedAt) return null;
+  const generatedMs = Date.parse(generatedAt);
+  if (!Number.isFinite(generatedMs) || generatedMs > now) return null;
+  const days = Math.floor((now - generatedMs) / (24 * 60 * 60 * 1000));
+  return days < 1 ? 'under ett døgn gammelt' : days === 1 ? '1 dag gammelt' : `${days} dager gammelt`;
+}
+
 function warningText(state: OfflineStatusState) {
   if (state.fallbackGeneratedContent) return 'Reserveinnhold er aktivt — kontroller mot gjeldende ordre når du er tilkoblet.';
-  if (state.staleGeneratedContent) return 'Innhold fra buffer kan være utdatert — kontroller mot gjeldende ordre når du er tilkoblet.';
+  if (state.staleGeneratedContent) {
+    // A concrete age beats a binary "kan være utdatert": six days stale and
+    // one day stale call for different field judgement.
+    const age = contentAgeText(state.generatedAt);
+    return age
+      ? `Innhold fra buffer kan være utdatert (${age}) — kontroller mot gjeldende ordre når du er tilkoblet.`
+      : 'Innhold fra buffer kan være utdatert — kontroller mot gjeldende ordre når du er tilkoblet.';
+  }
   return null;
 }
 
@@ -82,6 +98,7 @@ export function OfflineStatus({ compact = false, children }: { compact?: boolean
           cacheVersion: cacheVersion ?? current.cacheVersion,
           staleGeneratedContent: cacheFallback || generatedFallback || isGeneratedContentStale(generatedAt, Date.now(), GENERATED_CONTENT_STALE_MS),
           fallbackGeneratedContent: generatedFallback || manifest?.fallback === true,
+          generatedAt,
         }));
       })
       .catch(() => {

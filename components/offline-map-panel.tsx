@@ -68,6 +68,7 @@ import { buildFieldLogEntryFromMapObject } from '@/lib/mission/map-log-link';
 import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
 import { getMission, listMissions, saveMission } from '@/lib/mission/local-store';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
+import { stackSchematicLabelYs } from '@/lib/maps/schematic-labels';
 import { SENSITIVE_TEXT_EXPLANATIONS, SensitiveTextError, detectSensitiveOperationalText, sensitiveTextFieldError, type SensitiveTextMatch } from '@/lib/privacy/sensitive-text';
 import { DEFAULT_FIELD_MODE_SETTINGS, FIELD_MODE_STORAGE_EVENT, readFieldModeSettings } from '@/lib/field-mode/field-mode';
 import type { FieldLogCategory, MissionContext } from '@/lib/mission/schemas';
@@ -274,6 +275,15 @@ function SchematicMap({ packageId, state, enabledLayers }: { packageId: string; 
   const filteredState = filterMissionMapStateByLayers(state, enabledLayers);
   const renderedOperations = operationItemsForRender(filteredState);
   const hiddenOperationCount = filteredState.markers.length + filteredState.drawings.length - renderedOperations.length;
+  // Labels for features and markers share one stacking pass so nearby
+  // anchors get distinct rows instead of overprinting each other.
+  const renderedMarkers = renderedOperations.filter((item) => item.itemType === 'marker');
+  const labelYs = stackSchematicLabelYs([
+    ...renderedFeatures.map((feature) => ({ x: feature.x, y: feature.y })),
+    ...renderedMarkers.map((item) => ({ x: item.point.x, y: item.point.y })),
+  ]);
+  const featureLabelY = (index: number) => labelYs[index];
+  const markerLabelYById = new Map(renderedMarkers.map((item, index) => [item.id, labelYs[renderedFeatures.length + index]]));
 
   return (
     <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 text-white shadow-sm" aria-label="Skjematisk lokalkart">
@@ -288,12 +298,12 @@ function SchematicMap({ packageId, state, enabledLayers }: { packageId: string; 
         <rect width="100" height="100" fill="url(#offline-map-grid)" />
         <path d="M 12 78 C 25 62, 39 56, 50 48 S 75 25, 88 14" fill="none" stroke="#38bdf8" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="3 2" />
         <path d="M 16 22 C 31 36, 51 44, 84 75" fill="none" stroke="#a7f3d0" strokeWidth="1.2" strokeLinecap="round" strokeDasharray="2 3" />
-        {renderedFeatures.map((feature) => {
+        {renderedFeatures.map((feature, index) => {
           const style = featureStyles[feature.kind];
           return (
             <g key={feature.id}>
               <circle cx={feature.x} cy={feature.y} r="4.2" fill={style.fill} stroke={style.stroke} strokeWidth="1" />
-              <text x={feature.x > 50 ? feature.x - 5 : feature.x + 5} y={Math.max(feature.y - 3, 8)} textAnchor={feature.x > 50 ? 'end' : 'start'} fill="#f8fafc" fontSize="3.3" fontWeight="700">
+              <text x={feature.x > 50 ? feature.x - 5 : feature.x + 5} y={featureLabelY(index)} textAnchor={feature.x > 50 ? 'end' : 'start'} fill="#f8fafc" fontSize="3.3" fontWeight="700">
                 {feature.label}
               </text>
             </g>
@@ -302,7 +312,7 @@ function SchematicMap({ packageId, state, enabledLayers }: { packageId: string; 
         {renderedOperations.map((item) => item.itemType === 'marker' ? (
           <g key={item.id} data-testid={`map-marker-${item.kind}`}>
             <circle cx={item.point.x} cy={item.point.y} r="3.2" fill={markerColors[item.kind]} stroke="#ffffff" strokeWidth="1" />
-            <text x={item.point.x > 50 ? item.point.x - 4 : item.point.x + 4} y={Math.max(item.point.y - 4, 7)} textAnchor={item.point.x > 50 ? 'end' : 'start'} fill="#ffffff" fontSize="3.1" fontWeight="800">{MAP_MARKER_LABELS[item.kind]}: {item.label}</text>
+            <text x={item.point.x > 50 ? item.point.x - 4 : item.point.x + 4} y={markerLabelYById.get(item.id) ?? Math.max(item.point.y - 4, 7)} textAnchor={item.point.x > 50 ? 'end' : 'start'} fill="#ffffff" fontSize="3.1" fontWeight="800">{MAP_MARKER_LABELS[item.kind]}: {item.label}</text>
           </g>
         ) : (
           <g key={item.id} data-testid={`map-drawing-${item.kind}`}>
@@ -485,7 +495,20 @@ export function OfflineMapPanel() {
       return;
     }
     try {
-      const result = await cacheLocalMapPackageAssets(localPackage);
+      // Field 3G + a 30-40 MB PMTiles package looks hung without feedback;
+      // stream the download and surface throttled percent/MB progress.
+      let lastReportedStep = -1;
+      const result = await cacheLocalMapPackageAssets(localPackage, {
+        onProgress: ({ loadedBytes, totalBytes, percent }) => {
+          const step = percent !== null ? percent : Math.floor(loadedBytes / (512 * 1024));
+          if (step === lastReportedStep) return;
+          lastReportedStep = step;
+          const loadedMb = (loadedBytes / (1024 * 1024)).toFixed(1);
+          setStatusMessage(percent !== null && totalBytes
+            ? `Lagrer lokal kartpakke … ${percent} % (${loadedMb} av ${(totalBytes / (1024 * 1024)).toFixed(1)} MB)`
+            : `Lagrer lokal kartpakke … ${loadedMb} MB lastet`);
+        },
+      });
       if (result.cached === 0) {
         setStatusMessage('Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline.');
         return;

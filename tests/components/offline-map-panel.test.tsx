@@ -276,7 +276,7 @@ it('stores selected map package cache metadata in localStorage and can reset it'
 
   await user.click(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }));
   await waitFor(() => {
-    expect(cacheLocalMapPackageAssets).toHaveBeenCalledWith(approvedPmtilesPackage);
+    expect(cacheLocalMapPackageAssets).toHaveBeenCalledWith(approvedPmtilesPackage, expect.objectContaining({ onProgress: expect.any(Function) }));
     expect(localStorage.getItem(OFFLINE_MAP_CACHE_STORAGE_KEY)).toContain('trondheim-demo-pmtiles');
     expect(screen.getByTestId('offline-map-cache-status')).toHaveTextContent(/Lokal kartpakke aktiv: Trondheim demo PMTiles/i);
   });
@@ -340,7 +340,7 @@ it('lets an approved PMTiles package be selected, cached and activated', async (
   await user.click(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }));
 
   await waitFor(() => {
-    expect(cacheLocalMapPackageAssets).toHaveBeenCalledWith(approvedPmtilesPackage);
+    expect(cacheLocalMapPackageAssets).toHaveBeenCalledWith(approvedPmtilesPackage, expect.objectContaining({ onProgress: expect.any(Function) }));
     expect(screen.getByText(/Lokal kartpakke aktiv: Trondheim demo PMTiles/i)).toBeInTheDocument();
   });
   expect(await screen.findByTestId('offline-maplibre-container')).toBeInTheDocument();
@@ -436,7 +436,7 @@ it('keeps schematic fallback when CacheStorage rejects while precaching an appro
   await user.click(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }));
 
   await waitFor(() => {
-    expect(cacheLocalMapPackageAssets).toHaveBeenCalledWith(approvedPmtilesPackage);
+    expect(cacheLocalMapPackageAssets).toHaveBeenCalledWith(approvedPmtilesPackage, expect.objectContaining({ onProgress: expect.any(Function) }));
     expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline/i);
     expect(screen.getByTestId('offline-map-cache-status')).toHaveTextContent(/Ingen kartpakke/i);
   });

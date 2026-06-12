@@ -35,7 +35,9 @@ test('oppdrag opens on Nå and keeps export tools secondary', async ({ page }) =
   });
 
   await expect(page.getByRole('heading', { name: /Situasjon og neste grep/i })).toBeVisible();
-  await expect(page.getByRole('heading', { name: /Gjør dette først/i })).toBeVisible();
+  // The guided runbook is the default Nå experience (replaced the old
+  // "Gjør dette først" card).
+  await expect(page.getByText(/Anbefalt rekkefølge — ikke en kommando/i)).toBeVisible();
   await expect(page.getByText('Avansert / dokumentasjon')).toHaveCount(0);
   await expect(page.getByText('Primært')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: /Kart og logg/i })).toHaveCount(0);
