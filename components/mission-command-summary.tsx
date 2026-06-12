@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { OperationalChecklist } from '@/lib/content/schemas';
 import { phaseLabels, roleLabels, scenarioLabels } from '@/lib/content/taxonomy';
 import type { ChecklistRun, MissionContext } from '@/lib/mission/schemas';
-import { OperationalStatusPills } from './operational-status-pills';
 import { OperationalIcon } from './ui/operational-icons';
 import { ProgressSummary, QuickActionButton, SectionCard } from './ui/operational-primitives';
 
@@ -50,7 +49,6 @@ export function MissionCommandHeader({ mission }: { mission: MissionContext }) {
             <Link href="/oppdrag/ny" className="inline-flex min-h-8 items-center rounded-full bg-white/10 px-3 py-1 text-xs font-black text-white ring-1 ring-white/20">Nytt oppdrag</Link>
           </div>
         </div>
-        <OperationalStatusPills compact limit={2} className="text-slate-950" />
       </div>
       <dl className="grid grid-cols-3 gap-px bg-white/10 text-sm">
         <div className="min-w-0 bg-[#082F49] px-3 py-2 sm:px-4 sm:py-3">

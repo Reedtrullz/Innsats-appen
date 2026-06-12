@@ -47,9 +47,9 @@ it('keeps a visible decision-support and local-only disclaimer in the persistent
   expect(screen.getByText(/ikke et offisielt kommando/i)).toBeInTheDocument();
   expect(screen.getByText(/lagres bare lokalt/i)).toBeInTheDocument();
   expect(screen.getByText(/ikke legg inn persondata/i)).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: /^Grenser$/i })).toHaveAttribute('href', '/begrensninger');
-  expect(screen.getByRole('link', { name: /^Kjente begrensninger$/i })).toHaveAttribute('href', '/kjente-begrensninger');
-  expect(screen.getByRole('link', { name: /^Data på enheten$/i })).toHaveAttribute('href', '/data-pa-enheten');
+  // The shell keeps one persistent entry point to the full boundary text;
+  // the deeper limitation/data pages are linked from /begrensninger and /mer.
+  expect(screen.getByRole('link', { name: /Les grensene/i })).toHaveAttribute('href', '/begrensninger');
 });
 
 it('applies field mode runtime CSS for night mode and 48x48 touch targets', async () => {

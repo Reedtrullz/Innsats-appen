@@ -4,7 +4,6 @@ import type { ActionCard, OperationalChecklist } from '@/lib/content/schemas';
 import type { listChecklistRuns } from '@/lib/mission/local-store';
 import type { MissionContext } from '@/lib/mission/schemas';
 import { MissionCommandHeader } from '../../mission-command-summary';
-import { MissionStatusStrip } from './mission-status-strip';
 import { PanelHeading } from './panel-heading';
 import { MissionProgressStrip } from './mission-progress-strip';
 import { CompactQuickLog } from './compact-quick-log';
@@ -64,7 +63,6 @@ export function MissionNowPanel({
     <section id="mission-now-panel" role="tabpanel" aria-labelledby="mission-now-tab" className="space-y-4">
       <PanelHeading eyebrow="Nå" title="Situasjon og neste grep" id="mission-now-heading" />
       <MissionCommandHeader mission={mission} />
-      <MissionStatusStrip />
       <NextActionCard nextActionSteps={nextActionSteps} checklist={checklist} />
       <RecommendedActionsPanel recommendedLabel={recommendedLabel} criticalActions={criticalActions} firstActions={firstActions} mission={mission} />
       <CompactQuickLog mission={mission} onMissionChange={onMissionChange} />

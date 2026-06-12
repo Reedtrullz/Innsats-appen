@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useMemo } from 'react';
-import { OperationalStatus } from '@/components/operational-status';
 import { QuickActionButton, SectionCard } from '@/components/ui/operational-primitives';
 import { OperationalIcon } from '@/components/ui/operational-icons';
 import { useRole } from '@/lib/role/role-context';
@@ -129,7 +128,7 @@ function HomeRoleLens() {
   return (
     <fieldset role="radiogroup" className="rounded-2xl bg-white/10 p-2 ring-1 ring-white/15" aria-label="Rollevisning">
       <legend className="sr-only">Rollevisning</legend>
-      <div className="grid gap-2 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {roleLensOptions.map((group) => (
           <label
             key={group}
@@ -194,7 +193,6 @@ function CriticalNowSection({ roleGroup }: { roleGroup: RoleGroup }) {
 export function HomeRoleContent() {
   const { roleGroup } = useRole();
 
-  const statusPillsAbove = roleGroup === 'leder';
   const heroTitle = roleGroup === 'leder'
     ? 'Lederoversikt'
     : roleGroup === 'mannskap'
@@ -206,12 +204,6 @@ export function HomeRoleContent() {
 
   return (
     <div>
-      {statusPillsAbove ? (
-        <div className="mb-4 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
-          <OperationalStatus showConnectivity={false} />
-        </div>
-      ) : null}
-
       <section className="overflow-hidden rounded-[1.35rem] bg-[#082F49] text-white shadow-sm">
         <div className="space-y-4 p-5">
           <div className="flex items-start justify-between gap-3">
@@ -230,12 +222,6 @@ export function HomeRoleContent() {
         </div>
         <HeroButtons roleGroup={roleGroup} />
       </section>
-
-      {!statusPillsAbove ? (
-        <div className="mt-4 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm">
-          <OperationalStatus showConnectivity={false} />
-        </div>
-      ) : null}
 
       <div className="mt-5">
         <CriticalNowSection roleGroup={roleGroup} />

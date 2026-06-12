@@ -57,24 +57,30 @@ export function DecisionSupportNotice({ compact = false }: { compact?: boolean }
     // Slim from first load so the primary action stays reachable. The full
     // boundary text lives on /begrensninger; the one-liner keeps the core
     // invariant (advisory, local-only, no persondata) visible everywhere.
+    if (acknowledged) {
+      // After acknowledgement the boundary collapses to one thin persistent
+      // line so it never crowds out operational content again.
+      return (
+        <section className="flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 text-amber-950" aria-label="Operativ grense og lokal datalagring">
+          <p className="py-1 text-[0.7rem] font-bold leading-4">Beslutningsstøtte · lagres bare lokalt · ingen persondata</p>
+          <Link href="/begrensninger" className="inline-flex min-h-11 shrink-0 items-center text-[0.7rem] font-black underline underline-offset-2">
+            Grenser
+          </Link>
+        </section>
+      );
+    }
     return (
       <section className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-amber-950" aria-label="Operativ grense og lokal datalagring">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs font-black uppercase tracking-wide">Grenser og lokal lagring</p>
-          {acknowledged ? (
-            <Link href="/begrensninger" className="inline-flex min-h-11 items-center rounded-full bg-white px-4 py-2 text-xs font-black text-amber-950 ring-1 ring-amber-200">
-              Åpne grenser
-            </Link>
-          ) : (
-            <button type="button" onClick={acknowledge} className="inline-flex min-h-11 items-center rounded-full bg-amber-950 px-4 py-2 text-xs font-black text-white">
-              Forstått
-            </button>
-          )}
+          <button type="button" onClick={acknowledge} className="inline-flex min-h-11 items-center rounded-full bg-amber-950 px-4 py-2 text-xs font-black text-white">
+            Forstått
+          </button>
         </div>
         <p className="mt-1 text-xs font-semibold leading-5">
-          Beslutningsstøtte, ikke et offisielt kommandosystem. Data lagres bare lokalt; ikke legg inn persondata.
+          Beslutningsstøtte, ikke et offisielt kommandosystem. Data lagres bare lokalt; ikke legg inn persondata.{' '}
+          <Link href="/begrensninger" className="inline-flex min-h-11 items-center align-middle font-black underline underline-offset-2">Les grensene</Link>.
         </p>
-        {!acknowledged ? <BoundaryLinks compact /> : null}
       </section>
     );
   }

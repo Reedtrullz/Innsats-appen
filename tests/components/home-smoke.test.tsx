@@ -25,10 +25,12 @@ it('shows the operational command-surface landing page', async () => {
   expect(screen.getByRole('link', { name: /Alvorlig ulykke/i })).toHaveAttribute('href', '/kort/alvorlig-ulykke-dod-eget-personell');
   expect(screen.getByRole('link', { name: /Psykologisk førstehjelp/i })).toHaveAttribute('href', '/kort/psykologisk-forstehjelp-sekvens');
   expect(screen.getByRole('link', { name: /Samband \/ ordre/i })).toHaveAttribute('href', '/kort/sambandsplan-start');
+  // Capability pills now live once in the shell status strip (compact labels,
+  // behind the Detaljer disclosure) instead of repeating as in-page cards.
   expect(screen.getAllByText('Offline-klar').length).toBeGreaterThan(0);
-  expect(screen.getAllByText('Lagres lokalt').length).toBeGreaterThan(0);
+  expect(screen.getAllByText('Lokalt').length).toBeGreaterThan(0);
   expect(screen.queryByRole('link', { name: /Release readiness/i })).not.toBeInTheDocument();
-  expect(screen.getByText(/Ikke offisielt kommandosystem/i)).toBeInTheDocument();
+  expect(screen.getByText('Ikke kommando')).toBeInTheDocument();
 });
 
 it('renders the in-app boundary, known limitations, and device data pages', async () => {

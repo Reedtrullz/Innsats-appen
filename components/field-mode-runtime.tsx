@@ -109,9 +109,11 @@ export function ActiveMissionShortcut() {
     };
   }, []);
 
-  // Redundant on the mission surfaces it links into (the dashboard and the runbook).
-  const onMissionSurface = pathname === '/oppdrag' || pathname.startsWith('/oppdrag/') || pathname === '/na';
-  if (!mission || onMissionSurface) return null;
+  // Redundant on the mission surfaces it links into (the dashboard and the
+  // runbook) and on home, where HomeActiveMission renders a richer card.
+  const suppressed =
+    pathname === '/' || pathname === '/oppdrag' || pathname.startsWith('/oppdrag/') || pathname === '/na';
+  if (!mission || suppressed) return null;
 
   return (
     <div className="border-b border-sky-200 bg-sky-50 px-3 py-2 text-sm font-bold text-sky-950" aria-label="Aktivt oppdrag">

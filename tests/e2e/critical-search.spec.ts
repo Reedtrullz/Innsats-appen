@@ -98,7 +98,9 @@ test('offline search returns results without network', async ({ page, context: b
   await browserContext.setOffline(true);
   await search.fill('samband');
   await expect(page.getByLabel('Lokalt søk').getByRole('link').first()).toBeVisible();
-  await expect(page.getByText(/nettverk|offline|internett/i).first()).toBeVisible();
+  // "Frakoblet – bufret innhold kan brukes" in the shell status line is the
+  // visible offline indication (same wording offline.spec.ts asserts on).
+  await expect(page.getByText(/nettverk|offline|internett|frakoblet/i).first()).toBeVisible();
 
   await browserContext.setOffline(false);
   await search.fill('radiac');

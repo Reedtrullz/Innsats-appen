@@ -13,14 +13,15 @@ describe('DecisionSupportNotice', () => {
     expect(document.body).not.toHaveTextContent(/post-MVP|MVP|backend sync|service worker/i);
   });
 
-  it('acknowledges the compact notice locally and keeps a persistent boundary link', async () => {
+  it('acknowledges the compact notice locally and collapses to one line with a persistent boundary link', async () => {
     render(<DecisionSupportNotice compact />);
 
     await userEvent.click(screen.getByRole('button', { name: /Forstått/i }));
 
     await waitFor(() => expect(localStorage.getItem(DECISION_SUPPORT_NOTICE_ACK_KEY)).toBe('true'));
-    expect(screen.getByText(/Grenser og lokal lagring/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Åpne grenser/i })).toHaveAttribute('href', '/begrensninger');
+    // The core invariant stays visible as a thin one-liner; the full text lives on /begrensninger.
+    expect(screen.getByText(/Beslutningsstøtte · lagres bare lokalt · ingen persondata/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Grenser/i })).toHaveAttribute('href', '/begrensninger');
     expect(screen.queryByRole('button', { name: /Forstått/i })).not.toBeInTheDocument();
   });
 

@@ -34,14 +34,14 @@ export function AppShell({ children, currentPath }: { children: React.ReactNode;
           </div>
         </div>
       </header>
-      <div className="border-b border-slate-200 bg-white px-3 py-2">
+      <div className="border-b border-slate-200 bg-white px-3 py-0.5">
         <div className="mx-auto max-w-3xl">
           <OperationalStatus variant="compact" />
         </div>
       </div>
       <ActiveMissionShortcut />
       <main className="mx-auto max-w-3xl px-3 pb-28 pt-3 sm:px-4 sm:pt-4">
-        <div className="mb-4">
+        <div className="mb-3">
           <DecisionSupportNotice compact />
         </div>
         {children}

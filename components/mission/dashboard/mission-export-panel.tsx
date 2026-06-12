@@ -14,7 +14,6 @@ import { EquipmentReadinessExportControls } from './equipment-readiness-export-c
 import { ExportGroup } from './export-group';
 import { ExportToolDetails } from './export-tool-details';
 import { MissionAdvancedPanel } from './mission-advanced-panel';
-import { MissionStatusStrip } from './mission-status-strip';
 import { PanelHeading } from './panel-heading';
 
 export function MissionExportPanel({
@@ -41,7 +40,6 @@ export function MissionExportPanel({
   return (
     <section id="mission-export-panel" role="tabpanel" aria-labelledby="mission-export-tab" className="space-y-4">
       <PanelHeading eyebrow="Eksport" title="Dokumentasjon og lokale eksportfiler" id="mission-export-heading" />
-      <MissionStatusStrip />
       <ExportGroup eyebrow="Primært" title="Ordre, samband og status">
         <ExportToolDetails eyebrow="Ordre" title="5-punktsordre">
           <div id="5-punktsordre" className="scroll-mt-28">

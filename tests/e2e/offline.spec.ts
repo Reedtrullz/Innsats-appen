@@ -66,8 +66,11 @@ test('visible app-shell and boundary links load offline after service-worker war
 
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const decisionNoticeRoutes = await visibleInternalRoutes(page.locator('section[aria-label="Operativ grense og lokal datalagring"] a[href^="/"]'));
-    expect(decisionNoticeRoutes).toEqual(['/begrensninger', '/kjente-begrensninger', '/data-pa-enheten']);
-    await expectVisibleRoutesWorkOffline(page, decisionNoticeRoutes, 'decision-support notice');
+    // The slimmed notice links only the boundary entry point, but all
+    // boundary/data routes must still work offline regardless of how the
+    // notice surfaces them.
+    expect(decisionNoticeRoutes).toEqual(['/begrensninger']);
+    await expectVisibleRoutesWorkOffline(page, ['/begrensninger', '/kjente-begrensninger', '/data-pa-enheten'], 'decision-support boundary routes');
 
     await page.goto('/mer', { waitUntil: 'domcontentloaded' });
     const moreRoutes = await visibleInternalRoutes(page.locator('a[href^="/"]'));

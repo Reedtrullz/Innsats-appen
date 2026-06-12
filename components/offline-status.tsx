@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 import {
   GENERATED_CONTENT_STALE_MS,
@@ -29,7 +29,7 @@ function warningText(state: OfflineStatusState) {
   return null;
 }
 
-export function OfflineStatus({ compact = false }: { compact?: boolean }) {
+export function OfflineStatus({ compact = false, children }: { compact?: boolean; children?: ReactNode }) {
   const [state, setState] = useState<OfflineStatusState>({
     online: true,
     ready: false,
@@ -102,9 +102,35 @@ export function OfflineStatus({ compact = false }: { compact?: boolean }) {
 
   const warning = warningText(state);
   const connectivityLabel = state.online ? 'Tilkoblet' : 'Frakoblet – bufret innhold kan brukes';
+  const diagnostics = `Tjenestearbeider ${state.ready ? 'klar' : 'starter'} · buffer ${shortOfflineVersion(state.cacheVersion || SW_CACHE_NAME)}`;
+
+  if (compact) {
+    // Shell chrome: one always-visible connectivity line; pills and
+    // diagnostics fold behind the disclosure. Live warnings stay visible.
+    return (
+      <div data-testid="offline-status" aria-live="polite" className="text-[0.7rem] font-semibold text-slate-600">
+        <details>
+          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-1.5">
+            <span aria-hidden className={`h-2 w-2 shrink-0 rounded-full ${state.online ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+            <span className="truncate">{connectivityLabel}</span>
+            <span className="ml-auto shrink-0 text-[0.66rem] font-bold text-slate-500">Detaljer</span>
+          </summary>
+          <div className="pb-2">
+            {children}
+            <p className="mt-1.5 text-[0.66rem] font-semibold text-slate-500">{diagnostics}</p>
+          </div>
+        </details>
+        {warning ? (
+          <p data-testid="content-cache-stale-warning" className="pb-1.5 font-black text-amber-800">
+            {warning}{state.lastFallbackUrl ? ` (${new URL(state.lastFallbackUrl, window.location.href).pathname})` : ''}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
 
   return (
-    <div data-testid="offline-status" aria-live="polite" className={compact ? 'text-[0.7rem] font-semibold text-slate-600' : 'text-xs font-semibold text-slate-700'}>
+    <div data-testid="offline-status" aria-live="polite" className="text-xs font-semibold text-slate-700">
       <span className="inline-flex items-center gap-1.5">
         <span aria-hidden className={`h-2 w-2 rounded-full ${state.online ? 'bg-emerald-500' : 'bg-amber-500'}`} />
         {connectivityLabel}
@@ -116,7 +142,7 @@ export function OfflineStatus({ compact = false }: { compact?: boolean }) {
       ) : null}
       <details className="mt-0.5">
         <summary className="cursor-pointer list-none text-[0.66rem] font-bold text-slate-500">Diagnostikk</summary>
-        <span className="text-[0.66rem] font-semibold text-slate-500">Tjenestearbeider {state.ready ? 'klar' : 'starter'} · buffer {shortOfflineVersion(state.cacheVersion || SW_CACHE_NAME)}</span>
+        <span className="text-[0.66rem] font-semibold text-slate-500">{diagnostics}</span>
       </details>
     </div>
   );

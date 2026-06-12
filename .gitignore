@@ -1,5 +1,7 @@
 .DS_Store
 .hermes/
+# Local Claude Code permissions/settings; .claude/launch.json is shared and committed.
+.claude/settings.local.json
 node_modules/
 .next/
 out/
