@@ -33,6 +33,7 @@
     "compile:curated": "tsx scripts/compile-curated.ts",
     "validate:content": "tsx scripts/validate-content.ts",
     "validate:maps": "tsx scripts/validate-map-packages.ts",
+    "map:fetch": "gh release download map-packages-20260610 --pattern '*.pmtiles' --dir public/map-packages --clobber && shasum -a 256 -c scripts/map-packages.sha256",
     "release:notes": "tsx scripts/generate-release-notes.ts",
     "report:stale-content": "tsx scripts/report-stale-content.ts",
     "report:source-governance": "tsx scripts/report-source-governance.ts",

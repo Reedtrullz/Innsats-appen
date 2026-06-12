@@ -85,6 +85,30 @@ function isLocalMapPackageAsset(pathname) {
   return relativePath.split('/').every((segment) => segment.length > 0 && segment !== '.' && segment !== '..');
 }
 
+// PMTiles clients read archives with Range requests. The Cache API stores the
+// full archive (the explicit "Lagre kartpakke" flow) but cannot store 206
+// responses, so ranges are served by lazily slicing the cached body's Blob
+// (disk-backed, zero-copy) when the network is unavailable.
+async function sliceCachedMapPackageResponse(cached, rangeHeader) {
+  const match = /^bytes=(\d+)-(\d+)?$/.exec(rangeHeader);
+  if (!match) return cached;
+  const blob = await cached.blob();
+  const start = Number(match[1]);
+  const end = match[2] === undefined ? blob.size - 1 : Math.min(Number(match[2]), blob.size - 1);
+  if (start >= blob.size || start > end) {
+    return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${blob.size}` } });
+  }
+  const part = blob.slice(start, end + 1);
+  return new Response(part, {
+    status: 206,
+    headers: {
+      'Content-Type': cached.headers.get('Content-Type') || 'application/octet-stream',
+      'Content-Range': `bytes ${start}-${end}/${blob.size}`,
+      'Content-Length': String(part.size),
+    },
+  });
+}
+
 async function postToClients(message) {
   const clients = await self.clients.matchAll({ includeUncontrolled: true, type: 'window' });
   clients.forEach((client) => client.postMessage(message));
@@ -305,15 +329,25 @@ self.addEventListener('fetch', (event) => {
   if (url.origin === self.location.origin && url.search === '' && url.hash === '' && isLocalMapPackageAsset(url.pathname)) {
     event.respondWith((async () => {
       const request = event.request;
+      const rangeHeader = request.headers.get('range');
       const cache = await caches.open(MAP_PACKAGE_CACHE_NAME);
-      const cached = await cache.match(request);
+      // Match by URL so a Range request finds the cached full archive.
+      const cached = await cache.match(request.url);
       try {
         const response = await fetch(request);
-        if (response.ok) await cache.put(request, response.clone());
+        // Never cache.put partial (206) responses — the Cache API rejects
+        // them; the full archive is stored by the explicit save flow.
+        if (response.status === 200 && !rangeHeader) await cache.put(request, response.clone());
+        // Some servers/proxies (and the Next dev server) ignore Range and
+        // return 200; PMTiles clients abort on that. Synthesize the 206.
+        if (response.status === 200 && rangeHeader) {
+          return sliceCachedMapPackageResponse(response, rangeHeader);
+        }
         return response;
       } catch (error) {
-        if (cached) return cached;
-        throw error;
+        if (!cached) throw error;
+        if (rangeHeader) return sliceCachedMapPackageResponse(cached, rangeHeader);
+        return cached;
       }
     })());
     return;

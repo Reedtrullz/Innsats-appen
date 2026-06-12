@@ -80,9 +80,8 @@ test('offline map page is local-only, schematic and tile-free', async ({ page, c
   await page.getByRole('combobox', { name: /Velg skjematisk kartpakke/i }).selectOption('trondelag-oversikt');
   await expect(page.getByTestId('map-performance-guard')).toContainText(/viser maks 12/i);
   await expect(page.getByTestId('map-performance-guard')).toContainText(/2 skjult/i);
-  await expect(page.getByText(/Ingen godkjente lokale kartpakker er tilgjengelige/i)).toBeVisible();
-  await expect(page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: /Tilbakestill kartcache/i })).toHaveCount(0);
+  // Approved PMTiles packages are listed; nothing is cached until the user saves.
+  await expect(page.getByRole('combobox', { name: /Velg lokal kartpakke/i })).toBeVisible();
   await expect(page.getByTestId('offline-map-cache-status')).toContainText(/Ingen kartpakke/i);
 
   await page.getByRole('combobox', { name: /Markørtype/i }).selectOption('il-ko');

@@ -33,6 +33,12 @@ Status legend: [x] done · [ ] open · [~] prepared/blocked on external step
 - [x] 13. Module switcher pill row on all /moduler/* pages (nested layout).
 - [x] 14. Dev-only CSP unsafe-eval carve-out; production CSP unchanged and test-pinned in both branches.
 
+## Addendum: real offline map packages (2026-06-12)
+- [x] First approved PMTiles packages: `trondheim-osm` (16 MB, z≤15) and `trondelag-osm` (69 MB, z≤11), extracted from the Protomaps daily build 20260610 (OpenStreetMap/ODbL). Binaries are GitHub release assets (`map-packages-20260610`) fetched by `npm run map:fetch` (CI does this in both jobs); checksums in scripts/map-packages.sha256; only styles/manifests in git.
+- [x] Service-worker fix the real packages exposed: PMTiles Range requests are now served correctly — never `cache.put` a 206, synthesize 206 from servers that ignore Range (the Next dev server does), and slice ranges from the cached archive blob when offline.
+- [ ] Follow-up: labelled map styles. v1 styles have no text layers because glyph fetches that miss would falsely trigger the schematic fallback; vendoring an app-local Latin glyph set enables place names.
+- [ ] Follow-up: a Kartverket-derived authoritative topo package (requires Geovekst permission for z12–20 and ©Kartverket attribution; see ADR 2026-06-04).
+
 ## Measurement
 - [~] 15. Field test script (run with 2–3 real users on their own phones):
   1. **Cold-start to card** — phone locked, app installed: "En i laget ditt er alvorlig skadet. Finn riktig tiltakskort." Stop the clock at the first instruction read aloud. Target: < 30 s.

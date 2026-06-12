@@ -1,0 +1,215 @@
+{
+  "version": 8,
+  "name": "Beredskapsboka offline basemap (Trøndelag, uten tekstlag)",
+  "sources": {
+    "protomaps": {
+      "type": "vector",
+      "url": "pmtiles:///map-packages/trondelag-osm.pmtiles",
+      "maxzoom": 11,
+      "attribution": "© OpenStreetMap-bidragsytere"
+    }
+  },
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "#dbe3ea"
+      }
+    },
+    {
+      "id": "earth",
+      "type": "fill",
+      "source": "protomaps",
+      "source-layer": "earth",
+      "paint": {
+        "fill-color": "#f1f5f9"
+      }
+    },
+    {
+      "id": "landcover",
+      "type": "fill",
+      "source": "protomaps",
+      "source-layer": "landcover",
+      "paint": {
+        "fill-color": "#e3ecdb",
+        "fill-opacity": 0.8
+      }
+    },
+    {
+      "id": "landuse",
+      "type": "fill",
+      "source": "protomaps",
+      "source-layer": "landuse",
+      "paint": {
+        "fill-color": "#e9ece7",
+        "fill-opacity": 0.6
+      }
+    },
+    {
+      "id": "water",
+      "type": "fill",
+      "source": "protomaps",
+      "source-layer": "water",
+      "paint": {
+        "fill-color": "#a8cbe2"
+      }
+    },
+    {
+      "id": "boundaries",
+      "type": "line",
+      "source": "protomaps",
+      "source-layer": "boundaries",
+      "paint": {
+        "line-color": "#94a3b8",
+        "line-dasharray": [
+          3,
+          2
+        ],
+        "line-width": 1
+      }
+    },
+    {
+      "id": "roads-minor",
+      "type": "line",
+      "source": "protomaps",
+      "source-layer": "roads",
+      "filter": [
+        "in",
+        [
+          "get",
+          "kind"
+        ],
+        [
+          "literal",
+          [
+            "minor_road",
+            "other",
+            "path"
+          ]
+        ]
+      ],
+      "paint": {
+        "line-color": "#cbd5e1",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          11,
+          0.4,
+          14,
+          1.5,
+          15,
+          3
+        ]
+      }
+    },
+    {
+      "id": "roads-medium",
+      "type": "line",
+      "source": "protomaps",
+      "source-layer": "roads",
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "medium_road"
+      ],
+      "paint": {
+        "line-color": "#94a3b8",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          9,
+          0.6,
+          13,
+          2.5,
+          15,
+          5
+        ]
+      }
+    },
+    {
+      "id": "roads-major",
+      "type": "line",
+      "source": "protomaps",
+      "source-layer": "roads",
+      "filter": [
+        "in",
+        [
+          "get",
+          "kind"
+        ],
+        [
+          "literal",
+          [
+            "major_road",
+            "highway"
+          ]
+        ]
+      ],
+      "paint": {
+        "line-color": "#475569",
+        "line-width": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          7,
+          0.8,
+          12,
+          3,
+          15,
+          7
+        ]
+      }
+    },
+    {
+      "id": "rail",
+      "type": "line",
+      "source": "protomaps",
+      "source-layer": "roads",
+      "filter": [
+        "==",
+        [
+          "get",
+          "kind"
+        ],
+        "rail"
+      ],
+      "paint": {
+        "line-color": "#9aa6b2",
+        "line-dasharray": [
+          4,
+          3
+        ],
+        "line-width": 1
+      }
+    },
+    {
+      "id": "buildings",
+      "type": "fill",
+      "source": "protomaps",
+      "source-layer": "buildings",
+      "minzoom": 13,
+      "paint": {
+        "fill-color": "#cdd6df",
+        "fill-opacity": 0.85
+      }
+    }
+  ]
+}

@@ -9,10 +9,15 @@ async function tempRoot() {
 }
 
 describe('validate map package files', () => {
-  it('keeps approved PMTiles package list empty until provenance is approved', async () => {
+  it('keeps the schematic fallback available alongside approved packages with documented provenance', async () => {
     const manifest = await import('@/lib/maps/offline-map-package-manifest');
     const fallback = await import('@/lib/maps/offline-map');
-    expect(manifest.approvedLocalMapPackages).toEqual([]);
+    expect(manifest.approvedLocalMapPackages.length).toBeGreaterThan(0);
+    for (const mapPackage of manifest.approvedLocalMapPackages) {
+      expect(mapPackage.approvedForOfflineUse).toBe(true);
+      expect(mapPackage.provenance).toMatch(/pmtiles extract/);
+      expect(mapPackage.provenance).toMatch(/sha256/i);
+    }
     expect(fallback.OFFLINE_MAP_PACKAGES.length).toBeGreaterThan(0);
   });
 

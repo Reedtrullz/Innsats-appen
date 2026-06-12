@@ -61,8 +61,7 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
   await expect(page.getByText(new RegExp(`Aktivt oppdrag: ${missionTitle}`))).toBeVisible();
   await page.getByRole('combobox', { name: /Velg skjematisk kartpakke/i }).selectOption('trondelag-oversikt');
   await expect(page.getByTestId('map-performance-guard')).toContainText(/viser maks 12/i);
-  await expect(page.getByText(/Ingen godkjente lokale kartpakker er tilgjengelige/i)).toBeVisible();
-  await expect(page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toHaveCount(0);
+  await expect(page.getByRole('combobox', { name: /Velg lokal kartpakke/i })).toBeVisible();
   await page.getByRole('combobox', { name: /Markørtype/i }).selectOption('hazard');
   await page.getByPlaceholder(/Sanitert lokal etikett/i).fill(markerLabel);
   await page.getByRole('spinbutton', { name: /X 0-100/i }).fill('22');

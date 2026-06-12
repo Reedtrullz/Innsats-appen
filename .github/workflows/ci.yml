@@ -42,6 +42,11 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install-deps
 
+      - name: Fetch local map packages (release assets)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run map:fetch
+
       - name: Audit for high or critical vulnerabilities
         run: npm run audit:ci
 
@@ -116,6 +121,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Fetch local map packages (release assets)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run map:fetch
 
       - name: Set image tag
         id: image

@@ -17,6 +17,9 @@ content/generated/*.json
 !content/generated/source-documents.json
 !content/generated/source-snapshot-metadata.json
 public/generated-content/
+# PMTiles binaries are GitHub release assets (see npm run map:fetch); only
+# manifests, styles and checksums are committed.
+public/map-packages/*.pmtiles
 public/content-assets/
 !public/content-assets/
 !public/content-assets/*.png

@@ -61,8 +61,11 @@ describe('local offline map package manifest', () => {
   });
 
   it('exposes approved packages by id without replacing schematic packages', () => {
-    expect(approvedLocalMapPackages).toHaveLength(0);
+    // The OSM-derived Protomaps extracts are the first approved packages;
+    // provenance and checksums live in the manifest + scripts/map-packages.sha256.
+    expect(approvedLocalMapPackages.map((mapPackage) => mapPackage.id)).toEqual(['trondheim-osm', 'trondelag-osm']);
     expect(Object.isFrozen(approvedLocalMapPackages)).toBe(true);
+    expect(localMapPackageForId('trondheim-osm')?.provider).toBe('osm-derived');
     expect(localMapPackageForId('missing')).toBeUndefined();
   });
 });

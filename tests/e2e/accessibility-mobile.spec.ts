@@ -190,9 +190,10 @@ test('map and field-mode controls expose screen-reader labels', async ({ page })
   await page.goto('/kart');
   const mapPackageRegion = page.getByRole('region', { name: /Lokale kartpakker/i });
   await expect(mapPackageRegion.getByRole('combobox', { name: /Velg skjematisk kartpakke/i })).toBeVisible();
-  await expect(mapPackageRegion.getByText(/Ingen godkjente lokale kartpakker er tilgjengelige/i)).toBeVisible();
-  await expect(page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: /Tilbakestill kartcache/i })).toHaveCount(0);
+  // Approved OSM-derived PMTiles packages expose a labelled selector and save control.
+  await expect(mapPackageRegion.getByRole('combobox', { name: /Velg lokal kartpakke/i })).toBeVisible();
+  await mapPackageRegion.getByRole('combobox', { name: /Velg lokal kartpakke/i }).selectOption('trondheim-osm');
+  await expect(page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toBeVisible();
 
   const markerRegion = page.getByRole('region', { name: /Lokale markører og lag/i });
   await expect(markerRegion.getByRole('combobox', { name: /Markørtype/i })).toBeVisible();
