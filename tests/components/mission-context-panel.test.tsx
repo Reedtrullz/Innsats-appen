@@ -598,7 +598,7 @@ it('generates a local oppdragsmappe export with map and log artifacts', async ()
   }));
 
   await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[]} />);
-  await screen.findByRole('heading', { name: /Gjør dette først/i });
+  await screen.findByRole('heading', { name: 'Oppdrag' });
   await openExportDetails(/Samlet lokal oppdragsmappe/i);
   await userEvent.click(screen.getByRole('button', { name: /Bygg oppdragsmappe/i }));
 
@@ -1035,14 +1035,16 @@ it('shows a situation-first mission dashboard with next action, progress and exp
   expect(screen.getByText(/Lokal lagring · Ikke delt/i)).toBeInTheDocument();
   const modeControl = screen.getByRole('tablist', { name: /Oppdragsmodus/i });
   expect(within(modeControl).getByRole('tab', { name: 'Nå' })).toHaveAttribute('aria-selected', 'true');
-  const nextActionSection = screen.getByRole('heading', { name: /Gjør dette først/i }).closest('section');
-  expect(nextActionSection).not.toBeNull();
-  expect(within(nextActionSection!).getByText(/Etabler sikkerhet/i)).toBeInTheDocument();
+  // The guided runbook is the default Nå experience and leads the panel;
+  // mission context and recommendations follow it.
+  const runbookSteps = await screen.findByRole('region', { name: 'Neste steg' });
+  expect(within(runbookSteps).getByText(/Etabler sikkerhet/i)).toBeInTheDocument();
+  expect(screen.getByText(/Anbefalt rekkefølge — ikke en kommando/i)).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /^Kritisk nå$/i })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /Fremdrift/i })).toBeInTheDocument();
   const nowText = document.body.textContent ?? '';
-  expect(nowText.indexOf('Oppdrag')).toBeLessThan(nowText.indexOf('Gjør dette først'));
-  expect(nowText.indexOf('Gjør dette først')).toBeLessThan(nowText.indexOf('Kritisk nå'));
+  expect(nowText.indexOf('Anbefalt rekkefølge')).toBeLessThan(nowText.indexOf('Oppdragsledelse'));
+  expect(nowText.indexOf('Oppdragsledelse')).toBeLessThan(nowText.indexOf('Kritisk nå'));
   expect(nowText.indexOf('Kritisk nå')).toBeLessThan(nowText.indexOf('Fremdrift'));
   expect(screen.queryByRole('heading', { name: /Hurtighandlinger/i })).not.toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: /Kart og logg/i })).not.toBeInTheDocument();
@@ -1198,7 +1200,7 @@ it('shows local manual order-update suggestions from important field-log entries
   expect(within(orderSuggestionPanel).getByText(/Flomvei stengt/i)).toBeInTheDocument();
 });
 
-it('shows a fallback next action when the matching action card has no steps', async () => {
+it('shows the guided runbook steps even when the matching action card has no steps', async () => {
   await saveMission(mission({
     id: 'm-command-surface-empty-step',
     title: 'Flom uten steg',
@@ -1242,9 +1244,11 @@ it('shows a fallback next action when the matching action card has no steps', as
     }]}
   />);
 
-  const nextActionSection = (await screen.findByRole('heading', { name: /Gjør dette først/i })).closest('section');
-  expect(nextActionSection).not.toBeNull();
-  expect(within(nextActionSection!).getByText(/Åpne sjekklisten og bekreft fase, samband og sikkerhet/i)).toBeInTheDocument();
+  // The Nå experience comes from the mission's checklist (runbook), so an
+  // action card without steps no longer degrades the next-action guidance.
+  const runbookSteps = await screen.findByRole('region', { name: 'Neste steg' });
+  expect(within(runbookSteps).getByText(/Etabler sikkerhet/i)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Gjort · neste/i })).toBeInTheDocument();
 });
 
 it('shows current situation and lets users add local tasks, quick status and resource requests', async () => {

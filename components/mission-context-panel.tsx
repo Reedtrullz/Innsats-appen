@@ -24,7 +24,7 @@ function formatUpdatedAt(value: string) {
 
 type MissionUpdate = (mission: MissionContext) => MissionContext;
 
-export function MissionContextPanel({ mode = 'list', contentVersion, checklists, actionCards = [] }: { mode?: 'list' | 'create'; contentVersion: string; checklists: OperationalChecklist[]; actionCards?: ActionCard[] }) {
+export function MissionContextPanel({ mode = 'list', contentVersion, checklists, actionCards = [], sourceTitleById, sourceRiskById }: { mode?: 'list' | 'create'; contentVersion: string; checklists: OperationalChecklist[]; actionCards?: ActionCard[]; sourceTitleById?: Record<string, string>; sourceRiskById?: Record<string, 'caution' | 'ok'> }) {
   const router = useRouter();
   const [missions, setMissions] = useState<MissionContext[]>([]);
   const [selectedActiveMissionId, setSelectedActiveMissionId] = useState<string | null>(() => readSelectedActiveMissionId());
@@ -227,7 +227,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
         </section>
       ) : (
         <>
-          <MissionCommandDashboard mission={activeMission} cards={actionCards} checklist={activeChecklist} checklists={checklists} contentVersion={contentVersion} onMissionChange={updateMission} onArchive={archiveActiveMission} />
+          <MissionCommandDashboard mission={activeMission} cards={actionCards} checklist={activeChecklist} checklists={checklists} contentVersion={contentVersion} sourceTitleById={sourceTitleById} sourceRiskById={sourceRiskById} onMissionChange={updateMission} onArchive={archiveActiveMission} />
           <p data-testid="privacy-message" className="rounded-2xl border border-sky-200 bg-sky-50 p-3 text-sm font-semibold text-sky-950">{privacyMessage}</p>
         </>
       )}

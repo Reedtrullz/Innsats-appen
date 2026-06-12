@@ -38,7 +38,6 @@ const STATIC_APP_SHELL = [
   '/ma-leses',
   '/oppdrag',
   '/oppdrag/ny',
-  '/na',
   '/mer',
   '/laering',
   '/kart',

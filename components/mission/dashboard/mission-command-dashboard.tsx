@@ -23,7 +23,7 @@ function missionCards(cards: ActionCard[], mission: MissionContext) {
   return sortActionCards(wider).slice(0, 3);
 }
 
-export function MissionCommandDashboard({ mission, cards, checklist, checklists, contentVersion, onMissionChange, onArchive }: { mission: MissionContext; cards: ActionCard[]; checklist?: OperationalChecklist; checklists: OperationalChecklist[]; contentVersion: string; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
+export function MissionCommandDashboard({ mission, cards, checklist, checklists, contentVersion, sourceTitleById, sourceRiskById, onMissionChange, onArchive }: { mission: MissionContext; cards: ActionCard[]; checklist?: OperationalChecklist; checklists: OperationalChecklist[]; contentVersion: string; sourceTitleById?: Record<string, string>; sourceRiskById?: Record<string, 'caution' | 'ok'>; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
   const firstActions = missionCards(cards, mission);
   const [checklistRuns, setChecklistRuns] = useState<Awaited<ReturnType<typeof listChecklistRuns>>>([]);
   const [activeMode, setActiveMode] = useState<MissionMode>('now');
@@ -57,9 +57,6 @@ export function MissionCommandDashboard({ mission, cards, checklist, checklists,
     return displaySignalsForExternalDataSourceSettings(storedSignals, sourceSettings);
   }, [mission.externalSignals, sourceSettings]);
   const disabledSources = useMemo(() => disabledExternalDataSources(sourceSettings), [sourceSettings]);
-  const nextActionSteps = firstActions[0]?.steps.length
-    ? firstActions[0].steps.slice(0, 3)
-    : ['Åpne sjekklisten og bekreft fase, samband og sikkerhet.'];
   const orderSuggestions = buildOrderUpdateSuggestions(mission.fieldLogEntries ?? []);
   const criticalActions = firstActions.filter((card) => card.priority === 'high');
   const recommendedLabel = criticalActions.length > 0 ? 'Kritisk nå' : 'Anbefalte tiltak';
@@ -188,15 +185,16 @@ export function MissionCommandDashboard({ mission, cards, checklist, checklists,
       {activeMode === 'now' ? (
         <MissionNowPanel
           mission={mission}
-          checklist={checklist}
           checklists={checklists}
           checklistRuns={checklistRuns}
           commandMapSummary={commandMapSummary}
           firstActions={firstActions}
           criticalActions={criticalActions}
           recommendedLabel={recommendedLabel}
-          nextActionSteps={nextActionSteps}
+          sourceTitleById={sourceTitleById}
+          sourceRiskById={sourceRiskById}
           onMissionChange={onMissionChange}
+          onChecklistRunSaved={refreshChecklistRuns}
         />
       ) : activeMode === 'work' ? (
         <MissionWorkPanel

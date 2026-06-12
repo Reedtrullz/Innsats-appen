@@ -109,10 +109,9 @@ export function ActiveMissionShortcut() {
     };
   }, []);
 
-  // Redundant on the mission surfaces it links into (the dashboard and the
-  // runbook) and on home, where HomeActiveMission renders a richer card.
-  const suppressed =
-    pathname === '/' || pathname === '/oppdrag' || pathname.startsWith('/oppdrag/') || pathname === '/na';
+  // Redundant on the mission dashboard it links into and on home, where
+  // HomeActiveMission renders a richer card.
+  const suppressed = pathname === '/' || pathname === '/oppdrag' || pathname.startsWith('/oppdrag/');
   if (!mission || suppressed) return null;
 
   return (
