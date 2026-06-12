@@ -59,11 +59,6 @@ export function AfterActionReportControls({ mission, displaySignals, checklists,
     appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'after-action-pdf-ready-html' });
   }
 
-  async function copyText(text: string) {
-    if (!text || typeof navigator === 'undefined' || !navigator.clipboard) return;
-    await navigator.clipboard.writeText(text);
-  }
-
   return (
     <section id="etterrapport" className="scroll-mt-24 space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
@@ -117,9 +112,9 @@ export function AfterActionReportControls({ mission, displaySignals, checklists,
           </div>
         </details>
       </div>
-      <ExportReview title="Etteraksjonsrapport Markdown" text={markdown} textareaId="after-action-markdown" onCopy={(text) => void copyText(text)} />
-      <ExportReview title="Etteraksjonsrapport JSON" text={json} textareaId="after-action-json" onCopy={(text) => void copyText(text)} />
-      <ExportReview title="PDF-klar etteraksjonsrapport HTML" text={pdfReadyHtml} textareaId="after-action-pdf-ready-html" onCopy={(text) => void copyText(text)} />
+      <ExportReview title="Etteraksjonsrapport Markdown" text={markdown} textareaId="after-action-markdown" />
+      <ExportReview title="Etteraksjonsrapport JSON" text={json} textareaId="after-action-json" />
+      <ExportReview title="PDF-klar etteraksjonsrapport HTML" text={pdfReadyHtml} textareaId="after-action-pdf-ready-html" />
     </section>
   );
 }

@@ -22,11 +22,6 @@ export function MissionFolderExportControls({ mission, checklists, mapState }: {
     appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'mission-folder' });
   }
 
-  async function copyText(text: string) {
-    if (!text || typeof navigator === 'undefined' || !navigator.clipboard) return;
-    await navigator.clipboard.writeText(text);
-  }
-
   return (
     <section id="oppdragsmappe" className="scroll-mt-24 space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200" aria-label="Oppdragsmappe">
       <div>
@@ -49,8 +44,8 @@ export function MissionFolderExportControls({ mission, checklists, mapState }: {
         </div>
       </div>
       <button type="button" onClick={() => void generate()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Bygg oppdragsmappe</button>
-      <ExportReview title="Oppdragsmappe Markdown" text={markdown} textareaId="mission-folder-markdown" onCopy={(text) => void copyText(text)} copyLabel="Kopier Markdown" formatLabel="Markdown" />
-      <ExportReview title="Oppdragsmappe JSON" text={json} textareaId="mission-folder-json" onCopy={(text) => void copyText(text)} copyLabel="Kopier JSON" formatLabel="JSON" />
+      <ExportReview title="Oppdragsmappe Markdown" text={markdown} textareaId="mission-folder-markdown" copyLabel="Kopier Markdown" formatLabel="Markdown" />
+      <ExportReview title="Oppdragsmappe JSON" text={json} textareaId="mission-folder-json" copyLabel="Kopier JSON" formatLabel="JSON" />
     </section>
   );
 }

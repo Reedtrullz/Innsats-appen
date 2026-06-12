@@ -2,6 +2,53 @@ export type SensitiveTextMatch = {
   kind: 'national-id' | 'patient-reference' | 'shielded-location' | 'private-location' | 'contact-reference';
 };
 
+/**
+ * Field-level UI copy per detection category, so a blocked input can say what
+ * triggered and what to do instead of a generic persondata warning. Display
+ * only — never stored, never echoes the matched input.
+ */
+export const SENSITIVE_TEXT_EXPLANATIONS: Record<SensitiveTextMatch['kind'], { label: string; remedy: string }> = {
+  'national-id': {
+    label: 'tallrekke som ligner fødselsnummer/personnummer',
+    remedy: 'Fjern tallrekken. Persondata skal bare i ordinære systemer.',
+  },
+  'contact-reference': {
+    label: 'telefonnummer eller e-postadresse',
+    remedy: 'Fjern kontaktinformasjonen — persondata skal ikke lagres her. Bruk rolle eller kallesignal.',
+  },
+  'patient-reference': {
+    label: 'tekst som ligner pasientnavn eller pasient-ID',
+    remedy: 'Beskriv uten navn eller ID, f.eks. «én skadet person». Pasientdata skal bare i ordinært system.',
+  },
+  // NB: this copy is checked against the detector itself (see
+  // free-text-privacy-guards tests) — phrasing must not trip the patterns.
+  'shielded-location': {
+    label: 'tekst som beskriver skjermet operativ informasjon',
+    remedy: 'Ikke registrer dette lokalt; bruk ordinære systemer.',
+  },
+  'private-location': {
+    label: 'tekst som peker på privatpersoners adresse eller bosted',
+    remedy: 'Bruk offentlige stedsnavn eller skjematiske referanser — ikke persondata.',
+  },
+};
+
+export function sensitiveTextFieldError(kind: SensitiveTextMatch['kind']): string {
+  const explanation = SENSITIVE_TEXT_EXPLANATIONS[kind];
+  return `Stoppet: ${explanation.label}. ${explanation.remedy}`;
+}
+
+export class SensitiveTextError extends Error {
+  readonly kind: SensitiveTextMatch['kind'];
+  readonly context: string;
+
+  constructor(kind: SensitiveTextMatch['kind'], context: string) {
+    super(`Local operational text rejected at ${context}: possible persondata/pasientdata/skjermet/private-location risk (${kind}).`);
+    this.name = 'SensitiveTextError';
+    this.kind = kind;
+    this.context = context;
+  }
+}
+
 const NATIONAL_ID_PATTERN = /(?:^|[^\p{L}\p{N}])(?:fødselsnummer|fodselsnummer|personnummer|fnr)(?![\p{L}\p{N}])[^\d]{0,30}\d(?:\D?\d){10}(?!\d)/iu;
 const BARE_DIGIT_SEQUENCE_PATTERN = /(?<!\d)(\d(?:[\s.-]?\d){10})(?!\d)/gu;
 const EMAIL_PATTERN = /(?:^|[^\p{L}\p{N}_-])[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}(?![\p{L}\p{N}_-])/iu;
@@ -64,30 +111,47 @@ export function assertNoSensitiveOperationalText(value: string | undefined | nul
   if (value === undefined || value === null || value.trim() === '') return;
   const match = detectSensitiveOperationalText(value);
   if (!match) return;
-  throw new Error(
-    `Local operational text rejected at ${context}: possible persondata/pasientdata/skjermet/private-location risk (${match.kind}).`,
-  );
+  throw new SensitiveTextError(match.kind, context);
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-export function assertNoSensitiveOperationalTextInValue(value: unknown, context = 'value', seen = new WeakSet<object>()): void {
+/**
+ * Non-throwing recursive scan. Returns the first finding with its context
+ * path so the UI can anchor the error to the offending field.
+ */
+export function findSensitiveOperationalTextInValue(
+  value: unknown,
+  context = 'value',
+  seen = new WeakSet<object>(),
+): { context: string; kind: SensitiveTextMatch['kind'] } | null {
   if (typeof value === 'string') {
-    assertNoSensitiveOperationalText(value, context);
-    return;
+    if (value.trim() === '') return null;
+    const match = detectSensitiveOperationalText(value);
+    return match ? { context, kind: match.kind } : null;
   }
   if (Array.isArray(value)) {
-    if (seen.has(value)) return;
+    if (seen.has(value)) return null;
     seen.add(value);
-    value.forEach((item, index) => assertNoSensitiveOperationalTextInValue(item, `${context}[${index}]`, seen));
-    return;
+    for (const [index, item] of value.entries()) {
+      const found = findSensitiveOperationalTextInValue(item, `${context}[${index}]`, seen);
+      if (found) return found;
+    }
+    return null;
   }
-  if (!isRecord(value)) return;
-  if (seen.has(value)) return;
+  if (!isRecord(value)) return null;
+  if (seen.has(value)) return null;
   seen.add(value);
   for (const [key, nested] of Object.entries(value)) {
-    assertNoSensitiveOperationalTextInValue(nested, context ? `${context}.${key}` : key, seen);
+    const found = findSensitiveOperationalTextInValue(nested, context ? `${context}.${key}` : key, seen);
+    if (found) return found;
   }
+  return null;
+}
+
+export function assertNoSensitiveOperationalTextInValue(value: unknown, context = 'value', seen = new WeakSet<object>()): void {
+  const found = findSensitiveOperationalTextInValue(value, context, seen);
+  if (found) throw new SensitiveTextError(found.kind, found.context);
 }

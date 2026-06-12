@@ -2,13 +2,22 @@
 
 import { useState } from 'react';
 import type { MissionContext } from '@/lib/mission/schemas';
-import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+import { findSensitiveOperationalTextInValue, sensitiveTextFieldError } from '@/lib/privacy/sensitive-text';
 import { ContextNotice } from '../context-notice';
 import type { MissionUpdate } from './dashboard-types';
 
-function operationalPrivacyErrorMessage(context: string) {
-  return `${context}: Lokal tekst ble stoppet fordi den kan inneholde persondata, pasientdata, skjermet informasjon eller private lokasjoner. Bruk ordinære systemer for slike opplysninger.`;
-}
+const STRUCTURED_FEEDBACK_FIELD_LABELS: Record<string, string> = {
+  'lessonsLearned.summary': 'Erfaringsoppsummering',
+  'lessonsLearned.whatWorked': 'Hva fungerte',
+  'lessonsLearned.improvements': 'Forbedringer',
+  'lessonsLearned.followUp': 'Oppfølging',
+  'feedback.leadership': 'Tilbakemelding ledelse',
+  'feedback.equipment': 'Tilbakemelding utstyr',
+  'feedback.procedures': 'Tilbakemelding prosedyrer',
+  'feedback.training': 'Tilbakemelding trening',
+  'feedback.safety': 'Tilbakemelding sikkerhet',
+  'feedback.communications': 'Tilbakemelding kommunikasjon',
+};
 
 export function StructuredLessonsFeedbackControls({ mission, onMissionChange, onArchive }: { mission: MissionContext; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
   const [lessons, setLessons] = useState(() => ({
@@ -27,6 +36,7 @@ export function StructuredLessonsFeedbackControls({ mission, onMissionChange, on
   }));
   const [message, setMessage] = useState('');
   const [privacyError, setPrivacyError] = useState('');
+  const [confirmingArchive, setConfirmingArchive] = useState(false);
 
   async function saveStructuredFeedback() {
     const now = new Date().toISOString();
@@ -44,10 +54,10 @@ export function StructuredLessonsFeedbackControls({ mission, onMissionChange, on
       safety: feedback.safety.trim(),
       communications: feedback.communications.trim(),
     };
-    try {
-      assertNoSensitiveOperationalTextInValue({ lessonsLearned: nextLessons, feedback: nextFeedback }, 'structuredFeedback');
-    } catch {
-      setPrivacyError(operationalPrivacyErrorMessage('Erfaringer'));
+    const sensitive = findSensitiveOperationalTextInValue({ lessonsLearned: nextLessons, feedback: nextFeedback }, '');
+    if (sensitive) {
+      const fieldLabel = STRUCTURED_FEEDBACK_FIELD_LABELS[sensitive.context] ?? 'Erfaringer';
+      setPrivacyError(`${fieldLabel}: ${sensitiveTextFieldError(sensitive.kind)}`);
       setMessage('');
       return false;
     }
@@ -63,6 +73,7 @@ export function StructuredLessonsFeedbackControls({ mission, onMissionChange, on
   }
 
   async function saveStructuredFeedbackAndArchive() {
+    setConfirmingArchive(false);
     if (await saveStructuredFeedback()) await onArchive(mission.id);
   }
 
@@ -89,8 +100,17 @@ export function StructuredLessonsFeedbackControls({ mission, onMissionChange, on
       </div>
       <div className="flex flex-wrap gap-2">
         <button type="button" onClick={() => void saveStructuredFeedback()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lagre erfaringer og tilbakemelding</button>
-        <button type="button" onClick={() => void saveStructuredFeedbackAndArchive()} className="min-h-11 rounded-xl border border-emerald-700 bg-emerald-50 px-4 font-bold text-emerald-950">Fullfør og arkiver lokalt</button>
+        <button type="button" onClick={() => setConfirmingArchive(true)} className="min-h-11 rounded-xl border border-emerald-700 bg-emerald-50 px-4 font-bold text-emerald-950">Fullfør og arkiver lokalt</button>
       </div>
+      {confirmingArchive ? (
+        <div role="alertdialog" aria-label="Bekreft arkivering" className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-950">
+          <p className="text-sm font-bold">Arkivere «{mission.title}»? Oppdraget lagres og flyttes ut av aktiv liste. Du finner det igjen via arkivsøket i oppdragslisten.</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button type="button" onClick={() => void saveStructuredFeedbackAndArchive()} className="min-h-11 rounded-xl bg-emerald-800 px-4 font-bold text-white">Bekreft arkivering</button>
+            <button type="button" onClick={() => setConfirmingArchive(false)} className="min-h-11 rounded-xl bg-white px-4 font-bold text-emerald-950 ring-1 ring-emerald-200">Avbryt</button>
+          </div>
+        </div>
+      ) : null}
       {privacyError ? <p role="alert" aria-label="erfaringer personvern" className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{privacyError}</p> : null}
       {message ? <p className="text-sm font-semibold text-emerald-800">{message}</p> : null}
     </section>

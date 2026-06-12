@@ -5,12 +5,14 @@ import { phaseLabels, roleLabels, scenarioLabels } from '@/lib/content/taxonomy'
 import { exportMissionStatusSummaryMarkdown } from '@/lib/mission/export-markdown';
 import type { MissionContext, MissionTaskStatus, QuickStatusMessage, ResourceRequestKind } from '@/lib/mission/schemas';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
-import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+import { SensitiveTextError, findSensitiveOperationalTextInValue, sensitiveTextFieldError } from '@/lib/privacy/sensitive-text';
 import { ContextNotice } from './context-notice';
 import { ExportReview } from './export-review';
 
 type MissionUpdate = (mission: MissionContext) => MissionContext;
 
+// Generic fallback for failures where no single field/category can be named
+// (e.g. status-summary generation over the whole mission).
 function operationalPrivacyErrorMessage(context: string) {
   return `${context}: Lokal tekst ble stoppet fordi den kan inneholde persondata, pasientdata, skjermet informasjon eller private lokasjoner. Bruk ordinære systemer for slike opplysninger.`;
 }
@@ -44,12 +46,7 @@ function localDisplayText(value: unknown, fallback: string, context: string) {
   if (typeof value !== 'string') return fallback;
   const trimmed = value.trim();
   if (!trimmed) return fallback;
-  try {
-    assertNoSensitiveOperationalTextInValue(trimmed, context);
-  } catch {
-    return localSensitivePlaceholder;
-  }
-  return trimmed;
+  return findSensitiveOperationalTextInValue(trimmed, context) ? localSensitivePlaceholder : trimmed;
 }
 
 function statusSummaryContentKey(mission: MissionContext, displaySignals: MissionContext['externalSignals']) {
@@ -116,11 +113,13 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange,
     let markdown: string;
     try {
       markdown = exportMissionStatusSummaryMarkdown({ mission: statusSummaryMission(mission, displaySignals) });
-    } catch {
+    } catch (error) {
       setStatusSummaryMarkdown('');
       setStatusSummaryMarkdownKey('');
       setShowStatusSummary(false);
-      setPrivacyError(operationalPrivacyErrorMessage('Lokal status'));
+      setPrivacyError(error instanceof SensitiveTextError
+        ? `Lokal status: ${sensitiveTextFieldError(error.kind)}`
+        : operationalPrivacyErrorMessage('Lokal status'));
       return;
     }
     setStatusSummaryMarkdown(markdown);
@@ -145,10 +144,9 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange,
     const now = new Date().toISOString();
     const status = String(form.get('taskStatus') ?? 'not-started') as MissionTaskStatus;
     const task = { id: crypto.randomUUID(), title, status, createdAt: now, updatedAt: now };
-    try {
-      assertNoSensitiveOperationalTextInValue({ title: task.title }, 'localStatus.task');
-    } catch {
-      setPrivacyError(operationalPrivacyErrorMessage('Lokal status'));
+    const sensitive = findSensitiveOperationalTextInValue({ title: task.title }, 'localStatus.task');
+    if (sensitive) {
+      setPrivacyError(`Lokal oppgave: ${sensitiveTextFieldError(sensitive.kind)}`);
       return;
     }
     setPrivacyError('');
@@ -187,10 +185,9 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange,
       quantity: String(form.get('resourceQuantity') ?? '').trim() || undefined,
       note: String(form.get('resourceNote') ?? '').trim() || undefined,
     };
-    try {
-      assertNoSensitiveOperationalTextInValue({ quantity: resourceRequest.quantity, note: resourceRequest.note }, 'localStatus.resourceRequest');
-    } catch {
-      setPrivacyError(operationalPrivacyErrorMessage('Lokal status'));
+    const sensitive = findSensitiveOperationalTextInValue({ quantity: resourceRequest.quantity, note: resourceRequest.note }, 'localStatus.resourceRequest');
+    if (sensitive) {
+      setPrivacyError(`Ressursbehov: ${sensitiveTextFieldError(sensitive.kind)}`);
       return;
     }
     setPrivacyError('');
@@ -225,9 +222,6 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange,
           title="Lokal statusrapport"
           text={showStatusSummary ? renderedStatusSummaryMarkdown : ''}
           textareaId="local-status-summary-markdown"
-          onCopy={(text) => {
-            if (typeof navigator !== 'undefined' && navigator.clipboard) void navigator.clipboard.writeText(text);
-          }}
           formatLabel="Markdown"
         />
       </div> : null}

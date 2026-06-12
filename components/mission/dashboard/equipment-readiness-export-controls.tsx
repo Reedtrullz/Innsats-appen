@@ -28,11 +28,6 @@ export function EquipmentReadinessExportControls({ mission, checklists }: { miss
     appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'mbk-json' });
   }
 
-  async function copyText(text: string) {
-    if (!text || typeof navigator === 'undefined' || !navigator.clipboard) return;
-    await navigator.clipboard.writeText(text);
-  }
-
   return (
     <section className="space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
@@ -44,8 +39,8 @@ export function EquipmentReadinessExportControls({ mission, checklists }: { miss
         <button type="button" onClick={() => void generateMarkdown()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag MBK Markdown</button>
         <button type="button" onClick={() => void generateJson()} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag MBK JSON</button>
       </div>
-      <ExportReview title="MBK materiellstatus Markdown" text={markdown} textareaId="mbk-equipment-markdown" onCopy={(text) => void copyText(text)} formatLabel="Markdown" />
-      <ExportReview title="MBK materiellstatus JSON" text={json} textareaId="mbk-equipment-json" onCopy={(text) => void copyText(text)} formatLabel="JSON" />
+      <ExportReview title="MBK materiellstatus Markdown" text={markdown} textareaId="mbk-equipment-markdown" formatLabel="Markdown" />
+      <ExportReview title="MBK materiellstatus JSON" text={json} textareaId="mbk-equipment-json" formatLabel="JSON" />
     </section>
   );
 }

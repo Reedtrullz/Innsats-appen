@@ -713,6 +713,7 @@ it('archives pending lessons and feedback typed without clicking the separate sa
   await userEvent.type(screen.getByLabelText(/Erfaringsoppsummering/i), 'Direkte arkivert erfaring');
   await userEvent.type(screen.getByLabelText(/Tilbakemelding utstyr/i), 'Direkte arkivert utstyrsfeedback');
   await userEvent.click(screen.getByRole('button', { name: /Fullfør og arkiver lokalt/i }));
+  await userEvent.click(await screen.findByRole('button', { name: /Bekreft arkivering/i }));
 
   await waitFor(() => {
     expect(screen.getByTestId('privacy-message')).toHaveTextContent(/Oppdraget er fullført og arkivert bare lokalt/i);
@@ -1467,6 +1468,7 @@ it('lets users save structured lessons and feedback before locally completing an
   });
 
   await userEvent.click(screen.getByRole('button', { name: /Fullfør og arkiver lokalt/i }));
+  await userEvent.click(await screen.findByRole('button', { name: /Bekreft arkivering/i }));
 
   await waitFor(async () => {
     expect(await listMissions()).toEqual([]);

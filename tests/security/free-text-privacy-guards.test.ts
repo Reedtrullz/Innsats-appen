@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  SENSITIVE_TEXT_EXPLANATIONS,
+  SensitiveTextError,
   assertNoSensitiveOperationalText,
   assertNoSensitiveOperationalTextInValue,
   detectSensitiveOperationalText,
+  findSensitiveOperationalTextInValue,
+  sensitiveTextFieldError,
 } from '@/lib/privacy/sensitive-text';
 
 describe('sensitive operational free-text guards', () => {
@@ -44,6 +48,36 @@ describe('sensitive operational free-text guards', () => {
       expect(detectSensitiveOperationalText(text)).toBeNull();
     },
   );
+
+  it('exposes the matched category and field path for field-anchored UI errors', () => {
+    const found = findSensitiveOperationalTextInValue(
+      { mission: { notes: 'fødselsnummer 01017012345' } },
+      'localImport',
+    );
+    expect(found).toEqual({ context: 'localImport.mission.notes', kind: 'national-id' });
+    expect(findSensitiveOperationalTextInValue({ notes: 'Observasjon uten persondata' })).toBeNull();
+
+    try {
+      assertNoSensitiveOperationalText('pasient Ola Nordmann', 'fieldLog.text');
+      expect.unreachable('expected SensitiveTextError');
+    } catch (error) {
+      expect(error).toBeInstanceOf(SensitiveTextError);
+      expect((error as SensitiveTextError).kind).toBe('patient-reference');
+      expect((error as SensitiveTextError).context).toBe('fieldLog.text');
+    }
+  });
+
+  it('keeps the persondata-class invariant words in every field-level explanation', () => {
+    for (const kind of Object.keys(SENSITIVE_TEXT_EXPLANATIONS) as (keyof typeof SENSITIVE_TEXT_EXPLANATIONS)[]) {
+      const message = sensitiveTextFieldError(kind);
+      // UI alerts built from these must keep matching the privacy-boundary
+      // regex used across component tests.
+      expect(message).toMatch(/persondata|pasientdata|skjermet/i);
+      // The explanation itself must not trip the detector when displayed
+      // alongside user input or persisted in an audit log.
+      expect(detectSensitiveOperationalText(message)).toBeNull();
+    }
+  });
 
   it('reports recursive context labels without echoing full sensitive input', () => {
     const sensitiveText = 'fødselsnummer 01017012345';

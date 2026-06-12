@@ -27,6 +27,7 @@ test('privacy reset removes active archived checklist and log data after archive
   await page.getByLabel(/Erfaringsoppsummering/i).fill('Sanitert læring fra testarkiv.');
   await page.getByLabel(/Hva fungerte/i).fill('Lokal tavle og sjekkliste fungerte.');
   await page.getByRole('button', { name: /Fullfør og arkiver lokalt/i }).click();
+  await page.getByRole('button', { name: /Bekreft arkivering/i }).click();
 
   await expect(page.getByTestId('privacy-message')).toHaveText(/arkivert bare lokalt/i);
   await expect(page.getByRole('heading', { name: /Ingen aktiv lokal tavle/i })).toBeVisible();

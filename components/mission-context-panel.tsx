@@ -8,17 +8,13 @@ import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArc
 import { readSelectedActiveMissionId, saveSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import type { MissionContext } from '@/lib/mission/schemas';
-import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+import { findSensitiveOperationalTextInValue, sensitiveTextFieldError } from '@/lib/privacy/sensitive-text';
 import { useRole } from '@/lib/role/role-context';
 import { selectRunbookChecklist } from '@/lib/mission/runbook';
 import { MissionCommandDashboard } from './mission/dashboard/mission-command-dashboard';
 
 function prefillRole(globalRole: string): Role {
   return (roles as readonly string[]).includes(globalRole) ? (globalRole as Role) : 'mannskap';
-}
-
-function operationalPrivacyErrorMessage(context: string) {
-  return `${context}: Lokal tekst ble stoppet fordi den kan inneholde persondata, pasientdata, skjermet informasjon eller private lokasjoner. Bruk ordinære systemer for slike opplysninger.`;
 }
 
 function formatUpdatedAt(value: string) {
@@ -35,7 +31,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
   const [archivedMissions, setArchivedMissions] = useState<MissionContext[]>([]);
   const [archiveSearch, setArchiveSearch] = useState('');
   const [privacyMessage, setPrivacyMessage] = useState('Lagres bare lokalt i denne nettleseren');
-  const [createPrivacyError, setCreatePrivacyError] = useState('');
+  const [createPrivacyError, setCreatePrivacyError] = useState<{ field: 'title' | 'locationText'; message: string } | null>(null);
   const [createError, setCreateError] = useState('');
   const { role: globalRole } = useRole();
   const [selectedRole, setSelectedRole] = useState<Role>(() => prefillRole(globalRole));
@@ -95,13 +91,15 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
     };
     const activeChecklist = selectRunbookChecklist(checklists, missionDraft);
     const mission = { ...missionDraft, activeChecklistIds: activeChecklist ? [activeChecklist.slug] : [] };
-    try {
-      assertNoSensitiveOperationalTextInValue({ title: mission.title, locationText: mission.locationText }, 'missionCreate');
-    } catch {
-      setCreatePrivacyError(operationalPrivacyErrorMessage('Oppdrag'));
+    const sensitive = findSensitiveOperationalTextInValue({ title: mission.title, locationText: mission.locationText }, 'missionCreate');
+    if (sensitive) {
+      setCreatePrivacyError({
+        field: sensitive.context.endsWith('locationText') ? 'locationText' : 'title',
+        message: sensitiveTextFieldError(sensitive.kind),
+      });
       return;
     }
-    setCreatePrivacyError('');
+    setCreatePrivacyError(null);
     try {
       await saveMission(mission);
     } catch {
@@ -184,16 +182,19 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
         <div>
           <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Nytt oppdrag</p>
           <h1 className="text-3xl font-black">Opprett lokalt oppdrag</h1>
-          {createPrivacyError ? <p role="alert" aria-label="oppdrag personvern" className="mt-2 rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{createPrivacyError}</p> : null}
         </div>
-        <label className="block text-sm font-bold">Tittel <span className="text-red-600" aria-label="påkrevd">*</span><input name="title" required aria-required="true" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3" placeholder="Eksempel: Tilfluktsrom sentrum" /></label>
+        <div>
+          <label className="block text-sm font-bold">Tittel <span className="text-red-600" aria-label="påkrevd">*</span><input name="title" required aria-required="true" aria-invalid={createPrivacyError?.field === 'title' || undefined} className={`mt-1 min-h-12 w-full rounded-xl border px-3 ${createPrivacyError?.field === 'title' ? 'border-red-500' : 'border-slate-300'}`} placeholder="Eksempel: Tilfluktsrom sentrum" /></label>
+          {createPrivacyError?.field === 'title' ? <p role="alert" aria-label="oppdrag personvern" className="mt-1 rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">Tittel: {createPrivacyError.message}</p> : null}
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block text-sm font-bold">Rolle<select name="role" value={selectedRole} onChange={(event) => setSelectedRole(event.target.value as Role)} className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{roles.map((role) => <option key={role} value={role}>{roleLabels[role]}</option>)}</select></label>
           <label className="block text-sm font-bold">Fase<select name="phase" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{phases.map((phase) => <option key={phase} value={phase}>{phaseLabels[phase]}</option>)}</select></label>
         </div>
         <label className="block text-sm font-bold">Scenario<select name="scenario" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{scenarios.map((scenario) => <option key={scenario} value={scenario}>{scenarioLabels[scenario]}</option>)}</select></label>
         <div>
-          <label className="block text-sm font-bold">Sted/lokasjon <span className="font-semibold text-slate-500">(valgfritt)</span><input name="locationText" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3" placeholder="Kun sted, ikke persondata" /></label>
+          <label className="block text-sm font-bold">Sted/lokasjon <span className="font-semibold text-slate-500">(valgfritt)</span><input name="locationText" aria-invalid={createPrivacyError?.field === 'locationText' || undefined} className={`mt-1 min-h-12 w-full rounded-xl border px-3 ${createPrivacyError?.field === 'locationText' ? 'border-red-500' : 'border-slate-300'}`} placeholder="Kun sted, ikke persondata" /></label>
+          {createPrivacyError?.field === 'locationText' ? <p role="alert" aria-label="oppdrag personvern" className="mt-1 rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">Sted/lokasjon: {createPrivacyError.message}</p> : null}
           <p className="mt-1 text-xs text-slate-600">Offentlig kontekst bruker bare valgt posisjon eller søketekst når du åpner egne kontekstverktøy. Oppdragsnotater og privat tekst forblir lokalt på enheten.</p>
         </div>
         {createError ? <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{createError}</p> : null}

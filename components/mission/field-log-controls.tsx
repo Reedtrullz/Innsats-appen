@@ -4,14 +4,10 @@ import { useState } from 'react';
 import { FIELD_LOG_CATEGORY_OPTIONS, FIELD_LOG_CATEGORY_LABELS, FIELD_LOG_LOCAL_ONLY_WARNING, FIELD_LOG_PATIENT_DATA_WARNING, exportFieldLogJson, exportFieldLogMarkdown, exportFieldLogPdfReadyHtml, filterFieldLogEntries } from '@/lib/mission/field-log';
 import type { FieldLogCategory, MissionContext } from '@/lib/mission/schemas';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
-import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+import { findSensitiveOperationalTextInValue, sensitiveTextFieldError } from '@/lib/privacy/sensitive-text';
 import { ContextNotice } from './context-notice';
 import { ExportReview } from './export-review';
 import type { MissionUpdate } from './quick-field-log-composer';
-
-function operationalPrivacyErrorMessage(context: string) {
-  return `${context}: Lokal tekst ble stoppet fordi den kan inneholde persondata, pasientdata, skjermet informasjon eller private lokasjoner. Bruk ordinære systemer for slike opplysninger.`;
-}
 
 function formatUpdatedAt(value: string) {
   return new Intl.DateTimeFormat('nb-NO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
@@ -58,10 +54,9 @@ export function FieldLogControls({ mission, onMissionChange }: { mission: Missio
       criticalObservation: form.get('criticalObservation') === 'on',
       mustBeForwarded: form.get('mustBeForwarded') === 'on',
     };
-    try {
-      assertNoSensitiveOperationalTextInValue({ text: entry.text, locationText: entry.locationText }, 'fieldLog');
-    } catch {
-      setPrivacyError(operationalPrivacyErrorMessage('Feltlogg'));
+    const sensitive = findSensitiveOperationalTextInValue({ text: entry.text, locationText: entry.locationText }, 'fieldLog');
+    if (sensitive) {
+      setPrivacyError(`Feltlogg: ${sensitiveTextFieldError(sensitive.kind)}`);
       return;
     }
     setPrivacyError('');
@@ -89,11 +84,6 @@ export function FieldLogControls({ mission, onMissionChange }: { mission: Missio
   function generatePdfReadyHtml() {
     setPdfReadyHtml(exportFieldLogPdfReadyHtml({ mission, entries: filteredEntries }));
     appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'field-log-pdf-ready-html', count: filteredEntries.length });
-  }
-
-  async function copyText(text: string) {
-    if (!text || typeof navigator === 'undefined' || !navigator.clipboard) return;
-    await navigator.clipboard.writeText(text);
   }
 
   return (
@@ -181,9 +171,9 @@ export function FieldLogControls({ mission, onMissionChange }: { mission: Missio
           <button type="button" onClick={generatePdfReadyHtml} className="min-h-11 rounded-xl bg-slate-950 px-4 font-bold text-white">Lag PDF-klar feltlogg</button>
         </div>
       </div>
-      <ExportReview title="Feltlogg Markdown" text={markdown} textareaId="field-log-markdown" onCopy={(text) => void copyText(text)} formatLabel="Markdown" />
-      <ExportReview title="Feltlogg JSON" text={json} textareaId="field-log-json" onCopy={(text) => void copyText(text)} formatLabel="JSON" />
-      <ExportReview title="PDF-klar feltlogg HTML" text={pdfReadyHtml} textareaId="field-log-pdf-ready-html" onCopy={(text) => void copyText(text)} formatLabel="HTML" />
+      <ExportReview title="Feltlogg Markdown" text={markdown} textareaId="field-log-markdown" formatLabel="Markdown" />
+      <ExportReview title="Feltlogg JSON" text={json} textareaId="field-log-json" formatLabel="JSON" />
+      <ExportReview title="PDF-klar feltlogg HTML" text={pdfReadyHtml} textareaId="field-log-pdf-ready-html" formatLabel="HTML" />
     </section>
   );
 }

@@ -5,7 +5,7 @@ import type { OperationalChecklist } from '@/lib/content/schemas';
 import { getChecklistRun, saveChecklistRun } from '@/lib/mission/local-store';
 import { equipmentStatusLabels, equipmentStatuses } from '@/lib/mission/equipment-readiness';
 import type { EquipmentStatus } from '@/lib/mission/schemas';
-import { assertNoSensitiveOperationalText } from '@/lib/privacy/sensitive-text';
+import { detectSensitiveOperationalText, sensitiveTextFieldError } from '@/lib/privacy/sensitive-text';
 
 export function ChecklistRunner({ checklist, missionId, onRunSaved }: { checklist: OperationalChecklist; missionId: string; onRunSaved?: () => void }) {
   const runId = `${missionId}:${checklist.slug}`;
@@ -17,7 +17,7 @@ function ChecklistRunnerState({ checklist, missionId, runId, onRunSaved }: { che
   const [notesByItemId, setNotesByItemId] = useState<Record<string, string>>({});
   const [equipmentStatusByItemId, setEquipmentStatusByItemId] = useState<Record<string, EquipmentStatus>>({});
   const [hydrated, setHydrated] = useState(false);
-  const [notePrivacyError, setNotePrivacyError] = useState<string | null>(null);
+  const [notePrivacyError, setNotePrivacyError] = useState<{ itemId: string; message: string } | null>(null);
   const checkedRef = useRef<Set<string>>(new Set());
   const notesByItemIdRef = useRef<Record<string, string>>({});
   const persistedNotesByItemIdRef = useRef<Record<string, string>>({});
@@ -90,22 +90,17 @@ function ChecklistRunnerState({ checklist, missionId, runId, onRunSaved }: { che
     setNotesByItemId(persistedNotesByItemIdRef.current);
   }
 
-  function assertChecklistNoteSafe(note: string) {
-    const normalized = note.replace(/[\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim();
-    if (!normalized) return '';
-    assertNoSensitiveOperationalText(normalized, 'checklistRunner.note');
-    return note;
-  }
-
   async function persistNoteOnBlur(itemId: string, note: string) {
-    let safeNote = '';
-    try {
-      safeNote = assertChecklistNoteSafe(note);
-    } catch {
-      setNotePrivacyError('Notatet kan ikke lagres lokalt fordi det kan inneholde persondata, pasientdata, identifikator, kontaktinformasjon eller private opplysninger.');
+    const normalized = note.replace(/[\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const match = normalized ? detectSensitiveOperationalText(normalized) : null;
+    if (match) {
+      // The unsafe draft is deliberately discarded (not kept in state/DOM);
+      // the error names the category so the user knows what to rewrite.
+      setNotePrivacyError({ itemId, message: `Notatet ble ikke lagret: ${sensitiveTextFieldError(match.kind)} Teksten ble fjernet av personvernhensyn.` });
       restorePersistedNotes();
       return;
     }
+    const safeNote = normalized ? note : '';
     setNotePrivacyError(null);
     const nextPersistedNotesByItemId = safeNote
       ? persistedNotesByItemIdRef.current[itemId] === safeNote
@@ -145,7 +140,6 @@ function ChecklistRunnerState({ checklist, missionId, runId, onRunSaved }: { che
       {requiredItems.length > 0 ? <p className="mt-2 text-sm font-semibold text-slate-700">Påkrevd: {requiredDone}/{requiredItems.length} kontrollert</p> : null}
       {!hydrated ? <p className="mt-2 text-sm font-semibold text-slate-600">Laster lokal sjekklistestatus før redigering.</p> : null}
       {checklist.warning ? <p className="mt-2 text-sm font-semibold text-amber-900">{checklist.warning}</p> : null}
-      {notePrivacyError ? <p role="alert" className="mt-2 rounded-xl border border-rose-200 bg-rose-50 p-2 text-sm font-semibold text-rose-900">{notePrivacyError}</p> : null}
       <ul className="mt-3 space-y-3">
         {checklist.items.map((item) => (
           <li key={item.id} className={`rounded-2xl border p-3 ${item.required ? 'border-amber-300 bg-amber-50/60' : 'border-slate-200'}`}>
@@ -181,6 +175,9 @@ function ChecklistRunnerState({ checklist, missionId, runId, onRunSaved }: { che
                 placeholder="Kun lokale, ikke-sensitive notater. Ikke persondata."
               />
             </label>
+            {notePrivacyError?.itemId === item.id ? (
+              <p role="alert" className="mt-2 rounded-xl border border-rose-200 bg-rose-50 p-2 text-sm font-semibold text-rose-900">{notePrivacyError.message}</p>
+            ) : null}
           </li>
         ))}
       </ul>

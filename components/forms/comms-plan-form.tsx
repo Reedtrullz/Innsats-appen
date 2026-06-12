@@ -76,11 +76,6 @@ export function CommsPlanForm({ contentVersion = 'local-mvp' }: CommsPlanFormPro
     }
   }
 
-  async function copyPreview() {
-    if (!preview?.text || typeof navigator === 'undefined' || !navigator.clipboard) return;
-    await navigator.clipboard.writeText(preview.text);
-  }
-
   return (
     <form onSubmit={onSubmit} onChange={() => { setPreview(null); setExportError(null); }} className="space-y-4 rounded-3xl bg-white p-5 shadow-sm">
       <div>
@@ -141,7 +136,7 @@ export function CommsPlanForm({ contentVersion = 'local-mvp' }: CommsPlanFormPro
       </div>
 
       {exportError ? <p role="status" className="rounded-2xl bg-red-50 p-3 text-sm font-bold text-red-950">{exportError}</p> : null}
-      <ExportReview title="Sambandsplan" text={preview?.text ?? ''} textareaId="comms-plan-preview" onCopy={() => void copyPreview()} formatLabel={preview?.format.toUpperCase()} />
+      <ExportReview title="Sambandsplan" text={preview?.text ?? ''} textareaId="comms-plan-preview" formatLabel={preview?.format.toUpperCase()} />
     </form>
   );
 }

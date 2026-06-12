@@ -68,7 +68,7 @@ import { buildFieldLogEntryFromMapObject } from '@/lib/mission/map-log-link';
 import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
 import { getMission, listMissions, saveMission } from '@/lib/mission/local-store';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
-import { detectSensitiveOperationalText } from '@/lib/privacy/sensitive-text';
+import { SENSITIVE_TEXT_EXPLANATIONS, SensitiveTextError, detectSensitiveOperationalText, sensitiveTextFieldError, type SensitiveTextMatch } from '@/lib/privacy/sensitive-text';
 import { DEFAULT_FIELD_MODE_SETTINGS, FIELD_MODE_STORAGE_EVENT, readFieldModeSettings } from '@/lib/field-mode/field-mode';
 import type { FieldLogCategory, MissionContext } from '@/lib/mission/schemas';
 
@@ -117,6 +117,15 @@ function operationMeasurement(drawing: MissionMapDrawing | undefined) {
 
 const importPrivacyWarning = 'Noen importerte kartobjekter ble stoppet lokalt fordi de kan inneholde persondata, pasientdata, kontaktinfo eller skjermet/privat lokasjon.';
 
+type ImportBlockedKind = SensitiveTextMatch['kind'] | 'unsupported-value';
+
+function importPrivacyWarningForKinds(kinds: ImportBlockedKind[]) {
+  const labels = [...new Set(kinds.filter((kind): kind is SensitiveTextMatch['kind'] => kind !== 'unsupported-value'))]
+    .map((kind) => SENSITIVE_TEXT_EXPLANATIONS[kind].label);
+  if (labels.length === 0) return importPrivacyWarning;
+  return `Noen importerte kartobjekter ble stoppet lokalt (${labels.join('; ')}). Persondata og pasientdata skal ikke lagres i kartet.`;
+}
+
 function missingMissionAction() {
   return (
     <span className="flex flex-wrap items-center gap-2">
@@ -128,6 +137,9 @@ function missingMissionAction() {
 }
 
 function privacyErrorText(error: unknown) {
+  if (error instanceof SensitiveTextError) {
+    return `Karttekst ble stoppet lokalt: ${sensitiveTextFieldError(error.kind)}`;
+  }
   return error instanceof Error && /persondata|pasientdata|private|skjermet|identifikator|kontakt|unsupported map text value/i.test(error.message)
     ? 'Karttekst ble stoppet lokalt fordi den kan inneholde persondata, pasientdata, kontaktinfo eller skjermet/privat lokasjon.'
     : 'Kunne ikke lagre lokal karttekst. Kontroller innholdet og prøv igjen.';
@@ -145,10 +157,10 @@ function normalizeImportMapTextForDetection(value: string | number | null | unde
     .trim();
 }
 
-function importMapTextHasBlockedValue(value: unknown, _maxLength?: number) {
+function importMapTextBlockedKind(value: unknown, _maxLength?: number): ImportBlockedKind | null {
   void _maxLength;
-  if (!isImportMapTextValue(value)) return true;
-  return Boolean(detectSensitiveOperationalText(normalizeImportMapTextForDetection(value)));
+  if (!isImportMapTextValue(value)) return 'unsupported-value';
+  return detectSensitiveOperationalText(normalizeImportMapTextForDetection(value))?.kind ?? null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -184,8 +196,8 @@ function isSupportedImportDrawingFeature(kind: MapDrawingKind, geometry: Record<
   return supportedImportDrawingPointCount(kind, geometry) >= minimumPoints;
 }
 
-function importFeatureHasBlockedMapText(feature: unknown) {
-  if (!isRecord(feature) || feature.type !== 'Feature' || !isRecord(feature.geometry) || !isRecord(feature.properties)) return false;
+function importFeatureBlockedMapTextKinds(feature: unknown): ImportBlockedKind[] {
+  if (!isRecord(feature) || feature.type !== 'Feature' || !isRecord(feature.geometry) || !isRecord(feature.properties)) return [];
   const { geometry, properties } = feature;
   const markerFeature = properties.itemType === 'marker'
     && MAP_MARKER_KINDS.includes(properties.kind as MapMarkerKind)
@@ -194,21 +206,21 @@ function importFeatureHasBlockedMapText(feature: unknown) {
   const drawingFeature = properties.itemType === 'drawing'
     && MAP_DRAWING_KINDS.includes(properties.kind as MapDrawingKind)
     && isSupportedImportDrawingFeature(properties.kind as MapDrawingKind, geometry);
-  if (!markerFeature && !drawingFeature) return false;
-  return importMapTextHasBlockedValue(properties.label)
-    || importMapTextHasBlockedValue(properties.note, 240);
+  if (!markerFeature && !drawingFeature) return [];
+  return [importMapTextBlockedKind(properties.label), importMapTextBlockedKind(properties.note, 240)]
+    .filter((kind): kind is ImportBlockedKind => kind !== null);
 }
 
-function geoJsonImportHasBlockedMapText(text: string) {
+function geoJsonImportBlockedMapTextKinds(text: string): ImportBlockedKind[] {
   try {
     const parsed = JSON.parse(text) as unknown;
     if (!isRecord(parsed)
       || parsed.type !== 'FeatureCollection'
       || parsed.coordinateSystem !== SCHEMATIC_GEOJSON_COORDINATE_SYSTEM
-      || !Array.isArray(parsed.features)) return false;
-    return parsed.features.some(importFeatureHasBlockedMapText);
+      || !Array.isArray(parsed.features)) return [];
+    return [...new Set(parsed.features.flatMap(importFeatureBlockedMapTextKinds))];
   } catch {
-    return false;
+    return [];
   }
 }
 
@@ -764,19 +776,21 @@ export function OfflineMapPanel() {
     }
     try {
       setMapPrivacyError(null);
-      const importHadBlockedMapText = geoJsonImportHasBlockedMapText(geoJsonImport);
+      const importBlockedKinds = geoJsonImportBlockedMapTextKinds(geoJsonImport);
       const imported = importGeoJsonText(geoJsonImport, new Date(), activeMission.id);
       const count = imported.markers.length + imported.drawings.length;
       if (count === 0) {
-        if (importHadBlockedMapText) {
-          showMapPrivacyError(new Error('GeoJSON import rejected persondata/kontakt/private map text.'));
+        if (importBlockedKinds.length > 0) {
+          const message = importPrivacyWarningForKinds(importBlockedKinds);
+          setMapPrivacyError(message);
+          setStatusMessage(message);
           return;
         }
         setStatusMessage('Ingen støttede skjematiske GeoJSON-objekter funnet.');
         return;
       }
       persistState(mergeMissionMapState(mapState, imported), `Importerte ${count} lokale kartobjekter fra GeoJSON til aktivt oppdrag.`);
-      if (importHadBlockedMapText) setMapPrivacyError(importPrivacyWarning);
+      if (importBlockedKinds.length > 0) setMapPrivacyError(importPrivacyWarningForKinds(importBlockedKinds));
     } catch (error) {
       showMapPrivacyError(error);
     }

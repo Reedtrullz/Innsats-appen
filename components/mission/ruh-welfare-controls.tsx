@@ -7,15 +7,11 @@ import { MAN_DOWN_POST_MVP_NOTE, MEDIA_ATTACHMENT_SAFETY_NOTES } from '@/lib/mis
 import { RUH_CATEGORY_OPTIONS, RUH_RISK_OPTIONS, WELFARE_LOAD_OPTIONS, exportRuhJson, exportRuhMarkdown, exportWelfareJson, exportWelfareMarkdown, summarizeWelfareCheck } from '@/lib/mission/ruh-welfare';
 import type { MissionContext, RuhCategory, RuhRisk, WelfareLoad } from '@/lib/mission/schemas';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
-import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+import { findSensitiveOperationalTextInValue, sensitiveTextFieldError } from '@/lib/privacy/sensitive-text';
 import { buildRuhWelfareSummary } from '@/lib/mission/after-action-report';
 
 type MissionUpdate = (mission: MissionContext) => MissionContext;
 type RuhWelfarePanel = 'ruh' | 'welfare' | 'export';
-
-function operationalPrivacyErrorMessage(context: string) {
-  return `${context}: Lokal tekst ble stoppet fordi den kan inneholde persondata, pasientdata, skjermet informasjon eller private lokasjoner. Bruk ordinære systemer for slike opplysninger.`;
-}
 
 function formatUpdatedAt(value: string) {
   return new Intl.DateTimeFormat('nb-NO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
@@ -68,10 +64,9 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
       followUpNeeded: form.get('ruhFollowUpNeeded') === 'on',
       linkedMissionId: mission.id,
     };
-    try {
-      assertNoSensitiveOperationalTextInValue({ whatHappened: report.whatHappened, immediateMeasure: report.immediateMeasure }, 'ruh');
-    } catch {
-      setRuhPrivacyError(operationalPrivacyErrorMessage('RUH'));
+    const sensitive = findSensitiveOperationalTextInValue({ whatHappened: report.whatHappened, immediateMeasure: report.immediateMeasure }, 'ruh');
+    if (sensitive) {
+      setRuhPrivacyError(`RUH: ${sensitiveTextFieldError(sensitive.kind)}`);
       return;
     }
     setRuhPrivacyError('');
@@ -108,10 +103,9 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
       },
       note: String(form.get('welfareNote') ?? '').trim() || undefined,
     };
-    try {
-      assertNoSensitiveOperationalTextInValue({ note: check.note }, 'welfare');
-    } catch {
-      setWelfarePrivacyError(operationalPrivacyErrorMessage('Velferd'));
+    const sensitive = findSensitiveOperationalTextInValue({ note: check.note }, 'welfare');
+    if (sensitive) {
+      setWelfarePrivacyError(`Velferd: ${sensitiveTextFieldError(sensitive.kind)}`);
       return;
     }
     setWelfarePrivacyError('');
@@ -143,11 +137,6 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
   function generateWelfareJson() {
     setWelfareJson(exportWelfareJson({ mission, checks: welfareChecks }));
     appendLocalAuditEntry('export-created', { missionId: mission.id, exportKind: 'welfare-json', count: welfareChecks.length });
-  }
-
-  async function copyText(text: string) {
-    if (!text || typeof navigator === 'undefined' || !navigator.clipboard) return;
-    await navigator.clipboard.writeText(text);
   }
 
   return (
@@ -263,10 +252,10 @@ export function RuhWelfareControls({ mission, onMissionChange }: { mission: Miss
               </div>
             </details>
           </div>
-          <ExportReview title="RUH Markdown" text={ruhMarkdown} textareaId="ruh-markdown" onCopy={(text) => void copyText(text)} />
-          <ExportReview title="RUH JSON" text={ruhJson} textareaId="ruh-json" onCopy={(text) => void copyText(text)} />
-          <ExportReview title="Velferd Markdown" text={welfareMarkdown} textareaId="welfare-markdown" onCopy={(text) => void copyText(text)} />
-          <ExportReview title="Velferd JSON" text={welfareJson} textareaId="welfare-json" onCopy={(text) => void copyText(text)} />
+          <ExportReview title="RUH Markdown" text={ruhMarkdown} textareaId="ruh-markdown" />
+          <ExportReview title="RUH JSON" text={ruhJson} textareaId="ruh-json" />
+          <ExportReview title="Velferd Markdown" text={welfareMarkdown} textareaId="welfare-markdown" />
+          <ExportReview title="Velferd JSON" text={welfareJson} textareaId="welfare-json" />
         </div>
       ) : null}
 

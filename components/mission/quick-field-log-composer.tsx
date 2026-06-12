@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from 'react';
 import { FIELD_LOG_CATEGORY_OPTIONS } from '@/lib/mission/field-log';
 import type { FieldLogCategory, FieldLogEntry, MissionContext } from '@/lib/mission/schemas';
-import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+import { findSensitiveOperationalTextInValue, sensitiveTextFieldError } from '@/lib/privacy/sensitive-text';
 
 export type MissionUpdate = (mission: MissionContext) => MissionContext;
 
@@ -16,10 +16,6 @@ export type QuickFieldLogComposerProps = {
   criticalObservationAriaLabel?: string;
   mustBeForwardedAriaLabel?: string;
 };
-
-function quickFieldLogPrivacyErrorMessage() {
-  return 'Hurtiglogg: Lokal tekst ble stoppet fordi den kan inneholde persondata, pasientdata, skjermet informasjon eller private lokasjoner. Bruk ordinære systemer for slike opplysninger.';
-}
 
 export function QuickFieldLogComposer({
   mission,
@@ -57,10 +53,9 @@ export function QuickFieldLogComposer({
       mustBeForwarded,
     };
 
-    try {
-      assertNoSensitiveOperationalTextInValue({ text: entry.text, locationText: entry.locationText }, 'quickFieldLog');
-    } catch {
-      setError(quickFieldLogPrivacyErrorMessage());
+    const sensitive = findSensitiveOperationalTextInValue({ text: entry.text, locationText: entry.locationText }, 'quickFieldLog');
+    if (sensitive) {
+      setError(`Hurtiglogg: ${sensitiveTextFieldError(sensitive.kind)}`);
       return;
     }
 

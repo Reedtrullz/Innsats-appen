@@ -143,11 +143,6 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
     }
   }
 
-  async function copyPreview() {
-    if (!preview?.text || typeof navigator === 'undefined' || !navigator.clipboard) return;
-    await navigator.clipboard.writeText(preview.text);
-  }
-
   return (
     <form onSubmit={onSubmit} onChange={resetPreview} className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
@@ -290,7 +285,7 @@ export function FivePointOrderForm({ contentVersion = 'local-mvp' }: FivePointOr
       </StepBlock>
 
       {exportError ? <p role="status" className="rounded-2xl bg-red-50 p-3 text-sm font-bold text-red-950">{exportError}</p> : null}
-      <ExportReview title="Eksport" text={preview?.text ?? ''} textareaId="five-point-order-preview" onCopy={() => void copyPreview()} formatLabel={preview?.format.toUpperCase()} />
+      <ExportReview title="Eksport" text={preview?.text ?? ''} textareaId="five-point-order-preview" formatLabel={preview?.format.toUpperCase()} />
     </form>
   );
 }
