@@ -10,7 +10,6 @@ import { MissionMapSummary } from '../../mission-map-summary';
 import { FieldLogControls } from '../field-log-controls';
 import { LocalMissionControls } from '../local-mission-controls';
 import { MissionLogOverview } from '../mission-log-overview';
-import { QuickFieldLogComposer } from '../quick-field-log-composer';
 import type { MissionUpdate } from './dashboard-types';
 import { PanelHeading } from './panel-heading';
 
@@ -40,12 +39,6 @@ export function MissionWorkPanel({
       {checklist ? <div id="sjekkliste" className="scroll-mt-28"><ChecklistRunner checklist={checklist} missionId={mission.id} onRunSaved={onChecklistRunSaved} /></div> : (
         <p id="sjekkliste" className="scroll-mt-28 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm font-semibold text-slate-700">Ingen scenariospesifikk sjekkliste for dette oppdraget ennå. Bruk søk og tiltakskort, eller velg et scenario med egen sjekkliste.</p>
       )}
-      <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <summary className="min-h-11 cursor-pointer list-none text-base font-black text-slate-950">Hurtiglogg</summary>
-        <div className="mt-3">
-          <QuickFieldLogComposer mission={mission} onMissionChange={onMissionChange} sourceLabel="Arbeidsflate" criticalObservationAriaLabel="Arbeid hurtiglogg kritisk flagg" mustBeForwardedAriaLabel="Arbeid hurtiglogg videresending flagg" />
-        </div>
-      </details>
       <details id="loggoversikt" className="scroll-mt-28 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <summary className="min-h-11 cursor-pointer list-none text-base font-black text-slate-950">
           <span id="mission-local-work-heading">Loggoversikt og lokale oppgaver</span>

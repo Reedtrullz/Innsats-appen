@@ -104,7 +104,7 @@ it('exports PDF-ready HTML that escapes order text and labels browser print-to-P
   expect(html).toContain('Tilbakelesing/forstått: Bekreftet');
 });
 
-it('refuses 5-punktsordre exports when readback is missing or false', () => {
+it('exports without readback but records the unconfirmed state and a warning', () => {
   const input = {
     templateId: 'lagleder-lagforer' as const,
     situasjon: 'Status',
@@ -116,10 +116,28 @@ it('refuses 5-punktsordre exports when readback is missing or false', () => {
     contentVersion: 'test-content-v3',
   };
 
-  for (const exporter of [exportFivePointOrderMarkdown, exportFivePointOrderJson, exportFivePointOrderPdfReadyHtml]) {
-    expect(() => exporter(input)).toThrow(/readbackConfirmed must be true/i);
-    expect(() => exporter({ ...input, readbackConfirmed: false })).toThrow(/readbackConfirmed must be true/i);
-  }
+  const markdown = exportFivePointOrderMarkdown(input);
+  expect(markdown).toContain('Tilbakelesing/forstått: Ikke bekreftet');
+
+  const parsed = JSON.parse(exportFivePointOrderJson({ ...input, readbackConfirmed: false }));
+  expect(parsed.readback).toEqual({ confirmed: false, label: 'Tilbakelesing/forstått ikke bekreftet' });
+  expect(parsed.warnings.some((warning: string) => /ikke bekreftet/i.test(warning))).toBe(true);
+});
+
+it('exports partial orders with empty points rendered as placeholders', () => {
+  const markdown = exportFivePointOrderMarkdown({
+    templateId: 'lagleder-lagforer' as const,
+    situasjon: 'Vannstand stiger ved offentlig kai',
+    oppdrag: '',
+    utforelse: '',
+    administrasjonForsyning: '',
+    ledelseSamband: '',
+    readbackConfirmed: false,
+    generatedAt: '2026-06-03T15:00:00.000Z',
+    contentVersion: 'test-content-v3',
+  });
+  expect(markdown).toContain('Vannstand stiger ved offentlig kai');
+  expect(markdown).toContain('## Oppdrag\n—');
 });
 
 it('refuses 5-punktsordre exports containing sensitive operational text', () => {

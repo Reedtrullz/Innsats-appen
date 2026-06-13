@@ -16,7 +16,7 @@ async function fillFivePointOrder(form: Locator) {
   await form.getByLabel('Utførelse').fill('Prioriter sikker adkomst, logg tiltak og stopp ved uavklarte farer.');
   await form.getByLabel('Administrasjon/forsyning').fill('Behov: lys, pumpe, varme drikker og avløsning.');
   await form.getByLabel('Ledelse/samband').fill('Kontaktvei etter lokal plan, status hvert 30. minutt.');
-  await form.getByLabel('Notes').fill('Kun sanitert testdata.');
+  await form.getByLabel('Notater').fill('Kun sanitert testdata.');
 }
 
 async function fillCommsPlan(form: Locator) {
@@ -28,7 +28,7 @@ async function fillCommsPlan(form: Locator) {
   await form.getByLabel(/Innsjekkingsintervall/i).fill('Hver 30. minutt og ved endring');
   await form.getByLabel(/Prosedyre ved bortfall av samband/i).fill('Forsøk fallback, møt på avtalt punkt, logg lokalt.');
   await form.getByLabel(/Batteri-\/ladestatus/i).fill('Radio og reservebatteri kontrollert');
-  await form.getByLabel('Notes').fill('Ikke ISSI-lister eller sensitive sambandstabeller.');
+  await form.getByLabel('Notater').fill('Ikke ISSI-lister eller sensitive sambandstabeller.');
 }
 
 test.beforeEach(async ({ page }) => {

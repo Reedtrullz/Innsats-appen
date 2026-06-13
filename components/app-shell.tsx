@@ -4,11 +4,16 @@ import { getMustReadNotices } from '@/lib/content/load-content';
 import { BottomNav } from './bottom-nav';
 import { DecisionSupportNotice } from './decision-support-notice';
 import { ActiveMissionShortcut, FieldModeRuntime } from './field-mode-runtime';
+import { FieldModeHeaderToggle } from './field-mode-header-toggle';
 import { OperationalStatus } from './operational-status';
 import { OperationalIcon } from './ui/operational-icons';
 
 export function AppShell({ children, currentPath }: { children: React.ReactNode; currentPath?: string }) {
-  const mustReadCount = getMustReadNotices().length;
+  const mustReadNotices = getMustReadNotices();
+  const mustReadCount = mustReadNotices.length;
+  // Alarm-red is reserved for critical notices so the badge keeps signal value
+  // in the field; routine warnings/info render as neutral chrome.
+  const hasCriticalNotice = mustReadNotices.some((notice) => notice.severity === 'critical');
   return (
     <div className="min-h-screen overflow-x-clip bg-[#F8FAFC] text-slate-950">
       <FieldModeRuntime />
@@ -24,7 +29,14 @@ export function AppShell({ children, currentPath }: { children: React.ReactNode;
             </span>
           </Link>
           <div className="flex shrink-0 items-center justify-end gap-2">
-            <Link href="/ma-leses" aria-label={`Må leses ${mustReadCount}`} className="inline-flex min-h-11 items-center rounded-full bg-red-600 px-3 py-2 text-xs font-black text-white shadow-sm shadow-red-950/20">
+            <FieldModeHeaderToggle />
+            <Link
+              href="/ma-leses"
+              aria-label={`Må leses ${mustReadCount}`}
+              className={hasCriticalNotice
+                ? 'inline-flex min-h-11 items-center rounded-full bg-red-600 px-3 py-2 text-xs font-black text-white shadow-sm shadow-red-950/20'
+                : 'inline-flex min-h-11 items-center rounded-full bg-white/10 px-3 py-2 text-xs font-black text-white ring-1 ring-white/15'}
+            >
               <span className="sm:hidden">Må {mustReadCount}</span>
               <span className="hidden sm:inline">Må leses {mustReadCount}</span>
             </Link>

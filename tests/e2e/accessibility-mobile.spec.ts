@@ -159,7 +159,7 @@ test('mission and local export form controls have accessible labels', async ({ p
   const orderForm = page.locator('form').filter({ has: page.getByRole('heading', { name: '5-punktsordre' }) });
   await expect(orderForm.getByLabel(/Rolle\/mal for 5-punktsordre/i)).toBeVisible();
   await orderForm.getByRole('tab', { name: /Fem punkter/i }).click();
-  for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband', 'Notes']) {
+  for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband', 'Notater']) {
     await expect(orderForm.getByLabel(new RegExp(label.replace('/', '\\/'), 'i'))).toBeVisible();
   }
   for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
@@ -180,7 +180,7 @@ test('mission and local export form controls have accessible labels', async ({ p
     'Innsjekkingsintervall',
     'Prosedyre ved bortfall av samband',
     'Batteri-/ladestatus',
-    'Notes',
+    'Notater',
   ]) {
     await expect(commsForm.getByLabel(new RegExp(label.replaceAll('/', '\\/'), 'i'))).toBeVisible();
   }
@@ -234,6 +234,7 @@ test('map and field-mode controls expose screen-reader labels', async ({ page })
   await expect(page.getByLabel(/Dag \/ utendørs/i)).toBeVisible();
   await expect(page.getByLabel(/^Natt/i)).toBeVisible();
   await expect(page.getByLabel(/Redusert blått lys/i)).toBeVisible();
+  await page.getByText(/Evaluering og feltprøving/i).click();
   await expect(page.getByLabel(/Utendørs lesbarhet er vurdert/i)).toBeVisible();
   await expect(page.getByLabel(/Jeg forstår at diktering er valgfritt/i)).toBeVisible();
   await expect(page.getByLabel(/Lokal notatkladd/i)).toBeVisible();

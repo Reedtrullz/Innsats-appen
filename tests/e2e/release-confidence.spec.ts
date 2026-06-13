@@ -13,7 +13,6 @@ function orderForm(page: Page) {
 }
 
 async function fillOrderPoints(form: Locator) {
-  await form.getByRole('tab', { name: /Fem punkter/i }).click();
   await expect(form.getByText(/0\/5 punkter fylt ut/i)).toBeVisible();
   const labels = ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband'];
   for (let index = 0; index < labels.length; index += 1) {
@@ -30,29 +29,19 @@ async function expectCollapsedReview(section: Locator, title: RegExp) {
   await expect(preview.locator('xpath=ancestor::details[1]')).not.toHaveAttribute('open', '');
 }
 
-test('5-punktsordre guided steps stay locked, show progress and render collapsed ExportReview', async ({ page }) => {
+test('5-punktsordre one-screen form shows progress, never locks, and renders collapsed ExportReview', async ({ page }) => {
   await createLocalMission(page, { title: `Guided ordre ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Release QA' });
   await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
   const form = orderForm(page);
 
-  await expect(form.getByRole('tab', { name: /Mal/i })).toContainText(/Fullført/i);
-  await expect(form.getByRole('tab', { name: /Bekreft/i })).toBeDisabled();
-  await expect(form.getByRole('tab', { name: /Bekreft/i })).toContainText(/Låst/i);
-  await expect(form.getByRole('tab', { name: /Eksporter/i })).toBeDisabled();
-  await expect(form.getByRole('tab', { name: /Eksporter/i })).toContainText(/Låst/i);
+  // One-screen form: no wizard tabs, export disabled only while empty.
+  await expect(form.getByRole('tab')).toHaveCount(0);
+  await expect(form.getByRole('button', { name: /Eksporter Markdown/i })).toBeDisabled();
 
   await fillOrderPoints(form);
-  await expect(form.getByRole('tab', { name: /Bekreft/i })).toBeEnabled();
-  await expect(form.getByRole('tab', { name: /Bekreft/i })).toContainText(/Klar/i);
-  await expect(form.getByRole('tab', { name: /Eksporter/i })).toBeDisabled();
-
-  await form.getByRole('tab', { name: /Bekreft/i }).click();
-  await expect(form.getByRole('tab', { name: /Eksporter/i })).toBeDisabled();
+  await expect(form.getByRole('button', { name: /Eksporter Markdown/i })).toBeEnabled();
   await form.getByLabel(/Tilbakelesing\/forstått/i).check();
-  await expect(form.getByRole('tab', { name: /Bekreft/i })).toContainText(/Fullført/i);
-  await expect(form.getByRole('tab', { name: /Eksporter/i })).toBeEnabled();
 
-  await form.getByRole('tab', { name: /Eksporter/i }).click();
   await form.getByRole('button', { name: /Eksporter Markdown/i }).click();
   await expectCollapsedReview(form, /Eksport er klar/i);
   await expect(form.locator('#five-point-order-preview')).toBeHidden();
@@ -66,9 +55,7 @@ test('generated exports use collapsed ExportReview pattern across mission export
   await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
   const order = orderForm(page);
   await fillOrderPoints(order);
-  await order.getByRole('tab', { name: /Bekreft/i }).click();
   await order.getByLabel(/Tilbakelesing\/forstått/i).check();
-  await order.getByRole('tab', { name: /Eksporter/i }).click();
   await order.getByRole('button', { name: /Eksporter Markdown/i }).click();
   await expectCollapsedReview(order, /Eksport er klar/i);
   await expect(order.locator('#five-point-order-preview')).toBeHidden();
@@ -161,7 +148,7 @@ test('warning discipline keeps privacy errors blocking and generic notices conta
   await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
   const order = orderForm(page);
   await fillOrderPoints(order);
-  await order.getByLabel(/Notes/i).fill('pasient Ola Nordmann');
+  await order.getByLabel(/Notater/i).fill('pasient Ola Nordmann');
   await order.getByRole('tab', { name: /Bekreft/i }).click();
   await order.getByLabel(/Tilbakelesing\/forstått/i).check();
   await order.getByRole('tab', { name: /Eksporter/i }).click();

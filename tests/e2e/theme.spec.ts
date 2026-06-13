@@ -117,7 +117,7 @@ test('5-punktsordre locked steps and privacy alert remain visible in dark mode',
   for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
     await form.getByLabel(label).fill(`${label} sanitert test`);
   }
-  await form.getByLabel(/Notes/i).fill('pasient Ola Nordmann');
+  await form.getByLabel(/Notater/i).fill('pasient Ola Nordmann');
   await form.getByRole('tab', { name: /Bekreft/i }).click();
   await form.getByLabel(/Tilbakelesing\/forstått/i).check();
   await form.getByRole('tab', { name: /Eksporter/i }).click();

@@ -259,9 +259,10 @@ function assertExportPayloadSafe(value: unknown, context: string) {
 }
 
 function buildFivePointOrderExport(input: FivePointOrderInput) {
-  if (input.readbackConfirmed !== true) {
-    throw new Error('readbackConfirmed must be true before exporting a 5-punktsordre');
-  }
+  // Readback is recommended but never a lock: a partially drafted order that
+  // can be copied beats a complete order that cannot. The export records the
+  // actual readback state instead of refusing.
+  const readbackConfirmed = input.readbackConfirmed === true;
   const template = selectedFivePointOrderTemplate(input.templateId);
   const order = {
     title: '5-punktsordre',
@@ -271,8 +272,8 @@ function buildFivePointOrderExport(input: FivePointOrderInput) {
       guidance: template.guidance,
     },
     readback: {
-      confirmed: true,
-      label: 'Tilbakelesing/forstått bekreftet',
+      confirmed: readbackConfirmed,
+      label: readbackConfirmed ? 'Tilbakelesing/forstått bekreftet' : 'Tilbakelesing/forstått ikke bekreftet',
     },
     metadata: {
       schemaVersion: FIVE_POINT_ORDER_SCHEMA_VERSION,
@@ -281,17 +282,18 @@ function buildFivePointOrderExport(input: FivePointOrderInput) {
       sourceIds: ORDER_SOURCE_IDS,
     },
     points: {
-      situasjon: clean(input.situasjon),
-      oppdrag: clean(input.oppdrag),
-      utforelse: clean(input.utforelse),
-      administrasjonForsyning: clean(input.administrasjonForsyning),
-      ledelseSamband: clean(input.ledelseSamband),
+      situasjon: clean(input.situasjon) || '—',
+      oppdrag: clean(input.oppdrag) || '—',
+      utforelse: clean(input.utforelse) || '—',
+      administrasjonForsyning: clean(input.administrasjonForsyning) || '—',
+      ledelseSamband: clean(input.ledelseSamband) || '—',
     },
     notes: clean(input.notes),
     warnings: [
       'Beslutningsstøtte for lokal strukturering. Kontroller alltid mot gjeldende ordre, innsatsledelse og lokale systemer før bruk.',
       EXPORT_SENSITIVITY_WARNING,
       'PDF-klar HTML er bare for nettleserens Skriv ut > Lagre som PDF. Ikke offisiell innsending.',
+      ...(readbackConfirmed ? [] : ['Tilbakelesing/forstått er ikke bekreftet. Les ordren tilbake før den brukes.']),
     ],
   };
   assertExportPayloadSafe({ points: order.points, notes: order.notes }, 'five-point-order');
@@ -331,7 +333,7 @@ export function exportFivePointOrderMarkdown(input: FivePointOrderInput) {
     order.points.ledelseSamband,
   ];
   if (order.notes) {
-    lines.push('', '## Notes', order.notes);
+    lines.push('', '## Notater', order.notes);
   }
   return `${lines.join('\n')}\n`;
 }
@@ -456,7 +458,7 @@ export function exportCommsPlanMarkdown(input: CommsPlanInput) {
   pushOptional(lines, 'Batteri-/ladestatus', plan.fields.batteryStatus);
   pushOptional(lines, 'Ekstra lokal kontaktreferanse (legacy)', plan.fields.legacyContactReference);
   if (plan.notes) {
-    lines.push('', '## Notes', plan.notes);
+    lines.push('', '## Notater',plan.notes);
   }
   return `${lines.join('\n')}\n`;
 }

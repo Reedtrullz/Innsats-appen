@@ -42,9 +42,9 @@ export function MissionNowPanel({
       {/* Instructions first: the guided runbook is the default Nå experience;
           mission context and recommendations follow below it. */}
       <RunbookView checklists={checklists} sourceTitleById={sourceTitleById} sourceRiskById={sourceRiskById} onRunSaved={onChecklistRunSaved} />
+      <CompactQuickLog mission={mission} onMissionChange={onMissionChange} />
       <MissionCommandHeader mission={mission} />
       <RecommendedActionsPanel recommendedLabel={recommendedLabel} criticalActions={criticalActions} firstActions={firstActions} mission={mission} />
-      <CompactQuickLog mission={mission} onMissionChange={onMissionChange} />
       <MissionProgressStrip mission={mission} checklists={checklists} checklistRuns={checklistRuns} mapSummary={commandMapSummary} />
     </section>
   );

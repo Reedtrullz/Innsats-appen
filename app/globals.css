@@ -274,3 +274,37 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Field-first defaults on touch devices. These apply WITHOUT feltmodus so a
+ * cold-start user in rain/gloves gets usable targets immediately; feltmodus
+ * then only adds the larger glove tier and night theme on top.
+ */
+@media (pointer: coarse) {
+  button,
+  [role='button'],
+  summary,
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  textarea {
+    touch-action: manipulation;
+    min-height: 44px;
+  }
+
+  /* Checkboxes/radios stay compact; their wrapping <label> provides the
+   * large hit area. They are only enlarged for visibility. */
+  input[type='checkbox'],
+  input[type='radio'] {
+    touch-action: manipulation;
+    min-height: 24px;
+    min-width: 24px;
+  }
+
+  /* 16px+ inputs stop iOS Safari from zoom-jumping on focus, which
+   * disorients gloved users and hides surrounding context. */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+}

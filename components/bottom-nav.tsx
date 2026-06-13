@@ -32,7 +32,7 @@ export function BottomNav({ currentPath }: { currentPath?: string }) {
               <Link
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
-                className={`flex min-h-14 w-full min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-center text-[0.66rem] font-black leading-tight transition ${
+                className={`flex min-h-14 w-full min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-center text-xs font-black leading-tight transition ${
                   active ? 'bg-[#082F49] text-white shadow-sm shadow-sky-950/20' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'
                 }`}
               >

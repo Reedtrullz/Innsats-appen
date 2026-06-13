@@ -18,20 +18,18 @@ afterEach(async () => {
 });
 
 async function fillFivePointOrderFields() {
-  await userEvent.click(screen.getByRole('tab', { name: /Fem punkter/i }));
   for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
     const field = screen.getByLabelText(new RegExp(label, 'i'));
-    expect(field).toBeRequired();
+    // One-screen form: nothing is required — partial orders export with «—».
+    expect(field).not.toBeRequired();
     await userEvent.type(field, `${label} tekst`);
   }
 }
 
 async function confirmFivePointOrderReadback() {
-  await userEvent.click(screen.getByRole('tab', { name: /Bekreft/i }));
   const readback = screen.getByLabelText(/tilbakelesing\/forstått er bekreftet/i);
-  expect(readback).toBeRequired();
+  expect(readback).not.toBeRequired();
   await userEvent.click(readback);
-  await userEvent.click(screen.getByRole('tab', { name: /Eksporter/i }));
   return readback;
 }
 
@@ -49,7 +47,7 @@ function previewTextarea(id: string) {
   return document.querySelector<HTMLTextAreaElement>(`#${id}`);
 }
 
-it('requires all five order points and renders exported markdown', async () => {
+it('renders the one-screen order form and exports markdown', async () => {
   render(<FivePointOrderForm contentVersion="test-content-ui" />);
   expect(screen.getByText(/lokal beslutningsstøtte/i)).toBeInTheDocument();
   expect(screen.getByText(/unngå persondata/i)).toBeInTheDocument();
@@ -63,13 +61,10 @@ it('requires all five order points and renders exported markdown', async () => {
   await userEvent.selectOptions(templateSelect, 'mfe');
   await userEvent.click(screen.getByText(/Malveiledning: MFE/i));
   expect(screen.getByText(/mobil forsterkningsenhet/i)).toBeInTheDocument();
-  expect(screen.getByRole('tab', { name: /Bekreft/i })).toBeDisabled();
-  expect(screen.getByRole('tab', { name: /Eksporter/i })).toBeDisabled();
-  expect(screen.getAllByText(/Låst/i).length).toBeGreaterThanOrEqual(2);
+  // No wizard: no tablist, no locked steps.
+  expect(screen.queryByRole('tab')).not.toBeInTheDocument();
   await fillFivePointOrderFields();
-  await userEvent.type(screen.getByLabelText(/Notes/i), 'lokal note');
-  expect(screen.getByRole('tab', { name: /Eksporter/i })).toBeDisabled();
-  expect(screen.getByRole('tab', { name: /Bekreft/i })).toBeEnabled();
+  await userEvent.type(screen.getByLabelText(/Notater/i), 'lokal note');
   const readback = await confirmFivePointOrderReadback();
   const markdownButton = screen.getByRole('button', { name: /Eksporter Markdown/i });
   await userEvent.click(screen.getByText(/Flere eksportformater/i));
@@ -82,7 +77,6 @@ it('requires all five order points and renders exported markdown', async () => {
   expect(readLocalAuditLog().some((entry) => entry.type === 'export-created' && entry.details.exportKind === 'five-point-order-markdown')).toBe(true);
   expect(screen.getByText(/Eksport er klar/i)).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /Kopier/i })).toBeInTheDocument();
-  expect(screen.getAllByText(/Fullført/i).length).toBeGreaterThanOrEqual(3);
   expect((screen.getByText(/Vis forhåndsvisning/i).closest('details') as HTMLDetailsElement | null)?.open).toBe(false);
   await openFivePointPreview();
   expectPreviewValue(/Eksport/i, /# 5-punktsordre/i);
@@ -101,7 +95,6 @@ it('requires all five order points and renders exported markdown', async () => {
 it('clears stale 5-punktsordre export preview when order text changes', async () => {
   render(<FivePointOrderForm contentVersion="test-content-ui" />);
 
-  await userEvent.click(screen.getByRole('tab', { name: /Fem punkter/i }));
   for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
     await userEvent.type(screen.getByLabelText(new RegExp(label, 'i')), `${label} første`);
   }
@@ -117,11 +110,42 @@ it('clears stale 5-punktsordre export preview when order text changes', async ()
   expect(previewTextarea('five-point-order-preview')).not.toBeInTheDocument();
 });
 
+it('exports a partial order without readback and marks the gaps', async () => {
+  render(<FivePointOrderForm contentVersion="test-content-ui" />);
+
+  // Export buttons are disabled only while the form is completely empty.
+  expect(screen.getByRole('button', { name: /Eksporter Markdown/i })).toBeDisabled();
+
+  await userEvent.type(screen.getByLabelText(/Situasjon/i), 'Vannstand stiger ved kai');
+  const markdownButton = screen.getByRole('button', { name: /Eksporter Markdown/i });
+  expect(markdownButton).toBeEnabled();
+  await userEvent.click(markdownButton);
+
+  await openFivePointPreview();
+  expectPreviewValue(/Eksport/i, /Vannstand stiger ved kai/i);
+  expectPreviewValue(/Eksport/i, /Tilbakelesing\/forstått: Ikke bekreftet/i);
+  expectPreviewValue(/Eksport/i, /—/);
+});
+
+it('persists the order draft across remounts and clears it on request', async () => {
+  const { unmount } = render(<FivePointOrderForm contentVersion="test-content-ui" />);
+  await userEvent.type(screen.getByLabelText(/Situasjon/i), 'Utkast som skal overleve');
+  unmount();
+
+  render(<FivePointOrderForm contentVersion="test-content-ui" />);
+  expect(await screen.findByText(/Lokalt utkast gjenopprettet/i)).toBeInTheDocument();
+  expect(screen.getByLabelText(/Situasjon/i)).toHaveValue('Utkast som skal overleve');
+
+  await userEvent.click(screen.getByRole('button', { name: /Tøm utkast/i }));
+  expect(screen.getByLabelText(/Situasjon/i)).toHaveValue('');
+  expect(localStorage.getItem('beredskapsboka-five-point-order-draft-v1')).toBeNull();
+});
+
 it('blocks 5-punktsordre preview when sensitive text is entered', async () => {
   render(<FivePointOrderForm contentVersion="test-content-ui" />);
 
   await fillFivePointOrderFields();
-  await userEvent.type(screen.getByLabelText(/Notes/i), 'Pasient Ola Nordmann skal følges opp');
+  await userEvent.type(screen.getByLabelText(/Notater/i), 'Pasient Ola Nordmann skal følges opp');
   await confirmFivePointOrderReadback();
   await userEvent.click(screen.getByRole('button', { name: /Eksporter Markdown/i }));
 
@@ -170,7 +194,7 @@ it('requires expanded sambandsplan fields and renders Markdown/JSON/PDF-ready pr
   await userEvent.type(checkInInterval, 'Hver 30. minutt');
   await userEvent.type(lostCommsProcedure, 'Bruk fallback, returner til møtepunkt');
   await userEvent.type(batteryStatus, 'Fulladet og reservebatteri klart');
-  await userEvent.type(screen.getByLabelText(/Notes/i), 'Fallback avtales lokalt');
+  await userEvent.type(screen.getByLabelText(/Notater/i), 'Fallback avtales lokalt');
 
   const markdownButton = screen.getByRole('button', { name: /Eksporter Markdown/i });
   const jsonButton = screen.getByRole('button', { name: /Eksporter JSON/i });
