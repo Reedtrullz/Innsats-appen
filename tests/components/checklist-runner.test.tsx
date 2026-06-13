@@ -28,7 +28,9 @@ it('renders required items, source links, and persists checked state with local 
   await waitFor(() => expect(checkbox).toBeEnabled());
   expect(screen.getByText('0/1 fullført')).toBeInTheDocument();
   expect(screen.getByText(/Påkrevd: 0\/1 kontrollert/i)).toBeInTheDocument();
-  expect(screen.getAllByText(/src-operativt-konsept-for-sivilforsvaret/i).length).toBeGreaterThan(0);
+  // P1-3: source IDs render resolved/prefix-stripped, never as raw src- tokens.
+  expect(screen.getAllByText(/operativt-konsept-for-sivilforsvaret/i).length).toBeGreaterThan(0);
+  expect(screen.queryByText(/\bsrc-/)).toBeNull();
   await userEvent.click(checkbox);
   expect(screen.getByText('1/1 fullført')).toBeInTheDocument();
   await waitFor(async () => expect((await getChecklistRun('mission-1:tilfluktsrom-teknisk-status'))?.checkedItemIds).toContain('ventilasjon'));
