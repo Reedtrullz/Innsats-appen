@@ -152,30 +152,35 @@ function ChecklistRunnerState({ checklist, missionId, runId, sourceTitleById, on
               </span>
             </label>
             <p className="mt-1 text-xs text-slate-500">Kilder: {formatSourceList(item.sourceIds, sourceTitleById)}</p>
-            {isEquipmentChecklist ? (
+            {/* Note/status one tap away so the checkbox list stays scannable (P3-2);
+                the privacy error lives outside the details so it can never hide. */}
+            <details className="mt-2">
+              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-xs font-bold text-sky-800">Legg til notat / status</summary>
+              {isEquipmentChecklist ? (
+                <label className="mt-2 block text-xs font-bold text-slate-700">
+                  Materiellstatus for {item.label}
+                  <select
+                    value={equipmentStatusByItemId[item.id] ?? 'ready'}
+                    disabled={!hydrated}
+                    onChange={(event) => void updateEquipmentStatus(item.id, event.currentTarget.value as EquipmentStatus)}
+                    className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm font-bold text-slate-900"
+                  >
+                    {equipmentStatuses.map((status) => <option key={status} value={status}>{equipmentStatusLabels[status]}</option>)}
+                  </select>
+                </label>
+              ) : null}
               <label className="mt-2 block text-xs font-bold text-slate-700">
-                Materiellstatus for {item.label}
-                <select
-                  value={equipmentStatusByItemId[item.id] ?? 'ready'}
+                Lokal note for {item.label}
+                <textarea
+                  value={notesByItemId[item.id] ?? ''}
                   disabled={!hydrated}
-                  onChange={(event) => void updateEquipmentStatus(item.id, event.currentTarget.value as EquipmentStatus)}
-                  className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm font-bold text-slate-900"
-                >
-                  {equipmentStatuses.map((status) => <option key={status} value={status}>{equipmentStatusLabels[status]}</option>)}
-                </select>
+                  onChange={(event) => updateNote(item.id, event.currentTarget.value)}
+                  onBlur={(event) => void persistNoteOnBlur(item.id, event.currentTarget.value)}
+                  className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 bg-white p-2 text-sm font-medium text-slate-900"
+                  placeholder="Kun lokale, ikke-sensitive notater. Ikke persondata."
+                />
               </label>
-            ) : null}
-            <label className="mt-2 block text-xs font-bold text-slate-700">
-              Lokal note for {item.label}
-              <textarea
-                value={notesByItemId[item.id] ?? ''}
-                disabled={!hydrated}
-                onChange={(event) => updateNote(item.id, event.currentTarget.value)}
-                onBlur={(event) => void persistNoteOnBlur(item.id, event.currentTarget.value)}
-                className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 bg-white p-2 text-sm font-medium text-slate-900"
-                placeholder="Kun lokale, ikke-sensitive notater. Ikke persondata."
-              />
-            </label>
+            </details>
             {notePrivacyError?.itemId === item.id ? (
               <p role="alert" className="mt-2 rounded-xl border border-rose-200 bg-rose-50 p-2 text-sm font-semibold text-rose-900">{notePrivacyError.message}</p>
             ) : null}
