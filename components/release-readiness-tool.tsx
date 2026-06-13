@@ -17,43 +17,43 @@ import { WorkplansSnapshotSchema, type WorkplansSnapshot } from '@/lib/workplans
 const storageKey = 'beredskapsboka-release-readiness-v1';
 
 const stages: Array<{ id: StageId; title: string; shortTitle: string; description: string; gate: string; color: string }> = [
-  { id: 'idea', title: 'Idea intake', shortTitle: 'Plan', description: 'Define and align', gate: 'Every idea has a clear user and outcome.', color: 'blue' },
-  { id: 'scope', title: 'Scope', shortTitle: 'Scope', description: 'Bound the release', gate: 'Release boundaries and non-goals are explicit.', color: 'blue' },
-  { id: 'build', title: 'Build', shortTitle: 'Build', description: 'Build and validate', gate: 'Core paths work with realistic content.', color: 'green' },
-  { id: 'verify', title: 'Verify', shortTitle: 'Enable', description: 'Prepare release evidence', gate: 'Known risks are fixed or accepted.', color: 'orange' },
-  { id: 'release', title: 'Release', shortTitle: 'Launch', description: 'Release and monitor', gate: 'The release can be explained and rolled back.', color: 'blue' },
+  { id: 'idea', title: 'Idé-innmelding', shortTitle: 'Plan', description: 'Definer og samkjør', gate: 'Hver idé har en tydelig bruker og et tydelig utfall.', color: 'blue' },
+  { id: 'scope', title: 'Omfang', shortTitle: 'Omfang', description: 'Avgrens releasen', gate: 'Release-grenser og ikke-mål er tydelige.', color: 'blue' },
+  { id: 'build', title: 'Bygg', shortTitle: 'Bygg', description: 'Bygg og valider', gate: 'Kjerneflytene fungerer med realistisk innhold.', color: 'green' },
+  { id: 'verify', title: 'Verifiser', shortTitle: 'Klargjør', description: 'Forbered release-bevis', gate: 'Kjente risikoer er løst eller akseptert.', color: 'orange' },
+  { id: 'release', title: 'Release', shortTitle: 'Lansering', description: 'Slipp og overvåk', gate: 'Releasen kan forklares og rulles tilbake.', color: 'blue' },
 ];
 
 const stageLabels: Record<StageId, string> = Object.fromEntries(stages.map((stage) => [stage.id, stage.title])) as Record<StageId, string>;
 
 const statusLabels: Record<WorkStatus, string> = {
-  'needs-work': 'Needs work',
-  'in-progress': 'In progress',
-  blocked: 'Blocked',
-  completed: 'Completed',
+  'needs-work': 'Trenger arbeid',
+  'in-progress': 'Pågår',
+  blocked: 'Blokkert',
+  completed: 'Fullført',
 };
 
 const riskLabels: Record<RiskLevel, string> = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
+  low: 'Lav',
+  medium: 'Middels',
+  high: 'Høy',
 };
 
 const stageStatusLabels: Record<StageStatus, string> = {
-  'not-started': 'Not started',
-  'in-progress': 'In progress',
-  ready: 'Ready',
+  'not-started': 'Ikke startet',
+  'in-progress': 'Pågår',
+  ready: 'Klar',
 };
 
 const milestones: Array<{ title: string; date: string; owner: string; stage: StageId }> = [
-  { title: 'MVP boundary approved', date: 'Jun 3', owner: 'AR', stage: 'idea' },
-  { title: 'Release scope locked', date: 'Jun 4', owner: 'JM', stage: 'scope' },
-  { title: 'Core dashboard complete', date: 'Jun 5', owner: 'AR', stage: 'build' },
-  { title: 'Local storage verified', date: 'Jun 6', owner: 'TS', stage: 'build' },
-  { title: 'Offline QA complete', date: 'Jun 7', owner: 'TS', stage: 'verify' },
-  { title: 'Privacy review', date: 'Jun 8', owner: 'AR', stage: 'verify' },
-  { title: 'Pilot notes ready', date: 'Jun 9', owner: 'JM', stage: 'release' },
-  { title: 'Go-live', date: 'Jun 10', owner: 'AR', stage: 'release' },
+  { title: 'MVP-grense godkjent', date: 'Jun 3', owner: 'AR', stage: 'idea' },
+  { title: 'Release-omfang låst', date: 'Jun 4', owner: 'JM', stage: 'scope' },
+  { title: 'Kjernedashbord ferdig', date: 'Jun 5', owner: 'AR', stage: 'build' },
+  { title: 'Lokal lagring verifisert', date: 'Jun 6', owner: 'TS', stage: 'build' },
+  { title: 'Offline-QA ferdig', date: 'Jun 7', owner: 'TS', stage: 'verify' },
+  { title: 'Personverngjennomgang', date: 'Jun 8', owner: 'AR', stage: 'verify' },
+  { title: 'Pilotnotater klare', date: 'Jun 9', owner: 'JM', stage: 'release' },
+  { title: 'Produksjonssetting', date: 'Jun 10', owner: 'AR', stage: 'release' },
 ];
 
 interface CoverageGap {
@@ -95,10 +95,10 @@ function normalizeCoverageReportSnapshot(value: unknown): CoverageReportSnapshot
 }
 
 function coverageGapBadge(gap: { id?: string; severity?: string }) {
-  if (gap.severity === 'high' && String(gap.id ?? '').startsWith('source-governance-')) return 'Pilot blocker';
-  if (gap.severity === 'high') return 'High';
-  if (gap.severity === 'medium') return 'Medium';
-  return 'Low';
+  if (gap.severity === 'high' && String(gap.id ?? '').startsWith('source-governance-')) return 'Pilotblokker';
+  if (gap.severity === 'high') return 'Høy';
+  if (gap.severity === 'medium') return 'Middels';
+  return 'Lav';
 }
 
 function newId() {
@@ -158,9 +158,9 @@ function workstreamProgress(plan: ReleasePlan, stage: StageId) {
 }
 
 function materialHref(title: string) {
-  if (title === 'Source pack') return '/kilder';
-  if (title === 'Mission demo') return '/oppdrag';
-  if (title === 'Quick cards') return '/hurtigkort';
+  if (title === 'Kildepakke') return '/kilder';
+  if (title === 'Oppdragsdemo') return '/oppdrag';
+  if (title === 'Hurtigkort') return '/hurtigkort';
   return '#release-export';
 }
 
@@ -231,7 +231,7 @@ export function ReleaseReadinessTool() {
       const response = await fetch('/generated-content/content-coverage-report.json', { cache: 'no-store' });
       if (!response.ok) throw new Error(`Failed to load content coverage report: ${response.status}`);
       const snapshot = normalizeCoverageReportSnapshot(await response.json());
-      if (snapshot.fallback) throw new Error('Generated content fallback is not release evidence');
+      if (snapshot.fallback) throw new Error('Generert reserveinnhold er ikke release-bevis');
       if (cancelled) return;
       setCoverageReport(snapshot);
       setCoverageError(null);
@@ -240,7 +240,7 @@ export function ReleaseReadinessTool() {
     loadCoverageReport().catch(() => {
       if (!cancelled) {
         setCoverageReport(null);
-        setCoverageError('Content coverage report is unavailable. Run npm run validate:content locally before assessing pilot readiness.');
+        setCoverageError('Dekningsrapport for innhold er utilgjengelig. Kjør npm run validate:content lokalt før du vurderer pilotklarhet.');
       }
     });
 
@@ -286,7 +286,7 @@ export function ReleaseReadinessTool() {
   const hasHighCoverageGaps = highCoverageGaps.length > 0;
   const hasPilotBlockingCoverageGaps = !hasCoverageReport || hasHighCoverageGaps;
   const hasPilotBlockingReadiness = hasPilotBlockingCoverageGaps || hasBlockedReleaseWork;
-  const readinessLabel = !hasCoverageReport ? 'Dekning ukjent' : hasHighCoverageGaps || hasBlockedReleaseWork ? 'Ikke pilotklar' : summary.score >= 80 ? 'Ready' : summary.score >= 55 ? 'Close' : 'Needs work';
+  const readinessLabel = !hasCoverageReport ? 'Dekning ukjent' : hasHighCoverageGaps || hasBlockedReleaseWork ? 'Ikke pilotklar' : summary.score >= 80 ? 'Pilotklar' : summary.score >= 55 ? 'Nær klar' : 'Trenger arbeid';
   const readinessTone = hasPilotBlockingReadiness ? 'text-red-700' : 'text-blue-600';
   const attentionItems = activeItems
     .filter((item) => item.status === 'blocked' || item.risk !== 'low')
@@ -349,14 +349,14 @@ export function ReleaseReadinessTool() {
             <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_10rem] lg:items-start">
               <div>
                 <h1 className="text-5xl font-black tracking-tight text-slate-950 sm:text-7xl">Innsats-app pilot</h1>
-                <p className="mt-2 text-2xl font-bold text-slate-500">Release Readiness</p>
+                <p className="mt-2 text-2xl font-bold text-slate-500">Release-status</p>
               </div>
               <div className="justify-self-start rounded-full p-3 lg:justify-self-end" style={ringStyle}>
                 <div className="grid h-36 w-36 place-items-center rounded-full bg-white text-center shadow-inner">
                   <div>
                     <p className="text-4xl font-black">{summary.score}%</p>
                     <p className={`text-base font-black ${readinessTone}`}>{readinessLabel}</p>
-                    {hasHighCoverageGaps ? <p className="mt-1 rounded-full bg-red-100 px-2 py-1 text-xs font-black text-red-700">{effectivePilotBlockerCount} pilot blocker{effectivePilotBlockerCount === 1 ? '' : 's'}</p> : null}
+                    {hasHighCoverageGaps ? <p className="mt-1 rounded-full bg-red-100 px-2 py-1 text-xs font-black text-red-700">{effectivePilotBlockerCount} pilotblokker{effectivePilotBlockerCount === 1 ? '' : 'e'}</p> : null}
                     {hasBlockedReleaseWork ? <p className="mt-1 rounded-full bg-red-100 px-2 py-1 text-xs font-black text-red-700">{blockedReleaseWorkCount} blokkert release/workplan</p> : null}
                     {!hasCoverageReport ? <p className="mt-1 rounded-full bg-red-100 px-2 py-1 text-xs font-black text-red-700">Dekning ikke verifisert</p> : null}
                   </div>
@@ -398,7 +398,7 @@ export function ReleaseReadinessTool() {
                         >
                           {status === 'ready' ? '✓' : index + 1}
                         </button>
-                        {status === 'in-progress' ? <span className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap rounded-md border border-orange-300 bg-orange-50 px-3 py-1 text-xs font-black text-orange-700">You are here</span> : null}
+                        {status === 'in-progress' ? <span className="absolute left-1/2 top-12 -translate-x-1/2 whitespace-nowrap rounded-md border border-orange-300 bg-orange-50 px-3 py-1 text-xs font-black text-orange-700">Du er her</span> : null}
                       </div>
                     );
                   })}
@@ -419,10 +419,10 @@ export function ReleaseReadinessTool() {
 
             <section className="mt-10 border-t border-slate-200 pt-4">
               <div className="hidden grid-cols-[minmax(10rem,1fr)_8rem_minmax(11rem,1fr)_7rem_8rem] gap-4 px-3 text-xs font-black uppercase tracking-wide text-slate-500 md:grid">
-                <span>Workstream</span>
-                <span>Progress</span>
-                <span>Next milestone</span>
-                <span>Owner</span>
+                <span>Arbeidsstrøm</span>
+                <span>Fremdrift</span>
+                <span>Neste milepæl</span>
+                <span>Eier</span>
                 <span>Status</span>
               </div>
               <div className="mt-3 divide-y divide-slate-200">
@@ -432,7 +432,7 @@ export function ReleaseReadinessTool() {
                   const next = stageItems.find((item) => item.status !== 'completed') ?? stageItems[0];
                   const owner = next?.owner ?? 'AR';
                   const atRisk = hasPilotBlockingCoverageGaps || stageItems.some((item) => item.status === 'blocked' || item.risk === 'high');
-                  const stageRiskLabel = hasPilotBlockingCoverageGaps ? 'Pilot blockers' : atRisk ? 'At Risk' : 'On Track';
+                  const stageRiskLabel = hasPilotBlockingCoverageGaps ? 'Pilotblokkere' : atRisk ? 'At Risk' : 'On Track';
                   return (
                     <article key={stage.id} className="grid grid-cols-1 gap-3 px-3 py-4 md:grid-cols-[minmax(10rem,1fr)_8rem_minmax(11rem,1fr)_7rem_8rem] md:items-center">
                       <div className="flex items-center gap-4">
@@ -478,14 +478,14 @@ export function ReleaseReadinessTool() {
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <h3 className="font-black">{workplan.title}</h3>
-                          <p className="mt-1 text-sm font-semibold text-slate-500">{workplan.taskCount} tasks · {stageLabels[workplan.stage]} · {riskLabels[workplan.risk]} risk</p>
+                          <p className="mt-1 text-sm font-semibold text-slate-500">{workplan.taskCount} oppgaver · {stageLabels[workplan.stage]} · {riskLabels[workplan.risk]} risiko</p>
                           <p className="mt-2 text-sm font-black text-slate-700">
                             {completedTaskCount(workplan)}/{workplan.taskCount} tasks completed
                           </p>
                           {firstOpenTask(workplan) ? (
                             <p className="mt-1 text-sm font-semibold text-orange-700">Open: {firstOpenTask(workplan)?.title}</p>
                           ) : (
-                            <p className="mt-1 text-sm font-semibold text-emerald-700">No open task headings.</p>
+                            <p className="mt-1 text-sm font-semibold text-emerald-700">Ingen åpne oppgavetitler.</p>
                           )}
                         </div>
                         <span className={`rounded-full px-2 py-1 text-xs font-black ${workplan.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : workplan.status === 'blocked' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>{workplan.status}</span>
@@ -500,29 +500,29 @@ export function ReleaseReadinessTool() {
 
             <section className="mt-8 grid gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               <div>
-                <p className="text-xs font-black uppercase tracking-wide text-blue-700">Add work</p>
-                <h2 className="text-2xl font-black">Capture an idea or release task</h2>
+                <p className="text-xs font-black uppercase tracking-wide text-blue-700">Legg til arbeid</p>
+                <h2 className="text-2xl font-black">Fang en idé eller release-oppgave</h2>
                 <form onSubmit={addItem} className="mt-4 grid gap-3">
-                  <label className="text-sm font-bold">Title<input name="title" required className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3" placeholder="Run production smoke test" /></label>
+                  <label className="text-sm font-bold">Tittel<input name="title" required className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3" placeholder="Kjør produksjons-røyktest" /></label>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <label className="text-sm font-bold">Owner<input name="owner" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3" placeholder="AR" /></label>
-                    <label className="text-sm font-bold">Stage<select name="stage" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3">{stages.map((stage) => <option key={stage.id} value={stage.id}>{stage.title}</option>)}</select></label>
+                    <label className="text-sm font-bold">Eier<input name="owner" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3" placeholder="AR" /></label>
+                    <label className="text-sm font-bold">Steg<select name="stage" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3">{stages.map((stage) => <option key={stage.id} value={stage.id}>{stage.title}</option>)}</select></label>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <label className="text-sm font-bold">Status<select name="status" defaultValue="needs-work" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3">{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-                    <label className="text-sm font-bold">Risk<select name="risk" defaultValue="medium" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3">{Object.entries(riskLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+                    <label className="text-sm font-bold">Risiko<select name="risk" defaultValue="medium" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3">{Object.entries(riskLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
                   </div>
                   <label className="text-sm font-bold">Notater<textarea name="notes" className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 bg-white px-3 py-2" /></label>
-                  <button type="submit" className="min-h-11 rounded-xl bg-blue-600 px-5 font-black text-white">Add to release board</button>
+                  <button type="submit" className="min-h-11 rounded-xl bg-blue-600 px-5 font-black text-white">Legg til på release-tavla</button>
                 </form>
               </div>
               <div>
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-black uppercase tracking-wide text-blue-700">Open controls</p>
-                    <h2 className="text-2xl font-black">Active work</h2>
+                    <p className="text-xs font-black uppercase tracking-wide text-blue-700">Åpne kontroller</p>
+                    <h2 className="text-2xl font-black">Aktivt arbeid</h2>
                   </div>
-                  <button type="button" onClick={resetPlan} className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm font-black">Reset</button>
+                  <button type="button" onClick={resetPlan} className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 text-sm font-black">Nullstill</button>
                 </div>
                 <div className="mt-4 space-y-3">
                   {activeItems.map((item) => (
@@ -530,13 +530,13 @@ export function ReleaseReadinessTool() {
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <h3 className="font-black">{item.title}</h3>
-                          <p className="text-sm font-semibold text-slate-500">{stageLabels[item.stage]} / {riskLabels[item.risk]} risk</p>
+                          <p className="text-sm font-semibold text-slate-500">{stageLabels[item.stage]} / {riskLabels[item.risk]} risiko</p>
                         </div>
-                        <button type="button" onClick={() => removeItem(item.id)} className="min-h-11 rounded-lg border border-red-200 px-3 py-2 text-xs font-black text-red-700">Remove</button>
+                        <button type="button" onClick={() => removeItem(item.id)} className="min-h-11 rounded-lg border border-red-200 px-3 py-2 text-xs font-black text-red-700">Fjern</button>
                       </div>
                       <div className="mt-3 grid gap-2 sm:grid-cols-2">
                         <label className="text-xs font-black uppercase tracking-wide text-slate-500">Status<select value={item.status} onChange={(event) => setItemStatus(item, event.target.value as WorkStatus)} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-2 text-sm normal-case tracking-normal text-slate-950">{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-                        <label className="text-xs font-black uppercase tracking-wide text-slate-500">Stage<select value={item.stage} onChange={(event) => setPlan((current) => ({ ...current, items: updateItem(current.items, item.id, { stage: event.target.value as StageId }) }))} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-2 text-sm normal-case tracking-normal text-slate-950">{stages.map((stage) => <option key={stage.id} value={stage.id}>{stage.title}</option>)}</select></label>
+                        <label className="text-xs font-black uppercase tracking-wide text-slate-500">Steg<select value={item.stage} onChange={(event) => setPlan((current) => ({ ...current, items: updateItem(current.items, item.id, { stage: event.target.value as StageId }) }))} className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-2 text-sm normal-case tracking-normal text-slate-950">{stages.map((stage) => <option key={stage.id} value={stage.id}>{stage.title}</option>)}</select></label>
                       </div>
                     </article>
                   ))}
@@ -545,20 +545,20 @@ export function ReleaseReadinessTool() {
             </section>
 
             <section id="release-export" className="mt-6 rounded-2xl bg-slate-100 p-4">
-              <h2 className="text-xl font-black">Local export</h2>
-              <p className="mt-1 text-sm font-semibold text-slate-600">Stored only in this browser. Copy this snapshot into a release issue or planning note when needed. Exported snapshots may contain operationally sensitive planning information; handle them according to local routines.</p>
+              <h2 className="text-xl font-black">Lokal eksport</h2>
+              <p className="mt-1 text-sm font-semibold text-slate-600">Lagres kun i denne nettleseren. Kopier dette øyeblikksbildet inn i en release-sak eller planleggingsnotat ved behov. Eksporterte øyeblikksbilder kan inneholde operasjonelt sensitiv planleggingsinformasjon; håndter dem etter lokale rutiner.</p>
               <pre tabIndex={0} aria-label="Lokal release-eksport" className="mt-3 max-h-56 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-xl bg-slate-950 p-3 text-xs text-slate-100">{exportText}</pre>
             </section>
           </main>
 
           <aside className="border-t border-slate-200 pt-6 xl:border-l xl:border-t-0 xl:pl-7 xl:pt-8">
             <section>
-              <h2 className="text-2xl font-black">Needs Attention</h2>
+              <h2 className="text-2xl font-black">Trenger oppmerksomhet</h2>
               <div className="mt-3 divide-y divide-slate-200 border-t border-slate-200">
-                {hasHighCoverageGaps ? <p className="py-6 text-sm font-semibold text-red-700">Pilot blockers from content coverage must be resolved or explicitly accepted before pilot-go.</p> : null}
-                {!hasCoverageReport ? <p className="py-6 text-sm font-semibold text-red-700">Content coverage report is missing or fallback-only; pilot readiness is not verified.</p> : null}
+                {hasHighCoverageGaps ? <p className="py-6 text-sm font-semibold text-red-700">Pilotblokkere fra innholdsdekning må løses eller eksplisitt aksepteres før pilot-start.</p> : null}
+                {!hasCoverageReport ? <p className="py-6 text-sm font-semibold text-red-700">Dekningsrapport for innhold mangler eller er bare reserve; pilotklarhet er ikke verifisert.</p> : null}
                 {hasCoverageReport && !hasHighCoverageGaps && hasBlockedReleaseWork ? <p className="py-6 text-sm font-semibold text-red-700">Blokkert release-/workplan-arbeid må løses før pilot.</p> : null}
-                {hasCoverageReport && !hasHighCoverageGaps && !hasBlockedReleaseWork && attentionItems.length === 0 ? <p className="py-6 text-sm font-semibold text-slate-500">No active risks on the board.</p> : null}
+                {hasCoverageReport && !hasHighCoverageGaps && !hasBlockedReleaseWork && attentionItems.length === 0 ? <p className="py-6 text-sm font-semibold text-slate-500">Ingen aktive risikoer på tavla.</p> : null}
                 {attentionItems.map((item) => {
                   const tone = attentionTone(item);
                   return (
@@ -576,9 +576,9 @@ export function ReleaseReadinessTool() {
             </section>
 
             <section className="mt-10">
-              <h2 className="text-2xl font-black">Launch Materials</h2>
+              <h2 className="text-2xl font-black">Lanseringsmateriell</h2>
               <div className="mt-3 divide-y divide-slate-200 border-t border-slate-200">
-                {['Mission demo', 'Source pack', 'Quick cards', 'Release export'].map((title) => (
+                {['Oppdragsdemo', 'Kildepakke', 'Hurtigkort', 'Release-eksport'].map((title) => (
                   <a key={title} href={materialHref(title)} className="flex min-h-14 items-center justify-between gap-3 py-3 text-base font-black">
                     <span>{title}</span>
                     <span aria-hidden="true" className="text-2xl text-slate-400">›</span>
@@ -588,10 +588,10 @@ export function ReleaseReadinessTool() {
             </section>
 
             <section className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-              <h2 className="text-2xl font-black">Content coverage gaps</h2>
-              <p className="mt-1 text-sm font-semibold text-slate-600">{coverageReport?.generatedAt ? `Report: ${coverageReport.generatedAt}` : coverageError ?? 'Waiting for generated coverage report.'}</p>
+              <h2 className="text-2xl font-black">Hull i innholdsdekning</h2>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{coverageReport?.generatedAt ? `Rapport: ${coverageReport.generatedAt}` : coverageError ?? 'Venter på generert dekningsrapport.'}</p>
               <div className="mt-3 space-y-3">
-                {hasCoverageReport && coverageGaps.length === 0 ? <p className="rounded-xl bg-white p-3 text-sm font-semibold text-slate-600">No release-board content coverage gaps reported.</p> : null}
+                {hasCoverageReport && coverageGaps.length === 0 ? <p className="rounded-xl bg-white p-3 text-sm font-semibold text-slate-600">Ingen hull i release-tavlas innholdsdekning rapportert.</p> : null}
                 {coverageGaps.map((gap) => (
                   <article key={gap.id} className="rounded-xl bg-white p-3">
                     <div className="flex items-start justify-between gap-3">
@@ -608,7 +608,7 @@ export function ReleaseReadinessTool() {
             </section>
 
             <section className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <h2 className="text-xl font-black">Completed work</h2>
+              <h2 className="text-xl font-black">Fullført arbeid</h2>
               <div className="mt-3 space-y-3">
                 {completedItems.map((item) => (
                   <article key={item.id} className="rounded-xl bg-white p-3">
