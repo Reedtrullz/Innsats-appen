@@ -21,7 +21,7 @@ test('home first viewport keeps triage to three primary actions', async ({ page 
 test('hurtigkort defaults to compact browsing rows with filters behind disclosure', async ({ page }) => {
   await page.goto('/hurtigkort');
   await expect(page.getByRole('heading', { name: 'Hurtigkort' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: /Kritisk nå/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Kritiske tiltak/i })).toBeVisible();
   await expect(page.getByText(/Vis alle og filtrer/i)).toBeVisible();
   await expect(page.getByText(/Gjør først/i)).toHaveCount(0);
 });

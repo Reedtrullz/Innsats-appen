@@ -179,7 +179,7 @@ function CriticalNowSection({ roleGroup }: { roleGroup: RoleGroup }) {
     <SectionCard className="bg-white" labelledBy="critical-shortcuts-heading">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 id="critical-shortcuts-heading" className="text-xl font-black tracking-tight">Kritisk nå</h2>
+          <h2 id="critical-shortcuts-heading" className="text-xl font-black tracking-tight">Snarveier</h2>
         </div>
       </div>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
