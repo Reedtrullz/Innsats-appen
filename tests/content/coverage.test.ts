@@ -1,6 +1,7 @@
 import { buildContentCoverageReport } from '@/lib/content/coverage-report';
 import { getActionCards, getChecklists, getGlossaryTerms, getProtectionMeasures, getSourceDocuments, getTrainingPaths } from '@/lib/content/load-content';
 import type { ActionCard, SourceDocument } from '@/lib/content/schemas';
+import { stepText } from '@/lib/content/steps';
 
 const requiredMarkers = [
   '5-punktsordre',
@@ -22,7 +23,7 @@ function cardText(card: ActionCard) {
   return normalize([
     card.title,
     card.slug,
-    ...card.steps,
+    ...card.steps.map(stepText),
     ...(card.safety ?? []),
     ...(card.reporting ?? []),
     ...(card.competenceRequired ?? []),

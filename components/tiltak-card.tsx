@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ActionCard } from '@/lib/content/schemas';
+import { stepText } from '@/lib/content/steps';
 import { phaseLabels, priorityLabels, roleLabels, scenarioLabels } from '@/lib/content/taxonomy';
 import { OperationalIcon } from './ui/operational-icons';
 import { CriticalNotice, StatusPill } from './ui/operational-primitives';
@@ -60,7 +61,7 @@ type TiltakCardProps = {
 export function TiltakCardRow({ card }: { card: ActionCard }) {
   const href = `/kort/${card.slug}`;
   const priorityTone = card.priority === 'high' ? 'critical' : card.priority === 'medium' ? 'warning' : 'slate';
-  const firstStep = card.steps[0] ?? 'Åpne kortet for tiltak.';
+  const firstStep = card.steps[0] ? stepText(card.steps[0]) : 'Åpne kortet for tiltak.';
 
   return (
     <Link
@@ -90,7 +91,7 @@ export function TiltakCardRow({ card }: { card: ActionCard }) {
 
 export function TiltakCardCompact({ card, ctaLabel = 'Åpne tiltakskort' }: Omit<TiltakCardProps, 'compact'>) {
   const href = `/kort/${card.slug}`;
-  const visibleSteps = card.steps.slice(0, 2);
+  const visibleSteps = card.steps.slice(0, 2).map(stepText);
   const sourceCount = card.sourceIds.length;
   const priorityTone = card.priority === 'high' ? 'critical' : card.priority === 'medium' ? 'warning' : 'slate';
 
@@ -147,7 +148,7 @@ export function TiltakCardCompact({ card, ctaLabel = 'Åpne tiltakskort' }: Omit
 
 export function TiltakCardFull({ card, ctaLabel = 'Åpne tiltakskort' }: Omit<TiltakCardProps, 'compact'>) {
   const href = `/kort/${card.slug}`;
-  const visibleSteps = card.steps.slice(0, 3);
+  const visibleSteps = card.steps.slice(0, 3).map(stepText);
   const sourceCount = card.sourceIds.length;
   const priorityTone = card.priority === 'high' ? 'critical' : card.priority === 'medium' ? 'warning' : 'slate';
 

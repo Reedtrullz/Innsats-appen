@@ -300,7 +300,8 @@
   priority: medium
   steps:
     - Avklar vannvei, sikring og strømfare.
-    - Etabler pumpested og slangeutlegg uten å skape ny skade.
+    - action: Etabler pumpested og slangeutlegg uten å skape ny skade.
+      imageIds: [ pumpeutlegg-image-1, pumpeutlegg-image-2, pumpeutlegg-image-3, pumpeutlegg-image-4, pumpeutlegg-image-5, pumpeutlegg-image-6, pumpeutlegg-image-7 ]
     - Overvåk vannstand og mannskapets arbeidstid.
   reporting:
     - Rapporter effekt, behov og risiko.
