@@ -51,7 +51,7 @@ export function StatusPill({
   className?: string;
 }) {
   return (
-    <span className={`inline-flex min-h-8 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-black ring-1 ${toneClasses[tone].pill} ${className}`}>
+    <span className={`inline-flex min-h-8 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ring-1 ${toneClasses[tone].pill} ${className}`}>
       <span>{label}</span>
       {detail && !compact ? <span className="font-bold opacity-80">{detail}</span> : null}
     </span>
@@ -104,7 +104,7 @@ export function CommandCard({
           </span>
         ) : null}
         <div className="min-w-0">
-          {eyebrow ? <p className="text-xs font-black uppercase tracking-wide text-slate-500">{eyebrow}</p> : null}
+          {eyebrow ? <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{eyebrow}</p> : null}
           <h3 className="text-base font-black leading-tight text-slate-950">{title}</h3>
           {children ? <div className="mt-1 text-sm font-semibold leading-5 text-slate-600">{children}</div> : null}
         </div>
@@ -168,7 +168,7 @@ export function ProgressSummary({
     <dl className="grid gap-2 sm:grid-cols-2">
       {items.map((item) => (
         <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-          <dt className="text-xs font-black uppercase tracking-wide text-slate-500">{item.label}</dt>
+          <dt className="text-xs font-bold uppercase tracking-wide text-slate-500">{item.label}</dt>
           <dd className="mt-1 text-lg font-black text-slate-950">{item.value}</dd>
           {typeof item.progress === 'number' ? (
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200" aria-hidden="true">

@@ -133,7 +133,7 @@ function HomeRoleLens() {
         {roleLensOptions.map((group) => (
           <label
             key={group}
-            className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl px-3 py-2 text-center text-xs font-black ring-1 ${roleGroup === group ? 'bg-white text-[#082F49] ring-white' : 'bg-white/5 text-white ring-white/15 hover:bg-white/15'}`}
+            className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl px-3 py-2 text-center text-xs font-bold ring-1 ${roleGroup === group ? 'bg-white text-[#082F49] ring-white' : 'bg-white/5 text-white ring-white/15 hover:bg-white/15'}`}
           >
             <input
               type="radio"

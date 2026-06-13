@@ -29,7 +29,7 @@ const phaseLongLabels: Record<Phase, string> = {
 
 function AuthorityBadge({ authority }: { authority: Authority }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-[#082F49] px-2.5 py-1 text-xs font-black text-white" title={`Beslutningsmyndighet: ${authorityLabels[authority]}`}>
+    <span className="inline-flex items-center gap-1 rounded-full bg-[#082F49] px-2.5 py-1 text-xs font-bold text-white" title={`Beslutningsmyndighet: ${authorityLabels[authority]}`}>
       <OperationalIcon name="shield" className="h-3.5 w-3.5" />
       {authorityLabels[authority]}
     </span>
@@ -100,7 +100,7 @@ export function TiltakCardCompact({ card, ctaLabel = 'Åpne tiltakskort' }: Omit
         <StatusPill label={priorityLabels[card.priority]} tone={priorityTone} />
         <StatusPill label={phaseLongLabels[card.phase]} tone="sky" />
         {card.authority ? <AuthorityBadge authority={card.authority} /> : null}
-        <span className={`inline-flex min-h-8 items-center rounded-full bg-white px-3 py-1 text-xs font-black ring-1 ${sourceCount > 0 ? 'text-slate-700 ring-slate-200' : 'text-amber-900 ring-amber-200'}`}>
+        <span className={`inline-flex min-h-8 items-center rounded-full bg-white px-3 py-1 text-xs font-bold ring-1 ${sourceCount > 0 ? 'text-slate-700 ring-slate-200' : 'text-amber-900 ring-amber-200'}`}>
           {sourceCount > 0 ? 'Kildebelagt' : 'Kilde mangler'}
           {sourceCount > 0 ? <span className="sr-only"> med {sourceCount} kilde{sourceCount === 1 ? '' : 'r'}</span> : null}
         </span>
@@ -116,12 +116,12 @@ export function TiltakCardCompact({ card, ctaLabel = 'Åpne tiltakskort' }: Omit
 
       <DoNotCallout items={card.doNot ?? []} />
       <div>
-        <p className="text-xs font-black uppercase tracking-wide text-slate-600">Gjør først</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-slate-600">Gjør først</p>
         {visibleSteps.length > 0 ? (
           <ol className="mt-1 space-y-1 text-sm font-semibold text-slate-800">
             {visibleSteps.map((step, index) => (
               <li key={step} className="grid grid-cols-[1.75rem_1fr] items-start gap-2 rounded-xl bg-white/80 p-2 ring-1 ring-slate-200">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 text-xs font-black text-slate-700">{index + 1}</span>
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold text-slate-700">{index + 1}</span>
                 <span>{step}</span>
               </li>
             ))}
@@ -159,7 +159,7 @@ export function TiltakCardFull({ card, ctaLabel = 'Åpne tiltakskort' }: Omit<Ti
         <StatusPill label={phaseLongLabels[card.phase]} tone="sky" />
         {card.authority ? <AuthorityBadge authority={card.authority} /> : null}
         {card.scenarios.map((scenario) => <StatusPill key={scenario} label={scenarioLabels[scenario]} tone="success" />)}
-        <span className={`inline-flex min-h-8 items-center rounded-full bg-white px-3 py-1 text-xs font-black ring-1 ${sourceCount > 0 ? 'text-slate-700 ring-slate-200' : 'text-amber-900 ring-amber-200'}`}>
+        <span className={`inline-flex min-h-8 items-center rounded-full bg-white px-3 py-1 text-xs font-bold ring-1 ${sourceCount > 0 ? 'text-slate-700 ring-slate-200' : 'text-amber-900 ring-amber-200'}`}>
           {sourceCount > 0 ? 'Kildebelagt' : 'Kilde mangler'}
           {sourceCount > 0 ? <span className="sr-only"> med {sourceCount} kilde{sourceCount === 1 ? '' : 'r'}</span> : null}
         </span>
@@ -180,12 +180,12 @@ export function TiltakCardFull({ card, ctaLabel = 'Åpne tiltakskort' }: Omit<Ti
 
       <DoNotCallout items={card.doNot ?? []} />
       <div>
-        <p className="text-xs font-black uppercase tracking-wide text-slate-600">Gjør først</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-slate-600">Gjør først</p>
         {visibleSteps.length > 0 ? (
           <ol className="mt-2 space-y-2 text-sm font-semibold text-slate-800">
             {visibleSteps.map((step, index) => (
               <li key={step} className="grid grid-cols-[1.75rem_1fr] items-start gap-2 rounded-xl bg-white/80 p-2 ring-1 ring-slate-200">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 text-xs font-black text-slate-700">{index + 1}</span>
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold text-slate-700">{index + 1}</span>
                 <span>{step}</span>
               </li>
             ))}

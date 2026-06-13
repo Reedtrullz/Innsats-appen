@@ -108,9 +108,9 @@ function SourceGovernancePanel({ card, linkedSources, missingSourceIds, sourceWa
             <ul className="mt-2 space-y-2">
               {sourceReviews.map(({ source, freshness }) => (
                 <li key={source.id} className="flex flex-wrap items-center gap-2">
-                  <span className="font-black">{source.id}</span>
-                  <span className={`rounded-full border px-2 py-0.5 text-xs font-black ${sourceStatusClasses(source.status)}`}>Status: {source.status}</span>
-                  <span className={`rounded-full border px-2 py-0.5 text-xs font-black ${freshnessClasses(freshness.tone)}`}>{freshness.label}</span>
+                  <span className="font-bold">{source.id}</span>
+                  <span className={`rounded-full border px-2 py-0.5 text-xs font-bold ${sourceStatusClasses(source.status)}`}>Status: {source.status}</span>
+                  <span className={`rounded-full border px-2 py-0.5 text-xs font-bold ${freshnessClasses(freshness.tone)}`}>{freshness.label}</span>
                   <span>Sist verifisert: {source.verifiedAt}</span>
                 </li>
               ))}
@@ -175,7 +175,7 @@ export function ActionCardDetail({ card, sources, images = [] }: { card: ActionC
         <p className="text-sm font-bold uppercase tracking-wide text-sky-700">{phaseLabels[card.phase]}</p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">{card.title}</h1>
         {card.authority ? (
-          <p className="mt-2 flex items-center gap-2 text-xs font-black">
+          <p className="mt-2 flex items-center gap-2 text-xs font-bold">
             <span className="uppercase tracking-wide text-slate-600">Beslutningsmyndighet:</span>
             <span className="inline-flex items-center gap-1 rounded-full bg-[#082F49] px-2.5 py-1 text-white">
               <OperationalIcon name="shield" className="h-3.5 w-3.5" />
