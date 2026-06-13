@@ -104,23 +104,22 @@ test('dark mode preserves export review and hash-routed export workflow readabil
   await expect(afterAction.getByLabel(/Etteraksjonsrapport Markdown/i)).toBeVisible();
 });
 
-test('5-punktsordre locked steps and privacy alert remain visible in dark mode', async ({ page }) => {
+test('5-punktsordre stays readable and privacy alert remains visible in dark mode', async ({ page }) => {
   await chooseTheme(page, 'Mørk');
   await createLocalMission(page, { title: `Dark warning ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Warning Dark QA' });
   await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
 
   const form = page.locator('form').filter({ has: page.getByRole('heading', { name: '5-punktsordre' }) });
-  await expect(form.getByRole('tab', { name: /Bekreft/i })).toContainText(/Låst/i);
-  await expect(form.getByRole('tab', { name: /Eksporter/i })).toContainText(/Låst/i);
+  // Un-gated form: no locked wizard steps. The local-support notice and the
+  // export-blocking privacy alert must stay legible in dark mode.
+  await expect(form.getByRole('tab')).toHaveCount(0);
+  await expect(form.getByText(/Lokal beslutningsstøtte/i)).toBeVisible();
 
-  await form.getByRole('tab', { name: /Fem punkter/i }).click();
   for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
     await form.getByLabel(label).fill(`${label} sanitert test`);
   }
   await form.getByLabel(/Notater/i).fill('pasient Ola Nordmann');
-  await form.getByRole('tab', { name: /Bekreft/i }).click();
   await form.getByLabel(/Tilbakelesing\/forstått/i).check();
-  await form.getByRole('tab', { name: /Eksporter/i }).click();
   await form.getByRole('button', { name: /Eksporter Markdown/i }).click();
   await expect(form.getByText(/Eksport blokkert/i)).toBeVisible();
 });

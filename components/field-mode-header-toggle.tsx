@@ -46,7 +46,7 @@ export function FieldModeHeaderToggle() {
       type="button"
       onClick={toggle}
       aria-pressed={settings.enabled}
-      aria-label={settings.enabled ? 'Feltmodus aktiv. Slå av feltmodus' : 'Slå på feltmodus'}
+      aria-label={settings.enabled ? 'Feltmodus på (snarvei i toppmeny)' : 'Feltmodus av (snarvei i toppmeny)'}
       className={settings.enabled
         ? 'inline-flex min-h-11 items-center rounded-full bg-emerald-500 px-3 py-2 text-xs font-black text-emerald-950 shadow-sm'
         : 'inline-flex min-h-11 items-center rounded-full bg-white/10 px-3 py-2 text-xs font-black text-white ring-1 ring-white/15'}

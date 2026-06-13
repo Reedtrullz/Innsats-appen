@@ -158,14 +158,13 @@ test('mission and local export form controls have accessible labels', async ({ p
   await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
   const orderForm = page.locator('form').filter({ has: page.getByRole('heading', { name: '5-punktsordre' }) });
   await expect(orderForm.getByLabel(/Rolle\/mal for 5-punktsordre/i)).toBeVisible();
-  await orderForm.getByRole('tab', { name: /Fem punkter/i }).click();
+  // Un-gated one-screen form: every point is labelled and visible immediately.
   for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband', 'Notater']) {
     await expect(orderForm.getByLabel(new RegExp(label.replace('/', '\\/'), 'i'))).toBeVisible();
   }
   for (const label of ['Situasjon', 'Oppdrag', 'Utførelse', 'Administrasjon/forsyning', 'Ledelse/samband']) {
     await orderForm.getByLabel(new RegExp(label.replace('/', '\\/'), 'i')).fill(`${label} test`);
   }
-  await orderForm.getByRole('tab', { name: /Bekreft/i }).click();
   await expect(orderForm.getByLabel(/Tilbakelesing\/forstått er bekreftet/i)).toBeVisible();
 
   await openMissionDetails(page, /Sambandsplan/i, 'Eksport');

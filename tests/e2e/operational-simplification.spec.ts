@@ -80,9 +80,11 @@ test('export forms start staged and collapsed', async ({ page }) => {
 
   await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
   const orderForm = page.locator('form').filter({ has: page.getByRole('heading', { name: '5-punktsordre' }) });
-  await expect(orderForm.getByRole('tab', { name: 'Mal' })).toHaveAttribute('aria-selected', 'true');
-  await expect(orderForm.getByRole('tab', { name: /Eksporter/i })).toBeDisabled();
-  await expect(orderForm.getByLabel('Situasjon')).toBeHidden();
+  // Un-gated order form: no wizard tabs, all points visible immediately, and
+  // export stays disabled only while the form is empty (no preview yet).
+  await expect(orderForm.getByRole('tab')).toHaveCount(0);
+  await expect(orderForm.getByLabel('Situasjon')).toBeVisible();
+  await expect(orderForm.getByRole('button', { name: /Eksporter Markdown/i })).toBeDisabled();
   await expect(orderForm.locator('pre')).toHaveCount(0);
 
   await openMissionDetails(page, /RUH og velferd/i, 'Eksport');

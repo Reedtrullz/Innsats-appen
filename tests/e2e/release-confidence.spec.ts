@@ -149,9 +149,7 @@ test('warning discipline keeps privacy errors blocking and generic notices conta
   const order = orderForm(page);
   await fillOrderPoints(order);
   await order.getByLabel(/Notater/i).fill('pasient Ola Nordmann');
-  await order.getByRole('tab', { name: /Bekreft/i }).click();
   await order.getByLabel(/Tilbakelesing\/forstått/i).check();
-  await order.getByRole('tab', { name: /Eksporter/i }).click();
   await order.getByRole('button', { name: /Eksporter Markdown/i }).click();
   await expect(order.getByText(/Eksport blokkert/i)).toBeVisible();
 

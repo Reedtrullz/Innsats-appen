@@ -10,7 +10,6 @@ function formByHeading(page: Page, heading: string) {
 }
 
 async function fillFivePointOrder(form: Locator) {
-  await form.getByRole('tab', { name: /Fem punkter/i }).click();
   await form.getByLabel('Situasjon').fill('Teststatus: vannstand stiger ved offentlig kai. Ingen persondata.');
   await form.getByLabel('Oppdrag').fill('Støtt lokal sikring og rapporter endringer til leder.');
   await form.getByLabel('Utførelse').fill('Prioriter sikker adkomst, logg tiltak og stopp ved uavklarte farer.');
@@ -40,19 +39,16 @@ test('exports expanded 5-punktsordre templates after readback confirmation', asy
   await openMissionDetails(page, /5-punktsordre/i, 'Eksport');
   const form = formByHeading(page, '5-punktsordre');
   await expect(form.getByText(/Lokal beslutningsstøtte/i)).toBeVisible();
-  await expect(form.getByRole('tab', { name: /Eksporter/i })).toBeDisabled();
+  // Empty one-screen form: export is disabled until at least one point has content.
+  await expect(form.getByRole('button', { name: /Eksporter Markdown/i })).toBeDisabled();
 
   await fillFivePointOrder(form);
-  await form.getByRole('tab', { name: /Bekreft/i }).click();
   await form.getByLabel(/Tilbakelesing\/forstått/i).check();
-  await form.getByRole('tab', { name: /Eksporter/i }).click();
   await form.getByText(/Flere eksportformater/i).click();
 
   for (let index = 0; index < templateIds.length; index += 1) {
-    await form.getByRole('tab', { name: /Mal/i }).click();
     await form.getByLabel(/Rolle\/mal for 5-punktsordre/i).selectOption(templateIds[index]);
     await expect(form.getByText(new RegExp(`Malveiledning: ${templateLabels[index].replace('/', '\\/')}`, 'i'))).toBeVisible();
-    await form.getByRole('tab', { name: /Eksporter/i }).click();
     await form.getByRole('button', { name: /Eksporter JSON/i }).click();
     await form.getByText(/Vis forhåndsvisning/i).last().click();
     const exported = await form.locator('textarea').last().inputValue();
