@@ -127,7 +127,7 @@ export function DeviceGatePanel() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-black">{check.label}</h3>
-                  <p className="mt-1 text-xs font-semibold text-slate-500">{check.description}</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-600">{check.description}</p>
                   <p className={`mt-1 text-xs font-bold ${effectivePass ? 'text-emerald-700' : 'text-red-700'}`}>
                     {check.autoDetected === 'skip' && !check.manualConfirmed
                       ? 'Venter på test...'
