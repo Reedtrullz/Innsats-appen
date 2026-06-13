@@ -1,4 +1,4 @@
-import type { ActionCard, SourceDocument } from '@/lib/content/schemas';
+import type { ActionCard, ImageMetadata, SourceDocument } from '@/lib/content/schemas';
 import { sourceFreshness } from '@/lib/content/source-review';
 import { competenceLabels, phaseLabels, roleLabels, scenarioLabels } from '@/lib/content/taxonomy';
 import { RecordCardVisit } from './recent-cards';
@@ -157,7 +157,7 @@ function SourceGovernancePanel({ card, linkedSources, missingSourceIds, sourceWa
  * before acting (compact), then the numbered steps as the visual primary.
  * Source governance and metadata sit collapsed below the instructions.
  */
-export function ActionCardDetail({ card, sources }: { card: ActionCard; sources: SourceDocument[] }) {
+export function ActionCardDetail({ card, sources, images = [] }: { card: ActionCard; sources: SourceDocument[]; images?: ImageMetadata[] }) {
   const sourceById = new Map(sources.map((source) => [source.id, source]));
   const linkedSources: SourceDocument[] = [];
   const missingSourceIds: string[] = [];
@@ -215,6 +215,25 @@ export function ActionCardDetail({ card, sources }: { card: ActionCard; sources:
           {card.steps.map((step) => <li key={step} className="pl-1">{step}</li>)}
         </ol>
       </section>
+      {images.length > 0 ? (
+        <section className="rounded-3xl bg-white p-5 shadow-sm" aria-labelledby="card-illustrations-heading">
+          <h2 id="card-illustrations-heading" className="text-xl font-black">Illustrasjon / utlegg</h2>
+          <div className="mt-3 space-y-4">
+            {images.map((image) => (
+              <figure key={image.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                {/* Plain img is deliberate: assets are same-origin under /content-assets
+                    (CSP img-src 'self') and precached by the service worker for offline
+                    use; the next/image optimizer route is unavailable offline. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={image.publicPath} alt={image.alt} className="block h-auto w-full" loading="lazy" />
+                {image.caption ? (
+                  <figcaption className="border-t border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600">{image.caption}</figcaption>
+                ) : null}
+              </figure>
+            ))}
+          </div>
+        </section>
+      ) : null}
       {[...(card.safety ?? []), ...(card.reporting ?? [])].length > 0 ? (
         <section className="rounded-3xl bg-white p-5 shadow-sm">
           <h2 className="text-xl font-black">Sikkerhet og rapportering</h2>

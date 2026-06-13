@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { ActionCardDetail } from '@/components/action-card-detail';
-import { getActionCards, getSourceDocuments } from '@/lib/content/load-content';
+import { getActionCards, getImageMetadata, getSourceDocuments } from '@/lib/content/load-content';
 
 export const revalidate = 3600;
 
@@ -12,5 +12,8 @@ export default async function CardPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const card = getActionCards().find((item) => item.slug === slug);
   if (!card) notFound();
-  return <ActionCardDetail card={card} sources={getSourceDocuments()} />;
+  const images = getImageMetadata()
+    .filter((image) => image.approvedForPublication && image.usedByCardSlugs.includes(slug))
+    .sort((a, b) => a.id.localeCompare(b.id, 'nb'));
+  return <ActionCardDetail card={card} sources={getSourceDocuments()} images={images} />;
 }
