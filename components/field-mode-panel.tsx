@@ -397,6 +397,11 @@ export function FieldModePanel() {
         </fieldset>
       </section>
 
+      {/* QA/evaluation instrumentation lives behind one collapsed disclosure so
+          the field screen itself stays a pure big-button workspace. */}
+      <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <summary className="min-h-12 cursor-pointer list-none text-sm font-black text-slate-900">Evaluering og feltprøving (for øvelse/QA, ikke innsats)</summary>
+        <div className="mt-3 space-y-5">
       <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200" aria-labelledby="outdoor-review">
         <p className="text-sm font-black uppercase tracking-wide text-sky-700">Utendørs lesbarhet og scroll</p>
         <h2 id="outdoor-review" className="text-2xl font-black">Review for regn, sol og hansker</h2>
@@ -420,6 +425,8 @@ export function FieldModePanel() {
 
       <VoiceInputEvaluation />
       <FieldFeedbackCapture />
+        </div>
+      </details>
     </div>
   );
 }

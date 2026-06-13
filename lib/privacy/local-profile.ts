@@ -57,7 +57,7 @@ export type RetentionSettings = {
   updatedAt: string;
 };
 
-export type AuditEntryType = 'order-created' | 'status-changed' | 'export-created' | 'local-reset';
+export type AuditEntryType = 'order-created' | 'status-changed' | 'export-created' | 'local-reset' | 'privacy-override';
 
 export type LocalAuditEntry = {
   id: string;
@@ -533,7 +533,7 @@ function sanitizeAuditEntry(input: unknown): LocalAuditEntry | null {
   const record = asRecord(input);
   if (!record) return null;
   const type = String(record.type ?? '') as AuditEntryType;
-  if (!['order-created', 'status-changed', 'export-created', 'local-reset'].includes(type)) return null;
+  if (!['order-created', 'status-changed', 'export-created', 'local-reset', 'privacy-override'].includes(type)) return null;
   const createdAt = sanitizeLocalProfileText(record.createdAt, 40);
   return {
     id: sanitizeLocalProfileText(record.id, 80) || randomId('audit'),

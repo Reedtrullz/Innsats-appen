@@ -47,4 +47,40 @@ describe('QuickFieldLogComposer', () => {
     expect(alert).not.toHaveTextContent(/01017012345/);
     expect(onMissionChange).not.toHaveBeenCalled();
   });
+
+  it('warns on fuzzy sensitive matches and saves after an explicit override', async () => {
+    const user = userEvent.setup();
+    const mission = buildMission({ id: 'mission-quick-log-override', title: 'Quick override log', fieldLogEntries: [] });
+    const onMissionChange = vi.fn(async (_missionId, update) => update(mission));
+
+    render(<QuickFieldLogComposer mission={mission} onMissionChange={onMissionChange} defaultCategory="observasjon" sourceLabel="Under-fasen" />);
+
+    // patient-reference is a fuzzy heuristic: warn first, never hard-block.
+    await user.type(screen.getByLabelText('Hurtiglogg tekst'), 'Pasient nr 123 flyttes til samleplass');
+    await user.click(screen.getByRole('button', { name: /lagre hurtiglogg/i }));
+
+    expect(onMissionChange).not.toHaveBeenCalled();
+    const warning = screen.getByRole('alert');
+    expect(warning).toHaveTextContent(/advarsel/i);
+
+    await user.click(screen.getByRole('button', { name: /lagre likevel/i }));
+    expect(onMissionChange).toHaveBeenCalledTimes(1);
+    const updated = onMissionChange.mock.calls[0][1](mission);
+    expect(updated.fieldLogEntries[0].text).toContain('flyttes til samleplass');
+  });
+
+  it('still hard-blocks structured identifiers with no override offered', async () => {
+    const user = userEvent.setup();
+    const mission = buildMission({ id: 'mission-quick-log-hard', title: 'Quick hard log', fieldLogEntries: [] });
+    const onMissionChange = vi.fn(async (_missionId, update) => update(mission));
+
+    render(<QuickFieldLogComposer mission={mission} onMissionChange={onMissionChange} defaultCategory="observasjon" sourceLabel="Under-fasen" />);
+
+    await user.type(screen.getByLabelText('Hurtiglogg tekst'), 'Ring +47 99 88 77 66 for status');
+    await user.click(screen.getByRole('button', { name: /lagre hurtiglogg/i }));
+
+    expect(onMissionChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toHaveTextContent(/stoppet/i);
+    expect(screen.queryByRole('button', { name: /lagre likevel/i })).not.toBeInTheDocument();
+  });
 });

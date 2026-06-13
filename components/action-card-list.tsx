@@ -54,7 +54,7 @@ function PhaseChecklistSummary({ checklists }: { checklists: OperationalChecklis
   return (
     <section className="space-y-3 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
-        <p className="text-xs font-black uppercase tracking-wide text-sky-700">Sjekkliste/workflow</p>
+        <p className="text-xs font-black uppercase tracking-wide text-sky-700">Sjekkliste/arbeidsflyt</p>
         <h2 className="text-2xl font-black">Fasekontroller</h2>
         <p className="mt-1 text-sm font-semibold text-slate-700">Kildebelagte sjekklister kan kjøres på lokal oppdragstavle og eksporteres manuelt uten skykobling.</p>
       </div>

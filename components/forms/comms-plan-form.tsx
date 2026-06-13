@@ -127,7 +127,7 @@ export function CommsPlanForm({ contentVersion = 'local-mvp' }: CommsPlanFormPro
       <label className="block text-sm font-bold">Innsjekkingsintervall<input name="checkInInterval" required placeholder={template.guidance.checkInInterval} className="mt-1 min-h-12 w-full rounded-2xl border px-3" /></label>
       <label className="block text-sm font-bold">Prosedyre ved bortfall av samband<textarea name="lostCommsProcedure" required placeholder={template.guidance.lostCommsProcedure} className="mt-1 min-h-20 w-full rounded-2xl border px-3 py-2" /></label>
       <label className="block text-sm font-bold">Batteri-/ladestatus<input name="batteryStatus" required placeholder={template.guidance.batteryStatus} className="mt-1 min-h-12 w-full rounded-2xl border px-3" /></label>
-      <label className="block text-sm font-bold">Notes<textarea name="notes" className="mt-1 min-h-20 w-full rounded-2xl border px-3 py-2" /></label>
+      <label className="block text-sm font-bold">Notater<textarea name="notes" className="mt-1 min-h-20 w-full rounded-2xl border px-3 py-2" /></label>
 
       <div className="grid gap-2 sm:grid-cols-3">
         <button type="submit" name="format" value="markdown" className="min-h-12 rounded-2xl bg-slate-950 px-5 font-bold text-white">Eksporter Markdown</button>

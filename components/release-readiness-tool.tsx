@@ -512,7 +512,7 @@ export function ReleaseReadinessTool() {
                     <label className="text-sm font-bold">Status<select name="status" defaultValue="needs-work" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3">{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
                     <label className="text-sm font-bold">Risk<select name="risk" defaultValue="medium" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3">{Object.entries(riskLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
                   </div>
-                  <label className="text-sm font-bold">Notes<textarea name="notes" className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 bg-white px-3 py-2" /></label>
+                  <label className="text-sm font-bold">Notater<textarea name="notes" className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 bg-white px-3 py-2" /></label>
                   <button type="submit" className="min-h-11 rounded-xl bg-blue-600 px-5 font-black text-white">Add to release board</button>
                 </form>
               </div>

@@ -41,6 +41,7 @@ test('exports local app data and imports it back to restore mission and checklis
   expect(backup.indexedDb?.checklistRuns?.length ?? 0).toBeGreaterThanOrEqual(1);
 
   await page.goto('/oppdrag');
+  await page.getByText('Personvern og sletting').click();
   await page.getByRole('button', { name: /^Slett lokale data$/i }).click();
   await expect(page.getByText(missionTitle)).toHaveCount(0);
   expect(await readLocalDatabaseCounts(page)).toEqual({ missions: 0, archivedMissions: 0, checklistRuns: 0 });

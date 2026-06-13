@@ -37,6 +37,28 @@ export function sensitiveTextFieldError(kind: SensitiveTextMatch['kind']): strin
   return `Stoppet: ${explanation.label}. ${explanation.remedy}`;
 }
 
+/**
+ * High-confidence structured identifiers (fødselsnummer, phone, e-mail) stay
+ * hard-blocked. The fuzzy text heuristics can false-positive on legitimate
+ * operational text (place names, "pasient"-phrasings), and a false positive
+ * must never strand a user mid-incident — those kinds can be saved locally
+ * after an explicit confirmation. Export-time guards are unaffected.
+ */
+const OVERRIDABLE_SENSITIVE_KINDS: ReadonlySet<SensitiveTextMatch['kind']> = new Set([
+  'patient-reference',
+  'shielded-location',
+  'private-location',
+]);
+
+export function isOverridableSensitiveTextKind(kind: SensitiveTextMatch['kind']): boolean {
+  return OVERRIDABLE_SENSITIVE_KINDS.has(kind);
+}
+
+export function sensitiveTextFieldWarning(kind: SensitiveTextMatch['kind']): string {
+  const explanation = SENSITIVE_TEXT_EXPLANATIONS[kind];
+  return `Advarsel: ${explanation.label}. ${explanation.remedy} Er dette en feiltolkning, kan du bekrefte og lagre likevel.`;
+}
+
 export class SensitiveTextError extends Error {
   readonly kind: SensitiveTextMatch['kind'];
   readonly context: string;

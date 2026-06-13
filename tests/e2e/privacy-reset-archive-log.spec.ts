@@ -40,6 +40,7 @@ test('privacy reset removes active archived checklist and log data after archive
   expect(counts.archivedMissions).toBeGreaterThanOrEqual(1);
   expect(counts.checklistRuns).toBeGreaterThanOrEqual(1);
 
+  await page.getByText('Personvern og sletting').click();
   await page.getByRole('button', { name: /^Slett lokale data$/i }).click();
   await expect(page.getByTestId('privacy-message')).toHaveText(/sletter bare data i denne nettleseren/i);
   await expect(page.getByText(missionTitle)).not.toBeVisible();

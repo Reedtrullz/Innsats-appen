@@ -279,8 +279,11 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
           <p className="mt-3 rounded-xl bg-slate-100 p-3 text-sm font-semibold text-slate-700">Ingen lokale arkivtreff.</p>
         )}
       </section>
-      <button type="button" onClick={() => void reset()} className="min-h-12 w-full rounded-xl border border-red-300 bg-red-50 px-5 font-bold text-red-900">Slett lokale data</button>
-      <p className="text-sm text-slate-600">Dette sletter bare data i denne nettleseren. Beredskapsboka sender ikke oppdrag, sjekklister eller notater til en server.</p>
+      <details className="rounded-2xl border border-slate-200 bg-white p-4">
+        <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Personvern og sletting</summary>
+        <p className="mt-2 text-sm text-slate-600">Dette sletter bare data i denne nettleseren. Beredskapsboka sender ikke oppdrag, sjekklister eller notater til en server. Se også <a href="/personvern" className="font-bold underline underline-offset-2">Personvern</a>.</p>
+        <button type="button" onClick={() => void reset()} className="mt-3 min-h-12 w-full rounded-xl border border-red-300 bg-red-50 px-5 font-bold text-red-900">Slett lokale data</button>
+      </details>
     </div>
   );
 }
