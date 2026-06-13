@@ -408,7 +408,7 @@ export function ReleaseReadinessTool() {
                   {milestones.map((milestone) => (
                     <article key={milestone.title} className="border-l border-slate-200 pl-3">
                       <span className={`block h-2 w-2 rounded-full ${plan.stages[milestone.stage] === 'ready' ? 'bg-blue-600' : plan.stages[milestone.stage] === 'in-progress' ? 'bg-orange-400' : 'bg-slate-300'}`} />
-                      <h3 className="mt-2 min-h-10 text-sm font-black leading-tight">{milestone.title}</h3>
+                      <h3 className="mt-2 min-h-10 break-words text-sm font-black leading-tight">{milestone.title}</h3>
                       <p className="mt-2 text-sm font-black uppercase text-slate-500">{milestone.date}</p>
                       <span className={`mt-2 inline-grid h-9 w-9 place-items-center rounded-full text-sm font-black ${ownerColor(milestone.owner)}`}>{milestone.owner}</span>
                     </article>
