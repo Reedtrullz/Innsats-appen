@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-import { clearBrowserLocalState, createLocalMission, openMissionDetails } from './helpers';
+import { clearBrowserLocalState, createLocalMission, getTextContrastRatio, openMissionDetails, openMissionMode } from './helpers';
+
+const WCAG_AA_NORMAL_TEXT = 4.5;
 
 test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
@@ -102,6 +104,34 @@ test('dark mode preserves export review and hash-routed export workflow readabil
   await expect(afterAction.getByLabel(/Etteraksjonsrapport Markdown/i)).toBeHidden();
   await afterAction.getByText(/Vis forhåndsvisning/i).click();
   await expect(afterAction.getByLabel(/Etteraksjonsrapport Markdown/i)).toBeVisible();
+});
+
+test('dark-mode priority surfaces meet WCAG AA contrast (regression lock for P0-1)', async ({ page }) => {
+  await chooseTheme(page, 'Mørk');
+
+  // High-priority quick card: title on the red surface. This is the surface that
+  // silently broke when `.dark` flipped the text light but missed the gradient/
+  // opacity background — the original bug class this test locks.
+  await page.goto('/hurtigkort');
+  await expectDarkMode(page);
+  const criticalSection = page.locator('section[aria-labelledby="hurtigkort-critical-heading"]');
+  await expect(criticalSection).toBeVisible();
+  const criticalTitle = criticalSection.locator('a .font-black').first();
+  await expect(criticalTitle).toBeVisible();
+  expect(await getTextContrastRatio(page, criticalTitle)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
+
+  // High-priority search result row (red surface).
+  await page.getByRole('searchbox').first().fill('tilfluktsrom');
+  const highPriorityResult = page.locator('a.border-red-200').first();
+  await expect(highPriorityResult).toBeVisible();
+  expect(await getTextContrastRatio(page, highPriorityResult)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
+
+  // Required checklist item (amber surface) in the work view.
+  await createLocalMission(page, { title: `Kontrast ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Kontrast QA' });
+  await openMissionMode(page, 'Arbeid');
+  const requiredItem = page.locator('li.border-amber-300').first();
+  await expect(requiredItem).toBeVisible();
+  expect(await getTextContrastRatio(page, requiredItem.locator('label').first())).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
 });
 
 test('5-punktsordre stays readable and privacy alert remains visible in dark mode', async ({ page }) => {

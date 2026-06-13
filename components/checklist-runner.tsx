@@ -142,7 +142,7 @@ function ChecklistRunnerState({ checklist, missionId, runId, onRunSaved }: { che
       {checklist.warning ? <p className="mt-2 text-sm font-semibold text-amber-900">{checklist.warning}</p> : null}
       <ul className="mt-3 space-y-3">
         {checklist.items.map((item) => (
-          <li key={item.id} className={`rounded-2xl border p-3 ${item.required ? 'border-amber-300 bg-amber-50/60' : 'border-slate-200'}`}>
+          <li key={item.id} className={`rounded-2xl border p-3 ${item.required ? 'border-amber-300 bg-amber-50' : 'border-slate-200'}`}>
             <label className="flex min-h-11 items-center gap-3 font-semibold">
               <input type="checkbox" checked={checked.has(item.id)} disabled={!hydrated} onChange={() => void toggle(item.id)} className="h-5 w-5" />
               <span>

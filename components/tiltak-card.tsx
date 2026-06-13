@@ -16,8 +16,8 @@ const authorityLabels: Record<Authority, string> = {
 };
 
 const priorityTreatment: Record<Priority, string> = {
-  high: 'border-red-200 bg-gradient-to-b from-red-50 to-white shadow-red-950/5',
-  medium: 'border-amber-200 bg-gradient-to-b from-amber-50 to-white shadow-amber-950/5',
+  high: 'border-red-200 bg-red-50 shadow-red-950/5',
+  medium: 'border-amber-200 bg-amber-50 shadow-amber-950/5',
   low: 'border-slate-200 bg-white shadow-slate-950/5',
 };
 
@@ -66,7 +66,7 @@ export function TiltakCardRow({ card }: { card: ActionCard }) {
     <Link
       href={href}
       aria-label={`Åpne tiltakskort: ${card.title}`}
-      className={`group flex min-h-16 items-start gap-3 rounded-2xl border bg-white p-3 shadow-sm transition hover:border-sky-200 hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49] ${card.priority === 'high' ? 'border-red-200 bg-red-50/70' : 'border-slate-200'}`}
+      className={`group flex min-h-16 items-start gap-3 rounded-2xl border bg-white p-3 shadow-sm transition hover:border-sky-200 hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49] ${card.priority === 'high' ? 'border-red-200 bg-red-50' : 'border-slate-200'}`}
     >
       <span className={`mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${card.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-sky-50 text-sky-800'}`}>
         <OperationalIcon name={card.priority === 'high' ? 'alert' : 'shield'} className="h-5 w-5" />

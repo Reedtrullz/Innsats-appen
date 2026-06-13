@@ -125,6 +125,71 @@ export async function readLocalDatabaseCounts(page: Page) {
   }, LOCAL_DB_NAME);
 }
 
+type Rgba = { r: number; g: number; b: number; a: number };
+
+function parseColor(value: string): Rgba {
+  const match = value.match(/rgba?\(([^)]+)\)/i);
+  if (!match) return { r: 255, g: 255, b: 255, a: 1 };
+  const parts = match[1].split(',').map((part) => Number.parseFloat(part.trim()));
+  const [r = 0, g = 0, b = 0, a = 1] = parts;
+  return { r, g, b, a: Number.isFinite(a) ? a : 1 };
+}
+
+// src-over compositing: `src` painted on top of `dst`.
+function over(src: Rgba, dst: Rgba): Rgba {
+  const a = src.a + dst.a * (1 - src.a);
+  if (a === 0) return { r: 0, g: 0, b: 0, a: 0 };
+  const blend = (s: number, d: number) => (s * src.a + d * dst.a * (1 - src.a)) / a;
+  return { r: blend(src.r, dst.r), g: blend(src.g, dst.g), b: blend(src.b, dst.b), a };
+}
+
+function relativeLuminance({ r, g, b }: Rgba): number {
+  const channel = (value: number) => {
+    const c = value / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+}
+
+function contrastRatio(a: Rgba, b: Rgba): number {
+  const la = relativeLuminance(a);
+  const lb = relativeLuminance(b);
+  const lighter = Math.max(la, lb);
+  const darker = Math.min(la, lb);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+/**
+ * Computed-style contrast ratio for the text in `locator` against its effective
+ * background — walks ancestors and composites every layer over the page base so
+ * opacity-suffix surfaces (`bg-red-50/70`) are measured as actually rendered.
+ * Locks the dark-mode contrast bug class (P0-2): light text on light surfaces.
+ */
+export async function getTextContrastRatio(page: Page, locator: import('@playwright/test').Locator): Promise<number> {
+  const { color, backgrounds, baseBackground } = await locator.evaluate((element) => {
+    const backgroundStack: string[] = [];
+    let node: HTMLElement | null = element as HTMLElement;
+    while (node) {
+      backgroundStack.push(getComputedStyle(node).backgroundColor);
+      node = node.parentElement;
+    }
+    return {
+      color: getComputedStyle(element as HTMLElement).color,
+      backgrounds: backgroundStack,
+      baseBackground: getComputedStyle(document.documentElement).backgroundColor,
+    };
+  });
+
+  // Composite from the page base upward; element background is painted last (on top).
+  const base = parseColor(baseBackground);
+  let surface: Rgba = base.a === 0 ? { r: 255, g: 255, b: 255, a: 1 } : base;
+  for (let i = backgrounds.length - 1; i >= 0; i -= 1) {
+    surface = over(parseColor(backgrounds[i]), surface);
+  }
+  const text = over(parseColor(color), surface);
+  return contrastRatio(text, surface);
+}
+
 export async function expectOfflineReloadPreservesMission(page: Page, context: BrowserContext, missionTitle: string) {
   await waitForServiceWorker(page);
   await context.setOffline(true);
