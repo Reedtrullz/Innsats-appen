@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { getContentChangelog, getMustReadNotices } from '@/lib/content/load-content';
+import { getContentChangelog, getMustReadNotices, getSourceDocuments } from '@/lib/content/load-content';
+import { buildSourceTitleById, formatSourceList } from '@/lib/content/source-titles';
 
 export const revalidate = 3600;
 
@@ -12,6 +13,7 @@ function severityTone(severity: string) {
 export default function MustReadPage() {
   const notices = getMustReadNotices();
   const changelogById = new Map(getContentChangelog().map((entry) => [entry.id, entry]));
+  const sourceTitleById = buildSourceTitleById(getSourceDocuments());
 
   return (
     <div className="space-y-4">
@@ -36,7 +38,7 @@ export default function MustReadPage() {
                 </div>
               ) : null}
               {changelog ? <p className="mt-3 text-xs font-semibold">Endringslogg: {changelog.title}</p> : null}
-              <p className="mt-2 text-xs font-semibold">Kilder: {notice.sourceIds.join(', ')}</p>
+              <p className="mt-2 text-xs font-semibold">Kilder: {formatSourceList(notice.sourceIds, sourceTitleById)}</p>
             </article>
           );
         })}

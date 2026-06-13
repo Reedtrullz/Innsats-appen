@@ -6,13 +6,14 @@ import { getChecklistRun, saveChecklistRun } from '@/lib/mission/local-store';
 import { equipmentStatusLabels, equipmentStatuses } from '@/lib/mission/equipment-readiness';
 import type { EquipmentStatus } from '@/lib/mission/schemas';
 import { detectSensitiveOperationalText, sensitiveTextFieldError } from '@/lib/privacy/sensitive-text';
+import { formatSourceList } from '@/lib/content/source-titles';
 
-export function ChecklistRunner({ checklist, missionId, onRunSaved }: { checklist: OperationalChecklist; missionId: string; onRunSaved?: () => void }) {
+export function ChecklistRunner({ checklist, missionId, sourceTitleById, onRunSaved }: { checklist: OperationalChecklist; missionId: string; sourceTitleById?: Record<string, string>; onRunSaved?: () => void }) {
   const runId = `${missionId}:${checklist.slug}`;
-  return <ChecklistRunnerState key={runId} checklist={checklist} missionId={missionId} runId={runId} onRunSaved={onRunSaved} />;
+  return <ChecklistRunnerState key={runId} checklist={checklist} missionId={missionId} runId={runId} sourceTitleById={sourceTitleById} onRunSaved={onRunSaved} />;
 }
 
-function ChecklistRunnerState({ checklist, missionId, runId, onRunSaved }: { checklist: OperationalChecklist; missionId: string; runId: string; onRunSaved?: () => void }) {
+function ChecklistRunnerState({ checklist, missionId, runId, sourceTitleById, onRunSaved }: { checklist: OperationalChecklist; missionId: string; runId: string; sourceTitleById?: Record<string, string>; onRunSaved?: () => void }) {
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [notesByItemId, setNotesByItemId] = useState<Record<string, string>>({});
   const [equipmentStatusByItemId, setEquipmentStatusByItemId] = useState<Record<string, EquipmentStatus>>({});
@@ -150,7 +151,7 @@ function ChecklistRunnerState({ checklist, missionId, runId, onRunSaved }: { che
                 {item.required ? <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-950">Påkrevd</span> : null}
               </span>
             </label>
-            <p className="mt-1 text-xs text-slate-500">Kilder: {(item.sourceIds ?? []).join(', ')}</p>
+            <p className="mt-1 text-xs text-slate-500">Kilder: {formatSourceList(item.sourceIds, sourceTitleById)}</p>
             {isEquipmentChecklist ? (
               <label className="mt-2 block text-xs font-bold text-slate-700">
                 Materiellstatus for {item.label}
@@ -181,7 +182,7 @@ function ChecklistRunnerState({ checklist, missionId, runId, onRunSaved }: { che
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-xs text-slate-500">Sjekklistekilder: {sourceIds.join(', ')}</p>
+      <p className="mt-3 text-xs text-slate-500">Sjekklistekilder: {formatSourceList(sourceIds, sourceTitleById)}</p>
     </section>
   );
 }

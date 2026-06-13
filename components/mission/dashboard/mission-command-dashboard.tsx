@@ -204,6 +204,7 @@ export function MissionCommandDashboard({ mission, cards, checklist, checklists,
           staleSignals={staleSignals}
           scopedMapState={scopedMapState}
           orderSuggestions={orderSuggestions}
+          sourceTitleById={sourceTitleById}
           onMissionChange={onMissionChange}
           onChecklistRunSaved={refreshChecklistRuns}
         />

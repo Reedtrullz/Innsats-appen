@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { getContentChangelog, getContentManifest } from '@/lib/content/load-content';
+import { getContentChangelog, getContentManifest, getSourceDocuments } from '@/lib/content/load-content';
+import { buildSourceTitleById, formatSourceList } from '@/lib/content/source-titles';
 import { buildReleaseNotes } from '@/lib/release/release-notes';
 import { formatNbDateTime } from '@/lib/formatting/format-date';
 
@@ -14,6 +15,7 @@ function changeLabel(changeType: string) {
 
 export default function WhatsNewPage() {
   const notes = buildReleaseNotes({ manifest: getContentManifest(), changelog: getContentChangelog() });
+  const sourceTitleById = buildSourceTitleById(getSourceDocuments());
 
   return (
     <div className="space-y-4">
@@ -45,7 +47,7 @@ export default function WhatsNewPage() {
               <h3 className="mt-1 text-lg font-black">{entry.title}</h3>
               <p className="mt-2 text-sm text-slate-800">{entry.summary}</p>
               <p className="mt-2 text-xs font-semibold text-slate-500">Må-leses: {entry.mustRead ? 'ja' : 'nei'}</p>
-              <p className="mt-1 text-xs font-semibold text-slate-500">Kilder: {entry.sourceIds.length > 0 ? entry.sourceIds.join(', ') : 'ingen'}</p>
+              <p className="mt-1 text-xs font-semibold text-slate-500">Kilder: {entry.sourceIds.length > 0 ? formatSourceList(entry.sourceIds, sourceTitleById) : 'ingen'}</p>
             </article>
           ))}
         </div>
