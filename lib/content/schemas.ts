@@ -54,6 +54,14 @@ export const SourceDocumentSchema = z
 
 export const ActionCardAuthoritySchema = z.enum(['leder', 'lagforer', 'mannskap', 'beredskapsvakt']);
 
+// Fagperson sign-off as data, not a checkbox in a plan doc. `unreviewed` is the
+// historical baseline (short, generic cards). `pending-fagperson` marks content
+// that has been expanded source-faithfully but still needs a subject-matter
+// expert before it can be trusted as field-grade. `reviewed` requires a named
+// reviewer. The coverage report and /release board gate on this; the card UI
+// shows a visible banner for anything not yet `reviewed`.
+export const ActionCardReviewStatusSchema = z.enum(['unreviewed', 'pending-fagperson', 'reviewed']);
+
 export const ActionCardSchema = z.object({
   slug: z.string().min(1).regex(slugPattern, 'action card slug must be lowercase kebab-case'),
   title: z.string().min(1),
@@ -71,6 +79,9 @@ export const ActionCardSchema = z.object({
   warning: z.string().optional(),
   authority: ActionCardAuthoritySchema.optional(),
   doNot: z.array(z.string().min(1)).default([]),
+  reviewStatus: ActionCardReviewStatusSchema.default('unreviewed'),
+  reviewedBy: z.string().min(1).optional(),
+  reviewedAt: z.string().min(1).optional(),
 });
 
 export const ChecklistItemSchema = z.object({

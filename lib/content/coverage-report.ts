@@ -36,6 +36,7 @@ export interface ContentCoverageReport {
   risk: {
     highRiskCardsWithoutWarnings: string[];
     highRiskCardsWithoutCompetenceOrRationale: string[];
+    expandedCardsAwaitingFagperson: string[];
   };
   glossary: {
     referencedButUndefined: string[];
@@ -50,6 +51,19 @@ export interface ContentCoverageReport {
   releaseBoard: {
     gaps: ReleaseCoverageGap[];
   };
+}
+
+// A card is "expanded" (field-grade depth, per the field-readiness review) once
+// it carries 5+ steps. Expanded content that has not been fagperson-reviewed is
+// a release-readiness gap: it must not ship as trusted doctrine without sign-off.
+const EXPANDED_STEP_THRESHOLD = 5;
+
+function cardIsExpanded(card: any): boolean {
+  return Array.isArray(card?.steps) && card.steps.length >= EXPANDED_STEP_THRESHOLD;
+}
+
+function cardIsFagpersonReviewed(card: any): boolean {
+  return String(card?.reviewStatus ?? 'unreviewed') === 'reviewed';
 }
 
 function collectRefs(item: any): string[] {
@@ -148,6 +162,9 @@ export function buildContentCoverageReport(graph: ContentCoverageGraph, generate
     .filter((card) => !Array.isArray(card.competenceRequired) || card.competenceRequired.length === 0)
     .filter((card) => !String(card.competenceRationale ?? '').trim())
     .map((card) => String(card.slug ?? 'card')));
+  const expandedCardsAwaitingFagperson = sorted(actionCards
+    .filter((card) => cardIsExpanded(card) && !cardIsFagpersonReviewed(card))
+    .map((card) => String(card.slug ?? 'card')));
 
   const definedGlossary = new Set<string>();
   for (const term of glossary) {
@@ -209,13 +226,14 @@ export function buildContentCoverageReport(graph: ContentCoverageGraph, generate
   addReleaseGap(gaps, 'content-high-risk-card-warnings', 'High-risk cards missing warnings', highRiskCardsWithoutWarnings.length, 'high', `${highRiskCardsWithoutWarnings.length} high-risk cards lack visible warning copy.`);
   addReleaseGap(gaps, 'content-high-risk-card-competence', 'High-risk cards missing competence or rationale', highRiskCardsWithoutCompetenceOrRationale.length, 'medium', `${highRiskCardsWithoutCompetenceOrRationale.length} high-risk cards lack competence requirements or explicit rationale.`);
   addReleaseGap(gaps, 'content-glossary-undefined', 'Glossary references not defined', referencedButUndefined.length, 'medium', `${referencedButUndefined.length} glossary references are not defined.`);
+  addReleaseGap(gaps, 'content-expanded-cards-unreviewed', 'Expanded cards awaiting fagperson review', expandedCardsAwaitingFagperson.length, 'high', `${expandedCardsAwaitingFagperson.length} cards have field-grade depth (${EXPANDED_STEP_THRESHOLD}+ steps) but are not yet fagperson-reviewed (reviewStatus != reviewed).`);
   addReleaseGap(gaps, 'source-governance-pilot-blockers', 'Referenced sources blocked by source governance', sourceGovernancePilotBlockers.length, 'high', `${sourceGovernancePilotBlockers.length} referenced sources are not verified, approved for pilot, and approved for public publication. Run npm run report:source-governance:strict for details.`);
   addReleaseGap(gaps, 'source-governance-publication-blockers', 'Public source bodies without publication approval', sourceGovernancePublicationBlockers.length, 'high', `${sourceGovernancePublicationBlockers.length} public source documents include body text without approved-public publication status.`);
 
   return {
     generatedAt,
     linkage: { sourcesWithoutReferences, cardsWithoutSources },
-    risk: { highRiskCardsWithoutWarnings, highRiskCardsWithoutCompetenceOrRationale },
+    risk: { highRiskCardsWithoutWarnings, highRiskCardsWithoutCompetenceOrRationale, expandedCardsAwaitingFagperson },
     glossary: { referencedButUndefined },
     coverage: { byRole, byPhase, byScenario, byCompetence, bySourceStatus },
     releaseBoard: { gaps },

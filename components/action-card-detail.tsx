@@ -185,6 +185,18 @@ export function ActionCardDetail({ card, sources }: { card: ActionCard; sources:
         ) : null}
       </div>
       {card.warning ? <WarningBanner>{card.warning}</WarningBanner> : null}
+      {card.reviewStatus === 'pending-fagperson' ? (
+        <section className="rounded-2xl border-2 border-indigo-300 bg-indigo-50 px-4 py-3 text-indigo-950 shadow-sm">
+          <h2 className="flex items-center gap-2 text-base font-black">
+            <OperationalIcon name="shield" className="h-5 w-5" />
+            Til faggjennomgang
+          </h2>
+          <p className="mt-1 text-sm font-semibold">
+            Innholdet er utvidet fra kildedokumentene, men er ennå ikke faggodkjent. Bruk det som støtte, ikke som
+            fasit, og kontroller alltid mot gjeldende ordre, innsatsledelse og fagmyndighet før operativ bruk.
+          </p>
+        </section>
+      ) : null}
       {(card.doNot ?? []).length > 0 ? (
         <section className="rounded-2xl border-2 border-red-300 bg-red-50 px-4 py-3 text-red-950 shadow-sm">
           <h2 className="flex items-center gap-2 text-base font-black">

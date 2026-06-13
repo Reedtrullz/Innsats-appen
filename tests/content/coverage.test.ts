@@ -78,6 +78,35 @@ it('does not leave orphan sources without accepted-risk metadata', () => {
   expect(report.releaseBoard.gaps.find((gap) => gap.id === 'content-orphan-sources')?.count ?? 0).toBe(0);
 });
 
+it('flags expanded cards that are not fagperson-reviewed and clears them once reviewed', () => {
+  const baseCard = {
+    phase: 'under',
+    roles: ['lagforer'],
+    scenarios: ['generelt'],
+    priority: 'high',
+    safety: [],
+    reporting: [],
+    sourceIds: ['src-x'],
+    authority: 'leder',
+  };
+  const expandedSteps = ['et', 'to', 'tre', 'fire', 'fem'];
+  const graph = {
+    sources: [],
+    actionCards: [
+      { ...baseCard, slug: 'expanded-unreviewed', steps: expandedSteps, reviewStatus: 'unreviewed' },
+      { ...baseCard, slug: 'expanded-pending', steps: expandedSteps, reviewStatus: 'pending-fagperson' },
+      { ...baseCard, slug: 'expanded-reviewed', steps: expandedSteps, reviewStatus: 'reviewed', reviewedBy: 'Fagperson' },
+      { ...baseCard, slug: 'short-unreviewed', steps: ['et', 'to', 'tre'], reviewStatus: 'unreviewed' },
+    ],
+  };
+
+  const report = buildContentCoverageReport(graph as never, '2026-06-13T00:00:00.000Z');
+  expect(report.risk.expandedCardsAwaitingFagperson).toEqual(['expanded-pending', 'expanded-unreviewed']);
+  const gap = report.releaseBoard.gaps.find((candidate) => candidate.id === 'content-expanded-cards-unreviewed');
+  expect(gap?.count).toBe(2);
+  expect(gap?.severity).toBe('high');
+});
+
 it('ensures every action card has a valid authority value', () => {
   const cards = getActionCards();
   const validAuthorities = new Set(['leder', 'lagforer', 'mannskap', 'beredskapsvakt']);
