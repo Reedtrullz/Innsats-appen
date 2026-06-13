@@ -15,14 +15,14 @@ it('tracks open release work and can mark it completed', async () => {
   const { container } = render(<ReleaseReadinessTool />);
 
   expect(screen.getByRole('heading', { name: /Innsats-app pilot/i })).toBeInTheDocument();
-  expect(screen.getAllByText(/Release Readiness/i).length).toBeGreaterThan(0);
-  expect(screen.getByRole('heading', { name: /Needs Attention/i })).toBeInTheDocument();
+  expect(screen.getAllByText(/Release-status/i).length).toBeGreaterThan(0);
+  expect(screen.getByRole('heading', { name: /Trenger oppmerksomhet/i })).toBeInTheDocument();
 
-  await userEvent.type(screen.getByLabelText('Title'), 'Write release notes');
-  await userEvent.type(screen.getByLabelText('Owner'), 'Reidar');
+  await userEvent.type(screen.getByLabelText('Tittel'), 'Write release notes');
+  await userEvent.type(screen.getByLabelText('Eier'), 'Reidar');
   await userEvent.selectOptions(container.querySelector('select[name="stage"]')!, 'release');
   await userEvent.selectOptions(container.querySelector('select[name="risk"]')!, 'low');
-  await userEvent.click(screen.getByRole('button', { name: /Add to release board/i }));
+  await userEvent.click(screen.getByRole('button', { name: /Legg til på release-tavla/i }));
 
   expect(screen.getByRole('heading', { name: 'Write release notes' })).toBeInTheDocument();
   const item = screen.getByRole('heading', { name: 'Write release notes' }).closest('article');
@@ -77,13 +77,13 @@ it('describes workplans as generated local artifacts without backend sync', asyn
 
   expect(await screen.findByRole('heading', { name: 'Genererte lokale workplan-artefakter' })).toBeInTheDocument();
   expect((await screen.findAllByRole('heading', { name: 'Pilot Workplan' })).length).toBeGreaterThan(0);
-  expect(screen.getByText(/1\/2 tasks completed/i)).toBeInTheDocument();
-  expect(screen.getByText(/Open: Verify release page/i)).toBeInTheDocument();
+  expect(screen.getByText(/1\/2 oppgaver fullført/i)).toBeInTheDocument();
+  expect(screen.getByText(/Åpen: Verify release page/i)).toBeInTheDocument();
   expect(screen.getByText(/1 workplan lastet fra `\/generated-content\/workplans\.json` — ingen backend-synk/i)).toBeInTheDocument();
   expect(screen.getByText(/Artefakt generert: 2026-06-04T12:00:00.000Z/i)).toBeInTheDocument();
   expect(screen.queryByText(/Automatic sync|Synced workplans|Last sync|synced from Obsidian/i)).not.toBeInTheDocument();
 
-  await userEvent.click(screen.getByRole('button', { name: 'Reset' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Nullstill' }));
   await waitFor(() => {
     expect(localStorage.getItem('beredskapsboka-release-readiness-v1') ?? '').toContain('workplan-pilot-workplan');
   });
@@ -138,7 +138,7 @@ it('keeps a generated blocked workplan blocked over stale local completed status
 
   render(<ReleaseReadinessTool />);
 
-  const activeHeading = await screen.findByRole('heading', { name: 'Active work' });
+  const activeHeading = await screen.findByRole('heading', { name: 'Aktivt arbeid' });
   const activeColumn = activeHeading.closest('div')?.parentElement?.parentElement;
   expect(activeColumn).not.toBeNull();
   await waitFor(() => {
@@ -152,7 +152,7 @@ it('keeps a generated blocked workplan blocked over stale local completed status
     expect(stored).toContain('\"status\":\"blocked\"');
     expect(stored).not.toContain('Stale local status from an older generated artifact.');
   });
-  expect(screen.getByText(/Open: Resolve launch blocker/i)).toBeInTheDocument();
+  expect(screen.getByText(/Åpen: Resolve launch blocker/i)).toBeInTheDocument();
 });
 
 it('prevents a ready label when ordinary blocked release work remains despite clean coverage', async () => {
@@ -193,7 +193,7 @@ it('prevents a ready label when ordinary blocked release work remains despite cl
   expect(await screen.findByText(/Ikke pilotklar/i)).toBeInTheDocument();
   expect(screen.getByText(/1 blokkert release\/workplan/i)).toBeInTheDocument();
   expect(screen.getByText(/Blokkert release-\/workplan-arbeid må løses før pilot/i)).toBeInTheDocument();
-  expect(screen.queryByText(/^Ready$/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/^Pilotklar$/i)).not.toBeInTheDocument();
 });
 
 it('shows content coverage gaps on the release board', async () => {
@@ -216,7 +216,7 @@ it('shows content coverage gaps on the release board', async () => {
 
   render(<ReleaseReadinessTool />);
 
-  expect(await screen.findByRole('heading', { name: 'Content coverage gaps' })).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { name: 'Hull i innholdsdekning' })).toBeInTheDocument();
   expect(await screen.findByText('Sources without linked content')).toBeInTheDocument();
   expect(screen.getByText(/2 sources need linking/i)).toBeInTheDocument();
 });
@@ -247,9 +247,9 @@ it('highlights source governance release gaps as pilot blockers', async () => {
 
   render(<ReleaseReadinessTool />);
 
-  expect(await screen.findByRole('heading', { name: 'Content coverage gaps' })).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { name: 'Hull i innholdsdekning' })).toBeInTheDocument();
   expect(await screen.findByText('Sources referenced by pilot content are not approved')).toBeInTheDocument();
-  expect(screen.getAllByText(/Pilot blocker/i).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/Pilotblokker/i).length).toBeGreaterThan(0);
   expect(screen.getByText(/57 referenced sources/i)).toBeInTheDocument();
 });
 
@@ -280,9 +280,9 @@ it('prevents a ready label when high coverage gaps still block pilot readiness',
   render(<ReleaseReadinessTool />);
 
   expect(await screen.findByText(/Ikke pilotklar/i)).toBeInTheDocument();
-  expect(screen.getByText(/57 pilot blocker/i)).toBeInTheDocument();
-  expect(screen.getAllByText(/Pilot blockers/i).length).toBeGreaterThan(0);
-  expect(screen.queryByText(/No active risks on the board/i)).not.toBeInTheDocument();
+  expect(screen.getByText(/57 pilotblokker/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/Pilotblokkere/i).length).toBeGreaterThan(0);
+  expect(screen.queryByText(/Ingen aktive risikoer på tavla/i)).not.toBeInTheDocument();
 });
 
 it('ignores malformed content coverage report gaps instead of crashing', async () => {
@@ -297,7 +297,7 @@ it('ignores malformed content coverage report gaps instead of crashing', async (
   render(<ReleaseReadinessTool />);
 
   expect(await screen.findByRole('heading', { name: /Innsats-app pilot/i })).toBeInTheDocument();
-  expect(await screen.findByText(/No release-board content coverage gaps reported/i)).toBeInTheDocument();
+  expect(await screen.findByText(/Ingen hull i release-tavlas innholdsdekning rapportert/i)).toBeInTheDocument();
 });
 
 it('treats generated content fallback coverage reports as unknown, not clean release evidence', async () => {
@@ -312,18 +312,18 @@ it('treats generated content fallback coverage reports as unknown, not clean rel
   render(<ReleaseReadinessTool />);
 
   expect(await screen.findByText(/Dekning ukjent/i)).toBeInTheDocument();
-  expect(await screen.findByText(/Content coverage report is unavailable/i)).toBeInTheDocument();
+  expect(await screen.findByText(/Dekningsrapport for innhold er utilgjengelig/i)).toBeInTheDocument();
   expect(screen.getByText(/Dekning ikke verifisert/i)).toBeInTheDocument();
-  expect(screen.queryByText(/No release-board content coverage gaps reported/i)).not.toBeInTheDocument();
-  expect(screen.queryByText(/^Ready$/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/Ingen hull i release-tavlas innholdsdekning rapportert/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/^Pilotklar$/i)).not.toBeInTheDocument();
 });
 
 it('renders release controls with mobile-safe touch targets', () => {
   render(<ReleaseReadinessTool />);
 
-  expect(screen.getByRole('button', { name: /Idea intake status/i })).toHaveClass('h-11', 'w-11');
-  expect(screen.getByRole('button', { name: 'Reset' })).toHaveClass('min-h-11');
-  expect(screen.getAllByRole('button', { name: 'Remove' })[0]).toHaveClass('min-h-11');
+  expect(screen.getByRole('button', { name: /Idé-innmelding status/i })).toHaveClass('h-11', 'w-11');
+  expect(screen.getByRole('button', { name: 'Nullstill' })).toHaveClass('min-h-11');
+  expect(screen.getAllByRole('button', { name: 'Fjern' })[0]).toHaveClass('min-h-11');
   for (const select of screen.getAllByRole('combobox')) {
     expect(select).toHaveClass('min-h-11');
   }

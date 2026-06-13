@@ -480,10 +480,10 @@ export function ReleaseReadinessTool() {
                           <h3 className="font-black">{workplan.title}</h3>
                           <p className="mt-1 text-sm font-semibold text-slate-500">{workplan.taskCount} oppgaver · {stageLabels[workplan.stage]} · {riskLabels[workplan.risk]} risiko</p>
                           <p className="mt-2 text-sm font-black text-slate-700">
-                            {completedTaskCount(workplan)}/{workplan.taskCount} tasks completed
+                            {completedTaskCount(workplan)}/{workplan.taskCount} oppgaver fullført
                           </p>
                           {firstOpenTask(workplan) ? (
-                            <p className="mt-1 text-sm font-semibold text-orange-700">Open: {firstOpenTask(workplan)?.title}</p>
+                            <p className="mt-1 text-sm font-semibold text-orange-700">Åpen: {firstOpenTask(workplan)?.title}</p>
                           ) : (
                             <p className="mt-1 text-sm font-semibold text-emerald-700">Ingen åpne oppgavetitler.</p>
                           )}
