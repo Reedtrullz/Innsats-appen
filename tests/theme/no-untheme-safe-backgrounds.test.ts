@@ -59,4 +59,18 @@ describe('theme-safe backgrounds', () => {
     }
     expect(offenders, `Use solid palette classes the .dark override covers.\n${offenders.join('\n')}`).toEqual([]);
   });
+
+  // P3-3 — secondary palette islands (indigo/rose/orange) used on app surfaces
+  // must have a .dark background override, or they render light-on-light at night.
+  it('the .dark override covers every secondary palette background used in app surfaces', () => {
+    const globals = readFileSync(path.resolve('app/globals.css'), 'utf8');
+    const bgPattern = /\bbg-(indigo|rose|orange)-(50|100)\b/g;
+    const used = new Set<string>();
+    for (const file of files) {
+      const source = readFileSync(file, 'utf8');
+      for (const match of source.matchAll(bgPattern)) used.add(match[0]);
+    }
+    const uncovered = [...used].filter((cls) => !globals.includes(`.dark .${cls}`));
+    expect(uncovered, `Add a .dark override for: ${uncovered.join(', ')}`).toEqual([]);
+  });
 });

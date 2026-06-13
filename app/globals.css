@@ -232,6 +232,75 @@ body {
   color: var(--critical-fg) !important;
 }
 
+/*
+ * Secondary palette islands (indigo/rose/orange) used on a few app surfaces.
+ * Map them onto the existing semantic surfaces so they stay legible in dark
+ * mode instead of leaving light text on a light, un-flipped background (P3-3).
+ * indigo = informational, rose = critical, orange = warning.
+ */
+.dark .bg-indigo-50,
+.dark .bg-indigo-100 {
+  background-color: var(--info-surface) !important;
+}
+
+.dark .text-indigo-950,
+.dark .text-indigo-900,
+.dark .text-indigo-800,
+.dark .text-indigo-700,
+.dark .text-indigo-600 {
+  color: var(--info-fg) !important;
+}
+
+.dark .border-indigo-200,
+.dark .border-indigo-300,
+.dark .ring-indigo-200,
+.dark .ring-indigo-300 {
+  border-color: #6366f1 !important;
+  --tw-ring-color: #6366f1 !important;
+}
+
+.dark .bg-rose-50,
+.dark .bg-rose-100 {
+  background-color: var(--critical-surface) !important;
+}
+
+.dark .text-rose-950,
+.dark .text-rose-900,
+.dark .text-rose-800,
+.dark .text-rose-700,
+.dark .text-rose-600 {
+  color: var(--critical-fg) !important;
+}
+
+.dark .border-rose-200,
+.dark .border-rose-300,
+.dark .ring-rose-200,
+.dark .ring-rose-300 {
+  border-color: #ef4444 !important;
+  --tw-ring-color: #ef4444 !important;
+}
+
+.dark .bg-orange-50,
+.dark .bg-orange-100 {
+  background-color: var(--warning-surface) !important;
+}
+
+.dark .text-orange-950,
+.dark .text-orange-900,
+.dark .text-orange-800,
+.dark .text-orange-700,
+.dark .text-orange-600 {
+  color: var(--warning-fg) !important;
+}
+
+.dark .border-orange-200,
+.dark .border-orange-300,
+.dark .ring-orange-200,
+.dark .ring-orange-300 {
+  border-color: #f59e0b !important;
+  --tw-ring-color: #f59e0b !important;
+}
+
 .dark .bg-\[\#082F49\] {
   background-color: var(--command-bg) !important;
 }
