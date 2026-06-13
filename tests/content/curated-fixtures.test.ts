@@ -106,6 +106,9 @@ const cardText = (card: any) => [
   card.slug,
   ...(card.steps ?? []),
   ...(card.safety ?? []),
+  // doNot included: P1-2 dedup moved prohibition lines out of safety, but the
+  // guidance still surfaces on the card via the "Ikke gjør" box.
+  ...(card.doNot ?? []),
   ...(card.reporting ?? []),
   card.warning ?? '',
 ].join('\n');

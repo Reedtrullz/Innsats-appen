@@ -29,8 +29,6 @@
     - Avklar kanal eller talegruppe før avmarsj.
     - Avklar kallesignal og alternativ kontaktvei.
     - Test samband før laget forlater oppmøtested.
-  safety:
-    - Ikke legg sensitive sambandstabeller i åpen app.
   reporting:
     - Loggfør sambandsbrudd og fallback-løsning.
   sourceIds: [ src-kommunikasjons-og-sambandsdiagram ]
@@ -50,8 +48,6 @@
     - Bruk bare offentlig eller eksplisitt godkjent lokasjonsinformasjon.
     - Kontroller ventilasjon, nødstrøm, vann, sanitær, belysning og samband.
     - Etabler publikumshåndtering og enkel statusrapportering.
-  safety:
-    - Ikke publiser private eller skjermede tilfluktsromdata i appen.
   reporting:
     - Rapporter åpning, kapasitet, teknisk status, avvik og behov.
   sourceIds: [ src-operativt-konsept-for-sivilforsvaret ]
@@ -79,9 +75,6 @@
     - Avklar soneinndeling før mannskap går inn.
     - Bruk riktig verneutstyr og rullering.
     - Etabler renselogikk og rapportering før eksponert personell flyttes videre.
-  safety:
-    - Stopp arbeid ved ukjent stoff, manglende verneutstyr eller uklar
-      sonegrense.
   reporting:
     - Rapporter sone, antall eksponerte, ressursbehov og avvik.
   sourceIds: [ src-tiltakskort-cbrne, src-veileder-for-sivilforsvarets-renseenheter-cbrn ]
@@ -104,8 +97,6 @@
     - Kontroller dosimeter og måleutstyr før måling.
     - Registrer målepunkt, tid, verdi og personell.
     - Følg etablerte grenser for oppholdstid og rullering.
-  safety:
-    - Avbryt ved dose-/rateverdier utenfor gitt ordre eller ukjent målesituasjon.
   reporting:
     - Rapporter måleverdier med tid, sted, metode og usikkerhet.
   sourceIds:
@@ -133,8 +124,6 @@
     - Avklar oppdragstype, ressursbehov og forventet varighet.
     - Kontroller transport, oppmøtested, sambandsvei og mottak.
     - Følg tiltakskort for MFE-støtte og oppsettende distrikt.
-  safety:
-    - Ikke send ressurs uten tydelig oppdragsforståelse og kontaktpunkt.
   reporting:
     - Loggfør anmodning, tidspunkt, beslutning og ressursstatus.
   sourceIds: [ src-tiltakskort-05-stotte-av-mfe, src-grunnopplaering-mfe-10-mannskap ]
@@ -155,8 +144,6 @@
     - Skap ro, trygghet og enkel oversikt.
     - Lytt uten å presse på detaljer.
     - Koble personell til leder/kollegastøtte ved behov.
-  safety:
-    - Ikke gjennomfør tvungen debrief eller medisinsk vurdering uten kompetanse.
   reporting:
     - Rapporter behov for oppfølging gjennom kommandolinjen.
   sourceIds:
@@ -217,7 +204,6 @@
       kvalifisert medisinsk personell, Sivilforsvaret bistår med hender, føtter
       og omsorg.
   safety:
-    - Ikke registrer pasientidentifiserende data i Beredskapsboka.
     - Det er alltid kvalifisert medisinsk personell som har ansvar for
       pasientundersøkelse, skadeprioritering og behandlingsbeslutning.
     - Bruk engangshansker ved pasientkontakt.
@@ -246,8 +232,6 @@
     - Avklar om myndighet har gitt råd om jodtabletter.
     - Skill egenberedskap, personellstøtte og publikumsinformasjon.
     - Vis til offisiell myndighetsinformasjon ved spørsmål.
-  safety:
-    - Ikke gi medisinske råd utover offisielle myndighetsråd.
   reporting:
     - Loggfør informasjonsbehov og henvendelser.
   sourceIds:
@@ -274,8 +258,6 @@
     - Møt med personlig utrustning og kontroller verneutstyr.
     - Avklar oppdrag, samband og transport før avmarsj.
     - Meld mangler før laget forlater oppmøtested.
-  safety:
-    - Ikke start arbeid uten oppdragsforståelse og egensikkerhet.
   reporting:
     - Rapporter klar/mangler til lagfører.
   sourceIds: [ src-tiltakskort-for-innsats, src-sjekkliste-fig-og-figp ]
@@ -294,8 +276,6 @@
     - Velg rensested etter vind, sone og logistikk.
     - Skill ren/uren side tydelig og etabler flyt.
     - Prioriter grovrens og trygg videreføring etter ordre.
-  safety:
-    - Stans dersom sonegrense eller verneutstyr er uklart.
   reporting:
     - Rapporter kapasitet, kø, forbruk og avvik.
   sourceIds:
@@ -322,8 +302,6 @@
     - Avklar vannvei, sikring og strømfare.
     - Etabler pumpested og slangeutlegg uten å skape ny skade.
     - Overvåk vannstand og mannskapets arbeidstid.
-  safety:
-    - Stans ved strømfare, undergraving eller ukjent forurensning.
   reporting:
     - Rapporter effekt, behov og risiko.
   sourceIds: [ src-eksempler-pa-utlegg-fra-pumpe ]
@@ -344,9 +322,6 @@
     - Vurder situasjon, risiko, tilgjengelige ressurser, varighet og sambandsvei.
     - Formuler foreløpig oppdrag, begrensninger og behov for ny beslutning før
       laget sendes.
-  safety:
-    - Ikke start innsats med uklar myndighetslinje, ukjent risiko eller
-      manglende egensikkerhet.
   reporting:
     - Loggfør beslutningsgrunnlag, forutsetninger, avklarte begrensninger og
       endringer lokalt.
@@ -377,9 +352,6 @@
     - Bedøm hva endringen betyr for risiko, prioritet og behov for samvirke.
     - Beslutt tiltak innenfor ordre, gi tydelig ordre til laget og følg opp ny
       observasjon.
-  safety:
-    - Stans tiltak som går utenfor gitt ordre eller trygg gjennomføring, og be
-      om avklaring.
   reporting:
     - Meld vesentlige endringer, beslutning og behov tilbake i kommandolinjen.
   sourceIds: [ src-enhetlig-ledelsessystem-els ]
@@ -405,9 +377,6 @@
       mottas.
     - Hold oversikt over oppdrag, ressursstatus, risiko, samband og avløsning.
     - Gi korte ordre, sjekk forståelse og oppdater laget ved endret situasjon.
-  safety:
-    - Unngå parallelle ordrelinjer; avklar konfliktende beskjeder før tiltak
-      fortsetter.
   reporting:
     - Rapporter status, avvik, ressursbehov og beslutninger etter avtalt
       intervall.
@@ -441,9 +410,6 @@
       eksponering.
     - Gi ikke vurderinger, årsak, identitet eller operative detaljer på eget
       initiativ.
-  safety:
-    - Hold arbeidsro og sikker avstand; stopp intervjuønsker som forstyrrer
-      innsats eller personvern.
   reporting:
     - Meld mediehenvendelser og eventuelle avvik til leder/innsatsledelse.
   sourceIds: [ src-operativt-konsept-for-sivilforsvaret ]
@@ -487,21 +453,19 @@
   scenarios: [ generelt, psykososial ]
   priority: high
   steps:
-    - Ta ledelsen, sikre skadestedet, stans farlig arbeid og skaff oversikt
-      over hvem som er berørt.
+    - Ta ledelsen, sikre skadestedet, stans farlig arbeid og skaff oversikt over
+      hvem som er berørt.
     - Varsle 113 og gi livreddende førstehjelp.
     - Varsle beredskapsvakt/sivilforsvarsdistrikt umiddelbart.
     - Hvis mulig, la noen følge syke/skadde til medisinsk
       undersøkelse/behandling.
     - Vurder, i samråd med innsatsleder, om personellet/laget skal tas ut av
       innsats.
-    - Samle personellet i trygge omgivelser, gi informasjon og skjerm berørte
-      og vitner.
+    - Samle personellet i trygge omgivelser, gi informasjon og skjerm berørte og
+      vitner.
     - Vurder behov for defuse/debrief etter innsatsen, og koordiner videre
       oppfølging med beredskapsvakt/distrikt.
   safety:
-    - Ikke flytt eller eksponer berørte mer enn nødvendig for livreddende tiltak
-      og sikkerhet.
     - Alt personell som er utsatt for akutt skade eller sykdom, eller mistanke
       om dette, skal vurderes medisinsk av lege.
   reporting:
@@ -543,8 +507,6 @@
     - Samle laget for informasjon, og vurder behov for defuse/debrief etter
       innsatsen.
   safety:
-    - Ikke utsett mannskap for fare for å gi hjelp; trekk ut hvis området ikke
-      er sikkert.
     - Alt personell som er utsatt for akutt skade eller sykdom, eller mistanke
       om dette, skal vurderes medisinsk av lege.
   reporting:
@@ -588,8 +550,6 @@
       kontaktinformasjon, dimittering skal kun skje i dialog med
       beredskapsvakt/sivilforsvarsdistrikt.
   safety:
-    - Ikke press frem detaljer, skyldspørsmål eller forklaringer; la personen
-      styre tempoet.
     - Tiltak gjøres i tett samarbeid med sivilforsvarsdistriktets EFOK-kontakt.
   reporting:
     - Meld behov for oppfølging uten personidentifiserende detaljer.
@@ -620,9 +580,6 @@
     - La berørte velge hvor mye de vil si, og følg opp senere ved behov.
     - Eskaler bekymring for akutt fare, sterk funksjonssvikt eller vedvarende
       reaksjoner til leder/helse.
-  safety:
-    - Ikke gjennomfør tvungen debrief, ikke press detaljer og ikke samle
-      forklaringer som behandling.
   reporting:
     - Meld kun behov for videre oppfølging og praktiske tiltak gjennom
       lederlinjen.
@@ -690,9 +647,6 @@
       unødvendig.
     - Overvåk koblinger, trykkendringer, friksjonsskader og behov for mer
       materiell.
-  safety:
-    - Stans ved fare fra trafikk, røyk, varme, elektrisk anlegg eller ustabil
-      vannvei.
   reporting:
     - Meld kapasitet, avbrudd, vannmangel og materiellbehov til leder.
   sourceIds: [ src-tiltakskort-under-innsats, src-eksempler-pa-utlegg-fra-pumpe ]
@@ -727,11 +681,8 @@
       innsatsleder, og før logg.
     - Merk funn og observasjoner lokalt og meld raskt, uten å spre private
       opplysninger.
-    - Påse behov for mat, vann og hvile, og vurder behov for avløsning i god
-      tid.
+    - Påse behov for mat, vann og hvile, og vurder behov for avløsning i god tid.
   safety:
-    - Stans søk ved tap av samband, farlig terreng, mørke/ vær eller uklar
-      lagstatus.
     - Vurder aktivitet i forhold til sikkerhet, og foreta ny analyse ved endring
       av oppdraget.
   reporting:
@@ -762,9 +713,6 @@
     - Hold oversikt over hva som faktisk er gjennomsøkt og hvilke hindringer som
       står igjen.
     - Meld avvik, usikre grenser og behov for ny teig før laget flyttes.
-  safety:
-    - Ikke kryss inn i ny sektor uten ordre når det kan skape dobbeltarbeid
-      eller risiko.
   reporting:
     - Rapporter teigstatus, dekningsgrad, hindringer og lokale
       posisjonsreferanser.
@@ -790,9 +738,6 @@
     - Kartlegg vannvei, mottakssted, høydeforskjell, pumpesikring og slangevei.
     - Prioriter liv, kritisk infrastruktur og skadebegrensning etter ordre.
     - Kontroller drivstoff, sil, slanger, avlastning, vakt og plan for stopp.
-  safety:
-    - Stans ved strømfare, forurenset vann, undergraving, rasfare eller utrygg
-      adkomst.
   reporting:
     - Rapporter effekt, vannstand, pumpekapasitet, risiko og behov for avløsning.
   sourceIds: [ src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-under-innsats ]
@@ -819,9 +764,6 @@
       etter ordre.
     - Utfør bare tildelte støtteoppgaver og meld observasjoner om terreng, vær
       og nye farer til leder.
-  safety:
-    - Stans ved ustabilt terreng, uavklart sone, endrede forhold eller manglende
-      ordre/faglig avklaring.
   reporting:
     - Rapporter posisjon, observasjoner, mannskapsstatus og behov til leder/KO.
   sourceIds: [ src-vedlegg-c-operative-forhold, src-tiltakskort-under-innsats ]
@@ -855,8 +797,6 @@
     - Bistå med transport og bemann kontrollpunkt etter ansvarlig myndighets
       plan.
     - Hold oversikt over ressursbehov og flaskehalser, og meld dette til leder.
-  safety:
-    - Ikke gå inn i område uten sikker adkomst, sambandsvei og avklart retrett.
   reporting:
     - Rapporter status, transportbehov, hindringer og ressursmangler til leder.
   sourceIds:
@@ -890,8 +830,6 @@
       helse/innsatsleders behov.
     - Ikke registrer journalfelt, navn, fødselsdato eller kontaktopplysninger i
       appen.
-  safety:
-    - Hold fri adkomst for helse og nødetater, og skjerm rammede mot innsyn.
   reporting:
     - Rapporter antallskategorier, ressursbehov og flaskehalser uten
       personidentifiserende detaljer.
@@ -916,9 +854,6 @@
       publikumshåndtering etter ordre.
     - Forbered enkel lokal status uten adresser eller detaljer som ikke er
       godkjent for publisering.
-  safety:
-    - Ikke lagre private rom, skjermede lokasjoner eller ikke-offentlige lister
-      i appen.
   reporting:
     - Rapporter klargjøringsstatus, åpning, tekniske avvik og ressursbehov til
       ansvarlig myndighet.
@@ -951,9 +886,6 @@
     - Merk praktiske grenser, inn-/utpassering og renselogikk på et generelt
       nivå.
     - Hold mannskap utenfor sone til verneutstyr, oppgave og ordre er bekreftet.
-  safety:
-    - Stopp eller avbryt ved ukjent stoff, uklar sone, værendring eller
-      manglende ordre.
   reporting:
     - Rapporter soneavklaring, ressursbehov, avvik og kapasitet uten taktiske
       detaljer.
@@ -980,9 +912,6 @@
     - Følg påkledning/avkledning etter lokal prosedyre og hold ren/uren side
       adskilt.
     - Avklar stoppkriterier før mannskap eksponeres.
-  safety:
-    - Avbryt ved skade på verneutstyr, symptomer, ukjent stoff, uklare grenser
-      eller ordrebrudd.
   reporting:
     - Meld stopp, avvik, eksponering, behov for fagmyndighet og materiellstatus
       til leder.
@@ -1010,9 +939,6 @@
     - Prioriter grovrens for å redusere spredning før videre håndtering.
     - Hold rent og urent utstyr adskilt, og bruk makkerkontroll ved kritiske
       overganger.
-  safety:
-    - Stans rens ved uklar sone, manglende vann/renseutstyr, skadet verneutstyr
-      eller ordreendring.
   reporting:
     - Rapporter kapasitet, kø, forbruk, stopp og behov for
       fagmyndighet/forsterkning.
@@ -1043,9 +969,6 @@
     - Mål på angitt punkt og noter verdi, enhet, tidspunkt, posisjonsreferanse
       og usikkerhet lokalt.
     - Sammenlign med forventet område og be om kontrollmåling ved avvik.
-  safety:
-    - Avbryt ved uventet høy verdi, instrumentfeil, uklar ordre eller behov for
-      fagmyndighet.
   reporting:
     - Rapporter måleverdi, tid, metode, posisjon og usikkerhet via avtalt kanal.
   sourceIds:
@@ -1078,9 +1001,6 @@
     - Kontroller dosimeter og makkerstatus før, under og etter oppdrag.
     - Planlegg avløsning og trekk ut før fastsatte grenser eller ved endret
       målebilde.
-  safety:
-    - Stans/avbryt ved uklar ordre, manglende dosimeter, instrumentfeil eller
-      tegn til overskridelse.
   reporting:
     - Rapporter oppholdstid, dose-/rateobservasjoner, rullering og behov for
       fagmyndighet.
@@ -1115,9 +1035,6 @@
     - Bekreft ressursstatus, forventet ankomst og hvem som gir første ordre
       lokalt.
     - Følg opp drift, avløsning, forsyning, avvik og demobilisering.
-  safety:
-    - Ikke send eller motta MFE uten tydelig kontaktpunkt, oppdragsforståelse og
-      sikkerhetsbrief.
   reporting:
     - Loggfør anmodning, beslutning, ankomst, oppdrag, avvik og avslutning
       lokalt.
@@ -1152,9 +1069,6 @@
       usikkerhet.
     - Bruk lokal/offline notatstøtte og slett eller anonymiser når oppdraget er
       avsluttet.
-  safety:
-    - Ikke lagre eller send live tracking, og ikke del sensitive lokasjoner i
-      åpne kanaler.
   reporting:
     - Send posisjonsrapport kun via avtalt sambandsvei eller direkte til leder.
   sourceIds: [ src-sjekkliste-fig-og-figp, src-vedlegg-c-operative-forhold ]
@@ -1181,9 +1095,6 @@
     - Vurder trafikk, vær, terreng, sårbare personer, kjøretøybehov og samband.
     - Oppdater laget ved ruteendring og bekreft at alle kjenner møtepunkt og
       fallback.
-  safety:
-    - Ikke lagre eller del sensitive lokasjoner, live tracking eller
-      rutedetaljer som ikke er godkjent.
   reporting:
     - Rapporter lokal/offline ruteavvik, stengninger og behov til leder uten
       private adresser.
@@ -1211,9 +1122,6 @@
     - Avklar transportoppdrag, rute, lastbegrensning, passasjerbehov og
       parkering/mottak.
     - Meld mangler før avmarsj og planlegg avløsning ved lang varighet.
-  safety:
-    - Ikke kjør med uavklart fører, usikret last, kjent teknisk feil eller
-      manglende oppdrag.
   reporting:
     - Rapporter klar/mangler, avgang, ankomst, avvik og behov for vedlikehold
       lokalt.
@@ -1241,9 +1149,6 @@
       foreligge.
     - Plasser pumpe, slanger og mannskap bare etter avklart ordre, og vent på
       fagperson ved elektrisk usikkerhet.
-  safety:
-    - Stans/avbryt umiddelbart ved mulig strømfare eller elektrisk usikkerhet,
-      og vent på ordre/fagperson.
   reporting:
     - Meld strømfare, avbrutt arbeid og behov for fagperson eller ny ordre til
       leder.
@@ -1273,9 +1178,6 @@
     - Merk, pakk, vask eller sett i karantene etter lokal prosedyre og lederens
       beskjed.
     - Dokumenter materiellstatus lokalt uten sensitive hendelsesdetaljer.
-  safety:
-    - Ikke ta kontaminert eller skadet utstyr tilbake i bruk før det er
-      kontrollert etter lokal prosedyre.
   reporting:
     - Meld type avvik, mengde, behov for renhold/vedlikehold og om beredskap
       påvirkes.
