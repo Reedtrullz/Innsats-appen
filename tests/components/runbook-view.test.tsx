@@ -86,6 +86,32 @@ it('shows a per-step source-trust indicator for the current step', async () => {
   expect(await screen.findByText(/Vær varsom/)).toBeInTheDocument();
 });
 
+it('compact "Nå" shows only the active step and the next couple, not the whole list', async () => {
+  const longChecklists = [
+    {
+      ...checklists[0],
+      items: [
+        { id: 's1', label: 'Steg en aktiv', required: true, sourceIds: [] },
+        { id: 's2', label: 'Steg to neste', required: true, sourceIds: [] },
+        { id: 's3', label: 'Steg tre neste', required: true, sourceIds: [] },
+        { id: 's4', label: 'Steg fire skjult', required: true, sourceIds: [] },
+        { id: 's5', label: 'Steg fem skjult', required: true, sourceIds: [] },
+      ],
+    },
+  ] as OperationalChecklist[];
+  await seedActiveMission();
+  render(<RunbookView checklists={longChecklists} compact />);
+  await flushAsyncEffects();
+
+  // Active + next two are visible; the rest stay on the full board ("Arbeid").
+  expect(await screen.findByText('Steg en aktiv')).toBeInTheDocument();
+  expect(screen.getByText('Steg to neste')).toBeInTheDocument();
+  expect(screen.getByText('Steg tre neste')).toBeInTheDocument();
+  expect(screen.queryByText('Steg fire skjult')).not.toBeInTheDocument();
+  expect(screen.queryByText('Steg fem skjult')).not.toBeInTheDocument();
+  expect(screen.getByText(/2 flere steg/i)).toBeInTheDocument();
+});
+
 it('lets the user reopen (undo) a completed step', async () => {
   await seedActiveMission();
   render(<RunbookView checklists={checklists} />);

@@ -2,6 +2,14 @@
 
 import { missionModeLabels, type MissionMode } from './hash-navigation';
 
+// Subtext clarifies the split: "Nå" is the single next grep, "Arbeid" is the
+// full board. Kept aria-hidden so the accessible tab name stays the bare label.
+const missionModeHints: Record<MissionMode, string> = {
+  now: 'neste grep',
+  work: 'full tavle',
+  export: 'del/lever',
+};
+
 export function MissionModeControl({ activeMode, onModeChange }: { activeMode: MissionMode; onModeChange: (mode: MissionMode) => void }) {
   const modes: MissionMode[] = ['now', 'work', 'export'];
   return (
@@ -19,10 +27,11 @@ export function MissionModeControl({ activeMode, onModeChange }: { activeMode: M
               aria-controls={`mission-${mode}-panel`}
               onClick={() => onModeChange(mode)}
               className={selected
-                ? 'min-h-11 rounded-xl bg-[#082F49] px-3 text-sm font-black text-white shadow-sm'
-                : 'min-h-11 rounded-xl px-3 text-sm font-black text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#082F49]'}
+                ? 'flex min-h-11 flex-col items-center justify-center rounded-xl bg-[#082F49] px-2 py-1 text-sm font-black text-white shadow-sm'
+                : 'flex min-h-11 flex-col items-center justify-center rounded-xl px-2 py-1 text-sm font-black text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#082F49]'}
             >
-              {missionModeLabels[mode]}
+              <span>{missionModeLabels[mode]}</span>
+              <span aria-hidden="true" className={`text-[0.6rem] font-bold uppercase tracking-wide ${selected ? 'text-sky-200' : 'text-slate-400'}`}>{missionModeHints[mode]}</span>
             </button>
           );
         })}
