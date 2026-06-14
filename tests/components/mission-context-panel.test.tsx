@@ -1040,12 +1040,12 @@ it('shows a situation-first mission dashboard with next action, progress and exp
   const runbookSteps = await screen.findByRole('region', { name: 'Neste steg' });
   expect(within(runbookSteps).getByText(/Etabler sikkerhet/i)).toBeInTheDocument();
   expect(screen.getByText(/Anbefalt rekkefølge — ikke en kommando/i)).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: /^Kritisk nå$/i })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /^Kritiske tiltak$/i })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /Fremdrift/i })).toBeInTheDocument();
   const nowText = document.body.textContent ?? '';
   expect(nowText.indexOf('Anbefalt rekkefølge')).toBeLessThan(nowText.indexOf('Oppdragsledelse'));
-  expect(nowText.indexOf('Oppdragsledelse')).toBeLessThan(nowText.indexOf('Kritisk nå'));
-  expect(nowText.indexOf('Kritisk nå')).toBeLessThan(nowText.indexOf('Fremdrift'));
+  expect(nowText.indexOf('Oppdragsledelse')).toBeLessThan(nowText.indexOf('Kritiske tiltak'));
+  expect(nowText.indexOf('Kritiske tiltak')).toBeLessThan(nowText.indexOf('Fremdrift'));
   expect(screen.queryByRole('heading', { name: /Hurtighandlinger/i })).not.toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: /Kart og logg/i })).not.toBeInTheDocument();
   expect(screen.queryByText('Avansert / dokumentasjon')).not.toBeInTheDocument();

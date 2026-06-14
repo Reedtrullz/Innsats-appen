@@ -36,7 +36,7 @@ export default function HurtigkortPage() {
 
       {criticalCards.length > 0 ? (
         <section className="space-y-3" aria-labelledby="hurtigkort-critical-heading">
-          <h2 id="hurtigkort-critical-heading" className="text-xl font-black text-slate-950">Kritisk nå</h2>
+          <h2 id="hurtigkort-critical-heading" className="text-xl font-black text-slate-950">Kritiske tiltak</h2>
           <div className="space-y-2">
             {criticalCards.map((card) => <TiltakCardRow key={card.slug} card={card} />)}
           </div>

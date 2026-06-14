@@ -1,5 +1,6 @@
 import { PhasePageContent } from '@/components/action-card-list';
-import { getActionCards, getChecklists, getContentChangelog, getMustReadNotices } from '@/lib/content/load-content';
+import { getActionCards, getChecklists, getContentChangelog, getMustReadNotices, getSourceDocuments } from '@/lib/content/load-content';
+import { buildSourceTitleById } from '@/lib/content/source-titles';
 
 function ForPreparationEntryPoints() {
   return (
@@ -26,6 +27,7 @@ export default function Page() {
         checklists={getChecklists()}
         latestChange={latestChange}
         mustRead={getMustReadNotices()}
+        sourceTitleById={buildSourceTitleById(getSourceDocuments())}
         primaryOperationalContent={<ForPreparationEntryPoints />}
       />
     </div>

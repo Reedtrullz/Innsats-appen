@@ -6,13 +6,14 @@ import { getChecklistRun, saveChecklistRun } from '@/lib/mission/local-store';
 import { equipmentStatusLabels, equipmentStatuses } from '@/lib/mission/equipment-readiness';
 import type { EquipmentStatus } from '@/lib/mission/schemas';
 import { detectSensitiveOperationalText, sensitiveTextFieldError } from '@/lib/privacy/sensitive-text';
+import { formatSourceList } from '@/lib/content/source-titles';
 
-export function ChecklistRunner({ checklist, missionId, onRunSaved }: { checklist: OperationalChecklist; missionId: string; onRunSaved?: () => void }) {
+export function ChecklistRunner({ checklist, missionId, sourceTitleById, onRunSaved }: { checklist: OperationalChecklist; missionId: string; sourceTitleById?: Record<string, string>; onRunSaved?: () => void }) {
   const runId = `${missionId}:${checklist.slug}`;
-  return <ChecklistRunnerState key={runId} checklist={checklist} missionId={missionId} runId={runId} onRunSaved={onRunSaved} />;
+  return <ChecklistRunnerState key={runId} checklist={checklist} missionId={missionId} runId={runId} sourceTitleById={sourceTitleById} onRunSaved={onRunSaved} />;
 }
 
-function ChecklistRunnerState({ checklist, missionId, runId, onRunSaved }: { checklist: OperationalChecklist; missionId: string; runId: string; onRunSaved?: () => void }) {
+function ChecklistRunnerState({ checklist, missionId, runId, sourceTitleById, onRunSaved }: { checklist: OperationalChecklist; missionId: string; runId: string; sourceTitleById?: Record<string, string>; onRunSaved?: () => void }) {
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [notesByItemId, setNotesByItemId] = useState<Record<string, string>>({});
   const [equipmentStatusByItemId, setEquipmentStatusByItemId] = useState<Record<string, EquipmentStatus>>({});
@@ -142,7 +143,7 @@ function ChecklistRunnerState({ checklist, missionId, runId, onRunSaved }: { che
       {checklist.warning ? <p className="mt-2 text-sm font-semibold text-amber-900">{checklist.warning}</p> : null}
       <ul className="mt-3 space-y-3">
         {checklist.items.map((item) => (
-          <li key={item.id} className={`rounded-2xl border p-3 ${item.required ? 'border-amber-300 bg-amber-50/60' : 'border-slate-200'}`}>
+          <li key={item.id} className={`rounded-2xl border p-3 ${item.required ? 'border-amber-300 bg-amber-50' : 'border-slate-200'}`}>
             <label className="flex min-h-11 items-center gap-3 font-semibold">
               <input type="checkbox" checked={checked.has(item.id)} disabled={!hydrated} onChange={() => void toggle(item.id)} className="h-5 w-5" />
               <span>
@@ -150,38 +151,43 @@ function ChecklistRunnerState({ checklist, missionId, runId, onRunSaved }: { che
                 {item.required ? <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-950">Påkrevd</span> : null}
               </span>
             </label>
-            <p className="mt-1 text-xs text-slate-500">Kilder: {(item.sourceIds ?? []).join(', ')}</p>
-            {isEquipmentChecklist ? (
+            <p className="mt-1 text-xs text-slate-500">Kilder: {formatSourceList(item.sourceIds, sourceTitleById)}</p>
+            {/* Note/status one tap away so the checkbox list stays scannable (P3-2);
+                the privacy error lives outside the details so it can never hide. */}
+            <details className="mt-2">
+              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-xs font-bold text-sky-800">Legg til notat / status</summary>
+              {isEquipmentChecklist ? (
+                <label className="mt-2 block text-xs font-bold text-slate-700">
+                  Materiellstatus for {item.label}
+                  <select
+                    value={equipmentStatusByItemId[item.id] ?? 'ready'}
+                    disabled={!hydrated}
+                    onChange={(event) => void updateEquipmentStatus(item.id, event.currentTarget.value as EquipmentStatus)}
+                    className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm font-bold text-slate-900"
+                  >
+                    {equipmentStatuses.map((status) => <option key={status} value={status}>{equipmentStatusLabels[status]}</option>)}
+                  </select>
+                </label>
+              ) : null}
               <label className="mt-2 block text-xs font-bold text-slate-700">
-                Materiellstatus for {item.label}
-                <select
-                  value={equipmentStatusByItemId[item.id] ?? 'ready'}
+                Lokal note for {item.label}
+                <textarea
+                  value={notesByItemId[item.id] ?? ''}
                   disabled={!hydrated}
-                  onChange={(event) => void updateEquipmentStatus(item.id, event.currentTarget.value as EquipmentStatus)}
-                  className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm font-bold text-slate-900"
-                >
-                  {equipmentStatuses.map((status) => <option key={status} value={status}>{equipmentStatusLabels[status]}</option>)}
-                </select>
+                  onChange={(event) => updateNote(item.id, event.currentTarget.value)}
+                  onBlur={(event) => void persistNoteOnBlur(item.id, event.currentTarget.value)}
+                  className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 bg-white p-2 text-sm font-medium text-slate-900"
+                  placeholder="Kun lokale, ikke-sensitive notater. Ikke persondata."
+                />
               </label>
-            ) : null}
-            <label className="mt-2 block text-xs font-bold text-slate-700">
-              Lokal note for {item.label}
-              <textarea
-                value={notesByItemId[item.id] ?? ''}
-                disabled={!hydrated}
-                onChange={(event) => updateNote(item.id, event.currentTarget.value)}
-                onBlur={(event) => void persistNoteOnBlur(item.id, event.currentTarget.value)}
-                className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 bg-white p-2 text-sm font-medium text-slate-900"
-                placeholder="Kun lokale, ikke-sensitive notater. Ikke persondata."
-              />
-            </label>
+            </details>
             {notePrivacyError?.itemId === item.id ? (
               <p role="alert" className="mt-2 rounded-xl border border-rose-200 bg-rose-50 p-2 text-sm font-semibold text-rose-900">{notePrivacyError.message}</p>
             ) : null}
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-xs text-slate-500">Sjekklistekilder: {sourceIds.join(', ')}</p>
+      <p className="mt-3 text-xs text-slate-500">Sjekklistekilder: {formatSourceList(sourceIds, sourceTitleById)}</p>
     </section>
   );
 }

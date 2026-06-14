@@ -91,3 +91,24 @@ test('mobile user can search, open source-backed card, create mission, run check
     await context.setOffline(false);
   }
 });
+
+test('approved illustrations render on the card detail (P1-1)', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto('/kort/flom-pumpe-start');
+
+  // The 7 approved pump images render as figures (linked to a Tiltak step via
+  // the P2-2 object-form imageIds; placement is inline under the step).
+  const figures = page.locator('figure img[src^="/content-assets/"]');
+  await expect(figures).toHaveCount(7);
+  for (let i = 0; i < 7; i += 1) {
+    const image = figures.nth(i);
+    await expect(image).toHaveAttribute('alt', /.+/);
+    await image.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate((node) => (node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+  }
+
+  // A card with no approved illustrations renders no card-asset images at all.
+  await page.goto('/kort/oppdragsanalyse');
+  await expect(page.getByRole('heading', { name: 'Tiltak' })).toBeVisible();
+  await expect(page.locator('figure img[src^="/content-assets/"]')).toHaveCount(0);
+});

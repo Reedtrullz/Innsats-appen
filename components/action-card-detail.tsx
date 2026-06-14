@@ -1,4 +1,5 @@
-import type { ActionCard, SourceDocument } from '@/lib/content/schemas';
+import type { ActionCard, ImageMetadata, SourceDocument } from '@/lib/content/schemas';
+import { normalizeStep } from '@/lib/content/steps';
 import { sourceFreshness } from '@/lib/content/source-review';
 import { competenceLabels, phaseLabels, roleLabels, scenarioLabels } from '@/lib/content/taxonomy';
 import { RecordCardVisit } from './recent-cards';
@@ -108,9 +109,9 @@ function SourceGovernancePanel({ card, linkedSources, missingSourceIds, sourceWa
             <ul className="mt-2 space-y-2">
               {sourceReviews.map(({ source, freshness }) => (
                 <li key={source.id} className="flex flex-wrap items-center gap-2">
-                  <span className="font-black">{source.id}</span>
-                  <span className={`rounded-full border px-2 py-0.5 text-xs font-black ${sourceStatusClasses(source.status)}`}>Status: {source.status}</span>
-                  <span className={`rounded-full border px-2 py-0.5 text-xs font-black ${freshnessClasses(freshness.tone)}`}>{freshness.label}</span>
+                  <span className="font-bold">{source.id}</span>
+                  <span className={`rounded-full border px-2 py-0.5 text-xs font-bold ${sourceStatusClasses(source.status)}`}>Status: {source.status}</span>
+                  <span className={`rounded-full border px-2 py-0.5 text-xs font-bold ${freshnessClasses(freshness.tone)}`}>{freshness.label}</span>
                   <span>Sist verifisert: {source.verifiedAt}</span>
                 </li>
               ))}
@@ -157,7 +158,7 @@ function SourceGovernancePanel({ card, linkedSources, missingSourceIds, sourceWa
  * before acting (compact), then the numbered steps as the visual primary.
  * Source governance and metadata sit collapsed below the instructions.
  */
-export function ActionCardDetail({ card, sources }: { card: ActionCard; sources: SourceDocument[] }) {
+export function ActionCardDetail({ card, sources, images = [] }: { card: ActionCard; sources: SourceDocument[]; images?: ImageMetadata[] }) {
   const sourceById = new Map(sources.map((source) => [source.id, source]));
   const linkedSources: SourceDocument[] = [];
   const missingSourceIds: string[] = [];
@@ -167,6 +168,12 @@ export function ActionCardDetail({ card, sources }: { card: ActionCard; sources:
     else missingSourceIds.push(id);
   });
   const sourceWarnings = Array.from(new Set(linkedSources.flatMap((source) => source.warnings).filter((warning): warning is string => Boolean(warning) && warning !== card.warning)));
+  const normalizedSteps = card.steps.map(normalizeStep);
+  const imageById = new Map(images.map((image) => [image.id, image]));
+  // Images linked to a specific step render inline under that step; the
+  // standalone "Illustrasjon / utlegg" section only shows the rest (P2-2/P1-1).
+  const stepReferencedImageIds = new Set(normalizedSteps.flatMap((step) => step.imageIds));
+  const overviewImages = images.filter((image) => !stepReferencedImageIds.has(image.id));
 
   return (
     <article className="space-y-3">
@@ -175,7 +182,7 @@ export function ActionCardDetail({ card, sources }: { card: ActionCard; sources:
         <p className="text-sm font-bold uppercase tracking-wide text-sky-700">{phaseLabels[card.phase]}</p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">{card.title}</h1>
         {card.authority ? (
-          <p className="mt-2 flex items-center gap-2 text-xs font-black">
+          <p className="mt-2 flex items-center gap-2 text-xs font-bold">
             <span className="uppercase tracking-wide text-slate-600">Beslutningsmyndighet:</span>
             <span className="inline-flex items-center gap-1 rounded-full bg-[#082F49] px-2.5 py-1 text-white">
               <OperationalIcon name="shield" className="h-3.5 w-3.5" />
@@ -212,9 +219,52 @@ export function ActionCardDetail({ card, sources }: { card: ActionCard; sources:
       <section className="rounded-3xl bg-white p-5 shadow-sm">
         <h2 className="text-xl font-black">Tiltak</h2>
         <ol className="mt-3 list-decimal space-y-3 pl-6 text-base font-semibold leading-6 text-slate-900 marker:font-black marker:text-sky-800">
-          {card.steps.map((step) => <li key={step} className="pl-1">{step}</li>)}
+          {normalizedSteps.map((step, index) => {
+            const stepImages = step.imageIds.map((id) => imageById.get(id)).filter((image): image is ImageMetadata => Boolean(image));
+            return (
+              <li key={`${index}-${step.action}`} className="pl-1">
+                {step.action}
+                {step.how ? (
+                  <details className="mt-1">
+                    <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-sm font-bold text-sky-800">Vis hvordan</summary>
+                    <p className="mt-1 text-sm font-medium leading-6 text-slate-700">{step.how}</p>
+                  </details>
+                ) : null}
+                {stepImages.length > 0 ? (
+                  <div className="mt-2 space-y-3">
+                    {stepImages.map((image) => (
+                      <figure key={image.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={image.publicPath} alt={image.alt} className="block h-auto w-full" loading="lazy" />
+                        {image.caption ? <figcaption className="border-t border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600">{image.caption}</figcaption> : null}
+                      </figure>
+                    ))}
+                  </div>
+                ) : null}
+              </li>
+            );
+          })}
         </ol>
       </section>
+      {overviewImages.length > 0 ? (
+        <section className="rounded-3xl bg-white p-5 shadow-sm" aria-labelledby="card-illustrations-heading">
+          <h2 id="card-illustrations-heading" className="text-xl font-black">Illustrasjon / utlegg</h2>
+          <div className="mt-3 space-y-4">
+            {overviewImages.map((image) => (
+              <figure key={image.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                {/* Plain img is deliberate: assets are same-origin under /content-assets
+                    (CSP img-src 'self') and precached by the service worker for offline
+                    use; the next/image optimizer route is unavailable offline. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={image.publicPath} alt={image.alt} className="block h-auto w-full" loading="lazy" />
+                {image.caption ? (
+                  <figcaption className="border-t border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600">{image.caption}</figcaption>
+                ) : null}
+              </figure>
+            ))}
+          </div>
+        </section>
+      ) : null}
       {[...(card.safety ?? []), ...(card.reporting ?? [])].length > 0 ? (
         <section className="rounded-3xl bg-white p-5 shadow-sm">
           <h2 className="text-xl font-black">Sikkerhet og rapportering</h2>

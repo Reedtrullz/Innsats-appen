@@ -101,11 +101,17 @@ const group4ActionCardSlugs = [
   'kontaminert-utstyr-handtering',
 ];
 
+// Steps are a string | { action, how?, ... } union (P2-2); read the action text.
+const stepStr = (step: any) => (typeof step === 'string' ? step : step?.action ?? '');
+
 const cardText = (card: any) => [
   card.title,
   card.slug,
-  ...(card.steps ?? []),
+  ...(card.steps ?? []).map(stepStr),
   ...(card.safety ?? []),
+  // doNot included: P1-2 dedup moved prohibition lines out of safety, but the
+  // guidance still surfaces on the card via the "Ikke gjør" box.
+  ...(card.doNot ?? []),
   ...(card.reporting ?? []),
   card.warning ?? '',
 ].join('\n');
@@ -278,7 +284,7 @@ it('keeps pilot-approved tilfluktsrom cards free of stale source-approval warnin
   for (const slug of tilfluktsromCardSlugs) {
     const card = cards.find((item) => item.slug === slug);
     const warning = card?.warning ?? '';
-    const cardBoundaryText = [warning, ...(card?.safety ?? []), ...(card?.steps ?? [])].join('\n');
+    const cardBoundaryText = [warning, ...(card?.safety ?? []), ...((card?.steps ?? []).map(stepStr))].join('\n');
 
     expect(card, `missing tilfluktsrom action card ${slug}`).toBeTruthy();
     expect(card?.sourceIds).toContain('src-operativt-konsept-for-sivilforsvaret');

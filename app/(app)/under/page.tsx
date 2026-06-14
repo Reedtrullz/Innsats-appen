@@ -1,5 +1,6 @@
 import { PhasePageContent } from '@/components/action-card-list';
-import { getActionCards, getChecklists } from '@/lib/content/load-content';
+import { getActionCards, getChecklists, getSourceDocuments } from '@/lib/content/load-content';
+import { buildSourceTitleById } from '@/lib/content/source-titles';
 
 function UnderOperationalEntryPoints() {
   return (
@@ -23,6 +24,7 @@ export default function Page() {
         phase="under"
         cards={getActionCards()}
         checklists={getChecklists()}
+        sourceTitleById={buildSourceTitleById(getSourceDocuments())}
         primaryOperationalContent={<UnderOperationalEntryPoints />}
       />
     </div>

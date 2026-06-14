@@ -37,11 +37,14 @@ const statusBadgeClass: Record<RunbookStep['status'], string> = {
  */
 export function RunbookView({
   checklists,
+  compact = false,
   sourceTitleById = {},
   sourceRiskById = {},
   onRunSaved,
 }: {
   checklists: OperationalChecklist[];
+  /** "Nå" view: show only the active step + the next couple, not the whole list. */
+  compact?: boolean;
   sourceTitleById?: Record<string, string>;
   sourceRiskById?: Record<string, 'caution' | 'ok'>;
   onRunSaved?: () => void;
@@ -83,6 +86,16 @@ export function RunbookView({
   const missionId = mission?.id ?? null;
   const activeChecklist = checklistSlug ? checklists.find((item) => item.slug === checklistSlug) : undefined;
   const resolved = runbook ? runbook.doneCount + runbook.skippedCount : 0;
+
+  // In "Nå" only the active step and the next couple are shown; the full board
+  // lives in "Arbeid". Falls back to the first unresolved steps if none is active.
+  const allSteps = runbook?.steps ?? [];
+  const nowIndex = allSteps.findIndex((step) => step.status === 'now');
+  const compactSteps = nowIndex >= 0
+    ? allSteps.slice(nowIndex, nowIndex + 3)
+    : allSteps.filter((step) => step.status === 'upcoming').slice(0, 3);
+  const visibleSteps = compact ? compactSteps : allSteps;
+  const hiddenStepCount = allSteps.length - visibleSteps.length;
 
   // Serialized via the `saving` guard so rapid taps can't race the read-modify-write
   // and silently drop progress. 'reopen' clears the step back to active.
@@ -155,8 +168,9 @@ export function RunbookView({
           <a href="#etterrapport" className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-emerald-700 px-4 font-bold text-white">Åpne etterrapport</a>
         </section>
       ) : (
+        <>
         <section aria-label="Neste steg" className="space-y-2">
-          {runbook.steps.map((step) => {
+          {visibleSteps.map((step) => {
             const isOpen = openStep?.id === step.id;
             const resolvedStep = step.status === 'done' || step.status === 'skipped';
             const badge = statusLabel[step.status] || (step.required ? 'Påkrevd' : '');
@@ -194,6 +208,12 @@ export function RunbookView({
             );
           })}
         </section>
+        {compact && hiddenStepCount > 0 ? (
+          <p className="rounded-xl bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600">
+            +{hiddenStepCount} flere steg — se hele tavla i <span className="font-black">Arbeid</span>.
+          </p>
+        ) : null}
+        </>
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ActionCard } from '@/lib/content/schemas';
+import { stepText } from '@/lib/content/steps';
 import { phaseLabels, priorityLabels, roleLabels, scenarioLabels } from '@/lib/content/taxonomy';
 import { OperationalIcon } from './ui/operational-icons';
 import { CriticalNotice, StatusPill } from './ui/operational-primitives';
@@ -16,8 +17,8 @@ const authorityLabels: Record<Authority, string> = {
 };
 
 const priorityTreatment: Record<Priority, string> = {
-  high: 'border-red-200 bg-gradient-to-b from-red-50 to-white shadow-red-950/5',
-  medium: 'border-amber-200 bg-gradient-to-b from-amber-50 to-white shadow-amber-950/5',
+  high: 'border-red-200 bg-red-50 shadow-red-950/5',
+  medium: 'border-amber-200 bg-amber-50 shadow-amber-950/5',
   low: 'border-slate-200 bg-white shadow-slate-950/5',
 };
 
@@ -29,7 +30,7 @@ const phaseLongLabels: Record<Phase, string> = {
 
 function AuthorityBadge({ authority }: { authority: Authority }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-[#082F49] px-2.5 py-1 text-xs font-black text-white" title={`Beslutningsmyndighet: ${authorityLabels[authority]}`}>
+    <span className="inline-flex items-center gap-1 rounded-full bg-[#082F49] px-2.5 py-1 text-xs font-bold text-white" title={`Beslutningsmyndighet: ${authorityLabels[authority]}`}>
       <OperationalIcon name="shield" className="h-3.5 w-3.5" />
       {authorityLabels[authority]}
     </span>
@@ -60,13 +61,13 @@ type TiltakCardProps = {
 export function TiltakCardRow({ card }: { card: ActionCard }) {
   const href = `/kort/${card.slug}`;
   const priorityTone = card.priority === 'high' ? 'critical' : card.priority === 'medium' ? 'warning' : 'slate';
-  const firstStep = card.steps[0] ?? 'Åpne kortet for tiltak.';
+  const firstStep = card.steps[0] ? stepText(card.steps[0]) : 'Åpne kortet for tiltak.';
 
   return (
     <Link
       href={href}
       aria-label={`Åpne tiltakskort: ${card.title}`}
-      className={`group flex min-h-16 items-start gap-3 rounded-2xl border bg-white p-3 shadow-sm transition hover:border-sky-200 hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49] ${card.priority === 'high' ? 'border-red-200 bg-red-50/70' : 'border-slate-200'}`}
+      className={`group flex min-h-16 items-start gap-3 rounded-2xl border bg-white p-3 shadow-sm transition hover:border-sky-200 hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49] ${card.priority === 'high' ? 'border-red-200 bg-red-50' : 'border-slate-200'}`}
     >
       <span className={`mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${card.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-sky-50 text-sky-800'}`}>
         <OperationalIcon name={card.priority === 'high' ? 'alert' : 'shield'} className="h-5 w-5" />
@@ -90,7 +91,7 @@ export function TiltakCardRow({ card }: { card: ActionCard }) {
 
 export function TiltakCardCompact({ card, ctaLabel = 'Åpne tiltakskort' }: Omit<TiltakCardProps, 'compact'>) {
   const href = `/kort/${card.slug}`;
-  const visibleSteps = card.steps.slice(0, 2);
+  const visibleSteps = card.steps.slice(0, 2).map(stepText);
   const sourceCount = card.sourceIds.length;
   const priorityTone = card.priority === 'high' ? 'critical' : card.priority === 'medium' ? 'warning' : 'slate';
 
@@ -100,7 +101,7 @@ export function TiltakCardCompact({ card, ctaLabel = 'Åpne tiltakskort' }: Omit
         <StatusPill label={priorityLabels[card.priority]} tone={priorityTone} />
         <StatusPill label={phaseLongLabels[card.phase]} tone="sky" />
         {card.authority ? <AuthorityBadge authority={card.authority} /> : null}
-        <span className={`inline-flex min-h-8 items-center rounded-full bg-white px-3 py-1 text-xs font-black ring-1 ${sourceCount > 0 ? 'text-slate-700 ring-slate-200' : 'text-amber-900 ring-amber-200'}`}>
+        <span className={`inline-flex min-h-8 items-center rounded-full bg-white px-3 py-1 text-xs font-bold ring-1 ${sourceCount > 0 ? 'text-slate-700 ring-slate-200' : 'text-amber-900 ring-amber-200'}`}>
           {sourceCount > 0 ? 'Kildebelagt' : 'Kilde mangler'}
           {sourceCount > 0 ? <span className="sr-only"> med {sourceCount} kilde{sourceCount === 1 ? '' : 'r'}</span> : null}
         </span>
@@ -116,12 +117,12 @@ export function TiltakCardCompact({ card, ctaLabel = 'Åpne tiltakskort' }: Omit
 
       <DoNotCallout items={card.doNot ?? []} />
       <div>
-        <p className="text-xs font-black uppercase tracking-wide text-slate-600">Gjør først</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-slate-600">Gjør først</p>
         {visibleSteps.length > 0 ? (
           <ol className="mt-1 space-y-1 text-sm font-semibold text-slate-800">
             {visibleSteps.map((step, index) => (
               <li key={step} className="grid grid-cols-[1.75rem_1fr] items-start gap-2 rounded-xl bg-white/80 p-2 ring-1 ring-slate-200">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 text-xs font-black text-slate-700">{index + 1}</span>
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold text-slate-700">{index + 1}</span>
                 <span>{step}</span>
               </li>
             ))}
@@ -147,7 +148,7 @@ export function TiltakCardCompact({ card, ctaLabel = 'Åpne tiltakskort' }: Omit
 
 export function TiltakCardFull({ card, ctaLabel = 'Åpne tiltakskort' }: Omit<TiltakCardProps, 'compact'>) {
   const href = `/kort/${card.slug}`;
-  const visibleSteps = card.steps.slice(0, 3);
+  const visibleSteps = card.steps.slice(0, 3).map(stepText);
   const sourceCount = card.sourceIds.length;
   const priorityTone = card.priority === 'high' ? 'critical' : card.priority === 'medium' ? 'warning' : 'slate';
 
@@ -159,7 +160,7 @@ export function TiltakCardFull({ card, ctaLabel = 'Åpne tiltakskort' }: Omit<Ti
         <StatusPill label={phaseLongLabels[card.phase]} tone="sky" />
         {card.authority ? <AuthorityBadge authority={card.authority} /> : null}
         {card.scenarios.map((scenario) => <StatusPill key={scenario} label={scenarioLabels[scenario]} tone="success" />)}
-        <span className={`inline-flex min-h-8 items-center rounded-full bg-white px-3 py-1 text-xs font-black ring-1 ${sourceCount > 0 ? 'text-slate-700 ring-slate-200' : 'text-amber-900 ring-amber-200'}`}>
+        <span className={`inline-flex min-h-8 items-center rounded-full bg-white px-3 py-1 text-xs font-bold ring-1 ${sourceCount > 0 ? 'text-slate-700 ring-slate-200' : 'text-amber-900 ring-amber-200'}`}>
           {sourceCount > 0 ? 'Kildebelagt' : 'Kilde mangler'}
           {sourceCount > 0 ? <span className="sr-only"> med {sourceCount} kilde{sourceCount === 1 ? '' : 'r'}</span> : null}
         </span>
@@ -180,12 +181,12 @@ export function TiltakCardFull({ card, ctaLabel = 'Åpne tiltakskort' }: Omit<Ti
 
       <DoNotCallout items={card.doNot ?? []} />
       <div>
-        <p className="text-xs font-black uppercase tracking-wide text-slate-600">Gjør først</p>
+        <p className="text-xs font-bold uppercase tracking-wide text-slate-600">Gjør først</p>
         {visibleSteps.length > 0 ? (
           <ol className="mt-2 space-y-2 text-sm font-semibold text-slate-800">
             {visibleSteps.map((step, index) => (
               <li key={step} className="grid grid-cols-[1.75rem_1fr] items-start gap-2 rounded-xl bg-white/80 p-2 ring-1 ring-slate-200">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 text-xs font-black text-slate-700">{index + 1}</span>
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 text-xs font-bold text-slate-700">{index + 1}</span>
                 <span>{step}</span>
               </li>
             ))}

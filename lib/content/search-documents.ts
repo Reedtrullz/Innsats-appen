@@ -1,5 +1,6 @@
 import type { SearchDocument } from './search';
 import { sourceFreshness } from './source-review';
+import { stepText } from './steps';
 import type { ActionCard, FAQEntry, GlossaryTerm, ProtectionMeasure, SourceDocument, TrainingPath } from './schemas';
 
 export interface BuildSearchDocumentsInput {
@@ -52,7 +53,7 @@ export function buildSearchDocuments({
     ...cards.map<SearchDocument>((card) => ({
       id: `kort:${card.slug}`,
       title: card.title,
-      body: joinSearchText([card.steps, card.safety, card.reporting, card.warning, card.competenceRequired, card.equipmentRequired]),
+      body: joinSearchText([card.steps.map(stepText), card.safety, card.reporting, card.warning, card.competenceRequired, card.equipmentRequired]),
       scenario: card.scenarios.join(' '),
       role: card.roles.join(' '),
       phase: card.phase,

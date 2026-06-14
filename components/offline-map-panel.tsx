@@ -9,14 +9,12 @@ import {
   OFFLINE_MAP_PACKAGES,
   cacheSizeWarningForPackage,
   getOfflineMapPackage,
-  getRenderableMapFeatures,
   offlineMapCacheSnapshot,
   offlineMapQuotaCopy,
   parseCachedOfflineMapPackage,
   resetCachedOfflineMapPackage,
   subscribeOfflineMapCache,
   writeCachedOfflineMapPackage,
-  type SchematicMapFeatureKind,
 } from '@/lib/maps/offline-map';
 import {
   approvedLocalMapPackages,
@@ -49,7 +47,6 @@ import {
   mapStateForMission,
   normalizeSchematicPoint,
   normalizeMissionMapState,
-  operationItemsForRender,
   parseCoordinateText,
   resetMissionMapState,
   subscribeMissionMapState,
@@ -68,8 +65,15 @@ import { buildFieldLogEntryFromMapObject } from '@/lib/mission/map-log-link';
 import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
 import { getMission, listMissions, saveMission } from '@/lib/mission/local-store';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
-import { stackSchematicLabelYs } from '@/lib/maps/schematic-labels';
+import { SchematicMap } from '@/components/offline-map/schematic-map';
 import { SENSITIVE_TEXT_EXPLANATIONS, SensitiveTextError, detectSensitiveOperationalText, sensitiveTextFieldError, type SensitiveTextMatch } from '@/lib/privacy/sensitive-text';
+import {
+  geoJsonImportBlockedMapTextKinds,
+  importPrivacyWarning,
+  importPrivacyWarningForKinds,
+  privacyErrorText,
+  type ImportBlockedKind,
+} from '@/lib/maps/map-import-privacy';
 import { DEFAULT_FIELD_MODE_SETTINGS, FIELD_MODE_STORAGE_EVENT, readFieldModeSettings } from '@/lib/field-mode/field-mode';
 import type { FieldLogCategory, MissionContext } from '@/lib/mission/schemas';
 
@@ -77,24 +81,6 @@ const OfflineMapLibreView = dynamic<{ packageManifest?: LocalMapPackageManifest;
   () => import('@/components/maps/offline-maplibre-view').then((module) => module.OfflineMapLibreView),
   { ssr: false },
 );
-
-const featureStyles: Record<SchematicMapFeatureKind, { fill: string; stroke: string }> = {
-  depot: { fill: '#0f172a', stroke: '#ffffff' },
-  'meeting-point': { fill: '#0369a1', stroke: '#ffffff' },
-  'risk-area': { fill: '#f97316', stroke: '#7c2d12' },
-  route: { fill: '#16a34a', stroke: '#052e16' },
-  resource: { fill: '#7c3aed', stroke: '#ffffff' },
-};
-
-const markerColors: Record<MapMarkerKind, string> = {
-  'incident-site': '#dc2626',
-  hazard: '#f97316',
-  resource: '#7c3aed',
-  'meeting-point': '#0369a1',
-  'il-ko': '#0f172a',
-  'pump-location': '#0891b2',
-  observation: '#16a34a',
-};
 
 type MarkerEditDraft = {
   label: string;
@@ -116,17 +102,6 @@ function operationMeasurement(drawing: MissionMapDrawing | undefined) {
   return `${MAP_DRAWING_LABELS[drawing.kind]}: avstand ${distance} skjematiske enheter, areal ${area}.`;
 }
 
-const importPrivacyWarning = 'Noen importerte kartobjekter ble stoppet lokalt fordi de kan inneholde persondata, pasientdata, kontaktinfo eller skjermet/privat lokasjon.';
-
-type ImportBlockedKind = SensitiveTextMatch['kind'] | 'unsupported-value';
-
-function importPrivacyWarningForKinds(kinds: ImportBlockedKind[]) {
-  const labels = [...new Set(kinds.filter((kind): kind is SensitiveTextMatch['kind'] => kind !== 'unsupported-value'))]
-    .map((kind) => SENSITIVE_TEXT_EXPLANATIONS[kind].label);
-  if (labels.length === 0) return importPrivacyWarning;
-  return `Noen importerte kartobjekter ble stoppet lokalt (${labels.join('; ')}). Persondata og pasientdata skal ikke lagres i kartet.`;
-}
-
 function missingMissionAction() {
   return (
     <span className="flex flex-wrap items-center gap-2">
@@ -135,94 +110,6 @@ function missingMissionAction() {
       <Link href="/oppdrag" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 font-black text-slate-950 text-sm">Velg oppdrag</Link>
     </span>
   );
-}
-
-function privacyErrorText(error: unknown) {
-  if (error instanceof SensitiveTextError) {
-    return `Karttekst ble stoppet lokalt: ${sensitiveTextFieldError(error.kind)}`;
-  }
-  return error instanceof Error && /persondata|pasientdata|private|skjermet|identifikator|kontakt|unsupported map text value/i.test(error.message)
-    ? 'Karttekst ble stoppet lokalt fordi den kan inneholde persondata, pasientdata, kontaktinfo eller skjermet/privat lokasjon.'
-    : 'Kunne ikke lagre lokal karttekst. Kontroller innholdet og prøv igjen.';
-}
-
-function isImportMapTextValue(value: unknown): value is string | number | null | undefined {
-  return value === undefined || value === null || typeof value === 'string' || typeof value === 'number';
-}
-
-function normalizeImportMapTextForDetection(value: string | number | null | undefined) {
-  return String(value ?? '')
-    .replace(/[<>]/g, '')
-    .replace(/[\r\n\t]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function importMapTextBlockedKind(value: unknown, _maxLength?: number): ImportBlockedKind | null {
-  void _maxLength;
-  if (!isImportMapTextValue(value)) return 'unsupported-value';
-  return detectSensitiveOperationalText(normalizeImportMapTextForDetection(value))?.kind ?? null;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === 'object';
-}
-
-function importPointFromCoordinates(coordinates: unknown) {
-  return Array.isArray(coordinates) ? normalizeSchematicPoint({ x: coordinates[0], y: coordinates[1] }) : null;
-}
-
-function supportedImportDrawingPointCount(kind: MapDrawingKind, geometry: Record<string, unknown>) {
-  if (kind === 'point') {
-    return geometry.type === 'Point' && importPointFromCoordinates(geometry.coordinates) ? 1 : 0;
-  }
-  if (kind === 'line') {
-    if (geometry.type !== 'LineString' || !Array.isArray(geometry.coordinates)) return 0;
-    return geometry.coordinates.filter((coords) => importPointFromCoordinates(coords)).length;
-  }
-  if (geometry.type !== 'Polygon' || !Array.isArray(geometry.coordinates) || !Array.isArray(geometry.coordinates[0])) return 0;
-  const points = geometry.coordinates[0]
-    .map((coords) => importPointFromCoordinates(coords))
-    .filter((point): point is NonNullable<ReturnType<typeof importPointFromCoordinates>> => Boolean(point));
-  const withoutClosingDuplicate = points.length > 1
-    && points[0]?.x === points.at(-1)?.x
-    && points[0]?.y === points.at(-1)?.y
-    ? points.slice(0, -1)
-    : points;
-  return withoutClosingDuplicate.length;
-}
-
-function isSupportedImportDrawingFeature(kind: MapDrawingKind, geometry: Record<string, unknown>) {
-  const minimumPoints = kind === 'point' ? 1 : kind === 'line' ? 2 : 3;
-  return supportedImportDrawingPointCount(kind, geometry) >= minimumPoints;
-}
-
-function importFeatureBlockedMapTextKinds(feature: unknown): ImportBlockedKind[] {
-  if (!isRecord(feature) || feature.type !== 'Feature' || !isRecord(feature.geometry) || !isRecord(feature.properties)) return [];
-  const { geometry, properties } = feature;
-  const markerFeature = properties.itemType === 'marker'
-    && MAP_MARKER_KINDS.includes(properties.kind as MapMarkerKind)
-    && geometry.type === 'Point'
-    && Boolean(importPointFromCoordinates(geometry.coordinates));
-  const drawingFeature = properties.itemType === 'drawing'
-    && MAP_DRAWING_KINDS.includes(properties.kind as MapDrawingKind)
-    && isSupportedImportDrawingFeature(properties.kind as MapDrawingKind, geometry);
-  if (!markerFeature && !drawingFeature) return [];
-  return [importMapTextBlockedKind(properties.label), importMapTextBlockedKind(properties.note, 240)]
-    .filter((kind): kind is ImportBlockedKind => kind !== null);
-}
-
-function geoJsonImportBlockedMapTextKinds(text: string): ImportBlockedKind[] {
-  try {
-    const parsed = JSON.parse(text) as unknown;
-    if (!isRecord(parsed)
-      || parsed.type !== 'FeatureCollection'
-      || parsed.coordinateSystem !== SCHEMATIC_GEOJSON_COORDINATE_SYSTEM
-      || !Array.isArray(parsed.features)) return [];
-    return [...new Set(parsed.features.flatMap(importFeatureBlockedMapTextKinds))];
-  } catch {
-    return [];
-  }
 }
 
 function markerActionAriaLabel(action: 'Rediger' | 'Slett' | 'Logg herfra', marker: MissionMapMarker) {
@@ -266,75 +153,6 @@ function parseMarkerEditCoordinate(value: string) {
   if (value.trim() === '') return null;
   const coordinate = Number(value);
   return Number.isFinite(coordinate) && coordinate >= 0 && coordinate <= 100 ? coordinate : null;
-}
-
-function SchematicMap({ packageId, state, enabledLayers }: { packageId: string; state: MissionMapState; enabledLayers: MapLayerKey[] }) {
-  const selectedPackage = getOfflineMapPackage(packageId) ?? OFFLINE_MAP_PACKAGES[0];
-  const renderedFeatures = getRenderableMapFeatures(selectedPackage);
-  const hiddenFeatureCount = Math.max(0, selectedPackage.features.length - renderedFeatures.length);
-  const filteredState = filterMissionMapStateByLayers(state, enabledLayers);
-  const renderedOperations = operationItemsForRender(filteredState);
-  const hiddenOperationCount = filteredState.markers.length + filteredState.drawings.length - renderedOperations.length;
-  // Labels for features and markers share one stacking pass so nearby
-  // anchors get distinct rows instead of overprinting each other.
-  const renderedMarkers = renderedOperations.filter((item) => item.itemType === 'marker');
-  const labelYs = stackSchematicLabelYs([
-    ...renderedFeatures.map((feature) => ({ x: feature.x, y: feature.y })),
-    ...renderedMarkers.map((item) => ({ x: item.point.x, y: item.point.y })),
-  ]);
-  const featureLabelY = (index: number) => labelYs[index];
-  const markerLabelYById = new Map(renderedMarkers.map((item, index) => [item.id, labelYs[renderedFeatures.length + index]]));
-
-  return (
-    <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 text-white shadow-sm" aria-label="Skjematisk lokalkart">
-      <svg viewBox="0 0 100 100" role="img" aria-labelledby="offline-map-title offline-map-desc" className="h-72 w-full bg-slate-900">
-        <title id="offline-map-title">{`Skjematisk lokalt kart for ${selectedPackage.title}`}</title>
-        <desc id="offline-map-desc">Statisk kartbilde uten eksterne kartkall.</desc>
-        <defs>
-          <pattern id="offline-map-grid" width="10" height="10" patternUnits="userSpaceOnUse">
-            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="0.35" />
-          </pattern>
-        </defs>
-        <rect width="100" height="100" fill="url(#offline-map-grid)" />
-        <path d="M 12 78 C 25 62, 39 56, 50 48 S 75 25, 88 14" fill="none" stroke="#38bdf8" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="3 2" />
-        <path d="M 16 22 C 31 36, 51 44, 84 75" fill="none" stroke="#a7f3d0" strokeWidth="1.2" strokeLinecap="round" strokeDasharray="2 3" />
-        {renderedFeatures.map((feature, index) => {
-          const style = featureStyles[feature.kind];
-          return (
-            <g key={feature.id}>
-              <circle cx={feature.x} cy={feature.y} r="4.2" fill={style.fill} stroke={style.stroke} strokeWidth="1" />
-              <text x={feature.x > 50 ? feature.x - 5 : feature.x + 5} y={featureLabelY(index)} textAnchor={feature.x > 50 ? 'end' : 'start'} fill="#f8fafc" fontSize="3.3" fontWeight="700">
-                {feature.label}
-              </text>
-            </g>
-          );
-        })}
-        {renderedOperations.map((item) => item.itemType === 'marker' ? (
-          <g key={item.id} data-testid={`map-marker-${item.kind}`}>
-            <circle cx={item.point.x} cy={item.point.y} r="3.2" fill={markerColors[item.kind]} stroke="#ffffff" strokeWidth="1" />
-            <text x={item.point.x > 50 ? item.point.x - 4 : item.point.x + 4} y={markerLabelYById.get(item.id) ?? Math.max(item.point.y - 4, 7)} textAnchor={item.point.x > 50 ? 'end' : 'start'} fill="#ffffff" fontSize="3.1" fontWeight="800">{MAP_MARKER_LABELS[item.kind]}: {item.label}</text>
-          </g>
-        ) : (
-          <g key={item.id} data-testid={`map-drawing-${item.kind}`}>
-            {(item.kind === 'polygon' || item.kind === 'sector') ? (
-              <polygon points={item.points.map((point) => `${point.x},${point.y}`).join(' ')} fill="rgba(14,165,233,0.20)" stroke="#38bdf8" strokeWidth="1.1" />
-            ) : item.kind === 'line' ? (
-              <polyline points={item.points.map((point) => `${point.x},${point.y}`).join(' ')} fill="none" stroke="#22c55e" strokeWidth="1.2" />
-            ) : (
-              <rect x={item.points[0].x - 2.5} y={item.points[0].y - 2.5} width="5" height="5" fill="#a855f7" stroke="#ffffff" strokeWidth="1" />
-            )}
-          </g>
-        ))}
-      </svg>
-      <figcaption className="space-y-2 border-t border-slate-700 bg-slate-950 p-4 text-xs font-semibold text-slate-200">
-        <p>{OFFLINE_MAP_ATTRIBUTION}</p>
-        <p>{OFFLINE_MAP_LIMITATION_COPY}</p>
-        <p data-testid="map-performance-guard">
-          Ytelsesvern: viser maks {renderedFeatures.length} skjematiske markører i kartbildet{hiddenFeatureCount ? ` (${hiddenFeatureCount} skjult)` : ''}. Operative lokale lag: {renderedOperations.length}{hiddenOperationCount > 0 ? ` (${hiddenOperationCount} skjult)` : ''}.
-        </p>
-      </figcaption>
-    </figure>
-  );
 }
 
 export function OfflineMapPanel() {

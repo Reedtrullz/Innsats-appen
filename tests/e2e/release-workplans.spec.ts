@@ -28,5 +28,5 @@ test('release page displays generated workplans from the production artifact', a
   await expect(page.getByText(`Artefakt generert: ${snapshot.generatedAt}`).first()).toBeVisible();
   await expect(page.getByRole('heading', { name: workplan.title }).first()).toBeVisible();
   await expect(page.getByText(workplan.summary).first()).toBeVisible();
-  await expect(page.getByText(`${completedTasks}/${workplan.taskCount} tasks completed`).first()).toBeVisible();
+  await expect(page.getByText(`${completedTasks}/${workplan.taskCount} oppgaver fullført`).first()).toBeVisible();
 });

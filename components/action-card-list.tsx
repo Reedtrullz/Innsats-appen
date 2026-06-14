@@ -4,6 +4,7 @@ import { useMemo, useState, type ReactNode } from 'react';
 import type { ActionCard, ContentChangelogEntry, MustReadNotice, OperationalChecklist } from '@/lib/content/schemas';
 import type { CardFilter } from '@/lib/content/filters';
 import { filterActionCards, sortActionCards } from '@/lib/content/filters';
+import { formatSourceList } from '@/lib/content/source-titles';
 import { phaseLabels, scenarioLabels, type Phase } from '@/lib/content/taxonomy';
 import { PhaseTabs } from './phase-tabs';
 import { RoleFilter } from './role-filter';
@@ -49,7 +50,7 @@ export function ActionCardList({ cards, initialFilter = {}, showFilters = true }
   );
 }
 
-function PhaseChecklistSummary({ checklists }: { checklists: OperationalChecklist[] }) {
+function PhaseChecklistSummary({ checklists, sourceTitleById }: { checklists: OperationalChecklist[]; sourceTitleById?: Record<string, string> }) {
   if (checklists.length === 0) return null;
   return (
     <section className="space-y-3 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
@@ -66,7 +67,7 @@ function PhaseChecklistSummary({ checklists }: { checklists: OperationalChecklis
             <ul className="mt-2 space-y-1 text-sm font-semibold text-slate-700">
               {checklist.items.slice(0, 5).map((item) => <li key={item.id}>• {item.label}</li>)}
             </ul>
-            <p className="mt-2 text-xs text-slate-500">Kilder: {(checklist.sourceIds ?? []).join(', ')}</p>
+            <p className="mt-2 text-xs text-slate-500">Kilder: {formatSourceList(checklist.sourceIds, sourceTitleById)}</p>
           </article>
         ))}
       </div>
@@ -74,14 +75,14 @@ function PhaseChecklistSummary({ checklists }: { checklists: OperationalChecklis
   );
 }
 
-function LatestProcedureNotice({ latestChange }: { latestChange?: ContentChangelogEntry }) {
+function LatestProcedureNotice({ latestChange, sourceTitleById }: { latestChange?: ContentChangelogEntry; sourceTitleById?: Record<string, string> }) {
   if (!latestChange) return null;
   return (
     <section className="rounded-3xl border border-sky-200 bg-sky-50 p-4 text-sky-950">
       <p className="text-xs font-black uppercase tracking-wide">Sist oppdatert prosedyre</p>
       <h2 className="mt-1 text-xl font-black">{latestChange.title}</h2>
       <p className="mt-1 text-sm font-semibold">{latestChange.summary}</p>
-      <p className="mt-2 text-xs font-bold">Dato: {latestChange.date} · Kilder: {(latestChange.sourceIds ?? []).join(', ')}</p>
+      <p className="mt-2 text-xs font-bold">Dato: {latestChange.date} · Kilder: {formatSourceList(latestChange.sourceIds, sourceTitleById)}</p>
     </section>
   );
 }
@@ -104,7 +105,7 @@ function MustReadBeforeDeployment({ notices }: { notices: MustReadNotice[] }) {
   );
 }
 
-export function PhasePageContent({ phase, cards, checklists = [], latestChange, mustRead = [], primaryOperationalContent }: { phase: Phase; cards: ActionCard[]; checklists?: OperationalChecklist[]; latestChange?: ContentChangelogEntry; mustRead?: MustReadNotice[]; primaryOperationalContent?: ReactNode }) {
+export function PhasePageContent({ phase, cards, checklists = [], latestChange, mustRead = [], sourceTitleById, primaryOperationalContent }: { phase: Phase; cards: ActionCard[]; checklists?: OperationalChecklist[]; latestChange?: ContentChangelogEntry; mustRead?: MustReadNotice[]; sourceTitleById?: Record<string, string>; primaryOperationalContent?: ReactNode }) {
   const phaseChecklists = checklists.filter((checklist) => checklist.phase === phase);
   return (
     <div className="space-y-5">
@@ -113,10 +114,10 @@ export function PhasePageContent({ phase, cards, checklists = [], latestChange, 
         <h1 className="text-3xl font-black">{phaseLabels[phase]} innsats</h1>
         <p className="mt-2 text-sm text-sky-100">Kildebelagte kort for {phaseLabels[phase].toLowerCase()} innsats.</p>
       </div>
-      <LatestProcedureNotice latestChange={latestChange} />
+      <LatestProcedureNotice latestChange={latestChange} sourceTitleById={sourceTitleById} />
       <MustReadBeforeDeployment notices={phase === 'for' ? mustRead : []} />
       {primaryOperationalContent}
-      <PhaseChecklistSummary checklists={phaseChecklists} />
+      <PhaseChecklistSummary checklists={phaseChecklists} sourceTitleById={sourceTitleById} />
       <div className="space-y-3">
         {sortActionCards(filterActionCards(cards, { phase })).slice(0, 6).map((card) => <TiltakCardRow key={card.slug} card={card} />)}
         <details className="rounded-2xl border border-slate-200 bg-white p-3">

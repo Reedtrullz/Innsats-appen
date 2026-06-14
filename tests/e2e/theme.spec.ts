@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-import { clearBrowserLocalState, createLocalMission, openMissionDetails } from './helpers';
+import { clearBrowserLocalState, createLocalMission, getTextContrastRatio, openMissionDetails, openMissionMode } from './helpers';
+
+const WCAG_AA_NORMAL_TEXT = 4.5;
 
 test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 
@@ -102,6 +104,78 @@ test('dark mode preserves export review and hash-routed export workflow readabil
   await expect(afterAction.getByLabel(/Etteraksjonsrapport Markdown/i)).toBeHidden();
   await afterAction.getByText(/Vis forhåndsvisning/i).click();
   await expect(afterAction.getByLabel(/Etteraksjonsrapport Markdown/i)).toBeVisible();
+});
+
+test('dark-mode priority surfaces meet WCAG AA contrast (regression lock for P0-1)', async ({ page }) => {
+  await chooseTheme(page, 'Mørk');
+
+  // High-priority quick card: title on the red surface. This is the surface that
+  // silently broke when `.dark` flipped the text light but missed the gradient/
+  // opacity background — the original bug class this test locks.
+  await page.goto('/hurtigkort');
+  await expectDarkMode(page);
+  const criticalSection = page.locator('section[aria-labelledby="hurtigkort-critical-heading"]');
+  await expect(criticalSection).toBeVisible();
+  const criticalTitle = criticalSection.locator('a .font-black').first();
+  await expect(criticalTitle).toBeVisible();
+  expect(await getTextContrastRatio(page, criticalTitle)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
+
+  // High-priority search result row (red surface).
+  await page.getByRole('searchbox').first().fill('tilfluktsrom');
+  const highPriorityResult = page.locator('a.border-red-200').first();
+  await expect(highPriorityResult).toBeVisible();
+  expect(await getTextContrastRatio(page, highPriorityResult)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
+
+  // Required checklist item (amber surface) in the work view.
+  await createLocalMission(page, { title: `Kontrast ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Kontrast QA' });
+  await openMissionMode(page, 'Arbeid');
+  const requiredItem = page.locator('li.border-amber-300').first();
+  await expect(requiredItem).toBeVisible();
+  expect(await getTextContrastRatio(page, requiredItem.locator('label').first())).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
+});
+
+test('light-mode priority surfaces also meet WCAG AA contrast', async ({ page }) => {
+  // Same priority surfaces as the dark regression lock, asserted in light mode so
+  // a future palette change cannot regress either theme silently.
+  await chooseTheme(page, 'Lys');
+
+  await page.goto('/hurtigkort');
+  await expect.poll(() => page.evaluate(() => document.documentElement.classList.contains('dark'))).toBe(false);
+  const criticalSection = page.locator('section[aria-labelledby="hurtigkort-critical-heading"]');
+  await expect(criticalSection).toBeVisible();
+  const criticalTitle = criticalSection.locator('a .font-black').first();
+  await expect(criticalTitle).toBeVisible();
+  expect(await getTextContrastRatio(page, criticalTitle)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
+
+  await page.getByRole('searchbox').first().fill('tilfluktsrom');
+  const highPriorityResult = page.locator('a.border-red-200').first();
+  await expect(highPriorityResult).toBeVisible();
+  expect(await getTextContrastRatio(page, highPriorityResult)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
+
+  await createLocalMission(page, { title: `Kontrast lys ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Kontrast lys QA' });
+  await openMissionMode(page, 'Arbeid');
+  const requiredItem = page.locator('li.border-amber-300').first();
+  await expect(requiredItem).toBeVisible();
+  expect(await getTextContrastRatio(page, requiredItem.locator('label').first())).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
+});
+
+test('feltmodus header toggle stays WCAG-legible when active in dark mode', async ({ page }) => {
+  // The active "Felt" pill is a saturated emerald surface in the navy header.
+  // It previously carried text-emerald-950, which `.dark` flips light → light
+  // text on bright green. Locks the mid-tone-surface variant of the bug class.
+  await chooseTheme(page, 'Mørk');
+  await page.goto('/');
+  await expectDarkMode(page);
+
+  // Scope to the shell-header toggle via its "(snarvei i toppmeny)" suffix —
+  // the home quick-toggle exposes a bare "Feltmodus av" name that would clash.
+  const feltToggle = page.getByRole('button', { name: /Feltmodus av \(snarvei i toppmeny\)/i });
+  await expect(feltToggle).toBeVisible();
+  await feltToggle.click();
+
+  const activePill = page.getByRole('button', { name: /Feltmodus på \(snarvei i toppmeny\)/i });
+  await expect(activePill).toBeVisible();
+  expect(await getTextContrastRatio(page, activePill)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
 });
 
 test('5-punktsordre stays readable and privacy alert remains visible in dark mode', async ({ page }) => {

@@ -133,7 +133,7 @@ function HomeRoleLens() {
         {roleLensOptions.map((group) => (
           <label
             key={group}
-            className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl px-3 py-2 text-center text-xs font-black ring-1 ${roleGroup === group ? 'bg-white text-[#082F49] ring-white' : 'bg-white/5 text-white ring-white/15 hover:bg-white/15'}`}
+            className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl px-3 py-2 text-center text-xs font-bold ring-1 ${roleGroup === group ? 'bg-white text-[#082F49] ring-white' : 'bg-white/5 text-white ring-white/15 hover:bg-white/15'}`}
           >
             <input
               type="radio"
@@ -179,7 +179,7 @@ function CriticalNowSection({ roleGroup }: { roleGroup: RoleGroup }) {
     <SectionCard className="bg-white" labelledBy="critical-shortcuts-heading">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 id="critical-shortcuts-heading" className="text-xl font-black tracking-tight">Kritisk nå</h2>
+          <h2 id="critical-shortcuts-heading" className="text-xl font-black tracking-tight">Snarveier</h2>
         </div>
       </div>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">

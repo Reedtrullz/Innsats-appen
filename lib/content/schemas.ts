@@ -62,6 +62,23 @@ export const ActionCardAuthoritySchema = z.enum(['leder', 'lagforer', 'mannskap'
 // shows a visible banner for anything not yet `reviewed`.
 export const ActionCardReviewStatusSchema = z.enum(['unreviewed', 'pending-fagperson', 'reviewed']);
 
+// Steps are a backward-compatible union (P2-2): a plain string (the legacy
+// form, still valid) or an object that carries the always-visible `action`
+// plus optional «hvordan/hvor» detail (`how`) and linked illustration ids
+// (`imageIds`). Consumers normalize via `normalizeStep`/`stepText` so they only
+// ever deal with the object shape. `how` content is fagperson-authored.
+export const ActionCardStepSchema = z.union([
+  z.string().min(1),
+  z.object({
+    action: z.string().min(1),
+    how: z.string().min(1).optional(),
+    imageIds: z.array(z.string().min(1)).default([]),
+    sourceIds: z.array(z.string().min(1)).default([]),
+  }),
+]);
+export type ActionCardStep = z.input<typeof ActionCardStepSchema>;
+export type NormalizedActionCardStep = { action: string; how?: string; imageIds: string[]; sourceIds: string[] };
+
 export const ActionCardSchema = z.object({
   slug: z.string().min(1).regex(slugPattern, 'action card slug must be lowercase kebab-case'),
   title: z.string().min(1),
@@ -69,7 +86,7 @@ export const ActionCardSchema = z.object({
   roles: z.array(RoleSchema).min(1),
   scenarios: z.array(ScenarioSchema).min(1),
   priority: z.enum(['high', 'medium', 'low']),
-  steps: z.array(z.string().min(1)).min(1),
+  steps: z.array(ActionCardStepSchema).min(1),
   safety: z.array(z.string()).default([]),
   reporting: z.array(z.string()).default([]),
   sourceIds: z.array(z.string().min(1)).min(1),

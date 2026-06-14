@@ -119,7 +119,7 @@ export function DeviceGatePanel() {
           return (
             <article
               key={check.id}
-              className={`rounded-2xl border p-3 ${effectivePass ? 'border-emerald-100 bg-emerald-50/40' : 'border-red-100 bg-red-50/40'}`}
+              className={`rounded-2xl border p-3 ${effectivePass ? 'border-emerald-100 bg-emerald-50' : 'border-red-100 bg-red-50'}`}
             >
               <div className="flex items-start gap-3">
                 <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border text-sm font-black ${tone}`}>
@@ -127,7 +127,7 @@ export function DeviceGatePanel() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-black">{check.label}</h3>
-                  <p className="mt-1 text-xs font-semibold text-slate-500">{check.description}</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-600">{check.description}</p>
                   <p className={`mt-1 text-xs font-bold ${effectivePass ? 'text-emerald-700' : 'text-red-700'}`}>
                     {check.autoDetected === 'skip' && !check.manualConfirmed
                       ? 'Venter på test...'

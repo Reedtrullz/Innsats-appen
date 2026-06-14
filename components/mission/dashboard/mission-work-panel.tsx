@@ -20,6 +20,7 @@ export function MissionWorkPanel({
   staleSignals,
   scopedMapState,
   orderSuggestions,
+  sourceTitleById,
   onMissionChange,
   onChecklistRunSaved,
 }: {
@@ -29,6 +30,7 @@ export function MissionWorkPanel({
   staleSignals: MissionContext['externalSignals'];
   scopedMapState: MissionMapState;
   orderSuggestions: string[];
+  sourceTitleById?: Record<string, string>;
   onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>;
   onChecklistRunSaved: () => void;
 }) {
@@ -36,7 +38,7 @@ export function MissionWorkPanel({
     <section id="mission-work-panel" role="tabpanel" aria-labelledby="mission-work-tab" className="space-y-4">
       <PanelHeading eyebrow="Arbeid" title="Sjekkliste, logg og kart" id="mission-work-heading" />
       <MissionQuickActionsGrid phase={mission.phase} />
-      {checklist ? <div id="sjekkliste" className="scroll-mt-28"><ChecklistRunner checklist={checklist} missionId={mission.id} onRunSaved={onChecklistRunSaved} /></div> : (
+      {checklist ? <div id="sjekkliste" className="scroll-mt-28"><ChecklistRunner checklist={checklist} missionId={mission.id} sourceTitleById={sourceTitleById} onRunSaved={onChecklistRunSaved} /></div> : (
         <p id="sjekkliste" className="scroll-mt-28 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm font-semibold text-slate-700">Ingen scenariospesifikk sjekkliste for dette oppdraget ennå. Bruk søk og tiltakskort, eller velg et scenario med egen sjekkliste.</p>
       )}
       <details id="loggoversikt" className="scroll-mt-28 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">

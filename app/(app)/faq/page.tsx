@@ -1,10 +1,12 @@
 import Link from 'next/link';
-import { getFAQEntries } from '@/lib/content/load-content';
+import { getFAQEntries, getSourceDocuments } from '@/lib/content/load-content';
+import { buildSourceTitleById, formatSourceList } from '@/lib/content/source-titles';
 
 export const revalidate = 3600;
 
 export default function FAQPage() {
   const entries = getFAQEntries();
+  const sourceTitleById = buildSourceTitleById(getSourceDocuments());
   const categories = [...new Set(entries.map((entry) => entry.category))].sort((a, b) => a.localeCompare(b, 'nb'));
   return (
     <div className="space-y-4">
@@ -27,7 +29,7 @@ export default function FAQPage() {
                   {entry.roles.map((role) => <span key={role} className="rounded-full bg-slate-100 px-2.5 py-1">{role}</span>)}
                   {entry.scenarios.map((scenario) => <span key={scenario} className="rounded-full bg-emerald-100 px-2.5 py-1 text-emerald-950">{scenario}</span>)}
                 </div>
-                <p className="mt-2 text-xs font-semibold text-slate-500">Oppdatert {entry.updatedAt} · kilder: {entry.sourceIds.join(', ')}</p>
+                <p className="mt-2 text-xs font-semibold text-slate-500">Oppdatert {entry.updatedAt} · kilder: {formatSourceList(entry.sourceIds, sourceTitleById)}</p>
               </article>
             ))}
           </div>

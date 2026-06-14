@@ -102,7 +102,7 @@ function SearchResultRow({ doc }: { doc: SearchHit }) {
   const highPriority = doc.type === 'kort' && doc.priority === 'high';
   return (
     <Link
-      className={`group block rounded-2xl border p-3 text-slate-900 shadow-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49] ${highPriority ? 'border-red-200 bg-red-50/60 hover:border-red-300 hover:bg-red-50' : 'border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50'}`}
+      className={`group block rounded-2xl border p-3 text-slate-900 shadow-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49] ${highPriority ? 'border-red-200 bg-red-50 hover:border-red-300 hover:bg-red-100' : 'border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50'}`}
       href={doc.href ?? '#'}
       aria-label={doc.title}
     >

@@ -1,5 +1,5 @@
 // BEGIN GENERATED SERVICE WORKER METADATA
-const SW_CACHE_VERSION = 'v4';
+const SW_CACHE_VERSION = 'v5';
 const CACHE_NAME = `beredskapsboka-${SW_CACHE_VERSION}`;
 const MAP_PACKAGE_CACHE_NAME = 'beredskapsboka-map-packages';
 const GENERATED_CONTENT_STALE_MS = 604800000;

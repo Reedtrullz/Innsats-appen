@@ -59,7 +59,7 @@ export function MissionCommandDashboard({ mission, cards, checklist, checklists,
   const disabledSources = useMemo(() => disabledExternalDataSources(sourceSettings), [sourceSettings]);
   const orderSuggestions = buildOrderUpdateSuggestions(mission.fieldLogEntries ?? []);
   const criticalActions = firstActions.filter((card) => card.priority === 'high');
-  const recommendedLabel = criticalActions.length > 0 ? 'Kritisk nå' : 'Anbefalte tiltak';
+  const recommendedLabel = criticalActions.length > 0 ? 'Kritiske tiltak' : 'Anbefalte tiltak';
 
   useEffect(() => {
     let active = true;
@@ -204,6 +204,7 @@ export function MissionCommandDashboard({ mission, cards, checklist, checklists,
           staleSignals={staleSignals}
           scopedMapState={scopedMapState}
           orderSuggestions={orderSuggestions}
+          sourceTitleById={sourceTitleById}
           onMissionChange={onMissionChange}
           onChecklistRunSaved={refreshChecklistRuns}
         />
