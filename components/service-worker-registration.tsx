@@ -118,6 +118,30 @@ export function ServiceWorkerRegistration() {
     };
   }, []);
 
+  // Belt-and-suspenders: if the user never taps the banner, activate the waiting
+  // worker the moment the view goes to the background (tab hidden, lock screen,
+  // app switch) or the page is unloaded. The controllerchange handler then
+  // reloads onto the new version when they return — so a shipped fix is never
+  // stranded in cache, without ever reloading a visible, in-use field view.
+  useEffect(() => {
+    if (!state.updateAvailable) return undefined;
+    if (typeof document === 'undefined') return undefined;
+    const activateInBackground = () => {
+      if (!state.registration?.waiting) return;
+      reloadRequestedForWaitingWorker = true;
+      state.registration.waiting.postMessage({ type: SW_MESSAGE_TYPES.skipWaiting });
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') activateInBackground();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pagehide', activateInBackground);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pagehide', activateInBackground);
+    };
+  }, [state.updateAvailable, state.registration]);
+
   if (!state.updateAvailable) return null;
 
   const activateUpdate = () => {

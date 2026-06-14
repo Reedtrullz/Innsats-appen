@@ -315,7 +315,9 @@ describe('CI workflow checks', () => {
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
-  });
+    // Spawns ~10 synchronous git subprocesses against a tmp fixture; under full
+    // parallel-suite load this exceeds the 5s default. Isolated it runs in ~1.3s.
+  }, 30_000);
 
   it('checks generated artifact freshness after content build in GitHub Actions CI', () => {
     const workflow = readCiWorkflow();

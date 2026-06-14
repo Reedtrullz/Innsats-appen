@@ -47,6 +47,28 @@ describe('theme-safe backgrounds', () => {
     expect(files.length).toBeGreaterThan(0);
   });
 
+  // P0-3 (extended) — saturated mid-tone surfaces (e.g. bg-emerald-500) are NOT
+  // reached by the `.dark` background override (which only flips the -50/-100
+  // tints, white and the navy command surface). When such a surface carries a
+  // dark palette text class (text-*-700..950), `.dark` flips that text light and
+  // the surface stays bright → light-on-bright, sub-WCAG. Dark text belongs only
+  // on a surface the override flips; saturated surfaces must use text-white.
+  const MID_TONE_BG = /\bbg-(?:red|amber|emerald|sky|rose|orange|indigo|lime|green|teal|yellow|cyan|blue|violet|purple|pink)-(?:400|500|600)\b/;
+  const FLIPPING_DARK_TEXT = /\btext-[a-z]+-(?:700|800|900|950)\b/;
+
+  it('has no dark palette text on a saturated (un-flipped) surface', () => {
+    const offenders: string[] = [];
+    for (const file of files) {
+      const lines = readFileSync(file, 'utf8').split('\n');
+      lines.forEach((line, index) => {
+        if (MID_TONE_BG.test(line) && FLIPPING_DARK_TEXT.test(line)) {
+          offenders.push(`${file}:${index + 1}: ${line.trim()}`);
+        }
+      });
+    }
+    expect(offenders, `Use text-white on saturated surfaces; the .dark override flips text-*-700..950 light.\n${offenders.join('\n')}`).toEqual([]);
+  });
+
   it.each(FORBIDDEN_PATTERNS)('has no $label in app/components surfaces', ({ regex }) => {
     const offenders: string[] = [];
     for (const file of files) {
