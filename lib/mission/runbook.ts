@@ -20,6 +20,8 @@ export interface MissionRunbook {
   total: number;
   doneCount: number;
   skippedCount: number;
+  /** Required steps that were resolved by skipping rather than doing. */
+  requiredSkippedCount: number;
   /** Required steps that are neither done nor skipped. */
   requiredRemaining: number;
   /** First step that is neither done nor skipped, in authored order. */
@@ -50,6 +52,7 @@ const EMPTY_RUNBOOK: MissionRunbook = {
   total: 0,
   doneCount: 0,
   skippedCount: 0,
+  requiredSkippedCount: 0,
   requiredRemaining: 0,
   currentStepId: null,
   allRequiredComplete: false,
@@ -114,6 +117,7 @@ export function buildChecklistRunbook(
 
   const doneCount = steps.filter((step) => step.status === 'done').length;
   const skippedCount = steps.filter((step) => step.status === 'skipped').length;
+  const requiredSkippedCount = steps.filter((step) => step.required && step.status === 'skipped').length;
   const requiredRemaining = steps.filter(
     (step) => step.required && (step.status === 'now' || step.status === 'upcoming'),
   ).length;
@@ -126,6 +130,7 @@ export function buildChecklistRunbook(
     total: steps.length,
     doneCount,
     skippedCount,
+    requiredSkippedCount,
     requiredRemaining,
     currentStepId: current?.id ?? null,
     allRequiredComplete: steps.length > 0 && requiredRemaining === 0,

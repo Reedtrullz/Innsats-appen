@@ -133,7 +133,7 @@ test('keyboard can use persistent bottom navigation and submit a new mission for
   await expect(page.getByRole('heading', { name: /Opprett lokalt oppdrag/i })).toBeVisible();
   await page.getByLabel('Tittel').fill(missionTitle);
   await page.locator('select[name="role"]').selectOption('beredskapsvakt');
-  await page.getByLabel('Fase').selectOption('for');
+  await page.getByLabel('Hvor i oppdraget er du nå?').selectOption('for');
   await page.getByLabel('Scenario').selectOption('tilfluktsrom');
   await page.getByLabel('Sted/lokasjon').fill('Keyboard testområde');
   await page.getByRole('button', { name: /Lagre oppdrag/i }).focus();
@@ -144,7 +144,7 @@ test('keyboard can use persistent bottom navigation and submit a new mission for
 
 test('mission and local export form controls have accessible labels', async ({ page }) => {
   await page.goto('/oppdrag/ny');
-  for (const label of ['Tittel', 'Fase', 'Scenario', 'Sted/lokasjon']) {
+  for (const label of ['Tittel', 'Hvor i oppdraget er du nå?', 'Scenario', 'Sted/lokasjon']) {
     await expect(page.getByLabel(label)).toBeVisible();
   }
   await expect(page.locator('select[name="role"]')).toBeVisible();

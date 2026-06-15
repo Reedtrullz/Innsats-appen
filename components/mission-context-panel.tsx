@@ -189,7 +189,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block text-sm font-bold">Rolle<select name="role" value={selectedRole} onChange={(event) => setSelectedRole(event.target.value as Role)} className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{roles.map((role) => <option key={role} value={role}>{roleLabels[role]}</option>)}</select></label>
-          <label className="block text-sm font-bold">Fase<select name="phase" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{phases.map((phase) => <option key={phase} value={phase}>{phaseLabels[phase]}</option>)}</select></label>
+          <label className="block text-sm font-bold">Hvor i oppdraget er du nå?<select name="phase" defaultValue="for" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{phases.map((phase) => <option key={phase} value={phase}>{phaseLabels[phase]}</option>)}</select></label>
         </div>
         <label className="block text-sm font-bold">Scenario<select name="scenario" className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 px-3">{scenarios.map((scenario) => <option key={scenario} value={scenario}>{scenarioLabels[scenario]}</option>)}</select></label>
         <div>

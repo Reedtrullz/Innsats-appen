@@ -1,6 +1,18 @@
 export const phases = ['for', 'under', 'etter'] as const;
 export type Phase = (typeof phases)[number];
 
+/** The phase after `phase` in authored order, or null for the terminal phase ('etter'). */
+export function nextPhase(phase: Phase): Phase | null {
+  const index = phases.indexOf(phase);
+  return index >= 0 && index < phases.length - 1 ? phases[index + 1] : null;
+}
+
+/** The phase before `phase` in authored order, or null for the first phase ('for'). */
+export function prevPhase(phase: Phase): Phase | null {
+  const index = phases.indexOf(phase);
+  return index > 0 ? phases[index - 1] : null;
+}
+
 export const roles = [
   'mannskap',
   'lagforer',

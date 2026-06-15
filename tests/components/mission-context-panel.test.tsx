@@ -142,7 +142,7 @@ it('stores the checklist that matches the selected mission scenario and phase', 
   await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} />);
 
   await userEvent.type(screen.getByLabelText(/Tittel/i), 'MFE etterkontroll øvelse');
-  await userEvent.selectOptions(screen.getByLabelText(/Fase/i), 'etter');
+  await userEvent.selectOptions(screen.getByLabelText(/Hvor i oppdraget er du nå/i), 'etter');
   await userEvent.selectOptions(screen.getByLabelText(/Scenario/i), 'mfe-stotte');
   await userEvent.type(screen.getByLabelText(/Sted\/lokasjon/i), 'Trondheim');
   await userEvent.click(screen.getByRole('button', { name: /Lagre oppdrag/i }));
@@ -176,7 +176,7 @@ it('matches a brann/skogbrann checklist for a skogbrann mission instead of an un
   await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={fireChecklists} />);
 
   await userEvent.type(screen.getByLabelText(/Tittel/i), 'Skogbrann sektor 3');
-  await userEvent.selectOptions(screen.getByLabelText(/Fase/i), 'under');
+  await userEvent.selectOptions(screen.getByLabelText(/Hvor i oppdraget er du nå/i), 'under');
   await userEvent.selectOptions(screen.getByLabelText(/Scenario/i), 'skogbrann');
   await userEvent.click(screen.getByRole('button', { name: /Lagre oppdrag/i }));
 
@@ -194,7 +194,7 @@ it('leaves the active checklist empty when no scenario or generelt checklist mat
   await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={onlyTilfluktsrom} />);
 
   await userEvent.type(screen.getByLabelText(/Tittel/i), 'Skogbrann uten sjekkliste');
-  await userEvent.selectOptions(screen.getByLabelText(/Fase/i), 'under');
+  await userEvent.selectOptions(screen.getByLabelText(/Hvor i oppdraget er du nå/i), 'under');
   await userEvent.selectOptions(screen.getByLabelText(/Scenario/i), 'skogbrann');
   await userEvent.click(screen.getByRole('button', { name: /Lagre oppdrag/i }));
 

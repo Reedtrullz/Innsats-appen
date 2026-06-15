@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { OperationalChecklist } from '@/lib/content/schemas';
 import type { ChecklistRun, MissionContext } from '@/lib/mission/schemas';
-import { scenarioLabels } from '@/lib/content/taxonomy';
+import { nextPhase, phaseLabels, scenarioLabels } from '@/lib/content/taxonomy';
 import { listChecklistRuns, listMissions, saveChecklistRun } from '@/lib/mission/local-store';
 import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
+import { withPhaseChange } from '@/lib/mission/phase-progress';
 import { buildMissionRunbook, type RunbookStep } from '@/lib/mission/runbook';
+import type { MissionUpdate } from '@/components/mission/dashboard/dashboard-types';
 
 const stepDotClass: Record<RunbookStep['status'], string> = {
   done: 'bg-emerald-500',
@@ -36,20 +38,31 @@ const statusBadgeClass: Record<RunbookStep['status'], string> = {
  * context lives in the surrounding dashboard chrome.
  */
 export function RunbookView({
+  mission: missionProp,
   checklists,
   compact = false,
   sourceTitleById = {},
   sourceRiskById = {},
+  onMissionChange,
   onRunSaved,
 }: {
+  /**
+   * Controlled active mission. When supplied (mission dashboard), the runbook
+   * re-derives whenever the mission — including its phase — changes, so the
+   * "Nå" runbook swaps with the phase. When omitted, the view self-loads the
+   * selected active mission (standalone usage / tests).
+   */
+  mission?: MissionContext;
   checklists: OperationalChecklist[];
   /** "Nå" view: show only the active step + the next couple, not the whole list. */
   compact?: boolean;
   sourceTitleById?: Record<string, string>;
   sourceRiskById?: Record<string, 'caution' | 'ok'>;
+  /** Required to offer the one-tap "go to next phase" CTA. */
+  onMissionChange?: (missionId: string, update: MissionUpdate) => Promise<void>;
   onRunSaved?: () => void;
 }) {
-  const [mission, setMission] = useState<MissionContext | null>(null);
+  const [mission, setMission] = useState<MissionContext | null>(missionProp ?? null);
   const [run, setRun] = useState<ChecklistRun | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [openStepId, setOpenStepId] = useState<string | null>(null);
@@ -59,8 +72,7 @@ export function RunbookView({
   useEffect(() => {
     let alive = true;
     (async () => {
-      const missions = await listMissions();
-      const active = selectActiveMission(missions, readSelectedActiveMissionId());
+      const active = missionProp ?? selectActiveMission(await listMissions(), readSelectedActiveMissionId());
       if (!alive) return;
       setMission(active ?? null);
       if (active) {
@@ -76,7 +88,7 @@ export function RunbookView({
     return () => {
       alive = false;
     };
-  }, [checklists, refreshKey]);
+  }, [checklists, refreshKey, missionProp]);
 
   const runbook = mission
     ? buildMissionRunbook(checklists, mission, { checkedItemIds: run?.checkedItemIds, skippedItemIds: run?.skippedItemIds })
@@ -86,6 +98,15 @@ export function RunbookView({
   const missionId = mission?.id ?? null;
   const activeChecklist = checklistSlug ? checklists.find((item) => item.slug === checklistSlug) : undefined;
   const resolved = runbook ? runbook.doneCount + runbook.skippedCount : 0;
+
+  // One-tap, never automatic: the user confirms the advance. Only offered when the
+  // view is controlled (has a mission + onMissionChange); 'etter' is terminal.
+  const upcomingPhase = mission ? nextPhase(mission.phase) : null;
+  const canAdvancePhase = Boolean(mission && onMissionChange && upcomingPhase);
+  function goToPhase(target: NonNullable<typeof upcomingPhase>) {
+    if (!mission || !onMissionChange) return;
+    void onMissionChange(mission.id, (current) => withPhaseChange(current, target));
+  }
 
   // In "Nå" only the active step and the next couple are shown; the full board
   // lives in "Arbeid". Falls back to the first unresolved steps if none is active.
@@ -160,12 +181,28 @@ export function RunbookView({
       ) : null}
 
       {runbook.isEmpty || runbook.total === 0 ? (
-        <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm font-semibold text-slate-700">Ingen scenariospesifikk runbook for dette oppdraget ennå. Bruk søk og tiltakskort.</p>
+        <section className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4">
+          <p className="text-sm font-semibold text-slate-700">
+            {canAdvancePhase
+              ? 'Ingen sjekkliste for denne fasen — gå videre når du er klar.'
+              : 'Ingen scenariospesifikk runbook for dette oppdraget ennå. Bruk søk og tiltakskort.'}
+          </p>
+          {canAdvancePhase && upcomingPhase ? (
+            <button type="button" onClick={() => goToPhase(upcomingPhase)} className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-[#082F49] px-4 font-bold text-white">Gå til {phaseLabels[upcomingPhase]} →</button>
+          ) : null}
+        </section>
       ) : runbook.allRequiredComplete && !runbook.currentStepId ? (
         <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
           <h3 className="text-lg font-black text-emerald-950">Alle anbefalte steg er gjort</h3>
-          <p className="mt-1 text-sm font-semibold text-emerald-900">Gå videre til neste fase eller åpne etterrapporten.</p>
-          <a href="#etterrapport" className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-emerald-700 px-4 font-bold text-white">Åpne etterrapport</a>
+          <p className="mt-1 text-sm font-semibold text-emerald-900">{canAdvancePhase ? 'Bekreft for å gå videre til neste fase, eller åpne etterrapporten.' : 'Gå videre til neste fase eller åpne etterrapporten.'}</p>
+          {runbook.requiredSkippedCount > 0 ? (
+            <p className="mt-2 text-xs font-bold text-amber-900">{runbook.requiredSkippedCount} påkrevde hoppet over</p>
+          ) : null}
+          {canAdvancePhase && upcomingPhase ? (
+            <button type="button" onClick={() => goToPhase(upcomingPhase)} className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-emerald-700 px-4 font-bold text-white">Gå til {phaseLabels[upcomingPhase]} →</button>
+          ) : (
+            <a href="#etterrapport" className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-emerald-700 px-4 font-bold text-white">Åpne etterrapport</a>
+          )}
         </section>
       ) : (
         <>
