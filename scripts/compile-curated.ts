@@ -15,6 +15,7 @@ import {
   MustReadNoticeSchema,
   OperationalChecklistSchema,
   ProtectionMeasureSchema,
+  ReferenceVideoSchema,
   SearchSynonymGroupSchema,
   TrainingPathSchema,
   type ActionCard,
@@ -29,6 +30,7 @@ import {
   type MustReadNotice,
   type OperationalChecklist,
   type ProtectionMeasure,
+  type ReferenceVideo,
   type SearchSynonymGroup,
   type TrainingPath,
 } from '@/lib/content/schemas';
@@ -49,6 +51,7 @@ export interface CompileResult {
   equipmentTaxonomy: EquipmentTaxonomyRecord[];
   exportTemplates: ExportTemplateMetadata[];
   imageMetadata: ImageMetadata[];
+  referenceVideos: ReferenceVideo[];
   localOverlays: LocalOverlayDeclaration[];
   searchSynonyms: SearchSynonymGroup[];
   changelog: ContentChangelogEntry[];
@@ -122,6 +125,7 @@ export async function compileCuratedContent(options: CompileOptions = {}): Promi
   const equipmentTaxonomy = await readYamlArray(path.join(curatedDir, 'equipment-taxonomy.yaml'), 'equipment taxonomy', (v) => EquipmentTaxonomyRecordSchema.parse(v));
   const exportTemplates = await readYamlArray(path.join(curatedDir, 'export-templates.yaml'), 'export templates', (v) => ExportTemplateMetadataSchema.parse(v));
   const imageMetadata = await readYamlArray(path.join(curatedDir, 'image-metadata.yaml'), 'image metadata', (v) => ImageMetadataSchema.parse(v));
+  const referenceVideos = await readYamlArray(path.join(curatedDir, 'reference-videos.yaml'), 'reference videos', (v) => ReferenceVideoSchema.parse(v));
   const localOverlays = await readYamlArray(path.join(curatedDir, 'local-overlays.yaml'), 'local overlays', (v) => LocalOverlayDeclarationSchema.parse(v));
   const searchSynonyms = await readYamlArray(path.join(curatedDir, 'search-synonyms.yaml'), 'search synonyms', (v) => SearchSynonymGroupSchema.parse(v));
   const changelog = await readYamlArray(path.join(curatedDir, 'changelog.yaml'), 'content changelog', (v) => ContentChangelogEntrySchema.parse(v));
@@ -137,6 +141,7 @@ export async function compileCuratedContent(options: CompileOptions = {}): Promi
   await writeMirroredJson(generatedDir, publicGeneratedDir, 'equipment-taxonomy.json', equipmentTaxonomy);
   await writeMirroredJson(generatedDir, publicGeneratedDir, 'export-templates.json', exportTemplates);
   await writeMirroredJson(generatedDir, publicGeneratedDir, 'image-metadata.json', imageMetadata);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'reference-videos.json', referenceVideos);
   await writeMirroredJson(generatedDir, publicGeneratedDir, 'local-overlays.json', localOverlays);
   await writeMirroredJson(generatedDir, publicGeneratedDir, 'search-synonyms.json', searchSynonyms);
   await writeMirroredJson(generatedDir, publicGeneratedDir, 'changelog.json', changelog);
@@ -164,7 +169,7 @@ export async function compileCuratedContent(options: CompileOptions = {}): Promi
   };
   await writeJson(path.join(generatedDir, 'manifest.json'), manifest);
   await writeJson(path.join(publicGeneratedDir, 'manifest.json'), manifest);
-  return { actionCards, checklists, trainingPaths, protectionMeasures, glossary, faq, equipmentTaxonomy, exportTemplates, imageMetadata, localOverlays, searchSynonyms, changelog, mustRead, manifest };
+  return { actionCards, checklists, trainingPaths, protectionMeasures, glossary, faq, equipmentTaxonomy, exportTemplates, imageMetadata, referenceVideos, localOverlays, searchSynonyms, changelog, mustRead, manifest };
 }
 
 async function main() {

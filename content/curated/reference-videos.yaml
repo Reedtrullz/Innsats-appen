@@ -1,0 +1,154 @@
+# Eksterne demonstrasjonsvideoer fra Sivilforsvarets kompetansesenter (SFK), Vimeo.
+# Kanal: https://vimeo.com/sivilforsvaret/videos  (hentet 2026-06-14, titler lest)
+#
+# STATUS: data klar, men ENNÅ IKKE wiret inn i innholds-pipelinen
+#   (krever ReferenceVideoSchema + loader + compile-steg + UI — se docs/sfk-video-sources.md).
+#   Inntil da er denne filen inert (pipelinen leser den ikke) og bryter ingenting.
+#
+# REGLER ved visning:
+#   - Vis KUN entries med permissionStatus: approved (SFK-tillatelse — opphavsrett).
+#   - Offline-først + CSP: kun utlenke som åpner nett (target=_blank), ALDRI embed/iframe.
+#   - vimeoId fylles inn per video fra kanalen. IKKE gjett/syntetiser IDer.
+
+- id: pumpe-honda-lensepumpe
+  title: Honda lensepumpe — klar til innsats, oppstart/drift, MBK
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null            # TODO: hent per video (Del 1–3 + repetisjon)
+  topic: pumpe-vannforsyning
+  relatedCardSlugs: [flom-pumpe-start, flom-pumpe-vannforsyning, brann-vannforsyning-slange, pumpe-stromfare]
+  permissionStatus: needs-permission
+  note: Flerdelt serie (Del 1 Klar til innsats, Del 2 Oppstart og drift, Del 3 MBK, + repetisjon).
+
+- id: pumpe-ziegler
+  title: Ziegler-pumpe — klar til innsats, start/drift, MBK
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: pumpe-vannforsyning
+  relatedCardSlugs: [flom-pumpe-start, flom-pumpe-vannforsyning, brann-vannforsyning-slange, pumpe-stromfare]
+  permissionStatus: needs-permission
+  note: Flerdelt serie (Del 1–3 + repetisjon).
+
+- id: pumpe-otterpumpe
+  title: Otterpumpe — klar til innsats/MBK, start/drift, trykkforsterkning
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: pumpe-vannforsyning
+  relatedCardSlugs: [flom-pumpe-start, flom-pumpe-vannforsyning, brann-vannforsyning-slange, pumpe-stromfare]
+  permissionStatus: needs-permission
+  note: Flerdelt serie (Del 1–3 + repetisjon).
+
+- id: forstehjelp-tourniquet
+  title: Tourniquet — førstehjelp
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: forstehjelp
+  relatedCardSlugs: [akutt-113-livreddende-forstehjelp, samleplass-skadde-start, samleplass-skadde-utvidet]
+  permissionStatus: needs-permission
+
+- id: forstehjelp-trykkbandasje
+  title: Trykkbandasje — førstehjelp
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: forstehjelp
+  relatedCardSlugs: [akutt-113-livreddende-forstehjelp, samleplass-skadde-start, samleplass-skadde-utvidet]
+  permissionStatus: needs-permission
+
+- id: forstehjelp-pakking
+  title: Pakking (sårpakking) — førstehjelp
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: forstehjelp
+  relatedCardSlugs: [akutt-113-livreddende-forstehjelp, samleplass-skadde-start, samleplass-skadde-utvidet]
+  permissionStatus: needs-permission
+
+- id: trafikkdirigering
+  title: Trafikkdirigering (intro + Del 1–8)
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: trafikkdirigering
+  relatedCardSlugs: [rute-og-evakueringsvei, evakueringsstotte, kjoretoy-transportberedskap]
+  permissionStatus: needs-permission
+  note: 9-delt serie. Kandidat til eget kildetro tiltakskort for trafikkdirigering.
+
+- id: rens-irp-avkledningsdrill
+  title: Avkledningsdrill på improvisert renseplass (IRP)
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: rens-cbrn
+  relatedCardSlugs: [mre-rens-start, mre-ren-uren-side-grovrens, cbrne-soneinndeling]
+  permissionStatus: needs-permission
+
+- id: rens-makkersjekk
+  title: Makkersjekk (verneutstyr)
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: rens-cbrn
+  relatedCardSlugs: [cbrne-verneutstyr-stoppkriterier, mre-rens-start]
+  permissionStatus: needs-permission
+
+- id: ordre-5-punktsordre
+  title: 5-punktsordre
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: ledelse-ordre
+  relatedCardSlugs: [ledelse-kommando-kontroll, obbo-beslutningssloyfe]
+  permissionStatus: needs-permission
+  note: Relaterer også til 5-punktsordre-funksjonen i oppdrag.
+
+- id: ledelse-sykkelhjulmodellen
+  title: Sykkelhjulmodellen
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: ledelse-ordre
+  relatedCardSlugs: [ledelse-kommando-kontroll, obbo-beslutningssloyfe]
+  permissionStatus: needs-permission
+  note: Sannsynlig beslutnings-/ledelsesmodell — verifiser mot fagperson.
+
+- id: omradebelysning
+  title: Områdebelysning for Sivilforsvaret (Del 1–4)
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: utstyr-oppsett
+  relatedCardSlugs: []
+  permissionStatus: needs-permission
+  note: Oppsett under innsats. Kandidat til eget oppsett-kort.
+
+- id: utstyr-va-m-15
+  title: Oppsett av VA-M 15 (telt)
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: "251796770"
+  topic: utstyr-oppsett
+  relatedCardSlugs: []
+  permissionStatus: needs-permission
+
+- id: brann-branntrekanten
+  title: Branntrekanten (brannteori)
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: brann
+  relatedCardSlugs: [skogbrann-startkort]
+  permissionStatus: needs-permission
+
+- id: admin-avviksregistrering
+  title: Avviksregistrering på avvik.dsb.no
+  publisher: Sivilforsvarets kompetansesenter (SFK)
+  channelUrl: https://vimeo.com/sivilforsvaret
+  vimeoId: null
+  topic: admin-avvik
+  relatedCardSlugs: []
+  permissionStatus: needs-permission
+  note: Relaterer til RUH/avvik-flyt. Ekstern tjeneste (avvik.dsb.no).

@@ -13,6 +13,7 @@ import {
   MustReadNoticeSchema,
   OperationalChecklistSchema,
   ProtectionMeasureSchema,
+  ReferenceVideoSchema,
   SearchSynonymGroupSchema,
   SourceDocumentSchema,
   TrainingPathSchema,
@@ -28,6 +29,7 @@ import {
   type MustReadNotice,
   type OperationalChecklist,
   type ProtectionMeasure,
+  type ReferenceVideo,
   type SearchSynonymGroup,
   type SourceDocument,
   type TrainingPath,
@@ -94,6 +96,10 @@ export function getExportTemplates(): ExportTemplateMetadata[] {
 
 export function getImageMetadata(): ImageMetadata[] {
   return loadArray('image-metadata.json', 'image metadata', (value) => ImageMetadataSchema.parse(value));
+}
+
+export function getReferenceVideos(): ReferenceVideo[] {
+  return loadArray('reference-videos.json', 'reference videos', (value) => ReferenceVideoSchema.parse(value));
 }
 
 export function getLocalOverlays(): LocalOverlayDeclaration[] {

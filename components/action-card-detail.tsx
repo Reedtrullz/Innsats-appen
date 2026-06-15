@@ -1,8 +1,9 @@
-import type { ActionCard, ImageMetadata, SourceDocument } from '@/lib/content/schemas';
+import type { ActionCard, ImageMetadata, ReferenceVideo, SourceDocument } from '@/lib/content/schemas';
 import { normalizeStep } from '@/lib/content/steps';
 import { sourceFreshness } from '@/lib/content/source-review';
 import { competenceLabels, phaseLabels, roleLabels, scenarioLabels } from '@/lib/content/taxonomy';
 import { RecordCardVisit } from './recent-cards';
+import { RelatedDemonstrationLinks } from './reference-videos';
 import { SourceBadge } from './source-badge';
 import { WarningBanner } from './warning-banner';
 import { OperationalIcon } from './ui/operational-icons';
@@ -158,7 +159,7 @@ function SourceGovernancePanel({ card, linkedSources, missingSourceIds, sourceWa
  * before acting (compact), then the numbered steps as the visual primary.
  * Source governance and metadata sit collapsed below the instructions.
  */
-export function ActionCardDetail({ card, sources, images = [] }: { card: ActionCard; sources: SourceDocument[]; images?: ImageMetadata[] }) {
+export function ActionCardDetail({ card, sources, images = [], referenceVideos = [] }: { card: ActionCard; sources: SourceDocument[]; images?: ImageMetadata[]; referenceVideos?: ReferenceVideo[] }) {
   const sourceById = new Map(sources.map((source) => [source.id, source]));
   const linkedSources: SourceDocument[] = [];
   const missingSourceIds: string[] = [];
@@ -273,6 +274,7 @@ export function ActionCardDetail({ card, sources, images = [] }: { card: ActionC
           </ul>
         </section>
       ) : null}
+      <RelatedDemonstrationLinks videos={referenceVideos} cardSlug={card.slug} />
       <SourceGovernancePanel card={card} linkedSources={linkedSources} missingSourceIds={missingSourceIds} sourceWarnings={sourceWarnings} />
     </article>
   );

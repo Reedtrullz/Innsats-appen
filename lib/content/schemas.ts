@@ -206,6 +206,18 @@ export const ImageMetadataSchema = z.object({
   updatedAt: DateOnlySchema,
 });
 
+export const ReferenceVideoSchema = z.object({
+  id: z.string().min(1).regex(slugPattern, 'reference video id must be lowercase kebab-case'),
+  title: z.string().min(1),
+  publisher: z.string().min(1),
+  channelUrl: z.string().url(),
+  vimeoId: z.string().regex(/^\d+$/).nullish(),
+  topic: z.string().min(1),
+  relatedCardSlugs: z.array(z.string()).default([]),
+  permissionStatus: z.enum(['needs-permission', 'approved', 'denied']).default('needs-permission'),
+  note: z.string().optional(),
+});
+
 export const LocalOverlayDeclarationSchema = z.object({
   id: z.string().min(1).regex(slugPattern, 'overlay id must be lowercase kebab-case'),
   districtName: z.string().min(1),
@@ -285,6 +297,7 @@ export type FAQEntry = z.infer<typeof FAQEntrySchema>;
 export type EquipmentTaxonomyRecord = z.infer<typeof EquipmentTaxonomyRecordSchema>;
 export type ExportTemplateMetadata = z.infer<typeof ExportTemplateMetadataSchema>;
 export type ImageMetadata = z.infer<typeof ImageMetadataSchema>;
+export type ReferenceVideo = z.infer<typeof ReferenceVideoSchema>;
 export type LocalOverlayDeclaration = z.infer<typeof LocalOverlayDeclarationSchema>;
 export type ContentChangelogEntry = z.infer<typeof ContentChangelogEntrySchema>;
 export type SearchSynonymGroup = z.infer<typeof SearchSynonymGroupSchema>;
