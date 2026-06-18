@@ -104,6 +104,21 @@ const group4ActionCardSlugs = [
   'kontaminert-utstyr-handtering',
 ];
 
+const nextActionCardSlugs = [
+  'oppdrag-mottatt-hva-na',
+  'fremme-innsatssted-forste-minutter',
+  'ordre-uklar-hva-na',
+  'samband-brutt-hva-na',
+  'eget-personell-skadet-hva-na',
+  'cbrne-mistanke-hva-na',
+  'radiac-hoy-verdi-hva-na',
+  'mre-kontaminert-person-hva-na',
+  'mfe-ankomst-hva-na',
+  'pumpe-vann-ikke-fram-hva-na',
+  'evakuering-mottak-hva-na',
+  'transport-avvik-hva-na',
+];
+
 const cardText = (card: any) => [
   card.title,
   card.slug,
@@ -925,4 +940,48 @@ it('curated ATV/BAT transport logistics content supports local planning without 
     'atv-bat-transportlogistikk',
     'kjoretoy-transportberedskap',
   ]));
+});
+
+it('curated operational next-action cards give first-aid-style what-next overviews', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const sourceIds = new Set(readYaml('content/generated/source-documents.json').map((source) => source.id));
+  const bySlug = new Map(cards.map((card) => [card.slug, card]));
+
+  expect(cards.map((card) => card.slug)).toEqual(expect.arrayContaining(nextActionCardSlugs));
+
+  for (const slug of nextActionCardSlugs) {
+    const card = bySlug.get(slug);
+    expect(card, `missing next-action card ${slug}`).toBeTruthy();
+    expect(card.reviewStatus, `${slug} review status`).toBe('pending-fagperson');
+    expect(card.warning, `${slug} warning`).toEqual(expect.any(String));
+    expect(card.steps?.length, `${slug} step count`).toBeGreaterThanOrEqual(4);
+    expect(card.reporting?.length, `${slug} reporting`).toBeGreaterThan(0);
+    expect(card.sourceIds?.length, `${slug} sourceIds`).toBeGreaterThan(0);
+
+    const text = cardText(card);
+    expect(text, `${slug} must answer what now`).toMatch(/hva n[aå]|gjør nå|først|neste/i);
+    expect(text, `${slug} must have stop/escalation language`).toMatch(/stopp|stans|avbryt|trekk|eskaler|meld/i);
+    expect(text, `${slug} must report concise status`).toMatch(/rapporter|meld|loggfør/i);
+    expect(text, `${slug} must preserve order boundary`).toMatch(/ordre|innsatsleder|fagmyndighet|lederlinje/i);
+    expect(text, `${slug} must not claim official order authority`).not.toMatch(/erstatter\s+(?:ordre|innsatsleder|fagmyndighet)|offisiell\s+(?:ordre|ruteordre|anmodning)/i);
+    expect(text, `${slug} must not include sensitive identifiers or tracking claims`).not.toMatch(
+      /personnummer|fødselsnummer|pasientnavn|live tracking|GPS-sporing|sanntid|kjøretøyidentifikator|registreringsnummer|ISSI/i,
+    );
+
+    for (const sourceId of card.sourceIds ?? []) {
+      expect(sourceIds, `${slug} references missing source ${sourceId}`).toContain(sourceId);
+    }
+    for (const step of card.steps ?? []) {
+      expect(typeof step, `${slug} steps should carry source detail`).toBe('object');
+      expect(step.sourceIds?.length, `${slug}/${step.action} sourceIds`).toBeGreaterThan(0);
+      for (const sourceId of step.sourceIds ?? []) {
+        expect(sourceIds, `${slug}/${step.action} references missing source ${sourceId}`).toContain(sourceId);
+      }
+    }
+  }
+
+  expect(cardText(bySlug.get('samband-brutt-hva-na'))).toMatch(/alternativ kontaktvei|fallback/i);
+  expect(cardText(bySlug.get('radiac-hoy-verdi-hva-na'))).toMatch(/ikke beregn.*dose|dosegrense/i);
+  expect(cardText(bySlug.get('pumpe-vann-ikke-fram-hva-na'))).toMatch(/sugeside|knekk|kavitasjon|samlerør/i);
+  expect(cardText(bySlug.get('transport-avvik-hva-na'))).toMatch(/framkommelighet|førerkompetanse|last/i);
 });
