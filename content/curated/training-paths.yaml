@@ -96,7 +96,7 @@
   prerequisites: [FIG10]
   skills: [terrengkjøring, sikker kjøretøybruk, tilhenger, kontroll og stell]
   sourceIds: [src-opplaering-forer-av-atb]
-  linkedCardSlugs: [kjoretoy-transportberedskap, rute-og-evakueringsvei]
+  linkedCardSlugs: [atv-bat-transportlogistikk, kjoretoy-transportberedskap, rute-og-evakueringsvei]
 
 - slug: bat-foreropplaering
   courseCode: BAT
@@ -106,7 +106,7 @@
   prerequisites: [FIG10]
   skills: [sikker ferdsel på sjø, praktisk båtføring, stell av båt, risikovurdering]
   sourceIds: [src-opplaering-forer-av-bat]
-  linkedCardSlugs: [evakueringsstotte, rute-og-evakueringsvei]
+  linkedCardSlugs: [atv-bat-transportlogistikk, evakueringsstotte, rute-og-evakueringsvei]
 
 - slug: lett-lastebil-forer
   courseCode: LETT_LASTEBIL
@@ -116,7 +116,7 @@
   prerequisites: [FIG10]
   skills: [transportberedskap, kjøretøykontroll, tilhenger, last og sikkerhet]
   sourceIds: [src-vedlegg-b-kurs-i-sivilforsvaret, src-sjekkliste-fig-og-figp]
-  linkedCardSlugs: [kjoretoy-transportberedskap, fig-for-innsats, fig-etterinnsats-klargjoring]
+  linkedCardSlugs: [atv-bat-transportlogistikk, kjoretoy-transportberedskap, fig-for-innsats, fig-etterinnsats-klargjoring]
 
 - slug: sps40-samvirke-skadested
   courseCode: SPS40

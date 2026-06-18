@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import type { Page as AxePage } from 'playwright-core';
 
 import { clearBrowserLocalState, createLocalMission, openMissionDetails, openMissionMode } from './helpers';
 
@@ -47,7 +48,7 @@ test('critical mobile routes have no automated WCAG A/AA accessibility violation
     } else {
       await expect(page.getByRole('navigation', { name: /Hovednavigasjon/i })).toBeVisible();
     }
-    const results = await new AxeBuilder({ page })
+    const results = await new AxeBuilder({ page: page as unknown as AxePage })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .analyze();
     expect(results.violations, `${route} accessibility violations: ${JSON.stringify(results.violations, null, 2)}`).toEqual([]);

@@ -612,6 +612,8 @@
       oppdrag, sektor og videre instrukser.
     - Revurder personlig utrustning og felles utstyr, og vurder behov for ekstra
       ressurser, vann og logistikk.
+    - Avklar vannkilder, pumpeplasser og mulig slangevei tidlig dersom laget
+      skal støtte vannforsyning.
     - Lag en foreløpig plan, forbered 5-punktsordre og gi deretter ordre til
       mannskap.
     - Hold kontinuerlig kontroll over personellet og løpende dialog med
@@ -627,13 +629,70 @@
     - Rapporter sektorstatus, mannskapsstatus, vannbehov og observerte
       fareendringer.
     - Rapporter til beredskapsvakt/sivilforsvarsdistrikt.
-  sourceIds: [ src-tiltakskort-under-innsats ]
+  sourceIds:
+    [
+      src-tiltakskort-under-innsats,
+      src-kursplan-grunnkurs-fig10,
+      src-eksempler-pa-utlegg-fra-pumpe
+    ]
   competenceRequired: [ FIG10 ]
   equipmentRequired: [ verneutstyr, samband, vann ]
   warning: Generisk støtte for Sivilforsvaret; følg brannvesenets innsatsledelse
     og lokal ordre.
   authority: leder
   reviewStatus: pending-fagperson
+
+- slug: skogbrann-vannforsyningsplan
+  title: Skogbrann vannforsyningsplan
+  phase: under
+  roles: [ lagforer, leder, materiellansvarlig ]
+  scenarios: [ skogbrann, brann ]
+  priority: high
+  steps:
+    - Bekreft sektor, leveringspunkt og ønsket effekt med innsatsleder før
+      laget legger pumpe eller slange.
+    - Finn aktuell vannkilde og alternativ vannkilde; vurder trygg adkomst,
+      mannskapsplassering, røyk, varme, vind og retrett før pumpeplass velges.
+    - Marker pumpeplass, mulig slangevei og leveringspunkt lokalt på kart eller
+      skisse uten å dele sensitive lokasjonsdetaljer videre.
+    - Del slangeveien i etapper og vurder vannføring og trykktap i
+      slangeutlegget før materiell fordeles.
+    - Avklar med leder/fagressurs om trykkforsterkning, seriekjøring,
+      parallelle utlegg eller kortere etapper trengs før langt slangeutlegg.
+    - Fordel mannskap på pumpe, vannkilde, slangeoverganger, kritiske knekkpunkt
+      og leveringspunkt.
+    - Følg med på vannmangel, luft i systemet, trykkfall, friksjonsskader,
+      drivstoff, mannskapsbelastning og endringer i brannbildet.
+    - Revider planen ved vindskifte, ny sektor, flyttet leveringspunkt,
+      materiellsvikt eller ordreendring.
+  safety:
+    - Hold retrettvei og sikker sone kjent før utlegg går frem mot brannen.
+    - Stans utlegg ved uavklart røyk-/varmepåkjenning, trafikkfare, strømfare
+      eller tap av samband.
+  reporting:
+    - Rapporter vannkilde, pumpeplass, slangevei, kjent begrensning og behov for
+      ekstra pumper, slanger, overganger eller mannskap.
+    - Meld raskt om trykkfall, vannmangel, skadet slange, flyttet brannfront
+      eller behov for avløsning.
+  sourceIds:
+    [
+      src-tiltakskort-under-innsats,
+      src-eksempler-pa-utlegg-fra-pumpe,
+      src-kursplan-grunnkurs-fig10
+    ]
+  competenceRequired: [ FIG10 ]
+  equipmentRequired: [ pumpe, slangeutlegg, samband, vann, verneutstyr ]
+  warning: Planleggingsstøtte for pumpe og slange; innsatsleder og fagressurs
+    bestemmer taktikk og kapasitet.
+  authority: leder
+  reviewStatus: pending-fagperson
+  doNot:
+    [
+      "Ikke dimensjoner vannforsyning på tall fra appen alene; avklar kapasitet,
+        trykk og taktikk med leder/fagressurs.",
+      "Ikke flytt pumpe, slangevei eller leveringspunkt inn i ny risiko uten
+        ordre og kjent retrettvei."
+    ]
 
 - slug: brann-vannforsyning-slange
   title: Brannstøtte med vannforsyning og slange
@@ -642,23 +701,43 @@
   scenarios: [ brann, skogbrann ]
   priority: medium
   steps:
-    - Avklar ønsket effekt, vannkilde, pumpeplass, slangevei og trygt
-      arbeidsområde.
-    - Legg slange slik at ferdsel, rømningsvei og kjøretøyflyt ikke blokkeres
-      unødvendig.
-    - Overvåk koblinger, trykkendringer, friksjonsskader og behov for mer
-      materiell.
+    - Avklar oppdrag, ønsket leveringspunkt, vannkilde, pumpeplass, slangevei
+      og trygt arbeidsområde med leder.
+    - Velg pumpeplass med sikker adkomst, plass til materiell og mulighet for
+      å holde mannskap unna trafikk, varme, røyk og ustabil kant.
+    - Planlegg slangevei fra vannkilde/pumpe til leveringspunkt før utlegg;
+      hold rømningsvei, ferdsel og kjøretøyflyt åpne så langt det lar seg gjøre.
+    - Vurder vannføring og trykktap i slangeutlegget; be leder avklare om
+      trykkforsterkning, seriekjøring eller kortere etapper trengs.
+    - Ved lang avstand eller stor vannmengde, vurder parallelle utlegg mellom
+      pumper når nok slanger, overganger og samlerør er tilgjengelig.
+    - Legg slanger slik at koblinger kan kontrolleres og slangen beskyttes mot
+      knekk, skarpe kanter, kjøretøy og friksjonsskader.
+    - Overvåk vannkilde, pumpe, koblinger, trykkendringer, knekk,
+      friksjonsskader, drivstoff og behov for mer materiell.
+    - Oppdater leder med pumpeplass, slangevei, kjent begrensning og behov for
+      ekstra slanger, pumper eller mannskap.
   reporting:
-    - Meld kapasitet, avbrudd, vannmangel og materiellbehov til leder.
-  sourceIds: [ src-tiltakskort-under-innsats, src-eksempler-pa-utlegg-fra-pumpe ]
+    - Meld kapasitet, avbrudd, vannmangel, trykktap og materiellbehov til leder.
+    - Noter lokalt hvor vannkilde, pumpeplass og slangevei ligger, uten å dele
+      sensitive lokasjonsdetaljer videre i appen.
+  sourceIds:
+    [
+      src-tiltakskort-under-innsats,
+      src-eksempler-pa-utlegg-fra-pumpe,
+      src-kursplan-grunnkurs-fig10
+    ]
   competenceRequired: [ FIG10 ]
   equipmentRequired: [ pumpe, slangeutlegg, samband ]
   warning: Ikke brannteknisk taktikk; utfør bare støtteoppgaver gitt av innsatsledelse.
   authority: lagforer
+  reviewStatus: pending-fagperson
   doNot:
     [
       "Stans ved fare fra trafikk, røyk, varme, elektrisk anlegg eller ustabil
         vannvei.",
+      "Ikke dimensjoner vannforsyning på tall fra appen alene; avklar kapasitet,
+        trykk og taktikk med leder/fagressurs.",
       Ikke brannteknisk taktikk; utfør bare støtteoppgaver gitt av
         innsatsledelse.
     ]
@@ -727,6 +806,53 @@
     [
       Ikke kryss inn i ny sektor uten ordre når det kan skape dobbeltarbeid
         eller risiko.
+    ]
+
+- slug: soketeig-plan-kart
+  title: Søketeig plan på lokalt kart
+  phase: under
+  roles: [ lagforer, leder, mannskap ]
+  scenarios: [ sok-og-redning ]
+  priority: high
+  steps:
+    - Bekreft oppdrag, teiggrense, metode, laginndeling, samband og
+      rapporteringsintervall med KO/leder før laget starter søk.
+    - Tegn teiggrensen som skjematiske lokale kartpunkt uten ekte koordinater,
+      navn, identitet eller private opplysninger.
+    - Marker startpunkt og returpunkt slik at laget vet hvor søket begynner,
+      hvor status meldes og hvor laget samles ved avbrudd.
+    - Avklar hvordan dekningsgrad, hindringer, funn, avvik og usikre grenser
+      skal meldes.
+    - Oppdater planen ved ordreendring, tap av samband, farlig terreng,
+      mørke/vær eller uklar lagstatus.
+  safety:
+    - Stans eller trekk laget ut ved tap av samband, ukjent lagstatus, farlig
+      terreng, trafikkfare eller ny ordre.
+    - Ikke bruk kartplanen til live tracking eller deling av sensitive
+      posisjoner.
+  reporting:
+    - Rapporter teigstatus, dekningsgrad, hindringer, funn, avvik og behov via
+      avtalt sambandsvei.
+    - Meld uavklarte teiggrenser til KO/innsatsleder før laget flyttes til ny
+      sektor.
+  sourceIds:
+    [
+      src-vedlegg-c-operative-forhold,
+      src-tiltakskort-under-innsats,
+      src-kommunikasjons-og-sambandsdiagram
+    ]
+  competenceRequired: [ FIG10, FIG20 ]
+  equipmentRequired: [ personlig-utrustning, samband ]
+  warning: Lokal beslutningsstøtte for tildelt søketeig. KO/innsatsleder
+    bestemmer teig, metode og prioritet; appen deler ikke posisjon.
+  authority: leder
+  reviewStatus: pending-fagperson
+  doNot:
+    [
+      "Ikke lagre navn, identitet, ekte koordinater, private opplysninger eller
+        sensitive posisjoner i kartplanen.",
+      "Ikke bruk appen til live tracking eller automatisk deling av
+        søksposisjon."
     ]
 
 - slug: flom-pumpe-vannforsyning
@@ -958,6 +1084,53 @@
         verneutstyr eller ordreendring."
     ]
 
+- slug: mre-soneplan-kart
+  title: MRE soneplan på lokalt kart
+  phase: under
+  roles: [ mre, lagforer, leder ]
+  scenarios: [ cbrn-cbrne ]
+  priority: high
+  steps:
+    - Bekreft oppdrag, stoffmistanke, ren side, uren side, renselinje,
+      innpassering og utpassering med innsatsleder/fagmyndighet før etablering.
+    - Tegn ren side, uren side og renselinje som skjematiske lokale kartobjekter
+      uten ekte koordinater, persondata eller pasientdata.
+    - Marker avfallspunkt, kapasitet, kø, forbruk, stoppunkt og behov for
+      forsterkning uten å lagre stoffdetaljer eller taktiske sperringer.
+    - Kontroller vann, renseutstyr, verneutstyr, samband og makkerkontroll før
+      personell flyttes gjennom renselinjen.
+    - Revider planen ved værendring, ordreendring, uklar sone, skadet
+      verneutstyr eller stopp i renseflyten.
+  safety:
+    - Appen fastsetter ikke stoff, vernenivå, sonegrense eller rensetaktikk;
+      gjeldende ordre og fagmyndighet styrer.
+    - Stans planlagt flyt ved ukjent stoff, uklar ren/uren grense, manglende
+      vann/renseutstyr, skadet verneutstyr eller symptomer hos personell.
+  reporting:
+    - Rapporter soneavklaring, kapasitet, kø, forbruk, avfallspunkt, stopp,
+      avvik og behov for forsterkning via avtalt sambandsvei.
+    - Meld uavklarte grenser eller endret renseflyt til innsatsleder og
+      fagmyndighet før laget fortsetter.
+  sourceIds:
+    [
+      src-veileder-for-sivilforsvarets-renseenheter-cbrn,
+      src-samvirke-pa-forurenset-skadested-cbrne-sps41,
+      src-sjekkliste-mobil-renseenhet-mre
+    ]
+  competenceRequired: [ MRE10, MRE30, SPS41 ]
+  equipmentRequired: [ renseutstyr, verneutstyr, vann, samband ]
+  warning: Lokal beslutningsstøtte for MRE soneplan. Fagmyndighet,
+    innsatsleder og lokal prosedyre styrer; appen er ikke et offisielt
+    sone- eller renseoppsett.
+  authority: leder
+  reviewStatus: pending-fagperson
+  doNot:
+    [
+      "Ikke lagre ekte koordinater, persondata, pasientdata, stoffdetaljer
+        eller taktiske sperringer i kartplanen.",
+      "Ikke fastsett stoff, vernenivå, sonegrense eller rensetaktikk i appen."
+    ]
+
 - slug: radiac-malepunkt
   title: RADIAC målepunkt
   phase: under
@@ -988,6 +1161,50 @@
     [
       "Avbryt ved uventet høy verdi, instrumentfeil, uklar ordre eller behov
         for fagmyndighet."
+    ]
+
+- slug: radiac-maleplan-kart
+  title: RADIAC måleplan på lokalt kart
+  phase: under
+  roles: [ rad, lagforer, leder ]
+  scenarios: [ radiac-nedfall ]
+  priority: high
+  steps:
+    - Bekreft måleordre, formål, rapporteringsformat, faglig kontakt og
+      sambandsvei før laget markerer målepunkter.
+    - Legg inn målepunkter og målerute som skjematiske lokale kartobjekter uten
+      ekte koordinater, persondata eller skjermede posisjoner.
+    - Nummerer målepunktene i den rekkefølgen laget skal bruke, og avklar hvor
+      kontrollmåling eller avbrudd skal meldes.
+    - Kontroller instrument, dosimeter, verneutstyr og returrutine før avmarsj.
+    - Revider måleplanen ved ordreendring, instrumentfeil, uventet målebilde
+      eller endret sikkerhetsvurdering.
+  safety:
+    - Stans planlagt rute ved uklar ordre, tap av samband, manglende dosimeter
+      eller behov for fagmyndighet.
+    - Appen beregner ikke dose, oppholdstid eller grenseverdier.
+  reporting:
+    - Rapporter målepunkt, tid, metode, posisjonsreferanse, usikkerhet og avvik
+      via avtalt sambandsvei.
+    - Meld instrumentfeil, behov for kontrollmåling og endret måleplan til
+      leder/fagmyndighet.
+  sourceIds:
+    [
+      src-bestemmelse-radiacmaletjeneste-del-i,
+      src-sjekkliste-radiaclag-rad,
+      src-kommunikasjons-og-sambandsdiagram
+    ]
+  competenceRequired: [ RAD10, RAD30 ]
+  equipmentRequired: [ dosimeter, maleinstrument, samband, verneutstyr ]
+  warning: Lokal beslutningsstøtte for måleplan. Følg RADIAC-ordre,
+    fagmyndighet og rapporteringsformat; ikke bruk appen til doseberegning.
+  authority: leder
+  reviewStatus: pending-fagperson
+  doNot:
+    [
+      "Ikke lagre ekte koordinater, persondata, pasientdata eller skjermede
+        posisjoner i kartplanen.",
+      "Ikke beregn dose, oppholdstid eller grenseverdier i appen."
     ]
 
 - slug: radiac-oppholdstid-rullering
@@ -1055,6 +1272,51 @@
     [
       "Ikke send eller motta MFE uten tydelig kontaktpunkt, oppdragsforståelse
         og sikkerhetsbrief."
+    ]
+
+- slug: mfe-mottaksboard-lokal
+  title: Lokal MFE mottaksboard
+  phase: under
+  roles: [ beredskapsvakt, leder, mfe, stab-logistikk ]
+  scenarios: [ mfe-stotte, generelt ]
+  priority: medium
+  steps:
+    - Bruk mottaksboardet som lokal huskeliste for kontaktpunkt, mottaker,
+      oppmøte, første ordre og hvem som følger opp MFE-støtten lokalt.
+    - Følg opp drift, liaison, ressursbehov, avvik, forsyning, avløsning og
+      demobilisering uten å lagre navn eller kontaktlister.
+    - Koble boardet til lokal oppgaveliste og ressursbehov; bruk ordinære
+      systemer og kommandolinje for offisiell anmodning, beslutning og rapport.
+    - Avslutt med MBK, retur, etterkontroll, læringspunkt og avklarte avvik
+      etter gjeldende ordre.
+  safety:
+    - Boardet er lokal beslutningsstøtte og erstatter ikke tiltakskort,
+      distriktets ordre eller innsatsleders beslutning.
+    - Ikke skriv navn, telefon, e-post, reg.nr., serienummer, private
+      lokasjoner eller skjermet materiellplassering i appen.
+  reporting:
+    - Rapporter ankomst, status, flaskehalser, ressursbehov, avvik og avslutning
+      via avtalt sambandsvei og ordinære systemer.
+    - Noter bare generelle kategorier og status lokalt; ikke bruk appen som
+      offisiell logg eller MFE-register.
+  sourceIds:
+    [
+      src-tiltakskort-05-stotte-av-mfe,
+      src-tiltakskort-06-oppsettende-mfe-distrikt,
+      src-sjekkliste-mobil-forsterkningsenhet-mfe
+    ]
+  competenceRequired: [ MFE10 ]
+  equipmentRequired: [ samband, kjoretoy ]
+  warning: Lokal mottaksboard for MFE-støtte. Ingen offisiell anmodning sendes
+    fra appen; beredskapsvakt, distrikt, innsatsleder og gjeldende ordre styrer.
+  authority: leder
+  reviewStatus: pending-fagperson
+  doNot:
+    [
+      "Ikke bruk boardet som offisiell anmodning, utkalling, ressursregister
+        eller rapport.",
+      "Ikke lagre navn, kontaktinformasjon, reg.nr., serienummer, private
+        lokasjoner eller skjermede materiellplasseringer."
     ]
 
 - slug: posisjonsrapport-kart-kompass-gps
@@ -1135,6 +1397,50 @@
     [
       "Ikke kjør med uavklart fører, usikret last, kjent teknisk feil eller
         manglende oppdrag."
+    ]
+
+- slug: atv-bat-transportlogistikk
+  title: ATV, båt og transportlogistikk
+  phase: for
+  roles: [ atv-bat, lagforer, materiellansvarlig, stab-logistikk ]
+  scenarios: [ generelt, evakuering, sok-og-redning, flom ]
+  priority: medium
+  reviewStatus: pending-fagperson
+  steps:
+    - Avklar transportoppdrag, last/passasjerbehov, varighet, mottak og hvem som
+      melder klar eller mangler før enhet settes inn.
+    - Bekreft relevant føreropplæring for aktuell transporttype og at lokal ordre,
+      trafikk-/sjøregler, HMS og begrensninger er forstått.
+    - Kontroller drivstoff, samband, lys/merking, førstehjelpsutstyr, lastesikring,
+      tilhenger og relevant verne-/sikringsutstyr.
+    - Vurder rute, terreng, sjø, vær, vendepunkt, parkering, alternativ rute og hva
+      som må avklares med leder før avgang.
+    - Planlegg avløsning, drivstoff/forbruk, enkel service, retur, vask/service og
+      MBK før ny beredskap.
+  reporting:
+    - Rapporter klar/mangler, ruteavvik, vedlikeholdsbehov, ressursmangel og retur
+      lokalt uten persondata eller kjøretøyidentifikatorer.
+  sourceIds:
+    [
+      src-opplaering-forer-av-atb,
+      src-opplaering-forer-av-bat,
+      src-opplaering-materiellansvarlig-fig,
+      src-sjekkliste-fig-og-figp,
+      src-tiltakskort-for-innsats,
+    ]
+  competenceRationale: Relevant fører-/båtførerkompetanse avhenger av transporttype;
+    ATV, båt og lett lastebil behandles som separate ferdigheter etter lokal
+    ordre og opplæringsplan.
+  equipmentRequired: [ kjoretoy, samband, verneutstyr ]
+  warning: Lokal planleggingsstøtte; ikke ruteordre, kjørebok, offisiell
+    ressursanmodning eller sporingssystem.
+  authority: lagforer
+  doNot:
+    [
+      "Ikke lagre navn, passasjerdetaljer, kjøretøyidentifikatorer, skjermede
+        ruter eller materiell-lokasjoner i appen.",
+      "Ikke sett ATV, båt eller kjøretøy inn uten relevant førerkompetanse,
+        avklart oppdrag og lederens risikovurdering.",
     ]
 
 - slug: pumpe-stromfare

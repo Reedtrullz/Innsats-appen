@@ -92,6 +92,70 @@ test('offline map page is local-only, schematic and tile-free', async ({ page, c
   await expect(page.getByTestId('operations-marker-list')).toContainText(/IL-KO — KO lokal/i);
   await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1'))).toContain('il-ko');
 
+  const waterSupplyPlanner = page.getByRole('region', { name: /Pumpe- og slangeplanlegger/i });
+  await waterSupplyPlanner.getByLabel(/Planetikett/i).fill('Skogbrann vest');
+  await waterSupplyPlanner.getByLabel(/Vannkilde X-koordinat/i).fill('10');
+  await waterSupplyPlanner.getByLabel(/Vannkilde Y-koordinat/i).fill('20');
+  await waterSupplyPlanner.getByLabel(/Pumpeplass X-koordinat/i).fill('25');
+  await waterSupplyPlanner.getByLabel(/Pumpeplass Y-koordinat/i).fill('35');
+  await waterSupplyPlanner.getByLabel(/Leveringspunkt X-koordinat/i).fill('60');
+  await waterSupplyPlanner.getByLabel(/Leveringspunkt Y-koordinat/i).fill('50');
+  await waterSupplyPlanner.getByLabel(/Planmerknad uten persondata/i).fill('Avklart med leder');
+  await waterSupplyPlanner.getByRole('button', { name: /Lag pumpe- og slangeplan/i }).click();
+  await expect(page.getByTestId('operations-marker-list')).toContainText(/Ressurs — Vannkilde Skogbrann vest/i);
+  await expect(page.getByTestId('operations-marker-list')).toContainText(/Pumpeplass — Pumpeplass Skogbrann vest/i);
+  await expect(page.getByTestId('operations-drawing-list')).toContainText(/Linje — Slangevei Skogbrann vest/i);
+  await expect(waterSupplyPlanner.getByTestId('water-supply-plan-summary')).toContainText(/trykkforsterkning|seriekjøring/i);
+  await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).toContain('"kind":"pump-location"');
+  await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).not.toMatch(/\b\d+\s*(?:l\/min|liter\/min|bar|m3\/t)\b/i);
+
+  const radiacPlanner = page.getByRole('region', { name: /RADIAC målepunktplanlegger/i });
+  await radiacPlanner.getByLabel(/RADIAC planetikett/i).fill('RAD nord');
+  await radiacPlanner.getByLabel(/Målepunkter som x,y/i).fill('15,30 35,40 55,45');
+  await radiacPlanner.getByLabel(/RADIAC planmerknad uten persondata/i).fill('Rapporteringsformat avklart');
+  await radiacPlanner.getByRole('button', { name: /Lag RADIAC måleplan/i }).click();
+  await expect(page.getByTestId('operations-marker-list')).toContainText(/Observasjon — Målepunkt 1 RAD nord/i);
+  await expect(page.getByTestId('operations-drawing-list')).toContainText(/Linje — Målerute RAD nord/i);
+  await expect(radiacPlanner.getByTestId('radiac-measurement-plan-summary')).toContainText(/beregner ikke dose/i);
+  await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).toContain('Målerute RAD nord');
+  await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).not.toMatch(/\b\d+\s*(?:µ?Sv\/h|mSv|dosegrense|oppholdstid)\b/i);
+
+  const searchPlanner = page.getByRole('region', { name: /Søketeig planlegger/i });
+  await searchPlanner.getByLabel(/Søketeig etikett/i).fill('Teig alfa');
+  await searchPlanner.getByLabel(/Teiggrense som x,y/i).fill('10,20 42,18 48,52 14,58');
+  await searchPlanner.getByLabel(/Startpunkt X-koordinat/i).fill('12');
+  await searchPlanner.getByLabel(/Startpunkt Y-koordinat/i).fill('22');
+  await searchPlanner.getByLabel(/Returpunkt X-koordinat/i).fill('40');
+  await searchPlanner.getByLabel(/Returpunkt Y-koordinat/i).fill('55');
+  await searchPlanner.getByLabel(/Søketeig planmerknad uten persondata/i).fill('Rapporteringsintervall avklart');
+  await searchPlanner.getByRole('button', { name: /Lag søketeig plan/i }).click();
+  await expect(page.getByTestId('operations-marker-list')).toContainText(/Møteplass — Startpunkt Teig alfa/i);
+  await expect(page.getByTestId('operations-drawing-list')).toContainText(/Sektor\/teig — Søketeig Teig alfa/i);
+  await expect(searchPlanner.getByTestId('search-sector-plan-summary')).toContainText(/live tracking/i);
+  await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).toContain('Søketeig Teig alfa');
+  await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).not.toMatch(/\b(?:personnummer|\+47|pasient|GPS-sporing|blue-force|sanntidsposisjon)\b/i);
+
+  const mrePlanner = page.getByRole('region', { name: /MRE ren\/uren-side planlegger/i });
+  await mrePlanner.getByLabel(/MRE planetikett/i).fill('Rens nord');
+  await mrePlanner.getByLabel(/Uren side som x,y/i).fill('10,20 38,18 36,46 12,48');
+  await mrePlanner.getByLabel(/^Ren side som x,y/i).fill('48,22 76,22 74,48 50,50');
+  await mrePlanner.getByLabel(/Renselinje som x,y/i).fill('40,20 44,52');
+  await mrePlanner.getByLabel(/Innpassering X-koordinat/i).fill('14');
+  await mrePlanner.getByLabel(/Innpassering Y-koordinat/i).fill('24');
+  await mrePlanner.getByLabel(/Utpassering X-koordinat/i).fill('54');
+  await mrePlanner.getByLabel(/Utpassering Y-koordinat/i).fill('46');
+  await mrePlanner.getByLabel(/Avfallspunkt X-koordinat/i).fill('32');
+  await mrePlanner.getByLabel(/Avfallspunkt Y-koordinat/i).fill('54');
+  await mrePlanner.getByLabel(/MRE planmerknad uten persondata/i).fill('Samband og stoppkriterier avklart');
+  await mrePlanner.getByRole('button', { name: /Lag MRE soneplan/i }).click();
+  await expect(page.getByTestId('operations-marker-list')).toContainText(/Møteplass — Innpassering Rens nord/i);
+  await expect(page.getByTestId('operations-marker-list')).toContainText(/Ressurs — Avfallspunkt Rens nord/i);
+  await expect(page.getByTestId('operations-drawing-list')).toContainText(/Polygon — Uren side Rens nord/i);
+  await expect(page.getByTestId('operations-drawing-list')).toContainText(/Linje — Renselinje Rens nord/i);
+  await expect(mrePlanner.getByTestId('mre-zone-plan-summary')).toContainText(/fastsetter ikke stoff/i);
+  await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).toContain('Renselinje Rens nord');
+  await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).not.toMatch(/\b(?:personnummer|\+47|pasient|Level\s*A|nivå\s*A|sarin|klorgass|cyanid)\b/i);
+
   await page.getByRole('button', { name: /Lagre lokal tegning\/sektor/i }).click();
   await expect(page.getByTestId('map-measurement-readout')).toContainText(/Sektor\/teig: avstand/i);
 

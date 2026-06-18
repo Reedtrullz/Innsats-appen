@@ -1,7 +1,7 @@
 import { RecentCardsRow } from '@/components/recent-cards';
 import { SearchBox } from '@/components/search-box';
 import { TiltakCardRow } from '@/components/tiltak-card';
-import { getActionCards, getContentManifest, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSearchSynonyms, getSourceDocuments, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
+import { getActionCards, getChecklists, getContentManifest, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSearchSynonyms, getSourceDocuments, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
 import { buildSearchDocuments } from '@/lib/content/search-documents';
 import { sortActionCards } from '@/lib/content/filters';
 import { formatNbDateTime } from '@/lib/formatting/format-date';
@@ -12,6 +12,7 @@ export default function HurtigkortPage() {
   const searchDocuments = buildSearchDocuments({
     queryBasePath: '/hurtigkort',
     cards,
+    checklists: getChecklists(),
     sources,
     glossary: getGlossaryTerms(),
     training: getTrainingPaths(),

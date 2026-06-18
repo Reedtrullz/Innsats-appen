@@ -103,12 +103,14 @@ describe('production Next build cleanup', () => {
       writeFixtureFile(root, '.next/server/app/kort/page.js', 'stale app route artifact\n');
       writeFixtureFile(root, '.next/server/chunks/deep/stale.js', 'stale server chunk\n');
       writeFixtureFile(root, '.next/cache/previous-build', 'stale build cache\n');
+      writeFixtureFile(root, '.next/standalone/.next/.DS_Store', 'macOS metadata\n');
 
       expect(existsSync(join(root, '.next/server/app/kort/page.js'))).toBe(true);
 
       cleanNextBuild(root);
 
       expect(existsSync(join(root, '.next/server'))).toBe(false);
+      expect(existsSync(join(root, '.next/standalone/.next/.DS_Store'))).toBe(false);
       expect(existsSync(join(root, '.next'))).toBe(false);
     } finally {
       rmSync(root, { recursive: true, force: true });

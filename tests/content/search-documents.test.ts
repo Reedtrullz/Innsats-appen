@@ -1,5 +1,5 @@
 import { buildSearchDocuments } from '@/lib/content/search-documents';
-import type { ActionCard, FAQEntry, GlossaryTerm, ProtectionMeasure, SourceDocument, TrainingPath } from '@/lib/content/schemas';
+import type { ActionCard, FAQEntry, GlossaryTerm, OperationalChecklist, ProtectionMeasure, SourceDocument, TrainingPath } from '@/lib/content/schemas';
 
 it('builds routeable search documents with operational metadata', () => {
   const docs = buildSearchDocuments({
@@ -32,6 +32,43 @@ it('builds routeable search documents with operational metadata', () => {
     href: '/kilder/src-flom',
     sourceStatus: 'verified',
   });
+});
+
+it('indexes operational checklists as routeable workflow documents', () => {
+  const docs = buildSearchDocuments({
+    queryBasePath: '/sok',
+    cards: [] as ActionCard[],
+    sources: [{ id: 'src-mfe', title: 'SRC - MFE mottak', sourcePath: 'source-extracts/SRC - MFE mottak.md', sourceType: 'source-extract', status: 'verified', verifiedAt: '2026-06-04', owner: 'content-team', reviewer: 'fag', reviewRisk: 'low', body: 'MFE mottak og oppfølging', warnings: [] }] as SourceDocument[],
+    glossary: [] as GlossaryTerm[],
+    checklists: [{
+      slug: 'mfe-mottak-under',
+      title: 'MFE mottak og oppfølging under innsats',
+      phase: 'under',
+      roles: ['beredskapsvakt', 'leder'],
+      scenarios: ['mfe-stotte'],
+      items: [
+        { id: 'mottak', label: 'Oppmøtested, liaison og rapporteringsrutine avklart', required: true, sourceIds: ['src-mfe'] },
+        { id: 'demobilisering', label: 'Retur, avvik og demobilisering fulgt opp uten persondata', required: true, sourceIds: ['src-mfe'] },
+      ],
+      sourceIds: ['src-mfe'],
+      warning: 'Lokal beslutningsstøtte.',
+    }] as OperationalChecklist[],
+    training: [] as TrainingPath[],
+    protection: [] as ProtectionMeasure[],
+    faq: [] as FAQEntry[],
+  });
+
+  expect(docs.find((doc) => doc.id === 'sjekkliste:mfe-mottak-under')).toMatchObject({
+    title: 'MFE mottak og oppfølging under innsats',
+    href: '/oppdrag#sjekkliste',
+    type: 'sjekkliste',
+    phase: 'under',
+    scenario: 'mfe-stotte',
+    role: 'beredskapsvakt leder',
+    sourceStatus: 'verified',
+    sourceIds: ['src-mfe'],
+  });
+  expect(docs.find((doc) => doc.id === 'sjekkliste:mfe-mottak-under')?.body).toMatch(/liaison|demobilisering|rapportering/i);
 });
 
 it('does not publish rejected source docs or unapproved source bodies into search documents', () => {

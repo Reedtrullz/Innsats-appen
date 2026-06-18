@@ -53,6 +53,11 @@
   aliases: [lensepumpe]
   synonyms: [flom, vannforsyning, slangeutlegg, vannskade]
   sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-operativt-konsept-for-sivilforsvaret]
+- term: slangeutlegg
+  definition: Slangeutlegg er planlagt slangevei fra vannkilde/pumpe til leveringspunkt, der vannføring, trykktap, trykkforsterkning og seriekjøring vurderes under ledelse.
+  aliases: [slangevei]
+  synonyms: [vannkilde, pumpeplass, vannforsyning, vannføring, trykktap, trykkforsterkning, seriekjøring, parallelle utlegg]
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-kursplan-grunnkurs-fig10]
 - term: skadde
   definition: Søketermer for skadde og førstehjelp peker til livreddende tiltak; ikke registrer pasientdata i appen.
   aliases: [skadet]
