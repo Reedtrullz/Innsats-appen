@@ -129,6 +129,56 @@ it('wires Hurtiglogg composer and log overview into the active mission dashboard
   expect(document.getElementById('loggoversikt')).toHaveTextContent('Dashboard loggoversikt entry');
 });
 
+it('surfaces secondary relevant checklists in the mission work panel', async () => {
+  await saveMission(mission({
+    id: 'mission-secondary-checklists',
+    title: 'Flom pumpe støtte',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'flom',
+  }));
+  const workflowChecklists = [
+    {
+      slug: 'flom-pumpe-under',
+      title: 'Flom pumpe under innsats',
+      phase: 'under',
+      roles: ['lagforer'],
+      scenarios: ['flom'],
+      sourceIds: ['src-eksempler-pa-utlegg-fra-pumpe'],
+      items: [{ id: 'pumpested', label: 'Pumpested og slangevei kontrollert', required: true, sourceIds: ['src-eksempler-pa-utlegg-fra-pumpe'] }],
+    },
+    {
+      slug: 'flom-sikring-under',
+      title: 'Flom sikring og avløsning',
+      phase: 'under',
+      roles: ['lagforer'],
+      scenarios: ['flom'],
+      sourceIds: ['src-tiltakskort-under-innsats'],
+      items: [{ id: 'avlosning', label: 'Avløsning, hvile og samband avklart', required: false, sourceIds: ['src-tiltakskort-under-innsats'] }],
+    },
+    {
+      slug: 'fig-under-innsats',
+      title: 'FIG under innsats',
+      phase: 'under',
+      roles: ['lagforer'],
+      scenarios: ['generelt'],
+      sourceIds: ['src-tiltakskort-under-innsats'],
+      items: [{ id: 'logg', label: 'Lokal logg og rapporteringslinje kontrollert', required: true, sourceIds: ['src-tiltakskort-under-innsats'] }],
+    },
+  ] as OperationalChecklist[];
+
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={workflowChecklists} actionCards={[]} />);
+
+  await openMissionMode('Arbeid');
+  expect(await screen.findByRole('heading', { name: /Flom pumpe under innsats/i })).toBeInTheDocument();
+  await userEvent.click(await findDetailsSummary(/Relevante kontroller/i));
+  const relevantControls = document.getElementById('relevante-kontroller');
+  expect(relevantControls).toHaveTextContent(/2 kontroller/i);
+  expect(relevantControls).toHaveTextContent(/Flom sikring og avløsning/i);
+  expect(relevantControls).toHaveTextContent(/FIG under innsats/i);
+  expect(relevantControls).not.toHaveTextContent(/Flom pumpe under innsats/i);
+});
+
 it('discloses the outbound boundary for public context lookups in mission creation', async () => {
   await renderMissionPanel(<MissionContextPanel mode="create" contentVersion="test-v1" checklists={checklists} actionCards={[]} />);
 

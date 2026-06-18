@@ -60,6 +60,10 @@ import {
   type MissionMapMarker,
   type MissionMapState,
 } from '@/lib/maps/operations-map';
+import { createMreZonePlanObjects, type MreZonePlanObjects } from '@/lib/maps/mre-zone-plan';
+import { createRadiacMeasurementPlanObjects, type RadiacMeasurementPlanObjects } from '@/lib/maps/radiac-measurement-plan';
+import { createSearchSectorPlanObjects, type SearchSectorPlanObjects } from '@/lib/maps/search-sector-plan';
+import { createWaterSupplyPlanObjects, type WaterSupplyPlanObjects } from '@/lib/maps/water-supply-plan';
 
 import { buildFieldLogEntryFromMapObject } from '@/lib/mission/map-log-link';
 import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
@@ -180,6 +184,10 @@ export function OfflineMapPanel() {
   const [drawingEditDraft, setDrawingEditDraft] = useState<DrawingEditDraft>({ label: '', coordinates: '', note: '' });
   const [drawingCoordinates, setDrawingCoordinates] = useState('12,20 40,22 34,54 16,48');
   const [lastDrawing, setLastDrawing] = useState<MissionMapDrawing | undefined>();
+  const [lastWaterSupplyPlan, setLastWaterSupplyPlan] = useState<WaterSupplyPlanObjects | null>(null);
+  const [lastRadiacPlan, setLastRadiacPlan] = useState<RadiacMeasurementPlanObjects | null>(null);
+  const [lastSearchSectorPlan, setLastSearchSectorPlan] = useState<SearchSectorPlanObjects | null>(null);
+  const [lastMreZonePlan, setLastMreZonePlan] = useState<MreZonePlanObjects | null>(null);
   const [imageExport, setImageExport] = useState('');
   const [geoJsonExport, setGeoJsonExport] = useState('');
   const [geoJsonImport, setGeoJsonImport] = useState('');
@@ -426,6 +434,115 @@ export function OfflineMapPanel() {
     if (editingMarkerId === marker.id) cancelMarkerEdit();
   }
 
+  function addWaterSupplyPlan(formData: FormData) {
+    if (!activeMission) {
+      setMapPrivacyError(null);
+      setStatusMessage('Opprett aktivt oppdrag før du lager pumpe- og slangeplan.');
+      return;
+    }
+    try {
+      setMapPrivacyError(null);
+      const plan = createWaterSupplyPlanObjects({
+        missionId: activeMission.id,
+        label: formData.get('waterPlanLabel'),
+        waterSource: { x: formData.get('waterSourceX'), y: formData.get('waterSourceY') },
+        pump: { x: formData.get('pumpX'), y: formData.get('pumpY') },
+        delivery: { x: formData.get('deliveryX'), y: formData.get('deliveryY') },
+        note: formData.get('waterPlanNote'),
+      });
+      setLastWaterSupplyPlan(plan);
+      setLastDrawing(plan.hoseLine);
+      persistState({
+        markers: [...mapState.markers, ...plan.markers],
+        drawings: [...mapState.drawings, plan.hoseLine],
+      }, `Lagret pumpe- og slangeplan lokalt (${plan.summary.hoseLengthSchematicUnits} skjematiske enheter).`);
+    } catch (error) {
+      showMapPrivacyError(error);
+    }
+  }
+
+  function addRadiacMeasurementPlan(formData: FormData) {
+    if (!activeMission) {
+      setMapPrivacyError(null);
+      setStatusMessage('Opprett aktivt oppdrag før du lager RADIAC måleplan.');
+      return;
+    }
+    try {
+      setMapPrivacyError(null);
+      const plan = createRadiacMeasurementPlanObjects({
+        missionId: activeMission.id,
+        label: formData.get('radiacPlanLabel'),
+        points: parseCoordinateText(String(formData.get('radiacPlanPoints') ?? '')),
+        note: formData.get('radiacPlanNote'),
+      });
+      setLastRadiacPlan(plan);
+      setLastDrawing(plan.routeLine);
+      persistState({
+        markers: [...mapState.markers, ...plan.markers],
+        drawings: [...mapState.drawings, plan.routeLine],
+      }, `Lagret RADIAC måleplan lokalt (${plan.summary.measurementPointCount} målepunkt).`);
+    } catch (error) {
+      showMapPrivacyError(error);
+    }
+  }
+
+  function addSearchSectorPlan(formData: FormData) {
+    if (!activeMission) {
+      setMapPrivacyError(null);
+      setStatusMessage('Opprett aktivt oppdrag før du lager søketeig plan.');
+      return;
+    }
+    try {
+      setMapPrivacyError(null);
+      const plan = createSearchSectorPlanObjects({
+        missionId: activeMission.id,
+        label: formData.get('searchPlanLabel'),
+        sectorPoints: parseCoordinateText(String(formData.get('searchSectorPoints') ?? '')),
+        start: { x: formData.get('searchStartX'), y: formData.get('searchStartY') },
+        exit: { x: formData.get('searchExitX'), y: formData.get('searchExitY') },
+        note: formData.get('searchPlanNote'),
+      });
+      setLastSearchSectorPlan(plan);
+      setLastDrawing(plan.sector);
+      persistState({
+        markers: [...mapState.markers, ...plan.markers],
+        drawings: [...mapState.drawings, plan.sector],
+      }, `Lagret søketeig plan lokalt (${plan.summary.boundaryPointCount} grensepunkt).`);
+    } catch (error) {
+      showMapPrivacyError(error);
+    }
+  }
+
+  function addMreZonePlan(formData: FormData) {
+    if (!activeMission) {
+      setMapPrivacyError(null);
+      setStatusMessage('Opprett aktivt oppdrag før du lager MRE soneplan.');
+      return;
+    }
+    try {
+      setMapPrivacyError(null);
+      const plan = createMreZonePlanObjects({
+        missionId: activeMission.id,
+        label: formData.get('mrePlanLabel'),
+        dirtyZonePoints: parseCoordinateText(String(formData.get('mreDirtyZonePoints') ?? '')),
+        cleanZonePoints: parseCoordinateText(String(formData.get('mreCleanZonePoints') ?? '')),
+        rinseLinePoints: parseCoordinateText(String(formData.get('mreRinseLinePoints') ?? '')),
+        entry: { x: formData.get('mreEntryX'), y: formData.get('mreEntryY') },
+        exit: { x: formData.get('mreExitX'), y: formData.get('mreExitY') },
+        waste: { x: formData.get('mreWasteX'), y: formData.get('mreWasteY') },
+        note: formData.get('mrePlanNote'),
+      });
+      setLastMreZonePlan(plan);
+      setLastDrawing(plan.rinseLine);
+      persistState({
+        markers: [...mapState.markers, ...plan.markers],
+        drawings: [...mapState.drawings, plan.dirtyZone, plan.cleanZone, plan.rinseLine],
+      }, `Lagret MRE soneplan lokalt (${plan.summary.zoneCount} soner).`);
+    } catch (error) {
+      showMapPrivacyError(error);
+    }
+  }
+
   async function createLogFromMapObject(mapObject: MissionMapMarker | MissionMapDrawing) {
     if (!activeMission) {
       setStatusMessage('Opprett aktivt oppdrag før feltlogg fra kart.');
@@ -661,6 +778,205 @@ export function OfflineMapPanel() {
       ) : (
         <SchematicMap packageId={selectedSchematicPackage.id} state={filteredState} enabledLayers={enabledLayers} />
       )}
+
+      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Pumpe- og slangeplanlegger">
+        <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Skogbrann vannforsyning</p>
+            <h2 className="text-2xl font-black">Pumpe- og slangeplan</h2>
+          </div>
+          <Link href="/kort/skogbrann-vannforsyningsplan" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-black text-slate-950">
+            Åpne tiltakskort
+          </Link>
+        </div>
+        <form action={addWaterSupplyPlan} className="grid gap-3 md:grid-cols-3">
+          <label className="text-sm font-bold md:col-span-3">Planetikett
+            <input name="waterPlanLabel" required defaultValue="Skogbrann vannforsyning" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Vannkilde X-koordinat (0-100)
+            <input name="waterSourceX" required type="number" min="0" max="100" defaultValue="12" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Vannkilde Y-koordinat (0-100)
+            <input name="waterSourceY" required type="number" min="0" max="100" defaultValue="78" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Pumpeplass X-koordinat (0-100)
+            <input name="pumpX" required type="number" min="0" max="100" defaultValue="28" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Pumpeplass Y-koordinat (0-100)
+            <input name="pumpY" required type="number" min="0" max="100" defaultValue="62" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Leveringspunkt X-koordinat (0-100)
+            <input name="deliveryX" required type="number" min="0" max="100" defaultValue="58" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Leveringspunkt Y-koordinat (0-100)
+            <input name="deliveryY" required type="number" min="0" max="100" defaultValue="42" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold md:col-span-3">Planmerknad uten persondata
+            <textarea name="waterPlanNote" className="mt-1 min-h-20 w-full rounded-xl border p-3" placeholder="Valgfri lokal merknad" />
+          </label>
+          <button type="submit" className={`${primaryButtonClass} md:col-span-3`}>Lag pumpe- og slangeplan</button>
+        </form>
+        <div data-testid="water-supply-plan-summary" className="space-y-2 rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-800">
+          <p className="font-black text-slate-950">
+            {lastWaterSupplyPlan
+              ? `Slangevei ${lastWaterSupplyPlan.summary.hoseLengthSchematicUnits} skjematiske enheter · ${lastWaterSupplyPlan.summary.markerCount} markører · ${lastWaterSupplyPlan.summary.drawingCount} linje`
+              : 'Ingen pumpe- og slangeplan laget i denne kartøkten.'}
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            {(lastWaterSupplyPlan?.planningPrompts ?? [
+              'Avklar vannføring og trykktap med leder/fagressurs.',
+              'Vurder trykkforsterkning, seriekjøring eller parallelle utlegg før langt slangeutlegg.',
+            ]).map((prompt) => <li key={prompt}>{prompt}</li>)}
+          </ul>
+        </div>
+      </section>
+
+      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="RADIAC målepunktplanlegger">
+        <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-wide text-sky-700">RADIAC måletjeneste</p>
+            <h2 className="text-2xl font-black">RADIAC måleplan</h2>
+          </div>
+          <Link href="/kort/radiac-maleplan-kart" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-black text-slate-950">
+            Åpne tiltakskort
+          </Link>
+        </div>
+        <form action={addRadiacMeasurementPlan} className="grid gap-3">
+          <label className="text-sm font-bold">RADIAC planetikett
+            <input name="radiacPlanLabel" required defaultValue="RAD måleplan" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Målepunkter som x,y (skjematisk 0-100)
+            <textarea name="radiacPlanPoints" required defaultValue="15,30 35,40 55,45" className="mt-1 min-h-20 w-full rounded-xl border p-3 font-mono text-xs" />
+          </label>
+          <label className="text-sm font-bold">RADIAC planmerknad uten persondata
+            <textarea name="radiacPlanNote" className="mt-1 min-h-20 w-full rounded-xl border p-3" placeholder="Valgfri lokal merknad om ordre/rapportformat" />
+          </label>
+          <button type="submit" className={primaryButtonClass}>Lag RADIAC måleplan</button>
+        </form>
+        <div data-testid="radiac-measurement-plan-summary" className="space-y-2 rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-800">
+          <p className="font-black text-slate-950">
+            {lastRadiacPlan
+              ? `${lastRadiacPlan.summary.measurementPointCount} målepunkt · målerute ${lastRadiacPlan.summary.routeLengthSchematicUnits} skjematiske enheter`
+              : 'Ingen RADIAC måleplan laget i denne kartøkten.'}
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            {(lastRadiacPlan?.planningPrompts ?? [
+              'Bekreft måleordre, rapporteringsformat og faglig kontakt før avmarsj.',
+              'Bruk skjematiske målepunkter; appen beregner ikke dose, oppholdstid eller grenseverdier.',
+            ]).map((prompt) => <li key={prompt}>{prompt}</li>)}
+          </ul>
+        </div>
+      </section>
+
+      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Søketeig planlegger">
+        <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Søk og redning</p>
+            <h2 className="text-2xl font-black">Søketeig plan</h2>
+          </div>
+          <Link href="/kort/soketeig-plan-kart" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-black text-slate-950">
+            Åpne tiltakskort
+          </Link>
+        </div>
+        <form action={addSearchSectorPlan} className="grid gap-3 md:grid-cols-2">
+          <label className="text-sm font-bold md:col-span-2">Søketeig etikett
+            <input name="searchPlanLabel" required defaultValue="Teig alfa" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold md:col-span-2">Teiggrense som x,y (skjematisk 0-100)
+            <textarea name="searchSectorPoints" required defaultValue="10,20 42,18 48,52 14,58" className="mt-1 min-h-20 w-full rounded-xl border p-3 font-mono text-xs" />
+          </label>
+          <label className="text-sm font-bold">Startpunkt X-koordinat (0-100)
+            <input name="searchStartX" required type="number" min="0" max="100" defaultValue="12" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Startpunkt Y-koordinat (0-100)
+            <input name="searchStartY" required type="number" min="0" max="100" defaultValue="22" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Returpunkt X-koordinat (0-100)
+            <input name="searchExitX" required type="number" min="0" max="100" defaultValue="40" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Returpunkt Y-koordinat (0-100)
+            <input name="searchExitY" required type="number" min="0" max="100" defaultValue="55" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold md:col-span-2">Søketeig planmerknad uten persondata
+            <textarea name="searchPlanNote" className="mt-1 min-h-20 w-full rounded-xl border p-3" placeholder="Valgfri lokal merknad om metode eller rapporteringsintervall" />
+          </label>
+          <button type="submit" className={`${primaryButtonClass} md:col-span-2`}>Lag søketeig plan</button>
+        </form>
+        <div data-testid="search-sector-plan-summary" className="space-y-2 rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-800">
+          <p className="font-black text-slate-950">
+            {lastSearchSectorPlan
+              ? `${lastSearchSectorPlan.summary.boundaryPointCount} grensepunkt · ${lastSearchSectorPlan.summary.markerCount} møtepunkt · areal ${lastSearchSectorPlan.summary.areaSchematicUnits} skjematiske enheter`
+              : 'Ingen søketeig plan laget i denne kartøkten.'}
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            {(lastSearchSectorPlan?.planningPrompts ?? [
+              'Bekreft teiggrense, metode, lagkontroll og rapporteringsintervall med KO/leder.',
+              'Bruk bare skjematiske punkter; ikke registrer navn, identitet, ekte posisjoner eller live tracking.',
+            ]).map((prompt) => <li key={prompt}>{prompt}</li>)}
+          </ul>
+        </div>
+      </section>
+
+      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="MRE ren/uren-side planlegger">
+        <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-wide text-sky-700">CBRN/MRE rens</p>
+            <h2 className="text-2xl font-black">MRE soneplan</h2>
+          </div>
+          <Link href="/kort/mre-soneplan-kart" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-black text-slate-950">
+            Åpne tiltakskort
+          </Link>
+        </div>
+        <form action={addMreZonePlan} className="grid gap-3 md:grid-cols-2">
+          <label className="text-sm font-bold md:col-span-2">MRE planetikett
+            <input name="mrePlanLabel" required defaultValue="Rens nord" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold md:col-span-2">Uren side som x,y (skjematisk 0-100)
+            <textarea name="mreDirtyZonePoints" required defaultValue="10,20 38,18 36,46 12,48" className="mt-1 min-h-20 w-full rounded-xl border p-3 font-mono text-xs" />
+          </label>
+          <label className="text-sm font-bold md:col-span-2">Ren side som x,y (skjematisk 0-100)
+            <textarea name="mreCleanZonePoints" required defaultValue="48,22 76,22 74,48 50,50" className="mt-1 min-h-20 w-full rounded-xl border p-3 font-mono text-xs" />
+          </label>
+          <label className="text-sm font-bold md:col-span-2">Renselinje som x,y (skjematisk 0-100)
+            <textarea name="mreRinseLinePoints" required defaultValue="40,20 44,52" className="mt-1 min-h-20 w-full rounded-xl border p-3 font-mono text-xs" />
+          </label>
+          <label className="text-sm font-bold">Innpassering X-koordinat (0-100)
+            <input name="mreEntryX" required type="number" min="0" max="100" defaultValue="14" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Innpassering Y-koordinat (0-100)
+            <input name="mreEntryY" required type="number" min="0" max="100" defaultValue="24" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Utpassering X-koordinat (0-100)
+            <input name="mreExitX" required type="number" min="0" max="100" defaultValue="54" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Utpassering Y-koordinat (0-100)
+            <input name="mreExitY" required type="number" min="0" max="100" defaultValue="46" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Avfallspunkt X-koordinat (0-100)
+            <input name="mreWasteX" required type="number" min="0" max="100" defaultValue="32" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold">Avfallspunkt Y-koordinat (0-100)
+            <input name="mreWasteY" required type="number" min="0" max="100" defaultValue="54" className="mt-1 min-h-11 w-full rounded-xl border px-3" />
+          </label>
+          <label className="text-sm font-bold md:col-span-2">MRE planmerknad uten persondata
+            <textarea name="mrePlanNote" className="mt-1 min-h-20 w-full rounded-xl border p-3" placeholder="Valgfri lokal merknad om samband, stoppkriterier eller kapasitet" />
+          </label>
+          <button type="submit" className={`${primaryButtonClass} md:col-span-2`}>Lag MRE soneplan</button>
+        </form>
+        <div data-testid="mre-zone-plan-summary" className="space-y-2 rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-800">
+          <p className="font-black text-slate-950">
+            {lastMreZonePlan
+              ? `${lastMreZonePlan.summary.zoneCount} soner · ${lastMreZonePlan.summary.markerCount} kontrollpunkt · renselinje ${lastMreZonePlan.summary.rinseLineLengthSchematicUnits} skjematiske enheter`
+              : 'Ingen MRE soneplan laget i denne kartøkten.'}
+          </p>
+          <ul className="list-disc space-y-1 pl-5">
+            {(lastMreZonePlan?.planningPrompts ?? [
+              'Avklar ren side, uren side, renselinje og stoppunkt med innsatsleder/fagmyndighet før etablering.',
+              'Appen fastsetter ikke stoff, vernenivå, sonegrense eller rensetaktikk; gjeldende ordre styrer.',
+            ]).map((prompt) => <li key={prompt}>{prompt}</li>)}
+          </ul>
+        </div>
+      </section>
 
       <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Lokale markører og lag">
         <div className="flex items-start justify-between gap-3">

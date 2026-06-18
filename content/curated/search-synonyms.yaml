@@ -34,7 +34,19 @@
     - cbrn
     - cbrne
     - rensenhet
-  cardIds: [mre-rens-start, mre-ren-uren-side-grovrens, cbrne-startkort, cbrne-soneinndeling, cbrne-verneutstyr-stoppkriterier, kontaminert-utstyr-handtering]
+  cardIds: [mre-rens-start, mre-ren-uren-side-grovrens, mre-soneplan-kart, cbrne-startkort, cbrne-soneinndeling, cbrne-verneutstyr-stoppkriterier, kontaminert-utstyr-handtering]
+
+- canonical: mre-soneplan
+  aliases:
+    - ren uren plan
+    - rensested plan
+    - renseplass plan
+    - soneplan
+    - renselinje
+    - avfallspunkt
+    - innpassering
+    - utpassering
+  cardIds: [mre-soneplan-kart, mre-ren-uren-side-grovrens, cbrne-soneinndeling]
 
 - canonical: MFE
   aliases:
@@ -47,7 +59,18 @@
     - støtteanmodning
     - stotteanmodning
     - forsterkning
-  cardIds: [mfe-anmodning, mfe-anmodning-mottak-oppfolging]
+  cardIds: [mfe-anmodning, mfe-anmodning-mottak-oppfolging, mfe-mottaksboard-lokal]
+
+- canonical: mfe-mottaksboard
+  aliases:
+    - mfe mottakstavle
+    - mfe mottak board
+    - mfe ressursmottak
+    - mfe oppfolging
+    - forsterkningsenhet mottak
+    - mfe demobilisering
+    - mfe liaison
+  cardIds: [mfe-mottaksboard-lokal, mfe-anmodning-mottak-oppfolging]
 
 - canonical: samband
   aliases:
@@ -91,6 +114,18 @@
     - maletjeneste
     - radiacmåletjeneste
   cardIds: [radiac-dosekontroll, radiac-malepunkt, radiac-oppholdstid-rullering]
+
+- canonical: radiac-måleplan
+  aliases:
+    - radiac maleplan
+    - radiac måleplan
+    - målerute
+    - malerute
+    - målepunkter
+    - malepunkter
+    - kontrollmåling
+    - kontrollmaling
+  cardIds: [radiac-maleplan-kart, radiac-malepunkt]
 
 - canonical: ordre
   aliases:
@@ -145,6 +180,18 @@
     - slangeutlegg
     - vannskade
   cardIds: [flom-pumpe-start, flom-pumpe-vannforsyning, brann-vannforsyning-slange, pumpe-stromfare]
+
+- canonical: slangeutlegg
+  aliases:
+    - slangevei
+    - vannkilde
+    - pumpeplass
+    - vannføring
+    - trykktap
+    - trykkforsterkning
+    - seriekjøring
+    - parallelle utlegg
+  cardIds: [brann-vannforsyning-slange, skogbrann-vannforsyningsplan, skogbrann-startkort, flom-pumpe-vannforsyning]
 
 - canonical: skadde
   aliases:
@@ -214,13 +261,27 @@
     - teig
     - søkesektor
     - søketeig
+    - søketeig plan
+    - soketeig plan
     - sokesektor
     - soketeig
     - søkeområde
+    - teiggrense
+    - dekningsgrad
     - ledeteig
     - avgrensning
     - sektorinndeling
-  cardIds: [soketeig-sektor, sok-og-redning-startkort]
+  cardIds: [soketeig-sektor, soketeig-plan-kart, sok-og-redning-startkort]
+
+- canonical: søketeig-plan
+  aliases:
+    - soketeig plan
+    - søkesektor
+    - sokesektor
+    - teiggrense
+    - dekningsgrad
+    - rapporteringsintervall
+  cardIds: [soketeig-plan-kart, soketeig-sektor]
 
 - canonical: ATV
   aliases:
@@ -232,7 +293,24 @@
     - fører båt
     - forer bat
     - transport
-  cardIds: [kjoretoy-transportberedskap]
+  cardIds: [atv-bat-transportlogistikk, kjoretoy-transportberedskap]
+
+- canonical: transportlogistikk
+  aliases:
+    - ATV logistikk
+    - bat logistikk
+    - båt logistikk
+    - transport board
+    - transporttavle
+    - ruteavvik
+    - fremkommelighet
+    - framkommelighet
+    - drivstoffplan
+    - forerkompetanse
+    - førerkompetanse
+    - kjoretoylogistikk
+    - kjøretøylogistikk
+  cardIds: [atv-bat-transportlogistikk, kjoretoy-transportberedskap, rute-og-evakueringsvei]
 
 - canonical: LIA
   aliases:
@@ -240,9 +318,8 @@
     - lager
     - forsyning
     - forsyninger
-    - depot
     - logistikk
-  cardIds: []
+  cardIds: [atv-bat-transportlogistikk]
 
 - canonical: hurtigkort
   aliases:

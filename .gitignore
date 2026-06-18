@@ -36,3 +36,9 @@ public/content-assets/
 /*.rtfd/
 /deep-research-*.md
 !/public/**/*.png
+
+# Local research crawler outputs.
+/downloads/
+/sivilforsvaret_dsb_dokumenter.zip
+__pycache__/
+.pytest_cache/

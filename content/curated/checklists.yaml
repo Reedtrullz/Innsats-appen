@@ -637,9 +637,13 @@
       required: true
       sourceIds: [src-tiltakskort-under-innsats]
     - id: vannforsyning-utlegg
-      label: Vannforsyning og slangeutlegg etablert og overvåket mot trykk og rekkevidde
+      label: Vannforsyning, vannkilde, pumpeplass og slangevei er planlagt mot vannføring, trykktap og rekkevidde
       required: true
-      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-kursplan-grunnkurs-fig10]
+    - id: trykkforsterkning-avklart
+      label: Behov for trykkforsterkning, seriekjøring eller parallelle utlegg er avklart med leder før langt slangeutlegg
+      required: false
+      sourceIds: [src-kursplan-grunnkurs-fig10, src-eksempler-pa-utlegg-fra-pumpe]
     - id: samband-statusrapport
       label: Jevnlig statusrapport gitt på avtalt samband; endringer i fare meldt umiddelbart
       required: true
@@ -648,7 +652,7 @@
       label: Mannskapets utholdenhet, væske og rotasjon fulgt opp; tegn på overoppheting fanget opp
       required: true
       sourceIds: [src-tiltakskort-under-innsats]
-  sourceIds: [src-tiltakskort-under-innsats, src-eksempler-pa-utlegg-fra-pumpe]
+  sourceIds: [src-tiltakskort-under-innsats, src-eksempler-pa-utlegg-fra-pumpe, src-kursplan-grunnkurs-fig10]
   warning: Lokal beslutningsstøtte. Kontroller alltid mot innsatsleders ordre og samband; ingen persondata.
 
 - slug: brann-etter-innsats
@@ -676,3 +680,173 @@
       sourceIds: [src-tiltakskort-etter-innsats]
   sourceIds: [src-tiltakskort-etter-innsats, src-renhold-etter-branninnsats]
   warning: Lokal dokumentasjon, ikke offisiell innsending. Ingen persondata eller helsedata.
+
+- slug: flom-pumpe-under-innsats
+  title: Flom og pumpe under innsats
+  phase: under
+  roles: [leder, lagforer, mannskap, materiellansvarlig]
+  scenarios: [flom]
+  equipmentRequired: [pumpe, slangeutlegg, vann, samband, verneutstyr]
+  items:
+    - id: oppdrag-og-sikkerhet
+      label: Oppdrag, prioritet og sikkerhetsgrenser er bekreftet med leder før pumpestart
+      required: true
+      sourceIds: [src-tiltakskort-under-innsats]
+    - id: pumpested-og-adkomst
+      label: Pumpested, adkomst, underlag og retrett er vurdert mot vannstand, strømfare og rasfare
+      required: true
+      sourceIds: [src-tiltakskort-under-innsats, src-eksempler-pa-utlegg-fra-pumpe]
+    - id: slangevei-og-utlop
+      label: Slangevei, utløpspunkt og avlastning er lagt slik at ny skade og knekk i slange unngås
+      required: true
+      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+    - id: drift-og-drivstoff
+      label: Drivstoff, sil, kjøling, vakt og stopp-plan er avklart for forventet driftstid
+      required: true
+      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
+    - id: effekt-og-endring
+      label: Effekt, vannstand og endret risikobilde følges opp og meldes før tiltak mister virkning
+      required: true
+      sourceIds: [src-tiltakskort-under-innsats]
+    - id: avlosning-og-mbk
+      label: Avløsning, hvile, MBK-behov og retur til beredskap er planlagt før langvarig pumping
+      required: false
+      sourceIds: [src-tiltakskort-under-innsats, src-sjekkliste-fig-og-figp]
+  sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-under-innsats, src-sjekkliste-fig-og-figp]
+  warning: Lokal beslutningsstøtte for pumpeinnsats. Følg leder/innsatsleders ordre; stans ved strømfare eller uavklart sikkerhet. Ingen persondata.
+
+- slug: sok-og-redning-sektor-under
+  title: Søk og redning sektor under innsats
+  phase: under
+  roles: [leder, lagforer, mannskap]
+  scenarios: [sok-og-redning]
+  equipmentRequired: [personlig-utrustning, samband]
+  items:
+    - id: oppdrag-og-teig
+      label: Oppdrag, teig, metode, startpunkt og sluttpunkt er bekreftet med KO eller leder
+      required: true
+      sourceIds: [src-vedlegg-c-operative-forhold, src-tiltakskort-under-innsats]
+    - id: samband-og-lagkontroll
+      label: Samband, makkerordning, rapporteringsintervall og stoppkriterier er kjent for laget
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram, src-tiltakskort-under-innsats]
+    - id: sikkerhet-og-utrustning
+      label: Terreng, vær, mørke, personlig utrustning, kart, kompass og GPS er vurdert før innrykk
+      required: true
+      sourceIds: [src-kursplan-grunnkurs-fig10, src-vedlegg-c-operative-forhold]
+    - id: dekning-og-observasjoner
+      label: Dekningsgrad, hindringer, observasjoner og usikre områder logges lokalt uten persondata
+      required: true
+      sourceIds: [src-tiltakskort-under-innsats, src-vedlegg-c-operative-forhold]
+    - id: funn-og-avvik
+      label: Funn, spor, avvik, farer og behov meldes straks til KO eller leder via avtalt samband
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram, src-tiltakskort-under-innsats]
+    - id: avslutning-teig
+      label: Teigstatus, dekningsgrad, utestående punkter og mannskapsstatus er meldt før laget flyttes
+      required: true
+      sourceIds: [src-tiltakskort-under-innsats]
+  sourceIds: [src-vedlegg-c-operative-forhold, src-tiltakskort-under-innsats, src-kursplan-grunnkurs-fig10, src-kommunikasjons-og-sambandsdiagram]
+  warning: Lokal beslutningsstøtte for tildelt søketeig. Følg KO/innsatsleders ordre og lagre ikke personsensitiv informasjon. Ingen persondata.
+
+- slug: mfe-mottak-under
+  title: MFE mottak og oppfølging under innsats
+  phase: under
+  roles: [beredskapsvakt, leder, mfe, liaison, stab-logistikk]
+  scenarios: [mfe-stotte]
+  equipmentRequired: [samband, kjoretoy]
+  items:
+    - id: oppstartsmote-og-rammer
+      label: Oppstartsmøte eller tilsvarende avklaring dekker situasjon, tid, materiell, personell, administrasjon og kommunikasjon
+      required: true
+      sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-tiltakskort-06-oppsettende-mfe-distrikt]
+    - id: liaison-og-kontaktpunkt
+      label: Liaison/stabskontakt, mottakende leder og rapporteringsrutine er kjent uten at kontaktlister lagres i appen
+      required: true
+      sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-tiltakskort-06-oppsettende-mfe-distrikt]
+    - id: mottak-oppmote-og-samband
+      label: Mottak, oppmøtested, transportvei, samband og første lokale ordre er avklart før MFE settes inn
+      required: true
+      sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-kommunikasjons-og-sambandsdiagram]
+    - id: materiell-og-kompetanse
+      label: Materiell, kompetanse, forpleining, forlegning og varighet er fulgt opp mot faktisk behov
+      required: true
+      sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-sjekkliste-mobil-forsterkningsenhet-mfe]
+    - id: drift-status-og-avvik
+      label: Status, avvik, forbruk, skader og behov for videre oppfølging er meldt via avtalt linje
+      required: true
+      sourceIds: [src-tiltakskort-06-oppsettende-mfe-distrikt, src-sjekkliste-mobil-forsterkningsenhet-mfe]
+    - id: demobilisering-og-retur
+      label: Demobilisering, retur, MBK, avvik og evalueringspunkter er planlagt før MFE fristilles
+      required: true
+      sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-sjekkliste-mobil-forsterkningsenhet-mfe]
+  sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-tiltakskort-06-oppsettende-mfe-distrikt, src-sjekkliste-mobil-forsterkningsenhet-mfe]
+  warning: Lokal beslutningsstøtte for MFE mottak og oppfølging. Appen sender ingen offisiell anmodning; følg distriktets ordre. Ingen persondata.
+
+- slug: cbrn-mre-rens-under
+  title: CBRN/MRE rens under innsats
+  phase: under
+  roles: [mre, lagforer, leder]
+  scenarios: [cbrn-cbrne]
+  equipmentRequired: [renseutstyr, verneutstyr, vann, samband]
+  items:
+    - id: ordre-og-sone
+      label: Oppdrag, stoffmistanke, varm/lunken/ren side og innsatsleders ordre er bekreftet før etablering
+      required: true
+      sourceIds: [src-veileder-for-sivilforsvarets-renseenheter-cbrn, src-samvirke-pa-forurenset-skadested-cbrne-sps41]
+    - id: ren-og-uren-side
+      label: Uren side, renselinje, ren side, inn-/utpassering og avfallspunkt er fysisk adskilt og merket
+      required: true
+      sourceIds: [src-veileder-for-sivilforsvarets-renseenheter-cbrn]
+    - id: verneutstyr-og-makker
+      label: Verneutstyr, makkerkontroll, rullering og stoppkriterier er avklart før personell eksponeres
+      required: true
+      sourceIds: [src-veileder-for-sivilforsvarets-renseenheter-cbrn]
+    - id: vann-varme-og-renseflyt
+      label: Vann, varme, renseflyt, grovrens, oppsamlingsbasseng og forbruksmateriell er kontrollert mot kapasitet
+      required: true
+      sourceIds: [src-veileder-for-sivilforsvarets-renseenheter-cbrn, src-sjekkliste-mobil-renseenhet-mre]
+    - id: samband-og-status
+      label: Samband, kø, kapasitetsstatus, forbruk, avvik og behov for fagmyndighet rapporteres jevnlig
+      required: true
+      sourceIds: [src-kommunikasjons-og-sambandsdiagram, src-veileder-for-sivilforsvarets-renseenheter-cbrn]
+    - id: avslutning-og-mbk
+      label: Avslutning, drenering, tørk, renhold, dosekontrollskjema og MBK-behov er fulgt opp
+      required: true
+      sourceIds: [src-sjekkliste-mobil-renseenhet-mre, src-veileder-for-sivilforsvarets-renseenheter-cbrn]
+  sourceIds: [src-veileder-for-sivilforsvarets-renseenheter-cbrn, src-samvirke-pa-forurenset-skadested-cbrne-sps41, src-sjekkliste-mobil-renseenhet-mre]
+  warning: Lokal beslutningsstøtte for MRE. Fagmyndighet og innsatsleders ordre styrer; stopp ved uklar sone, ukjent stoff eller skadet verneutstyr. Ingen persondata.
+
+- slug: radiac-maleoppdrag-under
+  title: RADIAC måleoppdrag under innsats
+  phase: under
+  roles: [rad, lagforer, leder]
+  scenarios: [radiac-nedfall]
+  equipmentRequired: [dosimeter, maleinstrument, samband, verneutstyr]
+  items:
+    - id: ordre-malepunkt-og-format
+      label: Ordre, målepunkt, metode, tidspunkt, rapporteringsformat og faglig kontakt er bekreftet før avmarsj
+      required: true
+      sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
+    - id: instrument-og-dosimeter
+      label: Instrument, Automess, personlig dosimeter, GPS og sambandsmiddel er kontrollert før måling
+      required: true
+      sourceIds: [src-sjekkliste-radiaclag-rad, src-bestemmelse-radiacmaletjeneste-del-i]
+    - id: dosekontroll-og-verneutstyr
+      label: Dosekontrollskjema, verneutstyr, oppholdstid og rullering er avklart uten at appen beregner grenser
+      required: true
+      sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i, src-grunnopplaering-rad-10-mannskap]
+    - id: maling-og-kontroll
+      label: Måleverdi, enhet, tid, posisjonsreferanse, usikkerhet og behov for kontrollmåling er vurdert etter ordre
+      required: true
+      sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i]
+    - id: rapportering-og-avvik
+      label: Måleresultater, instrumentfeil, avvik og behov for fagmyndighet meldes via avtalt sambandsvei
+      required: true
+      sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i, src-kommunikasjons-og-sambandsdiagram]
+    - id: retur-og-mbk
+      label: Retur, dosekontrollskjema, kasse radiac, kjøretøy og personlig utrustning er kontrollert etter innsats
+      required: true
+      sourceIds: [src-sjekkliste-radiaclag-rad]
+  sourceIds: [src-bestemmelse-radiacmaletjeneste-del-i, src-sjekkliste-radiaclag-rad, src-grunnopplaering-rad-10-mannskap, src-kommunikasjons-og-sambandsdiagram]
+  warning: Lokal beslutningsstøtte for RADIAC måleoppdrag. Ikke beregn dosegrenser i appen; følg ordre og fagmyndighet. Ingen persondata.

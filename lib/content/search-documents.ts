@@ -1,11 +1,12 @@
 import type { SearchDocument } from './search';
 import { sourceFreshness } from './source-review';
 import { stepText } from './steps';
-import type { ActionCard, FAQEntry, GlossaryTerm, ProtectionMeasure, SourceDocument, TrainingPath } from './schemas';
+import type { ActionCard, FAQEntry, GlossaryTerm, OperationalChecklist, ProtectionMeasure, SourceDocument, TrainingPath } from './schemas';
 
 export interface BuildSearchDocumentsInput {
   queryBasePath?: '/hurtigkort' | '/sok';
   cards: ActionCard[];
+  checklists?: OperationalChecklist[];
   sources: SourceDocument[];
   glossary: GlossaryTerm[];
   training: TrainingPath[];
@@ -41,6 +42,7 @@ function sourceStatusFor(sourceIds: string[] | undefined, sourcesById: Map<strin
 export function buildSearchDocuments({
   queryBasePath = '/hurtigkort',
   cards,
+  checklists = [],
   sources,
   glossary,
   training,
@@ -62,6 +64,27 @@ export function buildSearchDocuments({
       sourceStatus: sourceStatusFor(card.sourceIds, sourcesById),
       sourceIds: card.sourceIds,
       priority: card.priority,
+    })),
+    ...checklists.map<SearchDocument>((checklist) => ({
+      id: `sjekkliste:${checklist.slug}`,
+      title: checklist.title,
+      body: joinSearchText([
+        checklist.items.map((item) => item.label),
+        checklist.warning,
+        checklist.equipmentRequired,
+        checklist.items.flatMap((item) => item.sourceIds ?? []),
+      ]),
+      scenario: checklist.scenarios.join(' '),
+      role: checklist.roles.join(' '),
+      phase: checklist.phase,
+      type: 'sjekkliste',
+      href: '/oppdrag#sjekkliste',
+      sourceStatus: sourceStatusFor([
+        ...(checklist.sourceIds ?? []),
+        ...checklist.items.flatMap((item) => item.sourceIds ?? []),
+      ], sourcesById),
+      sourceIds: checklist.sourceIds,
+      priority: checklist.items.some((item) => item.required) ? 'high' : 'medium',
     })),
     ...sources
       .filter((source) => source.pilotReviewStatus !== 'rejected-for-pilot')

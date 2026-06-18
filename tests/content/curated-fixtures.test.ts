@@ -80,6 +80,7 @@ const group4ActionCardSlugs = [
   'psykologisk-forstehjelp-sekvens',
   'psykososial-ikke-tvungen-debrief',
   'skogbrann-startkort',
+  'skogbrann-vannforsyningsplan',
   'brann-vannforsyning-slange',
   'sok-og-redning-startkort',
   'soketeig-sektor',
@@ -97,6 +98,7 @@ const group4ActionCardSlugs = [
   'posisjonsrapport-kart-kompass-gps',
   'rute-og-evakueringsvei',
   'kjoretoy-transportberedskap',
+  'atv-bat-transportlogistikk',
   'pumpe-stromfare',
   'kontaminert-utstyr-handtering',
 ];
@@ -371,9 +373,9 @@ it('curated training paths include Group 5A competence records with source IDs a
   expect(byCode.get('FIG20')?.linkedCardSlugs).toEqual(expect.arrayContaining(['oppdragsanalyse', 'ledelse-kommando-kontroll']));
   expect(byCode.get('RAD30')?.linkedCardSlugs).toEqual(expect.arrayContaining(['radiac-malepunkt', 'radiac-oppholdstid-rullering']));
   expect(byCode.get('MRE30')?.linkedCardSlugs).toEqual(expect.arrayContaining(['mre-ren-uren-side-grovrens']));
-  expect(byCode.get('ATV')?.linkedCardSlugs).toEqual(expect.arrayContaining(['kjoretoy-transportberedskap']));
-  expect(byCode.get('BAT')?.linkedCardSlugs).toEqual(expect.arrayContaining(['evakueringsstotte']));
-  expect(byCode.get('LETT_LASTEBIL')?.linkedCardSlugs).toEqual(expect.arrayContaining(['kjoretoy-transportberedskap']));
+  expect(byCode.get('ATV')?.linkedCardSlugs).toEqual(expect.arrayContaining(['atv-bat-transportlogistikk', 'kjoretoy-transportberedskap']));
+  expect(byCode.get('BAT')?.linkedCardSlugs).toEqual(expect.arrayContaining(['atv-bat-transportlogistikk', 'evakueringsstotte']));
+  expect(byCode.get('LETT_LASTEBIL')?.linkedCardSlugs).toEqual(expect.arrayContaining(['atv-bat-transportlogistikk', 'kjoretoy-transportberedskap']));
   expect(byCode.get('SPS41')?.linkedCardSlugs).toEqual(expect.arrayContaining(['cbrne-soneinndeling']));
   expect(byCode.get('SPS40')?.targetRoles).toEqual(['lagforer', 'leder']);
   expect(byCode.get('SPS41')?.targetRoles).toEqual(['lagforer', 'leder']);
@@ -527,6 +529,64 @@ it('curated Group 2A/2B checklists cover før utrykning, expanded under innsats 
   ]);
 });
 
+it('curated workflow expansion adds source-backed scenario checklists for flom, search, MFE, MRE and RADIAC', () => {
+  const checklists = readYaml('content/curated/checklists.yaml');
+  const sourceIds = new Set(readYaml('content/generated/source-documents.json').map((source) => source.id));
+  const bySlug = new Map(checklists.map((checklist) => [checklist.slug, checklist]));
+  const expected = {
+    'flom-pumpe-under-innsats': {
+      scenarios: ['flom'],
+      sources: ['src-eksempler-pa-utlegg-fra-pumpe', 'src-tiltakskort-under-innsats'],
+      terms: /pumpested|slangevei|strømfare|vannstand|avløsning/i,
+    },
+    'sok-og-redning-sektor-under': {
+      scenarios: ['sok-og-redning'],
+      sources: ['src-vedlegg-c-operative-forhold', 'src-tiltakskort-under-innsats'],
+      terms: /teig|startpunkt|dekningsgrad|observasjoner|KO/i,
+    },
+    'mfe-mottak-under': {
+      scenarios: ['mfe-stotte'],
+      sources: ['src-tiltakskort-05-stotte-av-mfe', 'src-tiltakskort-06-oppsettende-mfe-distrikt', 'src-sjekkliste-mobil-forsterkningsenhet-mfe'],
+      terms: /oppstartsmøte|liaison|mottak|materiell|demobilisering/i,
+    },
+    'cbrn-mre-rens-under': {
+      scenarios: ['cbrn-cbrne'],
+      sources: ['src-veileder-for-sivilforsvarets-renseenheter-cbrn', 'src-sjekkliste-mobil-renseenhet-mre'],
+      terms: /ren side|uren side|grovrens|renseflyt|avfall/i,
+    },
+    'radiac-maleoppdrag-under': {
+      scenarios: ['radiac-nedfall'],
+      sources: ['src-bestemmelse-radiacmaletjeneste-del-i', 'src-sjekkliste-radiaclag-rad', 'src-grunnopplaering-rad-10-mannskap'],
+      terms: /målepunkt|instrument|dosimeter|dosekontrollskjema|GPS/i,
+    },
+  };
+
+  for (const [slug, expectation] of Object.entries(expected)) {
+    const checklist = bySlug.get(slug);
+    expect(checklist, `missing workflow checklist ${slug}`).toBeTruthy();
+    expect(checklist.phase, `${slug} phase`).toBe('under');
+    expect(checklist.scenarios, `${slug} scenarios`).toEqual(expectation.scenarios);
+    expect(checklist.sourceIds, `${slug} sources`).toEqual(expect.arrayContaining(expectation.sources));
+    expect(checklist.warning, `${slug} warning`).toMatch(/lokal|beslutningsstøtte/i);
+    expect(checklist.warning, `${slug} warning`).toMatch(/ordre|innsatsleder|fagmyndighet|ingen persondata/i);
+    expect(checklist.items?.length, `${slug} item depth`).toBeGreaterThanOrEqual(5);
+    expect(checklist.items?.some((item: any) => item.required), `${slug} required items`).toBe(true);
+    const text = [checklist.title, checklist.warning, ...(checklist.items ?? []).map((item: any) => item.label)].join('\n');
+    expect(text, `${slug} operational terms`).toMatch(expectation.terms);
+    expect(text, `${slug} no rejected source wording`).not.toMatch(/deep research/i);
+    expectNoUnsafeSensitiveDataInstruction(slug, text);
+    for (const sourceId of checklist.sourceIds ?? []) {
+      expect(sourceIds, `${slug} references missing source ${sourceId}`).toContain(sourceId);
+    }
+    for (const item of checklist.items ?? []) {
+      expect(item.sourceIds?.length, `${slug}/${item.id} sourceIds`).toBeGreaterThan(0);
+      for (const sourceId of item.sourceIds ?? []) {
+        expect(sourceIds, `${slug}/${item.id} references missing source ${sourceId}`).toContain(sourceId);
+      }
+    }
+  }
+});
+
 it('curated Group 4 action cards exist with source-backed public/offline boundaries', () => {
   const cards = readYaml('content/curated/action-cards.yaml');
   const bySlug = new Map(cards.map((card) => [card.slug, card]));
@@ -585,4 +645,270 @@ it('curated Group 4 action cards enforce operational safety and data-minimizatio
 
   expect(text('kontaminert-utstyr-handtering')).toMatch(/kontaminert.*skadet|skadet.*kontaminert/i);
   expect(text('kontaminert-utstyr-handtering')).toMatch(/lokal prosedyre/i);
+});
+
+it('curated forest-fire water supply content includes source-backed pump and hose planning prompts', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const checklists = readYaml('content/curated/checklists.yaml');
+  const glossary = readYaml('content/curated/glossary.yaml');
+  const synonyms = readYaml('content/curated/search-synonyms.yaml');
+  const cardsBySlug = new Map(cards.map((card) => [card.slug, card]));
+  const checklistsBySlug = new Map(checklists.map((checklist) => [checklist.slug, checklist]));
+  const glossaryByTerm = new Map(glossary.map((term) => [String(term.term).toLowerCase(), term]));
+  const synonymsByCanonical = new Map(synonyms.map((group) => [group.canonical, group]));
+
+  const waterCard = cardsBySlug.get('brann-vannforsyning-slange');
+  expect(waterCard?.reviewStatus).toBe('pending-fagperson');
+  expect(waterCard?.sourceIds).toEqual(expect.arrayContaining([
+    'src-tiltakskort-under-innsats',
+    'src-eksempler-pa-utlegg-fra-pumpe',
+    'src-kursplan-grunnkurs-fig10',
+  ]));
+  expect(waterCard?.steps.length).toBeGreaterThanOrEqual(7);
+  const waterText = cardText(waterCard);
+  expect(waterText).toMatch(/vannkilde/i);
+  expect(waterText).toMatch(/pumpeplass/i);
+  expect(waterText).toMatch(/slangevei/i);
+  expect(waterText).toMatch(/vannføring/i);
+  expect(waterText).toMatch(/trykktap/i);
+  expect(waterText).toMatch(/trykkforsterkning|seriekjøring/i);
+  expect(waterText).toMatch(/friksjonsskader|knekk/i);
+  expect(waterText).not.toMatch(/\b\d+\s*(?:l\/min|liter\/min|bar|m3\/t)\b/i);
+
+  const skogbrannChecklist = checklistsBySlug.get('skogbrann-under-innsats');
+  const checklistText = [
+    skogbrannChecklist?.title,
+    ...(skogbrannChecklist?.items ?? []).map((item: any) => item.label),
+  ].join('\n');
+  expect(skogbrannChecklist?.sourceIds).toContain('src-kursplan-grunnkurs-fig10');
+  expect(checklistText).toMatch(/pumpeplass/i);
+  expect(checklistText).toMatch(/slangevei/i);
+  expect(checklistText).toMatch(/vannføring/i);
+  expect(checklistText).toMatch(/trykktap/i);
+  expect(checklistText).toMatch(/trykkforsterkning|seriekjøring/i);
+
+  const slangeutlegg = glossaryByTerm.get('slangeutlegg');
+  expect(slangeutlegg?.sourceIds).toEqual(expect.arrayContaining([
+    'src-eksempler-pa-utlegg-fra-pumpe',
+    'src-kursplan-grunnkurs-fig10',
+  ]));
+  expect(slangeutlegg?.definition).toMatch(/vannkilde|pumpe|trykktap/i);
+
+  const slangeSynonyms = synonymsByCanonical.get('slangeutlegg');
+  expect(slangeSynonyms?.aliases).toEqual(expect.arrayContaining([
+    'slangevei',
+    'vannkilde',
+    'pumpeplass',
+    'trykktap',
+    'trykkforsterkning',
+    'seriekjøring',
+  ]));
+  expect(slangeSynonyms?.cardIds).toEqual(expect.arrayContaining([
+    'brann-vannforsyning-slange',
+    'skogbrann-vannforsyningsplan',
+    'skogbrann-startkort',
+    'flom-pumpe-vannforsyning',
+  ]));
+
+  const forestWaterPlan = cardsBySlug.get('skogbrann-vannforsyningsplan');
+  expect(forestWaterPlan?.priority).toBe('high');
+  expect(forestWaterPlan?.reviewStatus).toBe('pending-fagperson');
+  expect(forestWaterPlan?.sourceIds).toEqual(expect.arrayContaining([
+    'src-tiltakskort-under-innsats',
+    'src-eksempler-pa-utlegg-fra-pumpe',
+    'src-kursplan-grunnkurs-fig10',
+  ]));
+  const planText = cardText(forestWaterPlan);
+  expect(planText).toMatch(/innsatsleder/i);
+  expect(planText).toMatch(/vannkilde/i);
+  expect(planText).toMatch(/pumpeplass/i);
+  expect(planText).toMatch(/slangevei/i);
+  expect(planText).toMatch(/trykktap/i);
+  expect(planText).toMatch(/trykkforsterkning|seriekjøring/i);
+  expect(planText).toMatch(/ikke\s+dimensjoner|tall fra appen/i);
+});
+
+it('curated RADIAC measurement planning content supports local map planning without dose advice', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const synonyms = readYaml('content/curated/search-synonyms.yaml');
+  const cardsBySlug = new Map(cards.map((card) => [card.slug, card]));
+  const synonymsByCanonical = new Map(synonyms.map((group) => [group.canonical, group]));
+
+  const measurementPlan = cardsBySlug.get('radiac-maleplan-kart');
+  expect(measurementPlan?.reviewStatus).toBe('pending-fagperson');
+  expect(measurementPlan?.sourceIds).toEqual(expect.arrayContaining([
+    'src-bestemmelse-radiacmaletjeneste-del-i',
+    'src-sjekkliste-radiaclag-rad',
+    'src-kommunikasjons-og-sambandsdiagram',
+  ]));
+  expect(measurementPlan?.scenarios).toContain('radiac-nedfall');
+  expect(measurementPlan?.equipmentRequired).toEqual(expect.arrayContaining(['dosimeter', 'maleinstrument', 'samband']));
+  const planText = cardText(measurementPlan);
+  expect(planText).toMatch(/måleplan|målepunkter/i);
+  expect(planText).toMatch(/skjematisk/i);
+  expect(planText).toMatch(/rapporteringsformat/i);
+  expect(planText).toMatch(/fagmyndighet|ordre/i);
+  expect(planText).toMatch(/ikke\s+beregn.*dose|dosegrenser/i);
+  expect(planText).not.toMatch(/\b\d+\s*(?:µ?Sv\/h|mSv|dosegrense|oppholdstid)\b/i);
+
+  const radiacSynonyms = synonymsByCanonical.get('radiac-måleplan');
+  expect(radiacSynonyms?.aliases).toEqual(expect.arrayContaining([
+    'radiac maleplan',
+    'målerute',
+    'malerute',
+    'målepunkter',
+    'malepunkter',
+  ]));
+  expect(radiacSynonyms?.cardIds).toEqual(expect.arrayContaining([
+    'radiac-maleplan-kart',
+    'radiac-malepunkt',
+  ]));
+});
+
+it('curated search-sector planning content supports local map planning without live tracking', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const synonyms = readYaml('content/curated/search-synonyms.yaml');
+  const cardsBySlug = new Map(cards.map((card) => [card.slug, card]));
+  const synonymsByCanonical = new Map(synonyms.map((group) => [group.canonical, group]));
+
+  const searchPlan = cardsBySlug.get('soketeig-plan-kart');
+  expect(searchPlan?.reviewStatus).toBe('pending-fagperson');
+  expect(searchPlan?.sourceIds).toEqual(expect.arrayContaining([
+    'src-vedlegg-c-operative-forhold',
+    'src-tiltakskort-under-innsats',
+    'src-kommunikasjons-og-sambandsdiagram',
+  ]));
+  expect(searchPlan?.scenarios).toContain('sok-og-redning');
+  expect(searchPlan?.equipmentRequired).toEqual(expect.arrayContaining(['personlig-utrustning', 'samband']));
+  const planText = cardText(searchPlan);
+  expect(planText).toMatch(/søketeig|søkesektor|teiggrense/i);
+  expect(planText).toMatch(/skjematisk/i);
+  expect(planText).toMatch(/dekningsgrad|hindringer|avvik/i);
+  expect(planText).toMatch(/KO|innsatsleder|ordre/i);
+  expect(planText).toMatch(/ikke.*live tracking|ingen.*live tracking/i);
+  expect(planText).not.toMatch(/GPS-sporing|blue-force|sanntidsposisjon/i);
+  expect(planText).not.toMatch(/savnet person|personnummer|telefonnummer/i);
+
+  const searchSynonyms = synonymsByCanonical.get('søketeig-plan');
+  expect(searchSynonyms?.aliases).toEqual(expect.arrayContaining([
+    'soketeig plan',
+    'søkesektor',
+    'sokesektor',
+    'teiggrense',
+    'dekningsgrad',
+  ]));
+  expect(searchSynonyms?.cardIds).toEqual(expect.arrayContaining([
+    'soketeig-plan-kart',
+    'soketeig-sektor',
+  ]));
+});
+
+it('curated MRE zone planning content supports local map planning without CBRN tactical authority claims', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const synonyms = readYaml('content/curated/search-synonyms.yaml');
+  const cardsBySlug = new Map(cards.map((card) => [card.slug, card]));
+  const synonymsByCanonical = new Map(synonyms.map((group) => [group.canonical, group]));
+
+  const zonePlan = cardsBySlug.get('mre-soneplan-kart');
+  expect(zonePlan?.reviewStatus).toBe('pending-fagperson');
+  expect(zonePlan?.sourceIds).toEqual(expect.arrayContaining([
+    'src-veileder-for-sivilforsvarets-renseenheter-cbrn',
+    'src-samvirke-pa-forurenset-skadested-cbrne-sps41',
+    'src-sjekkliste-mobil-renseenhet-mre',
+  ]));
+  expect(zonePlan?.scenarios).toContain('cbrn-cbrne');
+  expect(zonePlan?.equipmentRequired).toEqual(expect.arrayContaining(['renseutstyr', 'verneutstyr', 'vann', 'samband']));
+  const planText = cardText(zonePlan);
+  expect(planText).toMatch(/ren side|uren side|renselinje/i);
+  expect(planText).toMatch(/innpassering|utpassering|avfallspunkt/i);
+  expect(planText).toMatch(/skjematisk/i);
+  expect(planText).toMatch(/fagmyndighet|innsatsleder|ordre/i);
+  expect(planText).toMatch(/ikke\s+fastsett.*stoff|ikke\s+fastsetter.*stoff|vernenivå|sonegrense/i);
+  expect(planText).not.toMatch(/Level\s*A|nivå\s*A|sarin|klorgass|cyanid|pasientnavn|personnummer/i);
+
+  const mreSynonyms = synonymsByCanonical.get('mre-soneplan');
+  expect(mreSynonyms?.aliases).toEqual(expect.arrayContaining([
+    'ren uren plan',
+    'renseplass plan',
+    'soneplan',
+    'renselinje',
+    'avfallspunkt',
+  ]));
+  expect(mreSynonyms?.cardIds).toEqual(expect.arrayContaining([
+    'mre-soneplan-kart',
+    'mre-ren-uren-side-grovrens',
+    'cbrne-soneinndeling',
+  ]));
+});
+
+it('curated MFE reception-board content supports local follow-up without official dispatch claims', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const synonyms = readYaml('content/curated/search-synonyms.yaml');
+  const cardsBySlug = new Map(cards.map((card) => [card.slug, card]));
+  const synonymsByCanonical = new Map(synonyms.map((group) => [group.canonical, group]));
+
+  const boardCard = cardsBySlug.get('mfe-mottaksboard-lokal');
+  expect(boardCard?.reviewStatus).toBe('pending-fagperson');
+  expect(boardCard?.sourceIds).toEqual(expect.arrayContaining([
+    'src-tiltakskort-05-stotte-av-mfe',
+    'src-tiltakskort-06-oppsettende-mfe-distrikt',
+    'src-sjekkliste-mobil-forsterkningsenhet-mfe',
+  ]));
+  expect(boardCard?.scenarios).toContain('mfe-stotte');
+  expect(boardCard?.roles).toEqual(expect.arrayContaining(['beredskapsvakt', 'leder', 'mfe', 'stab-logistikk']));
+  const boardText = cardText(boardCard);
+  expect(boardText).toMatch(/mottaksboard|mottakstavle|mottak/i);
+  expect(boardText).toMatch(/kontaktpunkt|første ordre|oppfølging|demobilisering/i);
+  expect(boardText).toMatch(/lokal/i);
+  expect(boardText).toMatch(/ikke.*offisiell anmodning|ingen.*offisiell anmodning/i);
+  expect(boardText).not.toMatch(/dispatch|live tracking|sanntid|GPS-sporing|kjøretøyidentifikator|depotdetalj/i);
+
+  const boardSynonyms = synonymsByCanonical.get('mfe-mottaksboard');
+  expect(boardSynonyms?.aliases).toEqual(expect.arrayContaining([
+    'mfe mottakstavle',
+    'mfe mottak board',
+    'forsterkningsenhet mottak',
+    'mfe demobilisering',
+  ]));
+  expect(boardSynonyms?.cardIds).toEqual(expect.arrayContaining([
+    'mfe-mottaksboard-lokal',
+    'mfe-anmodning-mottak-oppfolging',
+  ]));
+});
+
+it('curated ATV/BAT transport logistics content supports local planning without tracking or dispatch claims', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const synonyms = readYaml('content/curated/search-synonyms.yaml');
+  const cardsBySlug = new Map(cards.map((card) => [card.slug, card]));
+  const synonymsByCanonical = new Map(synonyms.map((group) => [group.canonical, group]));
+
+  const transportCard = cardsBySlug.get('atv-bat-transportlogistikk');
+  expect(transportCard?.reviewStatus).toBe('pending-fagperson');
+  expect(transportCard?.sourceIds).toEqual(expect.arrayContaining([
+    'src-opplaering-forer-av-atb',
+    'src-opplaering-forer-av-bat',
+    'src-opplaering-materiellansvarlig-fig',
+    'src-sjekkliste-fig-og-figp',
+    'src-tiltakskort-for-innsats',
+  ]));
+  expect(transportCard?.roles).toEqual(expect.arrayContaining(['atv-bat', 'materiellansvarlig', 'stab-logistikk']));
+  expect(transportCard?.equipmentRequired).toEqual(expect.arrayContaining(['kjoretoy', 'samband', 'verneutstyr']));
+  const transportText = cardText(transportCard);
+  expect(transportText).toMatch(/ATV|båt|transport/i);
+  expect(transportText).toMatch(/føreropplæring|førerkompetanse|båtførerkompetanse/i);
+  expect(transportText).toMatch(/last|passasjerbehov|drivstoff|framkommelighet|MBK/i);
+  expect(transportText).toMatch(/ikke.*ruteordre|offisiell.*ressursanmodning|sporingssystem/i);
+  expect(transportText).not.toMatch(/dispatch|live tracking|sanntid|GPS-sporing|registreringsnummer|kjennemerke|depotdetalj/i);
+
+  const transportSynonyms = synonymsByCanonical.get('transportlogistikk');
+  expect(transportSynonyms?.aliases).toEqual(expect.arrayContaining([
+    'transporttavle',
+    'ruteavvik',
+    'framkommelighet',
+    'førerkompetanse',
+  ]));
+  expect(transportSynonyms?.cardIds).toEqual(expect.arrayContaining([
+    'atv-bat-transportlogistikk',
+    'kjoretoy-transportberedskap',
+  ]));
 });

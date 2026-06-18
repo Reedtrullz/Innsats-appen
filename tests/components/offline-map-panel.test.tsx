@@ -937,6 +937,169 @@ it('renders, exports and logs only map objects from the active mission', async (
   });
 });
 
+it('creates a local skogbrann water-supply plan as pump markers and a hose-line drawing', async () => {
+  const user = userEvent.setup();
+  await saveMission(activeMission);
+  saveSelectedActiveMissionId(activeMission.id);
+
+  await renderOfflineMapPanel();
+
+  const waterSupplyPlanner = screen.getByRole('region', { name: /Pumpe- og slangeplanlegger/i });
+  expect(waterSupplyPlanner).toBeInTheDocument();
+  const waterControls = within(waterSupplyPlanner);
+  await user.clear(waterControls.getByLabelText(/Planetikett/i));
+  await user.type(waterControls.getByLabelText(/Planetikett/i), 'Skogbrann vest');
+  await user.clear(waterControls.getByLabelText(/Vannkilde X-koordinat/i));
+  await user.type(waterControls.getByLabelText(/Vannkilde X-koordinat/i), '10');
+  await user.clear(waterControls.getByLabelText(/Vannkilde Y-koordinat/i));
+  await user.type(waterControls.getByLabelText(/Vannkilde Y-koordinat/i), '20');
+  await user.clear(waterControls.getByLabelText(/Pumpeplass X-koordinat/i));
+  await user.type(waterControls.getByLabelText(/Pumpeplass X-koordinat/i), '25');
+  await user.clear(waterControls.getByLabelText(/Pumpeplass Y-koordinat/i));
+  await user.type(waterControls.getByLabelText(/Pumpeplass Y-koordinat/i), '35');
+  await user.clear(waterControls.getByLabelText(/Leveringspunkt X-koordinat/i));
+  await user.type(waterControls.getByLabelText(/Leveringspunkt X-koordinat/i), '60');
+  await user.clear(waterControls.getByLabelText(/Leveringspunkt Y-koordinat/i));
+  await user.type(waterControls.getByLabelText(/Leveringspunkt Y-koordinat/i), '50');
+  await user.type(waterControls.getByLabelText(/Planmerknad uten persondata/i), 'Avklart med leder');
+
+  await user.click(waterControls.getByRole('button', { name: /Lag pumpe- og slangeplan/i }));
+
+  expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/Ressurs — Vannkilde Skogbrann vest/i);
+  expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/Pumpeplass — Pumpeplass Skogbrann vest/i);
+  expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/Ressurs — Leveringspunkt Skogbrann vest/i);
+  expect(screen.getByTestId('operations-drawing-list')).toHaveTextContent(/Linje — Slangevei Skogbrann vest/i);
+  expect(screen.getByTestId('water-supply-plan-summary')).toHaveTextContent(/Slangevei .* skjematiske enheter/i);
+  expect(screen.getByTestId('water-supply-plan-summary')).toHaveTextContent(/trykkforsterkning|seriekjøring/i);
+
+  const stored = localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY) ?? '';
+  expect(stored).toContain('"missionId":"mission-map-log"');
+  expect(stored).toContain('"kind":"pump-location"');
+  expect(stored).toContain('Slangevei Skogbrann vest');
+  expect(stored).not.toMatch(/\b\d+\s*(?:l\/min|liter\/min|bar|m3\/t)\b/i);
+});
+
+it('creates a local RADIAC measurement plan as observation markers and a route line', async () => {
+  const user = userEvent.setup();
+  await saveMission({ ...activeMission, scenario: 'radiac-nedfall', role: 'rad' });
+  saveSelectedActiveMissionId(activeMission.id);
+
+  await renderOfflineMapPanel();
+
+  const radiacPlanner = screen.getByRole('region', { name: /RADIAC målepunktplanlegger/i });
+  expect(radiacPlanner).toBeInTheDocument();
+  const radiacControls = within(radiacPlanner);
+  await user.clear(radiacControls.getByLabelText(/RADIAC planetikett/i));
+  await user.type(radiacControls.getByLabelText(/RADIAC planetikett/i), 'RAD nord');
+  await user.clear(radiacControls.getByLabelText(/Målepunkter som x,y/i));
+  await user.type(radiacControls.getByLabelText(/Målepunkter som x,y/i), '15,30 35,40 55,45');
+  await user.type(radiacControls.getByLabelText(/RADIAC planmerknad uten persondata/i), 'Rapporteringsformat avklart');
+
+  await user.click(radiacControls.getByRole('button', { name: /Lag RADIAC måleplan/i }));
+
+  expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/Observasjon — Målepunkt 1 RAD nord/i);
+  expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/Observasjon — Målepunkt 2 RAD nord/i);
+  expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/Observasjon — Målepunkt 3 RAD nord/i);
+  expect(screen.getByTestId('operations-drawing-list')).toHaveTextContent(/Linje — Målerute RAD nord/i);
+  expect(screen.getByTestId('radiac-measurement-plan-summary')).toHaveTextContent(/3 målepunkt/i);
+  expect(screen.getByTestId('radiac-measurement-plan-summary')).toHaveTextContent(/beregner ikke dose/i);
+
+  const stored = localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY) ?? '';
+  expect(stored).toContain('"missionId":"mission-map-log"');
+  expect(stored).toContain('"kind":"observation"');
+  expect(stored).toContain('Målerute RAD nord');
+  expect(stored).not.toMatch(/\b\d+\s*(?:µ?Sv\/h|mSv|dosegrense|oppholdstid)\b/i);
+});
+
+it('creates a local search-sector plan as a sector drawing with start and return markers', async () => {
+  const user = userEvent.setup();
+  await saveMission({ ...activeMission, scenario: 'sok-og-redning', role: 'lagforer' });
+  saveSelectedActiveMissionId(activeMission.id);
+
+  await renderOfflineMapPanel();
+
+  const searchPlanner = screen.getByRole('region', { name: /Søketeig planlegger/i });
+  expect(searchPlanner).toBeInTheDocument();
+  const searchControls = within(searchPlanner);
+  await user.clear(searchControls.getByLabelText(/Søketeig etikett/i));
+  await user.type(searchControls.getByLabelText(/Søketeig etikett/i), 'Teig alfa');
+  await user.clear(searchControls.getByLabelText(/Teiggrense som x,y/i));
+  await user.type(searchControls.getByLabelText(/Teiggrense som x,y/i), '10,20 42,18 48,52 14,58');
+  await user.clear(searchControls.getByLabelText(/Startpunkt X-koordinat/i));
+  await user.type(searchControls.getByLabelText(/Startpunkt X-koordinat/i), '12');
+  await user.clear(searchControls.getByLabelText(/Startpunkt Y-koordinat/i));
+  await user.type(searchControls.getByLabelText(/Startpunkt Y-koordinat/i), '22');
+  await user.clear(searchControls.getByLabelText(/Returpunkt X-koordinat/i));
+  await user.type(searchControls.getByLabelText(/Returpunkt X-koordinat/i), '40');
+  await user.clear(searchControls.getByLabelText(/Returpunkt Y-koordinat/i));
+  await user.type(searchControls.getByLabelText(/Returpunkt Y-koordinat/i), '55');
+  await user.type(searchControls.getByLabelText(/Søketeig planmerknad uten persondata/i), 'Rapporteringsintervall avklart');
+
+  await user.click(searchControls.getByRole('button', { name: /Lag søketeig plan/i }));
+
+  expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/Møteplass — Startpunkt Teig alfa/i);
+  expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/Møteplass — Returpunkt Teig alfa/i);
+  expect(screen.getByTestId('operations-drawing-list')).toHaveTextContent(/Sektor\/teig — Søketeig Teig alfa/i);
+  expect(screen.getByTestId('search-sector-plan-summary')).toHaveTextContent(/4 grensepunkt/i);
+  expect(screen.getByTestId('search-sector-plan-summary')).toHaveTextContent(/live tracking/i);
+
+  const stored = localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY) ?? '';
+  expect(stored).toContain('"missionId":"mission-map-log"');
+  expect(stored).toContain('"kind":"sector"');
+  expect(stored).toContain('Søketeig Teig alfa');
+  expect(stored).not.toMatch(/\b(?:personnummer|\+47|pasient|GPS-sporing|blue-force|sanntidsposisjon)\b/i);
+});
+
+it('creates a local MRE zone plan with clean and dirty zones, rinse line and checkpoints', async () => {
+  const user = userEvent.setup();
+  await saveMission({ ...activeMission, scenario: 'cbrn-cbrne', role: 'mre' });
+  saveSelectedActiveMissionId(activeMission.id);
+
+  await renderOfflineMapPanel();
+
+  const mrePlanner = screen.getByRole('region', { name: /MRE ren\/uren-side planlegger/i });
+  expect(mrePlanner).toBeInTheDocument();
+  const mreControls = within(mrePlanner);
+  await user.clear(mreControls.getByLabelText(/MRE planetikett/i));
+  await user.type(mreControls.getByLabelText(/MRE planetikett/i), 'Rens nord');
+  await user.clear(mreControls.getByLabelText(/Uren side som x,y/i));
+  await user.type(mreControls.getByLabelText(/Uren side som x,y/i), '10,20 38,18 36,46 12,48');
+  await user.clear(mreControls.getByLabelText(/^Ren side som x,y/i));
+  await user.type(mreControls.getByLabelText(/^Ren side som x,y/i), '48,22 76,22 74,48 50,50');
+  await user.clear(mreControls.getByLabelText(/Renselinje som x,y/i));
+  await user.type(mreControls.getByLabelText(/Renselinje som x,y/i), '40,20 44,52');
+  await user.clear(mreControls.getByLabelText(/Innpassering X-koordinat/i));
+  await user.type(mreControls.getByLabelText(/Innpassering X-koordinat/i), '14');
+  await user.clear(mreControls.getByLabelText(/Innpassering Y-koordinat/i));
+  await user.type(mreControls.getByLabelText(/Innpassering Y-koordinat/i), '24');
+  await user.clear(mreControls.getByLabelText(/Utpassering X-koordinat/i));
+  await user.type(mreControls.getByLabelText(/Utpassering X-koordinat/i), '54');
+  await user.clear(mreControls.getByLabelText(/Utpassering Y-koordinat/i));
+  await user.type(mreControls.getByLabelText(/Utpassering Y-koordinat/i), '46');
+  await user.clear(mreControls.getByLabelText(/Avfallspunkt X-koordinat/i));
+  await user.type(mreControls.getByLabelText(/Avfallspunkt X-koordinat/i), '32');
+  await user.clear(mreControls.getByLabelText(/Avfallspunkt Y-koordinat/i));
+  await user.type(mreControls.getByLabelText(/Avfallspunkt Y-koordinat/i), '54');
+  await user.type(mreControls.getByLabelText(/MRE planmerknad uten persondata/i), 'Samband og stoppkriterier avklart');
+
+  await user.click(mreControls.getByRole('button', { name: /Lag MRE soneplan/i }));
+
+  expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/Møteplass — Innpassering Rens nord/i);
+  expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/Møteplass — Utpassering Rens nord/i);
+  expect(screen.getByTestId('operations-marker-list')).toHaveTextContent(/Ressurs — Avfallspunkt Rens nord/i);
+  expect(screen.getByTestId('operations-drawing-list')).toHaveTextContent(/Polygon — Uren side Rens nord/i);
+  expect(screen.getByTestId('operations-drawing-list')).toHaveTextContent(/Polygon — Ren side Rens nord/i);
+  expect(screen.getByTestId('operations-drawing-list')).toHaveTextContent(/Linje — Renselinje Rens nord/i);
+  expect(screen.getByTestId('mre-zone-plan-summary')).toHaveTextContent(/2 soner/i);
+  expect(screen.getByTestId('mre-zone-plan-summary')).toHaveTextContent(/fastsetter ikke stoff/i);
+
+  const stored = localStorage.getItem(OPERATIONS_MAP_STORAGE_KEY) ?? '';
+  expect(stored).toContain('"missionId":"mission-map-log"');
+  expect(stored).toContain('Uren side Rens nord');
+  expect(stored).toContain('Renselinje Rens nord');
+  expect(stored).not.toMatch(/\b(?:personnummer|\+47|pasient|Level\s*A|nivå\s*A|sarin|klorgass|cyanid)\b/i);
+});
+
 it('preserves newer local mission updates when saving a field log from the map', async () => {
   const user = userEvent.setup();
   const existingEntry: FieldLogEntry = {

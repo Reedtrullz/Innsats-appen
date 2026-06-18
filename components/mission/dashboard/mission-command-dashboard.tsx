@@ -200,6 +200,7 @@ export function MissionCommandDashboard({ mission, cards, checklist, checklists,
         <MissionWorkPanel
           mission={mission}
           checklist={checklist}
+          checklists={checklists}
           checklistRuns={checklistRuns}
           staleSignals={staleSignals}
           scopedMapState={scopedMapState}

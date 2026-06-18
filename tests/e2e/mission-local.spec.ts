@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { createLocalMission, openMissionMode } from './helpers';
 
 test('creates and reopens a local mission offline', async ({ page, context }) => {
   await page.goto('/oppdrag/ny');
@@ -49,4 +50,50 @@ test('advances Før → Under by confirmation and preserves per-phase progress w
   // Free navigation back to 'for' must keep its checkmarks (own ChecklistRun).
   await page.getByRole('navigation', { name: 'Faser' }).getByRole('button', { name: /Før/ }).click();
   await expect(page.getByText('Alle anbefalte steg er gjort')).toBeVisible();
+});
+
+test('uses the local MFE reception board without official request actions', async ({ page }) => {
+  await createLocalMission(page, {
+    title: `MFE mottak ${Date.now()}`,
+    role: 'beredskapsvakt',
+    phase: 'for',
+    scenario: 'mfe-stotte',
+    location: 'Lokal mottaksplass',
+  });
+
+  await openMissionMode(page, 'Arbeid');
+  const board = page.getByRole('region', { name: /MFE mottaksboard/i });
+  await expect(board).toBeVisible();
+  await expect(board).toContainText(/ikke offisiell anmodning/i);
+
+  await board.getByRole('button', { name: /Legg inn MFE mottakssteg/i }).click();
+  await board.getByRole('button', { name: /Marker Mottak, oppmøte og første ordre pågår/i }).click();
+  await board.getByRole('button', { name: /Registrer ressursbehov for Mottak, oppmøte og første ordre/i }).click();
+
+  await expect(board).toContainText(/1\/5 startet/i);
+  await expect(board).toContainText(/Lokalt ressursbehov er registrert/i);
+  await expect(board.getByRole('button', { name: /send|anmod|utkall/i })).toHaveCount(0);
+});
+
+test('uses the local transport logistics board without dispatch or tracking actions', async ({ page }) => {
+  await createLocalMission(page, {
+    title: `Transportlogistikk ${Date.now()}`,
+    role: 'atv-bat',
+    phase: 'for',
+    scenario: 'evakuering',
+    location: 'Lokal oppstillingsplass',
+  });
+
+  await openMissionMode(page, 'Arbeid');
+  const board = page.getByRole('region', { name: /Transportlogistikk board/i });
+  await expect(board).toBeVisible();
+  await expect(board).toContainText(/ikke offisiell ordre/i);
+
+  await board.getByRole('button', { name: /Legg inn transportsteg/i }).click();
+  await board.getByRole('button', { name: /Marker Rute, vær og framkommelighet trenger assistanse/i }).click();
+  await board.getByRole('button', { name: /Registrer ressursbehov for Rute, vær og framkommelighet/i }).click();
+
+  await expect(board).toContainText(/1\/6 startet/i);
+  await expect(board).toContainText(/Lokalt ressursbehov er registrert/i);
+  await expect(board.getByRole('button', { name: /\b(send|dispatch|tracking|sporing|sporingssystem)\b/i })).toHaveCount(0);
 });

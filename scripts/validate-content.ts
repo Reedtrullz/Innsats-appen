@@ -294,8 +294,9 @@ function validateGeneratedArtifacts(errors: string[], graph: GraphInput) {
     const searchableSources = (graph.sources ?? []).filter((source) => source.pilotReviewStatus !== 'rejected-for-pilot');
     const sourceDocs = docs.filter((doc: any) => String(doc?.id ?? '').startsWith('kilde:'));
     compareIdSets(errors, 'search index source document ids', searchableSources.map((source) => `kilde:${source.id}`), sourceDocs.map((doc: any) => String(doc.id)));
+    compareIdSets(errors, 'search index checklist document ids', (graph.checklists ?? []).map((checklist) => `sjekkliste:${checklist.slug}`), docs.filter((doc: any) => String(doc?.id ?? '').startsWith('sjekkliste:')).map((doc: any) => String(doc.id)));
     compareIdSets(errors, 'search index FAQ document ids', publicFaq.map((entry: any) => `faq:${entry.id}`), docs.filter((doc: any) => String(doc?.id ?? '').startsWith('faq:')).map((doc: any) => String(doc.id)));
-    const expectedDocCount = searchableSources.length + counts.actionCardCount + counts.glossaryCount + counts.trainingPathCount + counts.protectionMeasureCount + publicFaq.length;
+    const expectedDocCount = searchableSources.length + counts.actionCardCount + counts.checklistCount + counts.glossaryCount + counts.trainingPathCount + counts.protectionMeasureCount + publicFaq.length;
     if (docs.length !== expectedDocCount) errors.push(`search index document count ${docs.length} does not match generated count ${expectedDocCount}`);
     const sourceById = new Map((graph.sources ?? []).map((source) => [String(source.id), source]));
     for (const doc of docs) {
