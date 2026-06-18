@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import { ActionCardDetail } from '@/components/action-card-detail';
-import type { ActionCard, SourceDocument } from '@/lib/content/schemas';
+import type { ActionCard, ImageMetadata, SourceDocument } from '@/lib/content/schemas';
 
 const testSource = (overrides: Partial<SourceDocument>): SourceDocument => ({
   id: 'src-test',
@@ -66,6 +66,46 @@ it('shows competence rationale when no explicit competence requirement exists', 
 
   expect(screen.getAllByText(/Kompetansevurdering/i).length).toBeGreaterThan(0);
   expect(screen.getByText(/Tilfluktsromstøtte styres av ansvarlig myndighet/i)).toBeInTheDocument();
+});
+
+it('renders expanded how examples and step-linked pump illustrations', () => {
+  const card = {
+    slug: 'skogbrann-vannforsyningsplan',
+    title: 'Skogbrann vannforsyningsplan',
+    phase: 'under',
+    roles: ['lagforer'],
+    scenarios: ['skogbrann'],
+    priority: 'high',
+    steps: [{
+      action: 'Velg mellom enkelt utlegg og seriekjøring.',
+      how: 'Bruk mellompumpe for trykkforsterkning når lang slangevei eller høydeforskjell gir for lavt trykk.',
+      imageIds: ['pumpeutlegg-image-1'],
+      sourceIds: ['src-pumpe'],
+    }],
+    safety: [],
+    reporting: [],
+    sourceIds: ['src-pumpe'],
+    competenceRequired: [],
+    reviewStatus: 'pending-fagperson',
+  } as ActionCard;
+  const sources = [testSource({ id: 'src-pumpe', title: 'SRC - Pumpe', body: 'Pumpe' })];
+  const images = [{
+    id: 'pumpeutlegg-image-1',
+    publicPath: '/content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image1.png',
+    alt: 'Illustrasjon av pumpeutlegg',
+    caption: 'Pumpeutlegg',
+    sourceIds: ['src-pumpe'],
+    approvedForPublication: true,
+    usedByCardSlugs: ['skogbrann-vannforsyningsplan'],
+    updatedAt: '2026-06-03',
+  }] as ImageMetadata[];
+
+  render(<ActionCardDetail card={card} sources={sources} images={images} />);
+
+  expect(screen.getByText(/Vis hvordan/i)).toBeInTheDocument();
+  expect(screen.getByText(/mellompumpe for trykkforsterkning/i)).toBeInTheDocument();
+  expect(screen.getByAltText(/Illustrasjon av pumpeutlegg/i)).toBeInTheDocument();
+  expect(screen.getByText(/Til faggjennomgang/i)).toBeInTheDocument();
 });
 
 it('summarizes source confidence before the full source list', () => {

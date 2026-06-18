@@ -21,3 +21,8 @@ export function normalizeStep(step: ActionCardStep): NormalizedActionCardStep {
 export function stepText(step: ActionCardStep): string {
   return typeof step === 'string' ? step : step.action;
 }
+
+/** Action plus optional how-text for full-text search surfaces. */
+export function stepSearchText(step: ActionCardStep): string {
+  return typeof step === 'string' ? step : [step.action, step.how].filter(Boolean).join(' ');
+}

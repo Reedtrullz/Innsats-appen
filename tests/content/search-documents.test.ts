@@ -34,6 +34,34 @@ it('builds routeable search documents with operational metadata', () => {
   });
 });
 
+it('indexes action-card how text so detailed examples are searchable', () => {
+  const docs = buildSearchDocuments({
+    queryBasePath: '/sok',
+    cards: [{
+      slug: 'skogbrann-vannforsyningsplan',
+      title: 'Skogbrann vannforsyningsplan',
+      phase: 'under',
+      roles: ['lagforer'],
+      scenarios: ['skogbrann'],
+      priority: 'high',
+      steps: [{ action: 'Velg utleggstype.', how: 'Seriekjøring bruker mellompumpe når trykkforsterkning trengs.', imageIds: [] }],
+      safety: [],
+      reporting: [],
+      sourceIds: ['src-skog'],
+      competenceRequired: [],
+      equipmentRequired: ['pumpe'],
+    }] as ActionCard[],
+    sources: [{ id: 'src-skog', title: 'SRC - Skog', sourcePath: 'source-extracts/SRC - Skog.md', sourceType: 'source-extract', status: 'verified', verifiedAt: '2026-06-04', owner: 'content-team', reviewer: 'fag', reviewRisk: 'low', body: 'Skog', warnings: [] }] as SourceDocument[],
+    glossary: [] as GlossaryTerm[],
+    training: [] as TrainingPath[],
+    protection: [] as ProtectionMeasure[],
+    faq: [] as FAQEntry[],
+  });
+
+  expect(docs.find((doc) => doc.id === 'kort:skogbrann-vannforsyningsplan')?.body)
+    .toMatch(/mellompumpe.*trykkforsterkning/i);
+});
+
 it('indexes operational checklists as routeable workflow documents', () => {
   const docs = buildSearchDocuments({
     queryBasePath: '/sok',

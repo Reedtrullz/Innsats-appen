@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import yaml from 'js-yaml';
 import { competenceCodes, competenceLabels, equipmentLabels, equipmentTerms } from '@/lib/content/taxonomy';
+import { stepSearchText } from '@/lib/content/steps';
 
 const readYaml = (path: string) => yaml.load(fs.readFileSync(path, 'utf8')) as any[];
 
@@ -103,13 +104,10 @@ const group4ActionCardSlugs = [
   'kontaminert-utstyr-handtering',
 ];
 
-// Steps are a string | { action, how?, ... } union (P2-2); read the action text.
-const stepStr = (step: any) => (typeof step === 'string' ? step : step?.action ?? '');
-
 const cardText = (card: any) => [
   card.title,
   card.slug,
-  ...(card.steps ?? []).map(stepStr),
+  ...(card.steps ?? []).map(stepSearchText),
   ...(card.safety ?? []),
   // doNot included: P1-2 dedup moved prohibition lines out of safety, but the
   // guidance still surfaces on the card via the "Ikke gjør" box.
@@ -286,7 +284,7 @@ it('keeps pilot-approved tilfluktsrom cards free of stale source-approval warnin
   for (const slug of tilfluktsromCardSlugs) {
     const card = cards.find((item) => item.slug === slug);
     const warning = card?.warning ?? '';
-    const cardBoundaryText = [warning, ...(card?.safety ?? []), ...((card?.steps ?? []).map(stepStr))].join('\n');
+    const cardBoundaryText = [warning, ...(card?.safety ?? []), ...((card?.steps ?? []).map(stepSearchText))].join('\n');
 
     expect(card, `missing tilfluktsrom action card ${slug}`).toBeTruthy();
     expect(card?.sourceIds).toContain('src-operativt-konsept-for-sivilforsvaret');
@@ -715,9 +713,18 @@ it('curated forest-fire water supply content includes source-backed pump and hos
   expect(forestWaterPlan?.reviewStatus).toBe('pending-fagperson');
   expect(forestWaterPlan?.sourceIds).toEqual(expect.arrayContaining([
     'src-tiltakskort-under-innsats',
+    'src-5-punktsordre',
     'src-eksempler-pa-utlegg-fra-pumpe',
     'src-kursplan-grunnkurs-fig10',
+    'src-operativt-konsept-for-sivilforsvaret',
+    'src-grunnopplaering-mfe-10-mannskap',
+    'src-sjekkliste-fig-og-figp',
+    'src-tiltakskort-05-stotte-av-mfe',
+    'src-tiltakskort-03-innsats',
   ]));
+  expect(forestWaterPlan?.steps.length).toBeGreaterThanOrEqual(12);
+  expect(forestWaterPlan?.steps.some((step: any) => typeof step !== 'string' && /seriekjøring|trykkforsterkning/i.test(step.how ?? ''))).toBe(true);
+  expect(forestWaterPlan?.steps.some((step: any) => typeof step !== 'string' && (step.imageIds ?? []).includes('pumpeutlegg-image-1'))).toBe(true);
   const planText = cardText(forestWaterPlan);
   expect(planText).toMatch(/innsatsleder/i);
   expect(planText).toMatch(/vannkilde/i);
@@ -725,6 +732,13 @@ it('curated forest-fire water supply content includes source-backed pump and hos
   expect(planText).toMatch(/slangevei/i);
   expect(planText).toMatch(/trykktap/i);
   expect(planText).toMatch(/trykkforsterkning|seriekjøring/i);
+  expect(planText).toMatch(/mellompumpe/i);
+  expect(planText).toMatch(/A-utlegg|lett MBS|slangebro|dobbelt utlegg/i);
+  expect(planText).toMatch(/samlerør|forgrening/i);
+  expect(planText).toMatch(/kavitasjon|ujevnt trykk|luft på sugesiden/i);
+  expect(planText).toMatch(/MFE-støtte|oppmøtested|sambandsplan/i);
+  expect(planText).toMatch(/0,1 bar/i);
+  expect(planText).toMatch(/regnekladde|ikke som fasit|fagressurs/i);
   expect(planText).toMatch(/ikke\s+dimensjoner|tall fra appen/i);
 });
 

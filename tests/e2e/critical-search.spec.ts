@@ -17,7 +17,7 @@ const criticalQueries = [
   'materiellberedskap',
 ];
 
-const synonymQueries = ['radiac', 'MFE', 'sektor', 'ATV', 'CBRNE'];
+const synonymQueries = ['radiac', 'MFE', 'sektor', 'ATV', 'CBRNE', 'mellompumpe', 'A-utlegg', 'slangebro'];
 
 test('critical operational search terms return local results', async ({ page }) => {
   await page.goto('/hurtigkort');
@@ -87,6 +87,27 @@ test('synonym queries all return results on the dedicated search page', async ({
     await search.fill(query);
     await expect(page.getByLabel('Lokalt søk').getByRole('link').first(), `query "${query}" returned no results`).toBeVisible();
   }
+});
+
+test('forest fire water-supply card exposes relay-pump planning details', async ({ page }) => {
+  await page.goto('/kort/skogbrann-vannforsyningsplan');
+  const card = page.locator('article');
+
+  await expect(page.getByRole('heading', { name: 'Skogbrann vannforsyningsplan' })).toBeVisible();
+  await expect(card.getByText(/Til faggjennomgang/i)).toBeVisible();
+  await expect(card.getByText(/Velg mellom enkelt utlegg, parallelt\/dobbelt utlegg og seriekjøring/i)).toBeVisible();
+  await expect(page.getByAltText(/pumpeutlegg/i).first()).toBeVisible();
+
+  for (const summary of await page.getByText('Vis hvordan').all()) {
+    await summary.click();
+  }
+
+  await expect(card.getByText(/mellompumpe for trykkforsterkning/i).first()).toBeVisible();
+  await expect(card.getByText(/0,1 bar/i).first()).toBeVisible();
+  await expect(card.getByText(/A-utlegg/i).first()).toBeVisible();
+  await expect(card.getByText(/lett MBS-utlegg/i).first()).toBeVisible();
+  await expect(card.getByText(/slangebro/i).first()).toBeVisible();
+  await expect(card.getByText(/kavitasjonslyd/i).first()).toBeVisible();
 });
 
 test('offline search returns results without network', async ({ page, context: browserContext }) => {

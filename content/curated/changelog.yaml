@@ -1,3 +1,22 @@
+- id: skogbrann-vannforsyning-detaljert
+  date: 2026-06-19
+  title: Skogbrann vannforsyningsplan utvidet
+  summary: Tiltakskortet for skogbrann vannforsyningsplan har fått konkrete eksempler for seriekjøring, trykkforsterkning, parallelt/dobbelt utlegg, pumpeplassering, slangevei, feilsøking og MFE-/materiellbehov, fortsatt markert for faggjennomgang.
+  changeType: updated
+  contentRefs:
+    - kind: action-card
+      id: skogbrann-vannforsyningsplan
+  sourceIds:
+    [
+      src-tiltakskort-under-innsats,
+      src-eksempler-pa-utlegg-fra-pumpe,
+      src-kursplan-grunnkurs-fig10,
+      src-operativt-konsept-for-sivilforsvaret,
+      src-grunnopplaering-mfe-10-mannskap,
+      src-tiltakskort-05-stotte-av-mfe
+    ]
+  mustRead: true
+
 - id: group-2a-for-utrykning
   date: 2026-06-03
   title: Før utrykning-prosedyre oppdatert

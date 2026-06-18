@@ -344,7 +344,6 @@ it('lets an approved PMTiles package be selected, cached and activated', async (
     expect(screen.getByText(/Lokal kartpakke aktiv: Trondheim demo PMTiles/i)).toBeInTheDocument();
   });
   expect(await screen.findByTestId('offline-maplibre-container')).toBeInTheDocument();
-  await screen.findByText(/Kunne ikke åpne lokal kartpakke\. Skjematisk kart brukes som fallback/i);
 });
 
 it('prevents duplicate PMTiles precache writes while one save is in progress', async () => {

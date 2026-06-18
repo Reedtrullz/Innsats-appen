@@ -649,36 +649,187 @@
   scenarios: [ skogbrann, brann ]
   priority: high
   steps:
-    - Bekreft sektor, leveringspunkt og ønsket effekt med innsatsleder før
-      laget legger pumpe eller slange.
-    - Finn aktuell vannkilde og alternativ vannkilde; vurder trygg adkomst,
-      mannskapsplassering, røyk, varme, vind og retrett før pumpeplass velges.
-    - Marker pumpeplass, mulig slangevei og leveringspunkt lokalt på kart eller
-      skisse uten å dele sensitive lokasjonsdetaljer videre.
-    - Del slangeveien i etapper og vurder vannføring og trykktap i
-      slangeutlegget før materiell fordeles.
-    - Avklar med leder/fagressurs om trykkforsterkning, seriekjøring,
-      parallelle utlegg eller kortere etapper trengs før langt slangeutlegg.
-    - Fordel mannskap på pumpe, vannkilde, slangeoverganger, kritiske knekkpunkt
-      og leveringspunkt.
-    - Følg med på vannmangel, luft i systemet, trykkfall, friksjonsskader,
-      drivstoff, mannskapsbelastning og endringer i brannbildet.
-    - Revider planen ved vindskifte, ny sektor, flyttet leveringspunkt,
-      materiellsvikt eller ordreendring.
+    - action: Bekreft sektor, leveringspunkt og ønsket effekt med innsatsleder før laget legger pumpe eller slange.
+      how: >-
+        Be om et konkret leveringspunkt og hva vannet skal brukes til: fylle
+        kar/tank, holde en branngate/fuktingslinje, forsyne strålerør, spyle
+        etterslokking eller bygge reserve. Avklar om prioriteten er mest vann,
+        stabilt trykk, rask etablering, lang varighet eller sikker retrett. Skriv
+        ned hvem som kan endre leveringspunktet, hvor laget skal trekke seg ved
+        vindskifte, og hva som er minstekravet for at utlegget fortsatt har
+        verdi. Uten denne avklaringen blir seriekjøring og trykkforsterkning bare
+        gjetting.
+      sourceIds: [src-tiltakskort-under-innsats, src-5-punktsordre]
+    - action: Tegn vannveien som en kjede fra vannkilde til leveringspunkt.
+      how: >-
+        Lag en enkel skisse: vannkilde -> kildepumpe -> eventuell mellompumpe
+        for trykkforsterkning/seriekjøring -> eventuell forgrening eller
+        samlerør -> leveringspunkt. Navngi mønsteret hvis det passer med lokal
+        tegning/opplæring: enkelt utlegg, A-utlegg, lett MBS-utlegg,
+        gjennomgående grenrør, veikryssing med slangebro, parallelt/dobbelt
+        utlegg eller seriekjøring prinsipp 1/2. Marker omtrentlige etapper,
+        høydeforskjell, vegkryssing, knekkpunkt, varm/røykutsatt del,
+        kjøretøy-/ATV-adkomst, drivstoffpunkt og hvem som vokter hvert kritisk
+        punkt. Bruk appkartet bare som lokal skisse; ikke legg inn sensitive
+        lokasjoner eller del skjermet ruteinformasjon videre.
+      imageIds:
+        [
+          pumpeutlegg-image-1,
+          pumpeutlegg-image-2,
+          pumpeutlegg-image-3,
+          pumpeutlegg-image-4,
+          pumpeutlegg-image-5,
+          pumpeutlegg-image-6,
+          pumpeutlegg-image-7
+        ]
+      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-operativt-konsept-for-sivilforsvaret, src-grunnopplaering-mfe-10-mannskap]
+    - action: Velg vannkilde og pumpeplass med sikker drift, kort sugeside og retrett.
+      how: >-
+        Prioriter stabil vannkilde, fast underlag og kortest mulig ryddig
+        sugeside. Sil/sug skal ligge dypt nok til ikke å trekke luft, men ikke
+        suge slam, sand, planter eller bunnen. Plasser pumpe slik at den kan
+        etterfylles med drivstoff, luftes, stanses, flyttes og overvåkes uten at
+        mannskap må stå i røyk, varme, trafikk eller ustabil kant. Tenk også på
+        eksos, støy, lys i mørke, slange som kan rykke ved trykksetting, og
+        mulighet for å få inn ekstra pumpe/slange uten å blokkere retrett.
+      sourceIds: [src-kursplan-grunnkurs-fig10, src-operativt-konsept-for-sivilforsvaret, src-grunnopplaering-mfe-10-mannskap]
+    - action: Velg mellom enkelt utlegg, parallelt/dobbelt utlegg og seriekjøring/trykkforsterkning.
+      how: >-
+        Enkelt utlegg passer når avstand, høydeforskjell og vannmengde er
+        moderate. Parallelt eller dobbelt utlegg mellom samme punkter kan brukes
+        når friksjonstapet er hovedproblemet og dere har nok slange,
+        overganger/samlerør og mannskap; da fordeles vannet på flere slanger og
+        trykktapet faller kraftig. Seriekjøring/trykkforsterkning passer når
+        linjen er lang eller går oppover og en pumpe alene ikke kan levere
+        nødvendig trykk ved leveringspunktet. Da må kildepumpen gi jevn
+        vanntilførsel til mellompumpen, og mellompumpen plasseres for å løfte
+        trykket videre uten å bli sultet for vann.
+      sourceIds: [src-kursplan-grunnkurs-fig10, src-operativt-konsept-for-sivilforsvaret, src-eksempler-pa-utlegg-fra-pumpe]
+    - action: Bruk en enkel trykk- og tapsskisse for faggjennomgang, ikke som fasit.
+      how: >-
+        Regnekladde for leder/pumpekyndig: nødvendig pumpetrykk består av
+        ønsket trykk/effekt ved leveringspunktet, pluss trykktap i slanger og
+        armatur, pluss høydeforskjell. Som grov fysikkregel krever hver meter
+        oppover omtrent 0,1 bar bare for å løfte vannet; friksjonstap kommer i
+        tillegg og øker raskt med høyere vannføring, lengre slange, mindre
+        diameter, knekk, skadet slange og unødvendige overganger. Bruk lokale
+        pumpetabeller, slangedimensjoner, pumpekurver og fagressurs for tall.
+        Hvis skissen ikke går opp: kortere etapper, større slange, parallelt
+        utlegg, flyttet leveringspunkt eller ekstra pumpe vurderes før noen
+        skrur opp trykket.
+      sourceIds: [src-kursplan-grunnkurs-fig10, src-operativt-konsept-for-sivilforsvaret]
+    - action: Plasser mellompumpe for seriekjøring der den kan overvåkes og mates stabilt.
+      how: >-
+        Mellompumpen bør stå utenfor varm/røykutsatt del, nær adkomst for
+        drivstoff, lys og avløsning, og foran den delen av utlegget der trykket
+        ellers blir for lavt. Den må ha stabil innkommende vannmengde; tegn på
+        sultet mellompumpe er fallende/ujevnt trykk, luft, kavitasjonslyd eller
+        at slangen inn flater ut. Avtal startrekkefølge og samband: kildepumpe
+        etablerer vann, mellompumpe bekrefter vann inn, leveringspunkt bekrefter
+        vann ut, deretter økes trykket gradvis. Unngå å stenge bratt nedstrøms
+        mens pumper går hardt.
+      sourceIds: [src-kursplan-grunnkurs-fig10, src-operativt-konsept-for-sivilforsvaret, src-grunnopplaering-mfe-10-mannskap]
+    - action: Planlegg forgreninger, ventiler og prioritering før trykket blir brukt opp.
+      how: >-
+        Sett forgrening/samlerør på et sted som kan betjenes, ikke midt i
+        brannfront, trafikk eller ulendt terreng. Avklar hva som stenges først
+        dersom trykket faller: reservegren, sekundært leveringspunkt eller
+        spyling som ikke er kritisk. Ikke bygg mange små avtak før hovedlinjen
+        er stabil. Ved flere grener: hold mest mulig like slangelengder og
+        dimensjoner, og meld til leder at en ny gren kan stjele trykk fra
+        eksisterende leveringspunkt.
+      sourceIds: [src-operativt-konsept-for-sivilforsvaret, src-eksempler-pa-utlegg-fra-pumpe]
+    - action: Legg slangevei slik at den kan kontrolleres, beskyttes og flyttes.
+      how: >-
+        Følg veikant, sti, grøft eller ryddig trasé der mannskap kan gå trygt
+        langs linjen. Unngå skarpe kanter, stein, glør, varme partier, krappe
+        vinkler, trange porter og kjøretøyspor uten slangebro/beskyttelse. La
+        koblinger ligge synlig, med litt slakk ved pumpe, ventiler, svinger og
+        leveringspunkt. Ved oppoverbakke sikres slangen mot glidning; ved
+        nedoverbakke må pumpelag og leveringspunkt være obs på trykkstøt, luft
+        og ukontrollert bevegelse når linjen fylles eller stenges.
+      sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-tiltakskort-under-innsats, src-sjekkliste-fig-og-figp]
+    - action: Fordel roller for oppstart, lufting, linjevakt og samband.
+      how: >-
+        Minst en person må ha pumpeansvar ved hver pumpe, en må kunne gå eller
+        overvåke kritiske koblinger/knekkpunkt, og leveringspunktet må kunne gi
+        klar beskjed om vann, trykk og avbrudd. Avtal korte meldinger for
+        "fyller linje", "vann framme", "øk sakte", "hold", "reduser" og "stopp".
+        Fyll linjen kontrollert, luft ut ved høypunkt/leveringspunkt der det er
+        mulig, og øk trykket i trinn mens noen ser etter lekkasje,
+        slangebevegelse, knekk og folk som står farlig til.
+      sourceIds: [src-tiltakskort-under-innsats, src-kursplan-grunnkurs-fig10]
+    - action: Feilsok trykkfall, vannmangel og ustabil drift systematisk.
+      how: >-
+        Svak levering kan skyldes for liten vannkilde, luft på sugesiden,
+        tett/for grunt sil, knekk, delvis stengt ventil, skadet slange, for
+        mange grener, for små slanger, for lang etappe, stor høydeforskjell eller
+        pumpe som går tom for drivstoff. Sultet mellompumpe: reduser uttak
+        nedstrøms og be oppstrøms pumpe stabilisere vann inn. Kavitasjon/ujevn
+        gange ved kildepumpe: senk krav, sjekk sugeside/sil og vannstand. Lekkasjer
+        eller slange som hopper: reduser trykk, avlast, bytt slange eller legg om.
+      sourceIds: [src-kursplan-grunnkurs-fig10, src-eksempler-pa-utlegg-fra-pumpe, src-grunnopplaering-mfe-10-mannskap]
+    - action: Pakk behovet for ekstra pumper, slanger eller MFE-støtte som en konkret anmodning.
+      how: >-
+        Når lokal vannforsyning ikke strekker til, meld en ferdig pakke: sektor
+        og oppdrag, vannkilde, leveringspunkt, skisse/navngitt utlegg, antatt
+        flaskehals, vær/vind/terreng, hva som trengs av pumper, slanger,
+        armatur/samlerør, overganger, ATV/kjøretøy og mannskap, ønsket
+        oppmøtested, kontaktperson, sambandsplan, varighet og om det trengs
+        avløsning. Skill tydelig mellom "vi mangler materiell", "vi mangler
+        trykk", "vi mangler vann inn" og "vi mangler folk til å holde linjen".
+      sourceIds: [src-tiltakskort-05-stotte-av-mfe, src-grunnopplaering-mfe-10-mannskap, src-tiltakskort-03-innsats]
+    - action: Revider planen ved endret brannbilde, vind, sektor, leveringspunkt eller materiellsvikt.
+      how: >-
+        Ny vindretning, flyttet brannfront, mer røyksatt trasé, tapt samband,
+        skadet pumpe, drivstoffmangel, knekt slange eller nytt leveringspunkt er
+        grunn til å stoppe og tegne kjeden på nytt. Meld hva som fortsatt virker,
+        hva som er flaskehalsen, og hva som trengs: mer slange, større slange,
+        ekstra pumpe, samlerør, overganger, drivstoff, ATV/kjøretøy, linjevakter
+        eller avløsning. Ikke dra laget lenger frem bare for å redde et dårlig
+        utlegg.
+      sourceIds: [src-tiltakskort-under-innsats, src-operativt-konsept-for-sivilforsvaret]
+    - action: Avslutt eller flytt utlegget kontrollert.
+      how: >-
+        Ved stans: informer hele kjeden, reduser trykk gradvis, unngå bratt
+        ventilavstenging, tapp/drener der det er mulig, og hold kontroll på
+        slange som kan bevege seg. Ved flytting: behold bare den delen av
+        slangeveien som fortsatt er sikker og nyttig, merk skadet materiell
+        lokalt uten utstyrsidentifikatorer, og planlegg vask, tørk, drivstoff,
+        service og retur til beredskap.
+      sourceIds: [src-tiltakskort-etter-innsats, src-eksempler-pa-utlegg-fra-pumpe]
   safety:
     - Hold retrettvei og sikker sone kjent før utlegg går frem mot brannen.
     - Stans utlegg ved uavklart røyk-/varmepåkjenning, trafikkfare, strømfare
       eller tap av samband.
+    - La trent pumpepersonell/fagressurs bekrefte trykk, kapasitet,
+      seriekjøring og trykkforsterkning før drift presses hardere.
+    - Reduser eller stopp trykket før slange, kobling, pumpe, forgrening eller
+      leveringspunkt flyttes.
   reporting:
     - Rapporter vannkilde, pumpeplass, slangevei, kjent begrensning og behov for
       ekstra pumper, slanger, overganger eller mannskap.
     - Meld raskt om trykkfall, vannmangel, skadet slange, flyttet brannfront
       eller behov for avløsning.
+    - >-
+      Ved seriekjøring: rapporter status for hver pumpe i kjeden, hvem som
+      bemanner den og hvilket punkt som er flaskehals.
+    - >-
+      Ved parallelle/doble utlegg eller forgreninger: rapporter hvilke linjer
+      som er prioritert dersom trykket faller.
   sourceIds:
     [
       src-tiltakskort-under-innsats,
+      src-5-punktsordre,
       src-eksempler-pa-utlegg-fra-pumpe,
-      src-kursplan-grunnkurs-fig10
+      src-kursplan-grunnkurs-fig10,
+      src-enhetlig-ledelsessystem-els,
+      src-grunnopplaering-mfe-10-mannskap,
+      src-sjekkliste-fig-og-figp,
+      src-tiltakskort-05-stotte-av-mfe,
+      src-tiltakskort-03-innsats,
+      src-tiltakskort-etter-innsats,
+      src-operativt-konsept-for-sivilforsvaret
     ]
   competenceRequired: [ FIG10 ]
   equipmentRequired: [ pumpe, slangeutlegg, samband, vann, verneutstyr ]
@@ -691,7 +842,9 @@
       "Ikke dimensjoner vannforsyning på tall fra appen alene; avklar kapasitet,
         trykk og taktikk med leder/fagressurs.",
       "Ikke flytt pumpe, slangevei eller leveringspunkt inn i ny risiko uten
-        ordre og kjent retrettvei."
+        ordre og kjent retrettvei.",
+      "Ikke bruk regneeksempler eller tommelfingerregler som ordre, pumpekurve
+        eller brannfaglig dimensjonering."
     ]
 
 - slug: brann-vannforsyning-slange

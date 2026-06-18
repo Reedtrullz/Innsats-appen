@@ -4,7 +4,7 @@
   caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
   sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
   approvedForPublication: true
-  usedByCardSlugs: [flom-pumpe-start]
+  usedByCardSlugs: [flom-pumpe-start, skogbrann-vannforsyningsplan]
   updatedAt: 2026-06-03
 - id: pumpeutlegg-image-2
   publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image2.png
@@ -12,7 +12,7 @@
   caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
   sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
   approvedForPublication: true
-  usedByCardSlugs: [flom-pumpe-start]
+  usedByCardSlugs: [flom-pumpe-start, skogbrann-vannforsyningsplan]
   updatedAt: 2026-06-03
 - id: pumpeutlegg-image-3
   publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image3.png
@@ -20,7 +20,7 @@
   caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
   sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
   approvedForPublication: true
-  usedByCardSlugs: [flom-pumpe-start]
+  usedByCardSlugs: [flom-pumpe-start, skogbrann-vannforsyningsplan]
   updatedAt: 2026-06-03
 - id: pumpeutlegg-image-4
   publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image4.png
@@ -28,7 +28,7 @@
   caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
   sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
   approvedForPublication: true
-  usedByCardSlugs: [flom-pumpe-start]
+  usedByCardSlugs: [flom-pumpe-start, skogbrann-vannforsyningsplan]
   updatedAt: 2026-06-03
 - id: pumpeutlegg-image-5
   publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image5.png
@@ -36,7 +36,7 @@
   caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
   sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
   approvedForPublication: true
-  usedByCardSlugs: [flom-pumpe-start]
+  usedByCardSlugs: [flom-pumpe-start, skogbrann-vannforsyningsplan]
   updatedAt: 2026-06-03
 - id: pumpeutlegg-image-6
   publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image6.png
@@ -44,7 +44,7 @@
   caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
   sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
   approvedForPublication: true
-  usedByCardSlugs: [flom-pumpe-start]
+  usedByCardSlugs: [flom-pumpe-start, skogbrann-vannforsyningsplan]
   updatedAt: 2026-06-03
 - id: pumpeutlegg-image-7
   publicPath: /content-assets/docx_Eksempler-pa-utlegg-fra-pumpe__image7.png
@@ -52,7 +52,7 @@
   caption: Pumpeutlegg, illustrasjon fra kildeutdrag.
   sourceIds: [src-eksempler-pa-utlegg-fra-pumpe]
   approvedForPublication: true
-  usedByCardSlugs: [flom-pumpe-start]
+  usedByCardSlugs: [flom-pumpe-start, skogbrann-vannforsyningsplan]
   updatedAt: 2026-06-03
 - id: sambandsdiagram-image-1
   publicPath: /content-assets/docx_2.6-Kommunikasjons-og-sambandsdiagram__image1.png

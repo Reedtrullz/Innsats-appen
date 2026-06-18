@@ -191,6 +191,15 @@
     - trykkforsterkning
     - seriekjøring
     - parallelle utlegg
+    - parallelt utlegg
+    - dobbelt utlegg
+    - mellompumpe
+    - samlerør
+    - forgrening
+    - slangebro
+    - A-utlegg
+    - MBS
+    - kavitasjon
   cardIds: [brann-vannforsyning-slange, skogbrann-vannforsyningsplan, skogbrann-startkort, flom-pumpe-vannforsyning]
 
 - canonical: skadde
