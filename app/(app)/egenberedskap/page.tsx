@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 import { PackingDiagram } from '@/components/personlig/packing-diagram';
+import { PersonalPrepChecklist } from '@/components/personlig/personal-prep-checklist';
 import { CommandCard } from '@/components/ui/operational-primitives';
+import { getChecklists, getSourceDocuments } from '@/lib/content/load-content';
+import { buildSourceTitleById } from '@/lib/content/source-titles';
+
+const PACKING_CHECKLIST_SLUG = 'personlig-utstyr-for-utrykning';
 
 export const metadata: Metadata = {
   title: 'Egenberedskap | Beredskapsboka',
@@ -39,6 +44,9 @@ const prepCards: Array<{ eyebrow: string; title: string; body: string; href: str
 ];
 
 export default function Page() {
+  const packingChecklist = getChecklists().find((checklist) => checklist.slug === PACKING_CHECKLIST_SLUG);
+  const sourceTitleById = buildSourceTitleById(getSourceDocuments());
+
   return (
     <div className="space-y-5">
       {/* Calm Personlig hero — softer green accent, more air, no alarm red. */}
@@ -65,6 +73,10 @@ export default function Page() {
           </CommandCard>
         ))}
       </div>
+
+      {packingChecklist ? (
+        <PersonalPrepChecklist checklist={packingChecklist} sourceTitleById={sourceTitleById} />
+      ) : null}
 
       <div id="pakking" className="scroll-mt-28">
         <PackingDiagram />
