@@ -7,6 +7,11 @@ import { formatNbDateTime } from '@/lib/formatting/format-date';
 
 const operationalLinks = [
   {
+    href: '/egenberedskap',
+    label: 'Egenberedskap',
+    description: 'Personlig forberedelse før vakt — pakk sekken, verneutstyr, helse og varsling.',
+  },
+  {
     href: '/hjelp',
     label: 'Hjelp og demo',
     description: 'Lær flytene og start en trygg demohendelse med lokale øvingsdata.',
