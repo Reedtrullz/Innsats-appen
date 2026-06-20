@@ -4,36 +4,38 @@ import { OperationalIcon, type OperationalIconName } from './operational-icons';
 
 type Tone = 'navy' | 'sky' | 'success' | 'warning' | 'critical' | 'slate';
 
+// Tone classes use CSS variables for dark-mode adaptability.
+// Light values are the defaults; dark overrides come from globals.css
 const toneClasses: Record<Tone, { pill: string; notice: string; icon: string }> = {
   navy: {
-    pill: 'bg-[#082F49] text-white ring-[#082F49]',
-    notice: 'border-[#082F49]/20 bg-[#082F49] text-white',
-    icon: 'bg-[#082F49] text-white',
+    pill: 'bg-[var(--command-bg)] text-[var(--command-fg)] ring-[var(--command-bg)]',
+    notice: 'border-[var(--command-bg)]/20 bg-[var(--command-bg)] text-[var(--command-fg)]',
+    icon: 'bg-[var(--command-bg)] text-[var(--command-fg)]',
   },
   sky: {
-    pill: 'bg-sky-100 text-sky-950 ring-sky-200',
-    notice: 'border-sky-200 bg-sky-50 text-sky-950',
-    icon: 'bg-sky-100 text-sky-900',
+    pill: 'bg-[var(--info-surface)] text-[var(--info-fg)] ring-[#38bdf8]/30',
+    notice: 'border-[#38bdf8]/30 bg-[var(--info-surface)] text-[var(--info-fg)]',
+    icon: 'bg-[var(--info-surface)] text-[var(--info-fg)]',
   },
   success: {
-    pill: 'bg-emerald-100 text-emerald-950 ring-emerald-200',
-    notice: 'border-emerald-200 bg-emerald-50 text-emerald-950',
-    icon: 'bg-emerald-100 text-emerald-900',
+    pill: 'bg-[var(--success-surface)] text-[var(--success-fg)] ring-[#34d399]/30',
+    notice: 'border-[#34d399]/30 bg-[var(--success-surface)] text-[var(--success-fg)]',
+    icon: 'bg-[var(--success-surface)] text-[var(--success-fg)]',
   },
   warning: {
-    pill: 'bg-amber-100 text-amber-950 ring-amber-200',
-    notice: 'border-amber-200 bg-amber-50 text-amber-950',
-    icon: 'bg-amber-100 text-amber-900',
+    pill: 'bg-[var(--warning-surface)] text-[var(--warning-fg)] ring-[#fbbf24]/30',
+    notice: 'border-[#fbbf24]/30 bg-[var(--warning-surface)] text-[var(--warning-fg)]',
+    icon: 'bg-[var(--warning-surface)] text-[var(--warning-fg)]',
   },
   critical: {
     pill: 'bg-red-700 text-white ring-red-700',
-    notice: 'border-red-200 bg-red-50 text-red-950',
-    icon: 'bg-red-100 text-red-700',
+    notice: 'border-[#f87171]/30 bg-[var(--critical-surface)] text-[var(--critical-fg)]',
+    icon: 'bg-[var(--critical-surface)] text-[var(--critical-fg)]',
   },
   slate: {
-    pill: 'bg-slate-100 text-slate-800 ring-slate-200',
-    notice: 'border-slate-200 bg-white text-slate-950',
-    icon: 'bg-slate-100 text-slate-700',
+    pill: 'bg-[var(--surface-muted)] text-[var(--text-secondary)] ring-[var(--border)]',
+    notice: 'border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)]',
+    icon: 'bg-[var(--surface-muted)] text-[var(--text-muted)]',
   },
 };
 
@@ -104,13 +106,13 @@ export function CommandCard({
           </span>
         ) : null}
         <div className="min-w-0">
-          {eyebrow ? <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{eyebrow}</p> : null}
-          <h3 className="text-base font-black leading-tight text-slate-950">{title}</h3>
-          {children ? <div className="mt-1 text-sm font-semibold leading-5 text-slate-600">{children}</div> : null}
+          {eyebrow ? <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[var(--text-muted)]">{eyebrow}</p> : null}
+          <h3 className="text-base font-bold leading-tight text-[var(--text-primary)]">{title}</h3>
+          {children ? <div className="mt-1 text-sm font-semibold leading-5 text-[var(--text-secondary)]">{children}</div> : null}
         </div>
       </div>
       {href && ctaLabel ? (
-        <span className="mt-3 inline-flex min-h-11 w-full items-center justify-between rounded-xl bg-[#082F49] px-4 text-sm font-black text-white">
+        <span className="mt-3 inline-flex min-h-11 w-full items-center justify-between rounded-xl bg-[var(--command-bg)] px-4 text-sm font-bold text-[var(--command-fg)]">
           {ctaLabel}
           <OperationalIcon name="chevron" className="h-4 w-4" />
         </span>
@@ -120,13 +122,13 @@ export function CommandCard({
 
   if (href) {
     return (
-      <Link href={href} className={`block rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-sky-200 hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49] ${className}`}>
+      <Link href={href} className={`block rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 transition hover:border-[#38bdf8]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#38bdf8] ${className}`}>
         {content}
       </Link>
     );
   }
 
-  return <div className={`rounded-2xl border border-slate-200 bg-white p-4 shadow-sm ${className}`}>{content}</div>;
+  return <div className={`rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 ${className}`}>{content}</div>;
 }
 
 export function QuickActionButton({
@@ -145,16 +147,16 @@ export function QuickActionButton({
   return (
     <Link
       href={href}
-      className="group flex min-h-16 items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-left shadow-sm transition hover:border-sky-200 hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49]"
+      className="group flex min-h-16 items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 text-left transition hover:border-[#38bdf8]/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#38bdf8]"
     >
       <span className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${toneClasses[tone].icon}`}>
         <OperationalIcon name={icon} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-sm font-black leading-tight text-slate-950">{label}</span>
-        {description ? <span className="mt-0.5 block text-xs font-semibold leading-4 text-slate-600">{description}</span> : null}
+        <span className="block text-sm font-bold leading-tight text-[var(--text-primary)]">{label}</span>
+        {description ? <span className="mt-0.5 block text-xs font-semibold leading-4 text-[var(--text-muted)]">{description}</span> : null}
       </span>
-      <OperationalIcon name="chevron" className="h-4 w-4 text-slate-400 group-hover:text-sky-800" />
+      <OperationalIcon name="chevron" className="h-4 w-4 text-[var(--text-muted)] group-hover:text-[var(--accent-fg)]" />
     </Link>
   );
 }
@@ -167,15 +169,18 @@ export function ProgressSummary({
   return (
     <dl className="grid gap-2 sm:grid-cols-2">
       {items.map((item) => (
-        <div key={item.label} className="rounded-2xl border border-slate-200 bg-slate-50 p-3">
-          <dt className="text-xs font-bold uppercase tracking-wide text-slate-500">{item.label}</dt>
-          <dd className="mt-1 text-lg font-black text-slate-950">{item.value}</dd>
+        <div key={item.label} className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3">
+          <dt className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[var(--text-muted)]">{item.label}</dt>
+          <dd className="mt-1 text-lg font-bold text-[var(--text-primary)]">{item.value}</dd>
           {typeof item.progress === 'number' ? (
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200" aria-hidden="true">
-              <div className={`h-full rounded-full ${item.tone === 'warning' ? 'bg-amber-500' : item.tone === 'critical' ? 'bg-red-600' : item.tone === 'sky' ? 'bg-sky-600' : 'bg-emerald-600'}`} style={{ width: `${Math.max(0, Math.min(100, item.progress))}%` }} />
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--border)]" aria-hidden="true">
+              <div
+                className={`h-full rounded-full ${item.tone === 'warning' ? 'bg-[#fbbf24]' : item.tone === 'critical' ? 'bg-[#f87171]' : item.tone === 'sky' ? 'bg-[#38bdf8]' : 'bg-[#34d399]'}`}
+                style={{ width: `${Math.max(0, Math.min(100, item.progress))}%` }}
+              />
             </div>
           ) : null}
-          {item.detail ? <p className="mt-1 text-xs font-semibold text-slate-600">{item.detail}</p> : null}
+          {item.detail ? <p className="mt-1 font-mono text-xs text-[var(--text-muted)]">{item.detail}</p> : null}
         </div>
       ))}
     </dl>

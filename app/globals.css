@@ -13,7 +13,7 @@
   --border-strong: #94a3b8;
   --text-primary: #0f172a;
   --text-secondary: #334155;
-  --text-muted: #64748b;
+  --text-muted: #475569;
   --command-bg: #082f49;
   --command-fg: #ffffff;
   --action-bg: #082f49;
@@ -27,37 +27,48 @@
   --critical-surface: #fef2f2;
   --critical-fg: #7f1d1d;
   --focus-ring: #38bdf8;
+  --accent-fg: #0369a1;
   --disabled-surface: #e2e8f0;
   --disabled-fg: #64748b;
 }
 
 .dark {
   color-scheme: dark;
+  /* Base surfaces — matches design board dark palette */
   --app-bg: #0b1220;
-  --app-fg: #e5edf6;
-  --surface: #111827;
-  --surface-elevated: #182235;
-  --surface-muted: #1e293b;
-  --border: #334155;
-  --border-strong: #64748b;
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
+  --app-fg: #f1f5f9;
+  --surface: #131c2e;
+  --surface-elevated: #0a1f33;
+  --surface-muted: #1a2438;
+  --border: #2a3a55;
+  --border-strong: #4a5c78;
+  --text-primary: #f1f5f9;
+  --text-secondary: #aab8cc;
+  --text-muted: #6b7c96;
+  /* Command / brand */
   --command-bg: #082f49;
-  --command-fg: #f8fafc;
-  --action-bg: #0ea5e9;
-  --action-fg: #031525;
-  --info-surface: #0c3148;
-  --info-fg: #e0f2fe;
-  --success-surface: #063d32;
-  --success-fg: #d1fae5;
-  --warning-surface: #442b08;
-  --warning-fg: #fef3c7;
-  --critical-surface: #4a1118;
-  --critical-fg: #fee2e2;
-  --focus-ring: #7dd3fc;
-  --disabled-surface: #1e293b;
-  --disabled-fg: #94a3b8;
+  --command-fg: #f1f5f9;
+  /* Active / "nå" signal — cyan */
+  --action-bg: #38bdf8;
+  --action-fg: #04141f;
+  /* Semantic surfaces */
+  --info-surface: #0a1f33;
+  --info-fg: #7dd3fc;
+  --success-surface: #052e1c;
+  --success-fg: #6ee7b7;
+  --warning-surface: #3a2400;
+  --warning-fg: #fcd34d;
+  --critical-surface: #3a0d12;
+  --critical-fg: #fca5a5;
+  /* Runbook signal colours (referenced by components via CSS vars) */
+  --step-now: #38bdf8;
+  --step-done: #34d399;
+  --step-skipped: #fbbf24;
+  --step-notdo: #f87171;
+  --focus-ring: #38bdf8;
+  --accent-fg: #38bdf8;
+  --disabled-surface: #1a2438;
+  --disabled-fg: #6b7c96;
 }
 
 html {
@@ -73,6 +84,12 @@ body {
   overflow-x: clip;
   background: var(--app-bg);
   color: var(--app-fg);
+  font-family: var(--font-plex-sans), system-ui, sans-serif;
+}
+
+/* Mono data: clock, channels, coordinates, source references */
+.font-mono, code, kbd, samp, pre {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
 }
 
 * {
@@ -111,7 +128,8 @@ body {
   background-color: var(--surface) !important;
 }
 
-.dark .bg-slate-100 {
+.dark .bg-slate-100,
+.dark .bg-slate-200 {
   background-color: var(--surface-muted) !important;
 }
 

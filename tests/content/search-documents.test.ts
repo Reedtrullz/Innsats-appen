@@ -4,7 +4,7 @@ import type { ActionCard, FAQEntry, GlossaryTerm, OperationalChecklist, Protecti
 it('builds routeable search documents with operational metadata', () => {
   const docs = buildSearchDocuments({
     queryBasePath: '/sok',
-    cards: [{ slug: 'flom-pumpe-start', title: 'Flom og pumpeutlegg', phase: 'under', roles: ['lagforer'], scenarios: ['flom'], priority: 'high', steps: ['Start pumpe'], safety: [], reporting: [], sourceIds: ['src-flom'], competenceRequired: [], equipmentRequired: ['pumpe'] }] as ActionCard[],
+    cards: [{ slug: 'flom-pumpe-start', title: 'Flom og pumpeutlegg', phase: 'under', roles: ['lagforer'], scenarios: ['flom'], priority: 'high', steps: ['Start pumpe'], safety: [], reporting: [], sourceIds: ['src-flom'], competenceRequired: [], equipmentRequired: ['pumpe'], reviewStatus: 'pending-fagperson' }] as ActionCard[],
     sources: [{ id: 'src-flom', title: 'SRC - Flom', sourcePath: 'source-extracts/SRC - Flom.md', sourceType: 'source-extract', status: 'verified', verifiedAt: '2026-06-04', owner: 'content-team', reviewer: 'fag', reviewRisk: 'low', body: 'Pumpe og flom', warnings: [] }] as SourceDocument[],
     glossary: [{ term: 'pumpe', definition: 'Lensepumpe', aliases: [], synonyms: [], sourceIds: ['src-flom'] }] as GlossaryTerm[],
     training: [] as TrainingPath[],
@@ -20,6 +20,7 @@ it('builds routeable search documents with operational metadata', () => {
     scenario: 'flom',
     role: 'lagforer',
     priority: 'high',
+    reviewStatus: 'pending-fagperson',
     sourceStatus: 'verified',
     sourceIds: ['src-flom'],
   });

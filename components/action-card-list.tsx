@@ -18,8 +18,8 @@ export function ActionCardList({ cards, initialFilter = {}, showFilters = true }
   return (
     <section className="space-y-4">
       {showFilters ? (
-        <details className="rounded-2xl bg-slate-100 p-3">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-xl text-sm font-black text-slate-900">
+        <details className="rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-3">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-xl text-sm font-black text-[var(--text-primary)]">
             Vis alle og filtrer
             <span aria-hidden="true">+</span>
           </summary>
@@ -27,7 +27,7 @@ export function ActionCardList({ cards, initialFilter = {}, showFilters = true }
           <PhaseTabs value={filter.phase} onChange={(phase) => setFilter((current) => ({ ...current, phase }))} />
           <RoleFilter value={filter.role} onChange={(role) => setFilter((current) => ({ ...current, role }))} />
           <ScenarioFilter value={filter.scenario} onChange={(scenario) => setFilter((current) => ({ ...current, scenario }))} />
-          <p className="text-sm font-semibold text-slate-700">Valgte filtre: {filter.phase ? phaseLabels[filter.phase] : 'alle faser'} / {filter.scenario ? scenarioLabels[filter.scenario] : 'alle scenario'}</p>
+          <p className="text-sm font-semibold text-[var(--text-secondary)]">Valgte filtre: {filter.phase ? phaseLabels[filter.phase] : 'alle faser'} / {filter.scenario ? scenarioLabels[filter.scenario] : 'alle scenario'}</p>
           </div>
         </details>
       ) : null}
@@ -35,8 +35,8 @@ export function ActionCardList({ cards, initialFilter = {}, showFilters = true }
       <div className="space-y-3">
         {visibleCards.slice(0, 8).map((card) => <TiltakCardRow key={card.slug} card={card} />)}
         {visibleCards.length > 8 ? (
-          <details className="rounded-2xl border border-slate-200 bg-white p-3">
-            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-xl text-sm font-black text-slate-900">
+          <details className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-xl text-sm font-black text-[var(--text-primary)]">
               Vis alle tiltakskort ({visibleCards.length})
               <span aria-hidden="true">+</span>
             </summary>
@@ -53,21 +53,21 @@ export function ActionCardList({ cards, initialFilter = {}, showFilters = true }
 function PhaseChecklistSummary({ checklists, sourceTitleById }: { checklists: OperationalChecklist[]; sourceTitleById?: Record<string, string> }) {
   if (checklists.length === 0) return null;
   return (
-    <section className="space-y-3 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <section className="space-y-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-sm">
       <div>
-        <p className="text-xs font-black uppercase tracking-wide text-sky-700">Sjekkliste/arbeidsflyt</p>
-        <h2 className="text-2xl font-black">Fasekontroller</h2>
-        <p className="mt-1 text-sm font-semibold text-slate-700">Kildebelagte sjekklister kan kjøres på lokal oppdragstavle og eksporteres manuelt uten skykobling.</p>
+        <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[var(--accent-fg)]">Sjekkliste/arbeidsflyt</p>
+        <h2 className="text-2xl font-black text-[var(--text-primary)]">Fasekontroller</h2>
+        <p className="mt-1 text-sm font-semibold text-[var(--text-secondary)]">Kildebelagte sjekklister kan kjøres på lokal oppdragstavle og eksporteres manuelt uten skykobling.</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         {checklists.map((checklist) => (
-          <article key={checklist.slug} className="rounded-2xl border border-slate-200 p-3">
-            <h3 className="text-lg font-black">{checklist.title}</h3>
-            {checklist.warning ? <p className="mt-1 text-sm font-semibold text-amber-900">{checklist.warning}</p> : null}
-            <ul className="mt-2 space-y-1 text-sm font-semibold text-slate-700">
+          <article key={checklist.slug} className="rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-3">
+            <h3 className="text-lg font-black text-[var(--text-primary)]">{checklist.title}</h3>
+            {checklist.warning ? <p className="mt-1 text-sm font-semibold text-[var(--warning-fg)]">{checklist.warning}</p> : null}
+            <ul className="mt-2 space-y-1 text-sm font-semibold text-[var(--text-secondary)]">
               {checklist.items.slice(0, 5).map((item) => <li key={item.id}>• {item.label}</li>)}
             </ul>
-            <p className="mt-2 text-xs text-slate-500">Kilder: {formatSourceList(checklist.sourceIds, sourceTitleById)}</p>
+            <p className="mt-2 text-xs text-[var(--text-muted)]">Kilder: {formatSourceList(checklist.sourceIds, sourceTitleById)}</p>
           </article>
         ))}
       </div>
@@ -78,8 +78,8 @@ function PhaseChecklistSummary({ checklists, sourceTitleById }: { checklists: Op
 function LatestProcedureNotice({ latestChange, sourceTitleById }: { latestChange?: ContentChangelogEntry; sourceTitleById?: Record<string, string> }) {
   if (!latestChange) return null;
   return (
-    <section className="rounded-3xl border border-sky-200 bg-sky-50 p-4 text-sky-950">
-      <p className="text-xs font-black uppercase tracking-wide">Sist oppdatert prosedyre</p>
+    <section className="rounded-2xl border border-[#38bdf8]/30 bg-[var(--info-surface)] p-4 text-[var(--info-fg)]">
+      <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest">Sist oppdatert prosedyre</p>
       <h2 className="mt-1 text-xl font-black">{latestChange.title}</h2>
       <p className="mt-1 text-sm font-semibold">{latestChange.summary}</p>
       <p className="mt-2 text-xs font-bold">Dato: {latestChange.date} · Kilder: {formatSourceList(latestChange.sourceIds, sourceTitleById)}</p>
@@ -90,11 +90,11 @@ function LatestProcedureNotice({ latestChange, sourceTitleById }: { latestChange
 function MustReadBeforeDeployment({ notices }: { notices: MustReadNotice[] }) {
   if (notices.length === 0) return null;
   return (
-    <section className="rounded-3xl border border-amber-300 bg-amber-50 p-4 text-amber-950">
-      <p className="text-xs font-black uppercase tracking-wide">Må leses før utrykning</p>
+    <section className="rounded-2xl border border-[#fbbf24]/30 bg-[var(--warning-surface)] p-4 text-[var(--warning-fg)]">
+      <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest">Må leses før utrykning</p>
       <div className="mt-3 space-y-3">
         {notices.map((notice) => (
-          <article key={notice.id} className="rounded-2xl bg-white/70 p-3 ring-1 ring-amber-200">
+          <article key={notice.id} className="rounded-2xl border border-[#fbbf24]/20 bg-[var(--surface)]/60 p-3">
             <h2 className="text-lg font-black">{notice.title}</h2>
             <p className="mt-1 text-sm font-semibold">{notice.body}</p>
             <p className="mt-2 text-xs font-bold">Alvorlighet: {notice.severity} · Oppdatert: {notice.changedAt}</p>
@@ -109,10 +109,10 @@ export function PhasePageContent({ phase, cards, checklists = [], latestChange, 
   const phaseChecklists = checklists.filter((checklist) => checklist.phase === phase);
   return (
     <div className="space-y-5">
-      <div className="rounded-3xl bg-sky-950 p-5 text-white">
-        <p className="text-sm font-semibold uppercase tracking-wide">Fase</p>
-        <h1 className="text-3xl font-black">{phaseLabels[phase]} innsats</h1>
-        <p className="mt-2 text-sm text-sky-100">Kildebelagte kort for {phaseLabels[phase].toLowerCase()} innsats.</p>
+      <div className="overflow-hidden rounded-2xl bg-[#082f49] p-5 text-white">
+        <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-sky-300/80">Fase</p>
+        <h1 className="text-3xl font-black tracking-tight">{phaseLabels[phase]} innsats</h1>
+        <p className="mt-2 text-sm font-semibold text-sky-100">Kildebelagte kort for {phaseLabels[phase].toLowerCase()} innsats.</p>
       </div>
       <LatestProcedureNotice latestChange={latestChange} sourceTitleById={sourceTitleById} />
       <MustReadBeforeDeployment notices={phase === 'for' ? mustRead : []} />
@@ -120,8 +120,8 @@ export function PhasePageContent({ phase, cards, checklists = [], latestChange, 
       <PhaseChecklistSummary checklists={phaseChecklists} sourceTitleById={sourceTitleById} />
       <div className="space-y-3">
         {sortActionCards(filterActionCards(cards, { phase })).slice(0, 6).map((card) => <TiltakCardRow key={card.slug} card={card} />)}
-        <details className="rounded-2xl border border-slate-200 bg-white p-3">
-          <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-slate-900">Vis flere tiltak for fasen</summary>
+        <details className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3">
+          <summary className="min-h-11 cursor-pointer list-none text-sm font-black text-[var(--text-primary)]">Vis flere tiltak for fasen</summary>
           <div className="mt-3 space-y-3">
             {sortActionCards(filterActionCards(cards, { phase })).slice(6).map((card) => <TiltakCardFull key={card.slug} card={card} />)}
           </div>

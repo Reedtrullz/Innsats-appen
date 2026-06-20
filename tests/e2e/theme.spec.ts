@@ -122,14 +122,14 @@ test('dark-mode priority surfaces meet WCAG AA contrast (regression lock for P0-
 
   // High-priority search result row (red surface).
   await page.getByRole('searchbox').first().fill('tilfluktsrom');
-  const highPriorityResult = page.locator('a.border-red-200').first();
+  const highPriorityResult = page.locator('a', { has: page.getByText('Kritisk prioritet') }).first();
   await expect(highPriorityResult).toBeVisible();
   expect(await getTextContrastRatio(page, highPriorityResult)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
 
   // Required checklist item (amber surface) in the work view.
   await createLocalMission(page, { title: `Kontrast ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Kontrast QA' });
   await openMissionMode(page, 'Arbeid');
-  const requiredItem = page.locator('li.border-amber-300').first();
+  const requiredItem = page.locator('li', { has: page.getByText('Påkrevd', { exact: true }) }).first();
   await expect(requiredItem).toBeVisible();
   expect(await getTextContrastRatio(page, requiredItem.locator('label').first())).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
 });
@@ -148,13 +148,13 @@ test('light-mode priority surfaces also meet WCAG AA contrast', async ({ page })
   expect(await getTextContrastRatio(page, criticalTitle)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
 
   await page.getByRole('searchbox').first().fill('tilfluktsrom');
-  const highPriorityResult = page.locator('a.border-red-200').first();
+  const highPriorityResult = page.locator('a', { has: page.getByText('Kritisk prioritet') }).first();
   await expect(highPriorityResult).toBeVisible();
   expect(await getTextContrastRatio(page, highPriorityResult)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
 
   await createLocalMission(page, { title: `Kontrast lys ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Kontrast lys QA' });
   await openMissionMode(page, 'Arbeid');
-  const requiredItem = page.locator('li.border-amber-300').first();
+  const requiredItem = page.locator('li', { has: page.getByText('Påkrevd', { exact: true }) }).first();
   await expect(requiredItem).toBeVisible();
   expect(await getTextContrastRatio(page, requiredItem.locator('label').first())).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
 });

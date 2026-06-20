@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import EtterPage from '@/app/(app)/etter/page';
 import ForPage from '@/app/(app)/for/page';
 import KnownLimitationsPage from '@/app/(app)/kjente-begrensninger/page';
@@ -76,6 +76,8 @@ it('shows under-phase operational entry points for map, quick log and active mis
   expect(screen.getByRole('link', { name: /Åpne kart/i })).toHaveAttribute('href', '/kart');
   expect(screen.getByRole('link', { name: /Hurtiglogg/i })).toHaveAttribute('href', '/oppdrag#hurtiglogg');
   expect(screen.getByText(/Kart og logg er lokal beslutningsstøtte/i)).toBeInTheDocument();
+  const whatNextSection = screen.getByRole('region', { name: /Hva nå under innsats/i });
+  expect(within(whatNextSection).getByRole('link', { name: /Samband brutt - hva nå/i })).toHaveAttribute('href', '/kort/samband-brutt-hva-na');
 });
 
 it('shows før-phase preparation actions for mission, map cache and field mode', () => {

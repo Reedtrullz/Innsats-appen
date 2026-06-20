@@ -88,12 +88,13 @@ it('shows operational result metadata and query terms', async () => {
 });
 
 it('marks high-priority tiltak results with an explicit critical badge', async () => {
-  render(<SearchBox documents={[{ ...docs[2], priority: 'high' }]} />);
+  render(<SearchBox documents={[{ ...docs[2], priority: 'high', reviewStatus: 'pending-fagperson' }]} />);
 
   await userEvent.type(screen.getByRole('searchbox'), 'pumpe');
 
   expect(screen.getByRole('link', { name: /Pumpe og vannforsyning/i })).toBeInTheDocument();
   expect(screen.getByText(/Kritisk prioritet/i)).toBeInTheDocument();
+  expect(screen.getByText(/Til faggjennomgang/i)).toBeInTheDocument();
 });
 
 it('filters operational search results by phase, type and source status', async () => {

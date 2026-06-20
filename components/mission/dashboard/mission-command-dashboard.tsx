@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useSyncExternalStore, type MouseEvent } from 'react';
 import type { ActionCard, OperationalChecklist } from '@/lib/content/schemas';
 import { filterActionCards, sortActionCards } from '@/lib/content/filters';
+import { isWhatNextCard } from '@/lib/content/what-next-cards';
 import { DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS, disabledExternalDataSources, displaySignalsForExternalDataSourceSettings, externalDataSourceSettingsSnapshot, parseExternalDataSourceSettings, subscribeExternalDataSourceSettings } from '@/lib/integrations/source-settings';
 import { missionMapStateSnapshot, normalizeMissionMapState, subscribeMissionMapState, mapStateForMission } from '@/lib/maps/operations-map';
 import { listChecklistRuns } from '@/lib/mission/local-store';
@@ -20,7 +21,20 @@ function missionCards(cards: ActionCard[], mission: MissionContext) {
   const exact = filterActionCards(cards, { phase: mission.phase, role: mission.role, scenario: mission.scenario });
   const fallback = exact.length > 0 ? exact : filterActionCards(cards, { phase: mission.phase, scenario: mission.scenario });
   const wider = fallback.length > 0 ? fallback : filterActionCards(cards, { scenario: mission.scenario });
-  return sortActionCards(wider).slice(0, 3);
+  const sortedCards = sortActionCards(wider);
+  const firstActions = sortedCards.slice(0, 3);
+  const firstWhatNextCard = sortedCards.find(isWhatNextCard);
+
+  if (!firstWhatNextCard || firstActions.some((card) => card.slug === firstWhatNextCard.slug)) {
+    return firstActions;
+  }
+
+  const replaceableIndex = firstActions.findLastIndex((card) => card.priority === firstWhatNextCard.priority);
+  if (replaceableIndex === -1) {
+    return firstActions;
+  }
+
+  return firstActions.map((card, index) => (index === replaceableIndex ? firstWhatNextCard : card));
 }
 
 export function MissionCommandDashboard({ mission, cards, checklist, checklists, contentVersion, sourceTitleById, sourceRiskById, onMissionChange, onArchive }: { mission: MissionContext; cards: ActionCard[]; checklist?: OperationalChecklist; checklists: OperationalChecklist[]; contentVersion: string; sourceTitleById?: Record<string, string>; sourceRiskById?: Record<string, 'caution' | 'ok'>; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {

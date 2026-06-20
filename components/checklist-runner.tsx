@@ -127,67 +127,67 @@ function ChecklistRunnerState({ checklist, missionId, runId, sourceTitleById, on
   }
 
   return (
-    <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <section className="rounded-2xl bg-[var(--surface)] p-4 shadow-sm ring-1 ring-[var(--border)]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-black uppercase tracking-wide text-sky-700">Aktiv sjekkliste</p>
-          <h2 className="text-xl font-black">{checklist.title}</h2>
+          <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[var(--accent-fg)]">Aktiv sjekkliste</p>
+          <h2 className="text-xl font-black text-[var(--text-primary)]">{checklist.title}</h2>
         </div>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">{checked.size}/{checklist.items.length} fullført</span>
+        <span className="rounded-full bg-[var(--surface-muted)] px-3 py-1 text-xs font-black text-[var(--text-secondary)]">{checked.size}/{checklist.items.length} fullført</span>
       </div>
-      <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200" aria-hidden="true">
-        <div className="h-full rounded-full bg-emerald-600" style={{ width: `${progress}%` }} />
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--surface-muted)]" aria-hidden="true">
+        <div className="h-full rounded-full bg-[#34d399]" style={{ width: `${progress}%` }} />
       </div>
-      {requiredItems.length > 0 ? <p className="mt-2 text-sm font-semibold text-slate-700">Påkrevd: {requiredDone}/{requiredItems.length} kontrollert</p> : null}
-      {!hydrated ? <p className="mt-2 text-sm font-semibold text-slate-600">Laster lokal sjekklistestatus før redigering.</p> : null}
-      {checklist.warning ? <p className="mt-2 text-sm font-semibold text-amber-900">{checklist.warning}</p> : null}
+      {requiredItems.length > 0 ? <p className="mt-2 text-sm font-semibold text-[var(--text-secondary)]">Påkrevd: {requiredDone}/{requiredItems.length} kontrollert</p> : null}
+      {!hydrated ? <p className="mt-2 text-sm font-semibold text-[var(--text-muted)]">Laster lokal sjekklistestatus før redigering.</p> : null}
+      {checklist.warning ? <p className="mt-2 text-sm font-semibold text-[var(--warning-fg)]">{checklist.warning}</p> : null}
       <ul className="mt-3 space-y-3">
         {checklist.items.map((item) => (
-          <li key={item.id} className={`rounded-2xl border p-3 ${item.required ? 'border-amber-300 bg-amber-50' : 'border-slate-200'}`}>
-            <label className="flex min-h-11 items-center gap-3 font-semibold">
+          <li key={item.id} className={`rounded-2xl border p-3 ${item.required ? 'border-[#fbbf24]/30 bg-[var(--warning-surface)]' : 'border-[var(--border)] bg-[var(--surface-muted)]'}`}>
+            <label className="flex min-h-11 items-center gap-3 font-semibold text-[var(--text-primary)]">
               <input type="checkbox" checked={checked.has(item.id)} disabled={!hydrated} onChange={() => void toggle(item.id)} className="h-5 w-5" />
               <span>
                 {item.label}
-                {item.required ? <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-black text-amber-950">Påkrevd</span> : null}
+                {item.required ? <span className="ml-2 rounded-full bg-[var(--warning-surface)] px-2 py-0.5 text-xs font-black text-[var(--warning-fg)]">Påkrevd</span> : null}
               </span>
             </label>
-            <p className="mt-1 text-xs text-slate-500">Kilder: {formatSourceList(item.sourceIds, sourceTitleById)}</p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">Kilder: {formatSourceList(item.sourceIds, sourceTitleById)}</p>
             {/* Note/status one tap away so the checkbox list stays scannable (P3-2);
                 the privacy error lives outside the details so it can never hide. */}
             <details className="mt-2">
-              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-xs font-bold text-sky-800">Legg til notat / status</summary>
+              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-xs font-bold text-[var(--accent-fg)]">Legg til notat / status</summary>
               {isEquipmentChecklist ? (
-                <label className="mt-2 block text-xs font-bold text-slate-700">
+                <label className="mt-2 block text-xs font-bold text-[var(--text-secondary)]">
                   Materiellstatus for {item.label}
                   <select
                     value={equipmentStatusByItemId[item.id] ?? 'ready'}
                     disabled={!hydrated}
                     onChange={(event) => void updateEquipmentStatus(item.id, event.currentTarget.value as EquipmentStatus)}
-                    className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm font-bold text-slate-900"
+                    className="mt-1 min-h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm font-bold text-[var(--text-primary)]"
                   >
                     {equipmentStatuses.map((status) => <option key={status} value={status}>{equipmentStatusLabels[status]}</option>)}
                   </select>
                 </label>
               ) : null}
-              <label className="mt-2 block text-xs font-bold text-slate-700">
+              <label className="mt-2 block text-xs font-bold text-[var(--text-secondary)]">
                 Lokal note for {item.label}
                 <textarea
                   value={notesByItemId[item.id] ?? ''}
                   disabled={!hydrated}
                   onChange={(event) => updateNote(item.id, event.currentTarget.value)}
                   onBlur={(event) => void persistNoteOnBlur(item.id, event.currentTarget.value)}
-                  className="mt-1 min-h-20 w-full rounded-xl border border-slate-300 bg-white p-2 text-sm font-medium text-slate-900"
+                  className="mt-1 min-h-20 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] p-2 text-sm font-medium text-[var(--text-primary)]"
                   placeholder="Kun lokale, ikke-sensitive notater. Ikke persondata."
                 />
               </label>
             </details>
             {notePrivacyError?.itemId === item.id ? (
-              <p role="alert" className="mt-2 rounded-xl border border-rose-200 bg-rose-50 p-2 text-sm font-semibold text-rose-900">{notePrivacyError.message}</p>
+              <p role="alert" className="mt-2 rounded-xl border border-[#f87171]/30 bg-[var(--critical-surface)] p-2 text-sm font-semibold text-[var(--critical-fg)]">{notePrivacyError.message}</p>
             ) : null}
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-xs text-slate-500">Sjekklistekilder: {formatSourceList(sourceIds, sourceTitleById)}</p>
+      <p className="mt-3 text-xs text-[var(--text-muted)]">Sjekklistekilder: {formatSourceList(sourceIds, sourceTitleById)}</p>
     </section>
   );
 }

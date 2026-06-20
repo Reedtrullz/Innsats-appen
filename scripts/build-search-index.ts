@@ -33,31 +33,13 @@ export async function buildGeneratedSearchIndex(generatedDir = 'content/generate
     training: trainingPaths,
     protection: protectionMeasures,
     faq,
+    searchSynonyms,
   });
-  bakeSearchSynonyms(docs, searchSynonyms);
   const index = buildSearchIndex(docs);
   const payload = { documents: docs, index: index.toJSON(), generatedAt: new Date().toISOString() };
   await writeJson(path.join(generatedDir, 'search-index.json'), payload);
   await writeJson(path.join(publicGeneratedDir, 'search-index.json'), payload);
   return payload;
-}
-
-function bakeSearchSynonyms(docs: Array<{ id: string; synonyms?: string }>, synonyms: SearchSynonymGroup[]) {
-  const cardSynonymMap = new Map<string, string[]>();
-  for (const group of synonyms) {
-    const tokens = [group.canonical, ...group.aliases];
-    for (const cardId of group.cardIds) {
-      const existing = cardSynonymMap.get(cardId) ?? [];
-      cardSynonymMap.set(cardId, [...existing, ...tokens]);
-    }
-  }
-  for (const doc of docs) {
-    const bareSlug = doc.id.startsWith('kort:') ? doc.id.slice(5) : doc.id;
-    const extraTokens = cardSynonymMap.get(bareSlug) ?? cardSynonymMap.get(doc.id);
-    if (extraTokens && extraTokens.length > 0) {
-      doc.synonyms = [doc.synonyms ?? '', ...extraTokens].join(' ').trim();
-    }
-  }
 }
 
 async function main() {

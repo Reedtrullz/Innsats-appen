@@ -1122,6 +1122,88 @@ it('shows a situation-first mission dashboard with next action, progress and exp
   expect(within(modeControl).getByRole('tab', { name: 'Eksport' })).toHaveAttribute('aria-selected', 'true');
 });
 
+it('keeps a matching what-now card visible in mission critical actions', async () => {
+  await saveMission(mission({
+    id: 'mission-cbrne-what-next',
+    title: 'CBRNE mistanke',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'cbrn-cbrne',
+    locationText: 'Sonegrense',
+    activeChecklistIds: [],
+    externalSignals: [],
+    notes: '',
+    tasks: [],
+    statusLog: [],
+    resourceRequests: [],
+    contentVersion: 'test-v1',
+    schemaVersion: 1,
+  }));
+
+  const cbrneCards = [
+    {
+      slug: 'alpha-cbrne',
+      title: 'A CBRNE teknisk tiltak',
+      phase: 'under',
+      roles: ['lagforer'],
+      scenarios: ['cbrn-cbrne'],
+      priority: 'high',
+      steps: ['Sjekk teknisk punkt A'],
+      safety: [],
+      reporting: [],
+      sourceIds: ['src-cbrne'],
+      competenceRequired: [],
+    },
+    {
+      slug: 'beta-cbrne',
+      title: 'B CBRNE teknisk tiltak',
+      phase: 'under',
+      roles: ['lagforer'],
+      scenarios: ['cbrn-cbrne'],
+      priority: 'high',
+      steps: ['Sjekk teknisk punkt B'],
+      safety: [],
+      reporting: [],
+      sourceIds: ['src-cbrne'],
+      competenceRequired: [],
+    },
+    {
+      slug: 'gamma-cbrne',
+      title: 'C CBRNE teknisk tiltak',
+      phase: 'under',
+      roles: ['lagforer'],
+      scenarios: ['cbrn-cbrne'],
+      priority: 'high',
+      steps: ['Sjekk teknisk punkt C'],
+      safety: [],
+      reporting: [],
+      sourceIds: ['src-cbrne'],
+      competenceRequired: [],
+    },
+    {
+      slug: 'cbrne-mistanke-hva-na',
+      title: 'Mistanke om CBRNE - hva nå?',
+      phase: 'under',
+      roles: ['lagforer'],
+      scenarios: ['cbrn-cbrne'],
+      priority: 'high',
+      steps: ['Stopp framrykning og meld mistanke'],
+      safety: [],
+      reporting: [],
+      sourceIds: ['src-cbrne'],
+      competenceRequired: [],
+    },
+  ] satisfies ActionCard[];
+
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={cbrneCards} />);
+
+  const criticalActionsHeading = await screen.findByRole('heading', { name: /^Kritiske tiltak$/i });
+  const criticalActions = criticalActionsHeading.closest('section');
+  if (!criticalActions) throw new Error('Expected critical actions section');
+  expect(within(criticalActions).getByText('Mistanke om CBRNE - hva nå?')).toBeInTheDocument();
+  expect(within(criticalActions).queryByText('C CBRNE teknisk tiltak')).not.toBeInTheDocument();
+});
+
 it('shows map and field-log summary on the mission dashboard', async () => {
   await saveMission(mission({
     id: 'm6-map-summary-dashboard',

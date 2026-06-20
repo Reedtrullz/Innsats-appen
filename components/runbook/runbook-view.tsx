@@ -12,10 +12,18 @@ import { buildMissionRunbook, type RunbookStep } from '@/lib/mission/runbook';
 import type { MissionUpdate } from '@/components/mission/dashboard/dashboard-types';
 
 const stepDotClass: Record<RunbookStep['status'], string> = {
-  done: 'bg-emerald-500',
-  now: 'bg-sky-500',
-  upcoming: 'bg-slate-300',
-  skipped: 'bg-amber-400',
+  done: 'bg-[#34d399]',
+  now: 'bg-[#38bdf8] ring-4 ring-[#38bdf8]/20',
+  upcoming: 'bg-[var(--border)]',
+  skipped: 'bg-[#fbbf24]',
+};
+
+// Dot size: active is larger to draw the eye
+const stepDotSize: Record<RunbookStep['status'], string> = {
+  done: 'h-3 w-3',
+  now: 'h-4 w-4',
+  upcoming: 'h-2.5 w-2.5',
+  skipped: 'h-2.5 w-2.5',
 };
 
 const statusLabel: Record<RunbookStep['status'], string> = {
@@ -26,10 +34,10 @@ const statusLabel: Record<RunbookStep['status'], string> = {
 };
 
 const statusBadgeClass: Record<RunbookStep['status'], string> = {
-  done: 'bg-emerald-100 text-emerald-900',
-  now: 'bg-sky-100 text-sky-900',
-  upcoming: 'bg-slate-100 text-slate-600',
-  skipped: 'bg-amber-100 text-amber-900',
+  done: 'bg-[#34d399]/15 text-[#34d399] dark:bg-[#34d399]/15 dark:text-[#34d399]',
+  now: 'bg-[#38bdf8]/15 text-[var(--accent-fg)] dark:bg-[#38bdf8]/15 dark:text-[var(--accent-fg)]',
+  upcoming: 'bg-slate-100 text-slate-600 dark:bg-[var(--surface)] dark:text-[var(--text-muted)]',
+  skipped: 'bg-[#fbbf24]/15 text-amber-700 dark:text-[#fcd34d]',
 };
 
 /**
@@ -152,15 +160,19 @@ export function RunbookView({
   }
 
   if (!loaded) {
-    return <p className="rounded-2xl bg-white p-5 text-sm font-semibold text-slate-600 shadow-sm">Laster lokal runbook …</p>;
+    return (
+      <p className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 font-mono text-sm text-[var(--text-muted)]">
+        Laster lokal runbook …
+      </p>
+    );
   }
 
   if (!mission || !runbook) {
     return (
-      <section className="rounded-2xl border border-dashed border-slate-300 bg-slate-100 p-5">
-        <h3 className="text-2xl font-black">Ingen aktivt oppdrag</h3>
-        <p className="mt-2 text-sm font-semibold text-slate-700">Start eller velg et lokalt oppdrag for å få en anbefalt rekkefølge av steg.</p>
-        <Link href="/oppdrag/ny" className="mt-4 inline-flex min-h-12 items-center rounded-xl bg-slate-950 px-5 font-bold text-white">Start oppdrag</Link>
+      <section className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-5">
+        <h3 className="text-xl font-bold text-[var(--text-primary)]">Ingen aktivt oppdrag</h3>
+        <p className="mt-2 text-sm font-semibold text-[var(--text-secondary)]">Start eller velg et lokalt oppdrag for å få en anbefalt rekkefølge av steg.</p>
+        <Link href="/oppdrag/ny" className="mt-4 inline-flex min-h-12 items-center rounded-xl bg-[#38bdf8] px-5 font-bold text-[#04141f]">Start oppdrag</Link>
       </section>
     );
   }
@@ -168,86 +180,169 @@ export function RunbookView({
   return (
     <div className="space-y-3">
       {runbook.total > 0 ? (
-        <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-          <div className="flex items-center justify-between gap-2 text-sm font-semibold text-slate-600">
-            <span className="min-w-0 truncate font-black text-slate-900">{runbook.title}</span>
-            <span className="shrink-0">{runbook.doneCount} gjort{runbook.skippedCount > 0 ? ` · ${runbook.skippedCount} hoppet over` : ''} av {runbook.total}</span>
+        <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
+          <div className="flex items-center justify-between gap-2">
+            <span className="min-w-0 truncate text-sm font-bold text-[var(--text-primary)]">{runbook.title}</span>
+            <span className="shrink-0 font-mono text-xs text-[var(--text-muted)]">
+              {runbook.doneCount} gjort{runbook.skippedCount > 0 ? ` · ${runbook.skippedCount} hoppet over` : ''} av {runbook.total}
+            </span>
           </div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200"><div className="h-full bg-emerald-500" style={{ width: `${Math.round((resolved / runbook.total) * 100)}%` }} /></div>
-          <p className="mt-2 text-xs font-semibold text-slate-500">Anbefalt rekkefølge — ikke en kommando. Hopp over eller bruk søk fritt.</p>
-          {runbook.isGenericFallback ? <p className="mt-2 rounded-xl bg-slate-100 p-2 text-xs font-semibold text-slate-700">Generell sjekkliste — ingen egen runbook for {scenarioLabels[mission.scenario].toLowerCase()} ennå.</p> : null}
-          {activeChecklist?.warning ? <p className="mt-2 rounded-xl bg-amber-50 p-2 text-xs font-bold text-amber-900">{activeChecklist.warning}</p> : null}
+          <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-[var(--border)]">
+            <div className="h-full rounded-full bg-[#34d399] transition-all" style={{ width: `${Math.round((resolved / runbook.total) * 100)}%` }} />
+          </div>
+          <p className="mt-2 font-mono text-[0.68rem] text-[var(--text-muted)]">Anbefalt rekkefølge — ikke en kommando. Hopp over eller bruk søk fritt.</p>
+          {runbook.isGenericFallback ? (
+            <p className="mt-2 rounded-xl bg-[var(--surface-muted)] p-2 text-xs font-semibold text-[var(--text-secondary)]">
+              Generell sjekkliste — ingen egen runbook for {scenarioLabels[mission.scenario].toLowerCase()} ennå.
+            </p>
+          ) : null}
+          {activeChecklist?.warning ? (
+            <p className="mt-2 rounded-xl border border-[#fbbf24]/30 bg-[var(--warning-surface)] p-2 text-xs font-bold text-[var(--warning-fg)]">{activeChecklist.warning}</p>
+          ) : null}
         </section>
       ) : null}
 
       {runbook.isEmpty || runbook.total === 0 ? (
-        <section className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4">
-          <p className="text-sm font-semibold text-slate-700">
+        <section className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] p-4">
+          <p className="text-sm font-semibold text-[var(--text-secondary)]">
             {canAdvancePhase
               ? 'Ingen sjekkliste for denne fasen — gå videre når du er klar.'
               : 'Ingen scenariospesifikk runbook for dette oppdraget ennå. Bruk søk og tiltakskort.'}
           </p>
           {canAdvancePhase && upcomingPhase ? (
-            <button type="button" onClick={() => goToPhase(upcomingPhase)} className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-[#082F49] px-4 font-bold text-white">Gå til {phaseLabels[upcomingPhase]} →</button>
+            <button type="button" onClick={() => goToPhase(upcomingPhase)} className="mt-3 inline-flex min-h-12 items-center rounded-xl bg-[#38bdf8] px-5 font-bold text-[#04141f]">
+              Gå til {phaseLabels[upcomingPhase]} →
+            </button>
           ) : null}
         </section>
       ) : runbook.allRequiredComplete && !runbook.currentStepId ? (
-        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-          <h3 className="text-lg font-black text-emerald-950">Alle anbefalte steg er gjort</h3>
-          <p className="mt-1 text-sm font-semibold text-emerald-900">{canAdvancePhase ? 'Bekreft for å gå videre til neste fase, eller åpne etterrapporten.' : 'Gå videre til neste fase eller åpne etterrapporten.'}</p>
+        <section className="rounded-2xl border border-[#34d399]/40 bg-[var(--success-surface)] p-5">
+          <h3 className="text-base font-bold text-[var(--success-fg)]">Alle anbefalte steg er gjort</h3>
+          <p className="mt-1 text-sm font-semibold text-[var(--success-fg)] opacity-80">
+            {canAdvancePhase ? 'Bekreft for å gå videre til neste fase, eller åpne etterrapporten.' : 'Gå videre til neste fase eller åpne etterrapporten.'}
+          </p>
           {runbook.requiredSkippedCount > 0 ? (
-            <p className="mt-2 text-xs font-bold text-amber-900">{runbook.requiredSkippedCount} påkrevde hoppet over</p>
+            <p className="mt-2 font-mono text-xs font-bold text-[var(--warning-fg)]">{runbook.requiredSkippedCount} påkrevde hoppet over</p>
           ) : null}
           {canAdvancePhase && upcomingPhase ? (
-            <button type="button" onClick={() => goToPhase(upcomingPhase)} className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-emerald-700 px-4 font-bold text-white">Gå til {phaseLabels[upcomingPhase]} →</button>
+            <button type="button" onClick={() => goToPhase(upcomingPhase)} className="mt-4 inline-flex min-h-12 items-center rounded-xl bg-[#38bdf8] px-5 font-bold text-[#04141f]">
+              Gå til {phaseLabels[upcomingPhase]} →
+            </button>
           ) : (
-            <a href="#etterrapport" className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-emerald-700 px-4 font-bold text-white">Åpne etterrapport</a>
+            <a href="#etterrapport" className="mt-4 inline-flex min-h-12 items-center rounded-xl bg-[#38bdf8] px-5 font-bold text-[#04141f]">Åpne etterrapport</a>
           )}
         </section>
       ) : (
         <>
-        <section aria-label="Neste steg" className="space-y-2">
-          {visibleSteps.map((step) => {
-            const isOpen = openStep?.id === step.id;
-            const resolvedStep = step.status === 'done' || step.status === 'skipped';
-            const badge = statusLabel[step.status] || (step.required ? 'Påkrevd' : '');
-            return (
-              <div key={step.id} className={`rounded-2xl border bg-white shadow-sm ${step.status === 'now' ? 'border-2 border-sky-400' : 'border-slate-200'}`}>
-                <button type="button" onClick={() => setOpenStepId(isOpen ? null : step.id)} className="flex w-full min-h-12 items-center gap-3 p-3 text-left" aria-expanded={isOpen}>
-                  <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${stepDotClass[step.status]}`} aria-hidden="true" />
-                  <span className={`flex-1 text-sm font-bold ${resolvedStep ? 'text-slate-500 line-through' : 'text-slate-950'}`}>{step.title}</span>
-                  {badge ? <span className={`shrink-0 rounded-full px-2 py-0.5 text-[0.66rem] font-bold ${statusBadgeClass[step.status]}`}>{badge}</span> : null}
-                </button>
-                {isOpen ? (
-                  <div className="border-t border-slate-100 p-3">
-                    {step.sourceIds.length > 0 ? (() => {
-                      const caution = step.sourceIds.some((id) => sourceRiskById[id] === 'caution');
-                      return (
-                        <p className="flex items-start gap-2 text-xs font-semibold text-slate-500">
-                          <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${caution ? 'bg-amber-500' : 'bg-emerald-500'}`} aria-hidden="true" />
-                          <span>{caution ? 'Vær varsom' : 'Verifisert'} · Kilder: {step.sourceIds.map((id) => sourceTitleById[id] ?? id.replace(/^src-/, '')).join(', ')}</span>
-                        </p>
-                      );
-                    })() : null}
-                    <div className="mt-3 flex gap-2">
-                      {resolvedStep ? (
-                        <button type="button" onClick={() => void writeProgress(step.itemId, 'reopen')} disabled={saving} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 text-sm font-bold text-slate-800 disabled:opacity-50">Angre · sett aktiv igjen</button>
+        {/* Vertical-spine runbook list — gjort/nå/kommende readable at a glance */}
+        <section aria-label="Neste steg">
+          <div className="flex gap-3">
+            {/* Spine column */}
+            <div className="relative flex w-4 flex-none flex-col items-center" aria-hidden="true">
+              {/* Continuous line behind all dots */}
+              <div className="absolute inset-x-0 top-2 bottom-2 mx-auto w-0.5 bg-[var(--border)]" style={{ left: '50%', transform: 'translateX(-50%)' }} />
+              {visibleSteps.map((step, idx) => (
+                <div key={step.id} className={`relative z-10 flex-none ${idx > 0 ? 'mt-[calc(var(--step-gap,2rem)-1rem)]' : ''}`} style={{ marginTop: idx > 0 ? undefined : undefined }}>
+                  <span className={`block rounded-full ${stepDotClass[step.status]} ${stepDotSize[step.status]}`} />
+                </div>
+              ))}
+            </div>
+
+            {/* Steps */}
+            <div className="flex flex-1 flex-col gap-2">
+              {visibleSteps.map((step) => {
+                const isOpen = openStep?.id === step.id;
+                const resolvedStep = step.status === 'done' || step.status === 'skipped';
+                const badge = statusLabel[step.status] || (step.required ? 'Påkrevd' : '');
+                const isActive = step.status === 'now';
+
+                return (
+                  <div
+                    key={step.id}
+                    className={`rounded-2xl border transition-shadow ${
+                      isActive
+                        ? 'border-[#38bdf8] bg-[var(--surface-elevated)] shadow-[0_4px_20px_rgba(56,189,248,0.12)] dark:border-[#38bdf8]'
+                        : resolvedStep
+                          ? 'border-[var(--border)] bg-[var(--surface)] opacity-70'
+                          : 'border-[var(--border)] bg-[var(--surface)]'
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setOpenStepId(isOpen ? null : step.id)}
+                      className="flex w-full min-h-12 items-center gap-3 px-3 py-3 text-left"
+                      aria-expanded={isOpen}
+                    >
+                      {isActive ? (
+                        <div className="min-w-0 flex-1">
+                          <span className="block font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[var(--accent-fg)]">Nå</span>
+                          <span className="mt-0.5 block text-sm font-bold text-[var(--text-primary)]">{step.title}</span>
+                        </div>
                       ) : (
-                        <>
-                          <button type="button" onClick={() => void writeProgress(step.itemId, 'done')} disabled={saving} className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 text-sm font-bold text-white disabled:opacity-50">Gjort · neste</button>
-                          <button type="button" onClick={() => void writeProgress(step.itemId, 'skip')} disabled={saving} className="min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-semibold text-slate-700 disabled:opacity-50">Hopp over</button>
-                        </>
+                        <span className={`flex-1 text-sm font-semibold ${resolvedStep ? 'text-[var(--text-muted)] line-through' : 'text-[var(--text-secondary)]'}`}>
+                          {step.title}
+                        </span>
                       )}
-                    </div>
+                      {badge ? (
+                        <span className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[0.6rem] font-semibold ${statusBadgeClass[step.status]}`}>
+                          {badge}
+                        </span>
+                      ) : null}
+                    </button>
+
+                    {isOpen ? (
+                      <div className="border-t border-[var(--border)] px-3 pb-3 pt-2">
+                        {step.sourceIds.length > 0 ? (() => {
+                          const caution = step.sourceIds.some((id) => sourceRiskById[id] === 'caution');
+                          return (
+                            <p className="flex items-start gap-2 font-mono text-xs text-[var(--text-muted)]">
+                              <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${caution ? 'bg-[#fbbf24]' : 'bg-[#34d399]'}`} aria-hidden="true" />
+                              <span>{caution ? 'Vær varsom' : 'Verifisert'} · Kilde: {step.sourceIds.map((id) => sourceTitleById[id] ?? id.replace(/^src-/, '')).join(', ')}</span>
+                            </p>
+                          );
+                        })() : null}
+                        <div className="mt-3 flex gap-2">
+                          {resolvedStep ? (
+                            <button
+                              type="button"
+                              onClick={() => void writeProgress(step.itemId, 'reopen')}
+                              disabled={saving}
+                              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-4 text-sm font-bold text-[var(--text-secondary)] disabled:opacity-50"
+                            >
+                              Angre · sett aktiv igjen
+                            </button>
+                          ) : (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => void writeProgress(step.itemId, 'done')}
+                                disabled={saving}
+                                className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#38bdf8] px-4 text-sm font-bold text-[#04141f] disabled:opacity-50"
+                              >
+                                Gjort · neste
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => void writeProgress(step.itemId, 'skip')}
+                                disabled={saving}
+                                className="min-h-12 rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text-muted)] disabled:opacity-50"
+                              >
+                                Hopp over
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
-                ) : null}
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          </div>
         </section>
         {compact && hiddenStepCount > 0 ? (
-          <p className="rounded-xl bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-600">
-            +{hiddenStepCount} flere steg — se hele tavla i <span className="font-black">Arbeid</span>.
+          <p className="rounded-xl bg-[var(--surface)] px-3 py-2 font-mono text-xs font-semibold text-[var(--text-muted)]">
+            +{hiddenStepCount} flere steg — se hele tavla i <span className="font-bold">Arbeid</span>.
           </p>
         ) : null}
         </>

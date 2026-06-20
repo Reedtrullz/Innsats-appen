@@ -325,8 +325,9 @@ async function networkThenCache(request) {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (event.request.method !== 'GET') return;
+  const sameOrigin = url.origin === self.location.origin;
 
-  if (url.origin === self.location.origin && url.search === '' && url.hash === '' && isLocalMapPackageAsset(url.pathname)) {
+  if (sameOrigin && url.search === '' && url.hash === '' && isLocalMapPackageAsset(url.pathname)) {
     event.respondWith((async () => {
       const request = event.request;
       const rangeHeader = request.headers.get('range');
@@ -353,12 +354,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (url.pathname.startsWith('/api/context/')) {
+  if (sameOrigin && url.pathname.startsWith('/api/context/')) {
     event.respondWith(
       fetch(event.request).then((response) => {
         if (!response.ok) return response;
         return response;
-      }).catch(() => new Response(JSON.stringify({ error: 'Context API unavailable offline' }), { status: 503, headers: { 'Content-Type': 'application/json' } })),
+      }).catch(() => new Response(JSON.stringify({ error: 'Context API unavailable offline' }), { status: 503, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' } })),
     );
     return;
   }
@@ -373,7 +374,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (url.pathname.startsWith('/generated-content/') || url.pathname.startsWith('/content-assets/') || url.pathname.startsWith('/_next/')) {
+  if (sameOrigin && (url.pathname.startsWith('/generated-content/') || url.pathname.startsWith('/content-assets/') || url.pathname.startsWith('/_next/'))) {
     event.respondWith(networkThenCache(event.request));
   }
 });

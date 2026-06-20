@@ -4,7 +4,7 @@ import { ActionCardList } from '@/components/action-card-list';
 import type { ActionCard } from '@/lib/content/schemas';
 
 const cards = [
-  { slug: 'tilfluktsrom-klargjoring', title: 'Klargjør tilfluktsrom', phase: 'for', roles: ['leder'], scenarios: ['tilfluktsrom'], priority: 'high', steps: ['ventilasjon'], safety: [], reporting: [], sourceIds: ['src-operativt-konsept-for-sivilforsvaret'], competenceRequired: [], warning: 'bruk bare godkjent informasjon' },
+  { slug: 'tilfluktsrom-klargjoring', title: 'Klargjør tilfluktsrom', phase: 'for', roles: ['leder'], scenarios: ['tilfluktsrom'], priority: 'high', steps: ['ventilasjon'], safety: [], reporting: [], sourceIds: ['src-operativt-konsept-for-sivilforsvaret'], competenceRequired: [], warning: 'bruk bare godkjent informasjon', reviewStatus: 'pending-fagperson' },
   { slug: 'radiac-dosekontroll', title: 'RADIAC dosekontroll', phase: 'under', roles: ['rad'], scenarios: ['radiac-nedfall'], priority: 'medium', steps: ['dosimeter'], safety: [], reporting: [], sourceIds: ['src-rad'], competenceRequired: ['RAD10'], warning: 'kontroller ordre' },
 ] as ActionCard[];
 
@@ -22,6 +22,7 @@ it('uses dense operational card rows in the list', () => {
   render(<ActionCardList cards={cards} showFilters={false} />);
 
   expect(screen.queryByText(/Kildebelagt/i)).not.toBeInTheDocument();
+  expect(screen.getByText(/Til faggjennomgang/i)).toBeInTheDocument();
   expect(screen.getAllByText(/Varsel/i).length).toBeGreaterThan(0);
   expect(screen.getByRole('link', { name: /Åpne tiltakskort: Klargjør.*tilfluktsrom/i })).toHaveAttribute('href', '/kort/tilfluktsrom-klargjoring');
   expect(screen.queryByText(/Gjør først/i)).not.toBeInTheDocument();
