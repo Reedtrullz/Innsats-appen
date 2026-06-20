@@ -66,6 +66,7 @@ import { createSearchSectorPlanObjects, type SearchSectorPlanObjects } from '@/l
 import { createWaterSupplyPlanObjects, type WaterSupplyPlanObjects } from '@/lib/maps/water-supply-plan';
 import { deriveWaterSupplyAdvisory, deriveSearchSectorAdvisory } from '@/lib/maps/map-advisory';
 import { AdvisorySuggestionCard } from '@/components/maps/advisory-suggestion-card';
+import { AdvisoryStateCard } from '@/components/maps/advisory-state-card';
 
 import { buildFieldLogEntryFromMapObject } from '@/lib/mission/map-log-link';
 import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
@@ -851,7 +852,12 @@ export function OfflineMapPanel() {
             onLog={() => prefillMapLogFromAdvisory(deriveWaterSupplyAdvisory(lastWaterSupplyPlan).suggestion)}
             onAdjust={() => scrollToElement('water-supply-plan-summary')}
           />
-        ) : null}
+        ) : (
+          <AdvisoryStateCard
+            state="empty"
+            body="Marker vannkilde, pumpeplass og leveringspunkt over — appen foreslår trasé, relébehov og konfidens."
+          />
+        )}
       </section>
 
       <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="RADIAC målepunktplanlegger">
@@ -944,7 +950,12 @@ export function OfflineMapPanel() {
             onLog={() => prefillMapLogFromAdvisory(deriveSearchSectorAdvisory(lastSearchSectorPlan).suggestion)}
             onAdjust={() => scrollToElement('search-sector-plan-summary')}
           />
-        ) : null}
+        ) : (
+          <AdvisoryStateCard
+            state="empty"
+            body="Tegn teiggrense og start-/returpunkt over — appen foreslår prioritert sone basert på terreng og savnetatferd."
+          />
+        )}
       </section>
 
       <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="MRE ren/uren-side planlegger">
