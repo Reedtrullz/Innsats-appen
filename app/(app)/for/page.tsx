@@ -8,7 +8,8 @@ function ForPreparationEntryPoints() {
       <p className="text-sm font-black uppercase tracking-wide text-sky-200">Før avmarsj</p>
       <h2 id="for-preparation-actions-heading" className="text-2xl font-black">Klargjør lokal feltpakke</h2>
       <p className="mt-2 text-sm font-semibold text-sky-100">Gjør dette før avmarsj: cache innhold/kart, velg aktivt oppdrag, test feltmodus og eksport.</p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <a href="/egenberedskap" className="rounded-2xl bg-white p-4 font-black text-slate-950">Egenberedskap — pakk sekken</a>
         <a href="/oppdrag/ny" className="rounded-2xl bg-white p-4 font-black text-slate-950">Start lokalt oppdrag</a>
         <a href="/kart" className="rounded-2xl bg-white p-4 font-black text-slate-950">Klargjør offline kart</a>
         <a href="/feltmodus" className="rounded-2xl bg-white p-4 font-black text-slate-950">Test Feltmodus</a>

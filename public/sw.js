@@ -24,6 +24,7 @@ const STATIC_APP_SHELL = [
   '/for',
   '/under',
   '/etter',
+  '/egenberedskap',
   '/hjelp',
   '/kilder',
   '/kildegjennomgang',
