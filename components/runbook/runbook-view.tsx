@@ -9,6 +9,7 @@ import { listChecklistRuns, listMissions, saveChecklistRun } from '@/lib/mission
 import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
 import { withPhaseChange } from '@/lib/mission/phase-progress';
 import { buildMissionRunbook, type RunbookStep } from '@/lib/mission/runbook';
+import { useRole } from '@/lib/role/role-context';
 import type { MissionUpdate } from '@/components/mission/dashboard/dashboard-types';
 
 const stepDotClass: Record<RunbookStep['status'], string> = {
@@ -16,6 +17,7 @@ const stepDotClass: Record<RunbookStep['status'], string> = {
   now: 'bg-[#38bdf8] ring-4 ring-[#38bdf8]/20',
   upcoming: 'bg-[var(--border)]',
   skipped: 'bg-[#fbbf24]',
+  locked: 'bg-[var(--border)]',
 };
 
 // Dot size: active is larger to draw the eye
@@ -24,6 +26,7 @@ const stepDotSize: Record<RunbookStep['status'], string> = {
   now: 'h-4 w-4',
   upcoming: 'h-2.5 w-2.5',
   skipped: 'h-2.5 w-2.5',
+  locked: 'h-2.5 w-2.5',
 };
 
 const statusLabel: Record<RunbookStep['status'], string> = {
@@ -31,6 +34,7 @@ const statusLabel: Record<RunbookStep['status'], string> = {
   now: 'Nå',
   upcoming: '',
   skipped: 'Hoppet over',
+  locked: '',
 };
 
 const statusBadgeClass: Record<RunbookStep['status'], string> = {
@@ -38,6 +42,7 @@ const statusBadgeClass: Record<RunbookStep['status'], string> = {
   now: 'bg-[#38bdf8]/15 text-[var(--accent-fg)] dark:bg-[#38bdf8]/15 dark:text-[var(--accent-fg)]',
   upcoming: 'bg-slate-100 text-slate-600 dark:bg-[var(--surface)] dark:text-[var(--text-muted)]',
   skipped: 'bg-[#fbbf24]/15 text-amber-700 dark:text-[#fcd34d]',
+  locked: 'bg-[var(--surface-muted)] text-[var(--text-muted)]',
 };
 
 /**
@@ -70,6 +75,8 @@ export function RunbookView({
   onMissionChange?: (missionId: string, update: MissionUpdate) => Promise<void>;
   onRunSaved?: () => void;
 }) {
+  const { roleGroup, roleGroupLabel } = useRole();
+  const lens = { roleGroup };
   const [mission, setMission] = useState<MissionContext | null>(missionProp ?? null);
   const [run, setRun] = useState<ChecklistRun | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -99,7 +106,7 @@ export function RunbookView({
   }, [checklists, refreshKey, missionProp]);
 
   const runbook = mission
-    ? buildMissionRunbook(checklists, mission, { checkedItemIds: run?.checkedItemIds, skippedItemIds: run?.skippedItemIds })
+    ? buildMissionRunbook(checklists, mission, { checkedItemIds: run?.checkedItemIds, skippedItemIds: run?.skippedItemIds }, lens)
     : null;
   const openStep = runbook?.steps.find((step) => step.id === openStepId) ?? runbook?.steps.find((step) => step.status === 'now') ?? null;
   const checklistSlug = runbook?.checklistSlug ?? null;
@@ -187,6 +194,12 @@ export function RunbookView({
               {runbook.doneCount} gjort{runbook.skippedCount > 0 ? ` · ${runbook.skippedCount} hoppet over` : ''} av {runbook.total}
             </span>
           </div>
+          {roleGroup !== 'ikke-valgt' ? (
+            <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[var(--surface-muted)] px-2.5 py-1 font-mono text-[0.6rem] font-bold uppercase tracking-widest text-[var(--text-secondary)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-fg)]" aria-hidden="true" />
+              {roleGroupLabel}-linse
+            </p>
+          ) : null}
           <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-[var(--border)]">
             <div className="h-full rounded-full bg-[#34d399] transition-all" style={{ width: `${Math.round((resolved / runbook.total) * 100)}%` }} />
           </div>
@@ -251,6 +264,25 @@ export function RunbookView({
             {/* Steps */}
             <div className="flex flex-1 flex-col gap-2">
               {visibleSteps.map((step) => {
+                if (step.status === 'locked') {
+                  return (
+                    <div
+                      key={step.id}
+                      className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface)] px-3 py-3 opacity-80"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span aria-hidden="true" className="text-sm text-[var(--text-muted)]">🔒</span>
+                        <span className="flex-1 text-sm font-semibold text-[var(--text-muted)]">{step.title}</span>
+                      </div>
+                      {step.lockReason ? (
+                        <p className="mt-1 pl-6 font-mono text-[0.6rem] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
+                          {step.lockReason}
+                        </p>
+                      ) : null}
+                    </div>
+                  );
+                }
+
                 const isOpen = openStep?.id === step.id;
                 const resolvedStep = step.status === 'done' || step.status === 'skipped';
                 const badge = statusLabel[step.status] || (step.required ? 'Påkrevd' : '');

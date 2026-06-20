@@ -1,7 +1,8 @@
 import type { OperationalChecklist } from '@/lib/content/schemas';
+import { roleGroupMeetsMinimum, ROLE_GROUP_LABELS, type MinRoleGroup, type RoleGroup } from '@/lib/role/role-groups';
 import type { MissionContext } from './schemas';
 
-export type RunbookStepStatus = 'done' | 'now' | 'upcoming' | 'skipped';
+export type RunbookStepStatus = 'done' | 'now' | 'upcoming' | 'skipped' | 'locked';
 
 export interface RunbookStep {
   /** Stable id across renders: `${checklistSlug}:${itemId}`. */
@@ -11,6 +12,22 @@ export interface RunbookStep {
   required: boolean;
   sourceIds: string[];
   status: RunbookStepStatus;
+  /** Locked by the role lens: visible but not actionable for the active role. */
+  locked: boolean;
+  /** Caption explaining the lock, e.g. "Vises for lagfører/leder". */
+  lockReason: string | null;
+}
+
+/** Active role lens applied to the runbook (rollelinse). */
+export interface RunbookLens {
+  roleGroup: RoleGroup;
+}
+
+function lockReasonFor(minRoleGroup: MinRoleGroup, roleNote: string | undefined): string {
+  if (roleNote) return roleNote;
+  const label = ROLE_GROUP_LABELS[minRoleGroup];
+  // "leder" steps are leader-only; "lagforer" steps belong to lagfører and up.
+  return minRoleGroup === 'leder' ? `Vises for ${label.toLowerCase()}` : `Vises for ${label.toLowerCase()} og leder`;
 }
 
 export interface MissionRunbook {
@@ -88,16 +105,26 @@ export function selectRunbookChecklist(
 export function buildChecklistRunbook(
   checklist: OperationalChecklist | undefined | null,
   progress: RunbookProgressInput | null = null,
+  lens: RunbookLens | null = null,
 ): MissionRunbook {
   if (!checklist) return { ...EMPTY_RUNBOOK };
 
   const checked = new Set(progress?.checkedItemIds ?? []);
   const skipped = new Set(progress?.skippedItemIds ?? []);
+  const activeRoleGroup = lens?.roleGroup ?? 'ikke-valgt';
   let assignedNow = false;
 
   const steps: RunbookStep[] = (checklist.items ?? []).map((item) => {
+    const minRoleGroup = item.minRoleGroup;
+    const locked = Boolean(minRoleGroup) && !roleGroupMeetsMinimum(activeRoleGroup, minRoleGroup!);
+
     let status: RunbookStepStatus;
-    if (checked.has(item.id)) status = 'done';
+    let lockReason: string | null = null;
+    if (locked) {
+      // Locked steps are visible but never the active step and never block progress.
+      status = 'locked';
+      lockReason = lockReasonFor(minRoleGroup!, item.roleNote);
+    } else if (checked.has(item.id)) status = 'done';
     else if (skipped.has(item.id)) status = 'skipped';
     else if (!assignedNow) {
       status = 'now';
@@ -112,13 +139,18 @@ export function buildChecklistRunbook(
       required: item.required ?? false,
       sourceIds: item.sourceIds ?? [],
       status,
+      locked,
+      lockReason,
     };
   });
 
-  const doneCount = steps.filter((step) => step.status === 'done').length;
-  const skippedCount = steps.filter((step) => step.status === 'skipped').length;
-  const requiredSkippedCount = steps.filter((step) => step.required && step.status === 'skipped').length;
-  const requiredRemaining = steps.filter(
+  // Locked steps are excluded from the active-role denominator — same mission,
+  // role-specific depth ("samme oppdrag, tre dybder").
+  const actionable = steps.filter((step) => !step.locked);
+  const doneCount = actionable.filter((step) => step.status === 'done').length;
+  const skippedCount = actionable.filter((step) => step.status === 'skipped').length;
+  const requiredSkippedCount = actionable.filter((step) => step.required && step.status === 'skipped').length;
+  const requiredRemaining = actionable.filter(
     (step) => step.required && (step.status === 'now' || step.status === 'upcoming'),
   ).length;
   const current = steps.find((step) => step.status === 'now');
@@ -127,13 +159,13 @@ export function buildChecklistRunbook(
     checklistSlug: checklist.slug,
     title: checklist.title,
     steps,
-    total: steps.length,
+    total: actionable.length,
     doneCount,
     skippedCount,
     requiredSkippedCount,
     requiredRemaining,
     currentStepId: current?.id ?? null,
-    allRequiredComplete: steps.length > 0 && requiredRemaining === 0,
+    allRequiredComplete: actionable.length > 0 && requiredRemaining === 0,
     isEmpty: false,
     isGenericFallback: false,
   };
@@ -144,9 +176,10 @@ export function buildMissionRunbook(
   checklists: OperationalChecklist[],
   mission: Pick<MissionContext, 'scenario' | 'phase'>,
   progress: RunbookProgressInput | null = null,
+  lens: RunbookLens | null = null,
 ): MissionRunbook {
   const checklist = selectRunbookChecklist(checklists, mission);
-  const runbook = buildChecklistRunbook(checklist, progress);
+  const runbook = buildChecklistRunbook(checklist, progress, lens);
   const isGenericFallback = Boolean(checklist) && !checklist!.scenarios.includes(mission.scenario);
   return { ...runbook, isGenericFallback };
 }
