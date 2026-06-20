@@ -25,7 +25,7 @@ export default function SokPage() {
           <OperationalIcon name="search" className="h-5 w-5" />
         </span>
         <div className="min-w-0">
-          <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[#38bdf8]">Operativt søk</p>
+          <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[var(--accent-fg)]">Operativt søk</p>
           <h1 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">Søk i tiltak, kilder og moduler</h1>
         </div>
       </div>

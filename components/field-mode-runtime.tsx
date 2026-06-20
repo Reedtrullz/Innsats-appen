@@ -118,7 +118,7 @@ export function ActiveMissionShortcut() {
     <div className="border-b border-[#38bdf8]/30 bg-[var(--surface-elevated)] px-3 py-2" aria-label="Aktivt oppdrag">
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-2">
         <span className="inline-flex min-w-0 items-center gap-2 text-sm font-semibold text-[var(--text-secondary)]">
-          <OperationalIcon name="briefcase" className="h-4 w-4 shrink-0 text-[#38bdf8]" />
+          <OperationalIcon name="briefcase" className="h-4 w-4 shrink-0 text-[var(--accent-fg)]" />
           <span className="truncate">Aktivt lokalt oppdrag klart</span>
         </span>
         <Link href="/oppdrag" className="inline-flex min-h-11 shrink-0 items-center rounded-xl bg-[#38bdf8] px-3 font-mono text-xs font-bold text-[#04141f]">Åpne</Link>

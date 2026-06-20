@@ -180,7 +180,7 @@ export function ActionCardDetail({ card, sources, images = [], referenceVideos =
     <article className="space-y-3">
       <RecordCardVisit slug={card.slug} />
       <div className="rounded-3xl bg-[var(--surface)] p-5 shadow-sm">
-        <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[#38bdf8]">{phaseLabels[card.phase]}</p>
+        <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[var(--accent-fg)]">{phaseLabels[card.phase]}</p>
         <h1 className="mt-1 text-3xl font-black tracking-tight text-[var(--text-primary)]">{card.title}</h1>
         {card.authority ? (
           <p className="mt-2 flex items-center gap-2 text-xs font-bold">
@@ -219,7 +219,7 @@ export function ActionCardDetail({ card, sources, images = [], referenceVideos =
       <CompetenceGuardrail card={card} />
       <section className="rounded-3xl bg-[var(--surface)] p-5 shadow-sm">
         <h2 className="text-xl font-black text-[var(--text-primary)]">Tiltak</h2>
-        <ol className="mt-3 list-decimal space-y-3 pl-6 text-base font-semibold leading-6 text-[var(--text-primary)] marker:font-black marker:text-[#38bdf8]">
+        <ol className="mt-3 list-decimal space-y-3 pl-6 text-base font-semibold leading-6 text-[var(--text-primary)] marker:font-black marker:text-[var(--accent-fg)]">
           {normalizedSteps.map((step, index) => {
             const stepImages = step.imageIds.map((id) => imageById.get(id)).filter((image): image is ImageMetadata => Boolean(image));
             return (
@@ -227,7 +227,7 @@ export function ActionCardDetail({ card, sources, images = [], referenceVideos =
                 {step.action}
                 {step.how ? (
                   <details className="mt-1">
-                    <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-sm font-bold text-[#38bdf8]">Vis hvordan</summary>
+                    <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-sm font-bold text-[var(--accent-fg)]">Vis hvordan</summary>
                     <p className="mt-1 text-sm font-medium leading-6 text-[var(--text-secondary)]">{step.how}</p>
                   </details>
                 ) : null}

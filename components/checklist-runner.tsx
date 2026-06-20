@@ -130,7 +130,7 @@ function ChecklistRunnerState({ checklist, missionId, runId, sourceTitleById, on
     <section className="rounded-2xl bg-[var(--surface)] p-4 shadow-sm ring-1 ring-[var(--border)]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[#38bdf8]">Aktiv sjekkliste</p>
+          <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[var(--accent-fg)]">Aktiv sjekkliste</p>
           <h2 className="text-xl font-black text-[var(--text-primary)]">{checklist.title}</h2>
         </div>
         <span className="rounded-full bg-[var(--surface-muted)] px-3 py-1 text-xs font-black text-[var(--text-secondary)]">{checked.size}/{checklist.items.length} fullført</span>
@@ -155,7 +155,7 @@ function ChecklistRunnerState({ checklist, missionId, runId, sourceTitleById, on
             {/* Note/status one tap away so the checkbox list stays scannable (P3-2);
                 the privacy error lives outside the details so it can never hide. */}
             <details className="mt-2">
-              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-xs font-bold text-[#38bdf8]">Legg til notat / status</summary>
+              <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-xs font-bold text-[var(--accent-fg)]">Legg til notat / status</summary>
               {isEquipmentChecklist ? (
                 <label className="mt-2 block text-xs font-bold text-[var(--text-secondary)]">
                   Materiellstatus for {item.label}

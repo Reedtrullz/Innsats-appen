@@ -121,7 +121,7 @@ function SearchResultRow({ doc }: { doc: SearchHit }) {
           </span>
           {termsLabel(doc.terms) ? <span className="mt-2 block text-xs font-semibold text-[var(--text-muted)]">Søkeord: {termsLabel(doc.terms)}</span> : null}
         </span>
-        <OperationalIcon name="chevron" className="mt-3 h-4 w-4 shrink-0 text-[var(--text-muted)] group-hover:text-[#38bdf8]" />
+        <OperationalIcon name="chevron" className="mt-3 h-4 w-4 shrink-0 text-[var(--text-muted)] group-hover:text-[var(--accent-fg)]" />
       </span>
     </Link>
   );

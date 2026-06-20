@@ -156,7 +156,7 @@ export function QuickActionButton({
         <span className="block text-sm font-bold leading-tight text-[var(--text-primary)]">{label}</span>
         {description ? <span className="mt-0.5 block text-xs font-semibold leading-4 text-[var(--text-muted)]">{description}</span> : null}
       </span>
-      <OperationalIcon name="chevron" className="h-4 w-4 text-[var(--text-muted)] group-hover:text-[#38bdf8]" />
+      <OperationalIcon name="chevron" className="h-4 w-4 text-[var(--text-muted)] group-hover:text-[var(--accent-fg)]" />
     </Link>
   );
 }

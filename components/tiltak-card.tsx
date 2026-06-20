@@ -91,7 +91,7 @@ export function TiltakCardRow({ card }: { card: ActionCard }) {
           {card.doNot && card.doNot.length > 0 ? <StatusPill label={`${card.doNot.length} nei`} tone="critical" compact /> : null}
         </span>
       </span>
-      <OperationalIcon name="chevron" className="mt-4 h-4 w-4 shrink-0 text-[var(--text-muted)] group-hover:text-[#38bdf8]" />
+      <OperationalIcon name="chevron" className="mt-4 h-4 w-4 shrink-0 text-[var(--text-muted)] group-hover:text-[var(--accent-fg)]" />
     </Link>
   );
 }

@@ -35,7 +35,7 @@ const statusLabel: Record<RunbookStep['status'], string> = {
 
 const statusBadgeClass: Record<RunbookStep['status'], string> = {
   done: 'bg-[#34d399]/15 text-[#34d399] dark:bg-[#34d399]/15 dark:text-[#34d399]',
-  now: 'bg-[#38bdf8]/15 text-[#38bdf8] dark:bg-[#38bdf8]/15 dark:text-[#38bdf8]',
+  now: 'bg-[#38bdf8]/15 text-[var(--accent-fg)] dark:bg-[#38bdf8]/15 dark:text-[var(--accent-fg)]',
   upcoming: 'bg-slate-100 text-slate-600 dark:bg-[var(--surface)] dark:text-[var(--text-muted)]',
   skipped: 'bg-[#fbbf24]/15 text-amber-700 dark:text-[#fcd34d]',
 };
@@ -275,7 +275,7 @@ export function RunbookView({
                     >
                       {isActive ? (
                         <div className="min-w-0 flex-1">
-                          <span className="block font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[#38bdf8]">Nå</span>
+                          <span className="block font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[var(--accent-fg)]">Nå</span>
                           <span className="mt-0.5 block text-sm font-bold text-[var(--text-primary)]">{step.title}</span>
                         </div>
                       ) : (

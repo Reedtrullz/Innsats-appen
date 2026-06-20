@@ -13,7 +13,7 @@
   --border-strong: #94a3b8;
   --text-primary: #0f172a;
   --text-secondary: #334155;
-  --text-muted: #64748b;
+  --text-muted: #475569;
   --command-bg: #082f49;
   --command-fg: #ffffff;
   --action-bg: #082f49;
@@ -27,6 +27,7 @@
   --critical-surface: #fef2f2;
   --critical-fg: #7f1d1d;
   --focus-ring: #38bdf8;
+  --accent-fg: #0369a1;
   --disabled-surface: #e2e8f0;
   --disabled-fg: #64748b;
 }
@@ -65,6 +66,7 @@
   --step-skipped: #fbbf24;
   --step-notdo: #f87171;
   --focus-ring: #38bdf8;
+  --accent-fg: #38bdf8;
   --disabled-surface: #1a2438;
   --disabled-fg: #6b7c96;
 }
