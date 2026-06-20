@@ -849,6 +849,7 @@ export function OfflineMapPanel() {
         {lastWaterSupplyPlan ? (
           <AdvisorySuggestionCard
             {...deriveWaterSupplyAdvisory(lastWaterSupplyPlan)}
+            compact={fieldMode.enabled}
             onLog={() => prefillMapLogFromAdvisory(deriveWaterSupplyAdvisory(lastWaterSupplyPlan).suggestion)}
             onAdjust={() => scrollToElement('water-supply-plan-summary')}
           />
@@ -947,6 +948,7 @@ export function OfflineMapPanel() {
         {lastSearchSectorPlan ? (
           <AdvisorySuggestionCard
             {...deriveSearchSectorAdvisory(lastSearchSectorPlan)}
+            compact={fieldMode.enabled}
             onLog={() => prefillMapLogFromAdvisory(deriveSearchSectorAdvisory(lastSearchSectorPlan).suggestion)}
             onAdjust={() => scrollToElement('search-sector-plan-summary')}
           />

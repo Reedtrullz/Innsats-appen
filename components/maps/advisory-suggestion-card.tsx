@@ -53,6 +53,7 @@ export function AdvisorySuggestionCard({
   onLog,
   adjustLabel = 'Juster manuelt',
   logLabel = '+ Logg',
+  compact = false,
   className = '',
 }: {
   /** The headline recommendation, e.g. "Tjern NV → relé ved 240 m". */
@@ -73,6 +74,12 @@ export function AdvisorySuggestionCard({
   onLog?: () => void;
   adjustLabel?: string;
   logLabel?: string;
+  /**
+   * Feltmodus: strip to the essentials — suggestion, confidence, and the two
+   * actions. Hides assumption chips, the hvorfor detail and the source note so
+   * a gloved user sees only what they act on. (Board §08, "⬡ Feltmodus · kart".)
+   */
+  compact?: boolean;
   className?: string;
 }) {
   return (
@@ -94,13 +101,17 @@ export function AdvisorySuggestionCard({
       <div className="space-y-3 p-4">
         <div>
           <h3 className="text-base font-black leading-tight text-[var(--text-primary)]">{suggestion}</h3>
-          <p className="mt-2 font-mono text-[0.6rem] font-bold uppercase tracking-widest text-[var(--text-muted)]">
-            Hvorfor
-          </p>
-          <p className="mt-0.5 text-sm font-semibold leading-5 text-[var(--text-secondary)]">{why}</p>
+          {!compact ? (
+            <>
+              <p className="mt-2 font-mono text-[0.6rem] font-bold uppercase tracking-widest text-[var(--text-muted)]">
+                Hvorfor
+              </p>
+              <p className="mt-0.5 text-sm font-semibold leading-5 text-[var(--text-secondary)]">{why}</p>
+            </>
+          ) : null}
         </div>
 
-        {assumptions.length > 0 ? (
+        {!compact && assumptions.length > 0 ? (
           <ul className="flex flex-wrap gap-1.5">
             {assumptions.map((chip) => (
               <li
@@ -128,7 +139,7 @@ export function AdvisorySuggestionCard({
           ) : null}
         </div>
 
-        {sourceNote ? (
+        {!compact && sourceNote ? (
           <p className="font-mono text-[0.7rem] leading-4 text-[var(--text-muted)]">{sourceNote}</p>
         ) : null}
 
