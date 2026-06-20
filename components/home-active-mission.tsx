@@ -26,13 +26,13 @@ export function HomeActiveMission() {
   return (
     <Link
       href="/oppdrag"
-      className="mb-3 flex min-h-14 items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-950 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49]"
+      className="mb-3 flex min-h-14 items-center justify-between gap-3 rounded-2xl border border-[#38bdf8]/30 bg-[var(--surface-elevated)] px-4 py-3 shadow-[0_4px_16px_rgba(56,189,248,0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#38bdf8] transition hover:border-[#38bdf8]/50"
     >
       <span className="min-w-0">
-        <span className="block text-xs font-black uppercase tracking-wide">Aktivt oppdrag</span>
-        <span className="block truncate text-sm font-black">{mission.title} · {mission.locationText}</span>
+        <span className="block font-mono text-[0.6rem] font-semibold uppercase tracking-widest text-[#38bdf8]">Aktivt oppdrag</span>
+        <span className="mt-0.5 block truncate text-sm font-bold text-[var(--text-primary)]">{mission.title} · {mission.locationText}</span>
       </span>
-      <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-900">
+      <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#38bdf8]/15 text-[#38bdf8]">
         <OperationalIcon name="chevron" className="h-4 w-4" />
       </span>
     </Link>
