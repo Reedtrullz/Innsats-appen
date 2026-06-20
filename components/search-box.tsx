@@ -114,6 +114,7 @@ function SearchResultRow({ doc }: { doc: SearchHit }) {
           <span className="block text-sm font-black leading-5 text-[var(--text-primary)]">{doc.title}</span>
           <span className="mt-2 flex flex-wrap gap-1.5 text-xs font-semibold text-[var(--text-secondary)]">
             {highPriority ? <StatusPill label="Kritisk prioritet" tone="critical" compact /> : null}
+            {doc.reviewStatus === 'pending-fagperson' ? <StatusPill label="Til faggjennomgang" tone="warning" compact /> : null}
             {doc.type ? <StatusPill label={`Type: ${typeMetadataLabel(doc.type)}`} tone="slate" compact /> : null}
             {doc.phase ? <StatusPill label={`Fase: ${doc.phase}`} tone="sky" compact /> : null}
             {doc.sourceStatus ? <StatusPill label={`Kilde: ${doc.sourceStatus}`} tone={doc.sourceStatus === 'verified' ? 'success' : 'warning'} compact /> : null}

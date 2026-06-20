@@ -37,6 +37,12 @@ function AuthorityBadge({ authority }: { authority: Authority }) {
   );
 }
 
+function FagReviewBadge({ reviewStatus }: { reviewStatus?: ActionCard['reviewStatus'] }) {
+  return reviewStatus === 'pending-fagperson'
+    ? <StatusPill label="Til faggjennomgang" tone="warning" compact />
+    : null;
+}
+
 export function DoNotCallout({ items }: { items: string[] }) {
   if (items.length === 0) return null;
   return (
@@ -77,6 +83,7 @@ export function TiltakCardRow({ card }: { card: ActionCard }) {
         <span className="mt-1 line-clamp-2 block text-xs font-semibold leading-4 text-[var(--text-secondary)]">{firstStep}</span>
         <span className="mt-2 flex flex-wrap gap-1.5">
           <StatusPill label={priorityLabels[card.priority]} tone={priorityTone} compact />
+          <FagReviewBadge reviewStatus={card.reviewStatus} />
           <StatusPill label={phaseLongLabels[card.phase]} tone="sky" compact />
           {card.authority ? <AuthorityBadge authority={card.authority} /> : null}
           {card.sourceIds.length === 0 ? <StatusPill label="Kilde mangler" tone="warning" compact /> : null}
@@ -99,6 +106,7 @@ export function TiltakCardCompact({ card, ctaLabel = 'Åpne tiltakskort' }: Omit
     <article className={`space-y-3 rounded-2xl border p-3 shadow-sm ${priorityTreatment[card.priority]}`}>
       <div className="flex flex-wrap items-center gap-2">
         <StatusPill label={priorityLabels[card.priority]} tone={priorityTone} />
+        <FagReviewBadge reviewStatus={card.reviewStatus} />
         <StatusPill label={phaseLongLabels[card.phase]} tone="sky" />
         {card.authority ? <AuthorityBadge authority={card.authority} /> : null}
         <span className={`inline-flex min-h-8 items-center rounded-full bg-[var(--surface)] px-3 py-1 text-xs font-bold ring-1 ${sourceCount > 0 ? 'text-[var(--text-secondary)] ring-[var(--border)]' : 'text-[var(--warning-fg)] ring-[#fbbf24]/30'}`}>
@@ -157,6 +165,7 @@ export function TiltakCardFull({ card, ctaLabel = 'Åpne tiltakskort' }: Omit<Ti
       <div className="flex flex-wrap items-center gap-2">
         <StatusPill label={priorityLabels[card.priority]} tone={priorityTone} />
         {card.priority === 'high' ? <StatusPill label="Kritisk støtte" tone="critical" /> : null}
+        <FagReviewBadge reviewStatus={card.reviewStatus} />
         <StatusPill label={phaseLongLabels[card.phase]} tone="sky" />
         {card.authority ? <AuthorityBadge authority={card.authority} /> : null}
         {card.scenarios.map((scenario) => <StatusPill key={scenario} label={scenarioLabels[scenario]} tone="success" />)}

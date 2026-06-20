@@ -1,9 +1,10 @@
 import { SearchBox } from '@/components/search-box';
 import { OperationalIcon } from '@/components/ui/operational-icons';
-import { getActionCards, getChecklists, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSourceDocuments, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
+import { getActionCards, getChecklists, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSearchSynonyms, getSourceDocuments, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
 import { buildSearchDocuments } from '@/lib/content/search-documents';
 
 export default function SokPage() {
+  const synonyms = getSearchSynonyms();
   const searchDocuments = buildSearchDocuments({
     queryBasePath: '/sok',
     cards: getActionCards(),
@@ -13,6 +14,7 @@ export default function SokPage() {
     training: getTrainingPaths(),
     protection: getProtectionMeasures(),
     faq: getFAQEntries(),
+    searchSynonyms: synonyms,
   });
   const searchIndexGeneratedAt = getSearchIndexGeneratedAt();
 
@@ -30,6 +32,7 @@ export default function SokPage() {
       <SearchBox
         documents={searchDocuments}
         generatedAt={searchIndexGeneratedAt}
+        externalSynonyms={synonyms}
         showFreshnessIndicator
         enableFilters
         suggestionBasePath="/sok"

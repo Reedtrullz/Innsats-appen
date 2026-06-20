@@ -1,7 +1,7 @@
 import type { SearchDocument } from './search';
 import { sourceFreshness } from './source-review';
 import { stepSearchText } from './steps';
-import type { ActionCard, FAQEntry, GlossaryTerm, OperationalChecklist, ProtectionMeasure, SourceDocument, TrainingPath } from './schemas';
+import type { ActionCard, FAQEntry, GlossaryTerm, OperationalChecklist, ProtectionMeasure, SearchSynonymGroup, SourceDocument, TrainingPath } from './schemas';
 
 export interface BuildSearchDocumentsInput {
   queryBasePath?: '/hurtigkort' | '/sok';
@@ -12,6 +12,7 @@ export interface BuildSearchDocumentsInput {
   training: TrainingPath[];
   protection: ProtectionMeasure[];
   faq: FAQEntry[];
+  searchSynonyms?: SearchSynonymGroup[];
 }
 
 const PROBLEM_SOURCE_STATUSES = ['expired', 'draft', 'unverified', 'historical'] as const;
@@ -39,6 +40,13 @@ function sourceStatusFor(sourceIds: string[] | undefined, sourcesById: Map<strin
   return PROBLEM_SOURCE_STATUSES.find((status) => statuses.includes(status)) ?? statuses[0];
 }
 
+function searchSynonymsForCard(slug: string, synonyms: SearchSynonymGroup[] = []) {
+  return synonyms
+    .filter((group) => group.cardIds.includes(slug))
+    .flatMap((group) => [group.canonical, ...group.aliases])
+    .join(' ');
+}
+
 export function buildSearchDocuments({
   queryBasePath = '/hurtigkort',
   cards,
@@ -48,6 +56,7 @@ export function buildSearchDocuments({
   training,
   protection,
   faq,
+  searchSynonyms = [],
 }: BuildSearchDocumentsInput): SearchDocument[] {
   const sourcesById = new Map(sources.map((source) => [source.id, source]));
 
@@ -59,11 +68,13 @@ export function buildSearchDocuments({
       scenario: card.scenarios.join(' '),
       role: card.roles.join(' '),
       phase: card.phase,
+      synonyms: searchSynonymsForCard(card.slug, searchSynonyms),
       type: 'kort',
       href: `/kort/${card.slug}`,
       sourceStatus: sourceStatusFor(card.sourceIds, sourcesById),
       sourceIds: card.sourceIds,
       priority: card.priority,
+      reviewStatus: card.reviewStatus,
     })),
     ...checklists.map<SearchDocument>((checklist) => ({
       id: `sjekkliste:${checklist.slug}`,

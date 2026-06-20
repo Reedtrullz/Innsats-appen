@@ -1,3 +1,12 @@
+- id: hva-na-kort-faggjennomgang
+  title: Hva nå-kort er ikke faggodkjent ennå
+  body: De nye stresskortene viser første avklaringer og stoppunkter når situasjonen endrer seg. De er merket Til faggjennomgang og skal brukes som beslutningsstøtte sammen med gjeldende ordre, innsatsledelse og fagmyndighet. De erstatter ikke ordre, dispatch, ressursstyring, pasienthåndtering eller sporing.
+  severity: warning
+  changedAt: 2026-06-19
+  sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram, src-tiltakskort-cbrne, src-veileder-for-sivilforsvarets-renseenheter-cbrn, src-grunnopplaering-mfe-10-mannskap]
+  linkedCardSlugs: [oppdrag-mottatt-hva-na, fremme-innsatssted-forste-minutter, ordre-uklar-hva-na, samband-brutt-hva-na, eget-personell-skadet-hva-na, cbrne-mistanke-hva-na, radiac-hoy-verdi-hva-na, mre-kontaminert-person-hva-na, mfe-ankomst-hva-na, pumpe-vann-ikke-fram-hva-na, evakuering-mottak-hva-na, transport-avvik-hva-na]
+  changelogEntryId: hva-na-stresskort-batch
+
 - id: for-utrykning-les-forst
   title: Må leses før utrykning
   body: Kontroller gjeldende ordre, beredskapsvaktens føringer, vær/farer, samband og lokale sikkerhetsgrenser før avreise. Bruk bare lokale sjekklistenotater; ikke registrer persondata, pasientdata eller sentral personlig inventarliste.

@@ -5,24 +5,32 @@ import { getActionCards, getChecklists, getContentManifest, getFAQEntries, getGl
 import { buildSearchDocuments } from '@/lib/content/search-documents';
 import { sortActionCards } from '@/lib/content/filters';
 import { formatNbDateTime } from '@/lib/formatting/format-date';
+import { getWhatNextCards } from '@/lib/content/what-next-cards';
 
 export default function HurtigkortPage() {
   const cards = getActionCards();
+  const checklists = getChecklists();
+  const glossary = getGlossaryTerms();
+  const training = getTrainingPaths();
+  const protection = getProtectionMeasures();
+  const faq = getFAQEntries();
   const sources = getSourceDocuments();
+  const synonyms = getSearchSynonyms();
   const searchDocuments = buildSearchDocuments({
     queryBasePath: '/hurtigkort',
     cards,
-    checklists: getChecklists(),
+    checklists,
     sources,
-    glossary: getGlossaryTerms(),
-    training: getTrainingPaths(),
-    protection: getProtectionMeasures(),
-    faq: getFAQEntries(),
+    glossary,
+    training,
+    protection,
+    faq,
+    searchSynonyms: synonyms,
   });
   const manifest = getContentManifest();
   const searchIndexGeneratedAt = getSearchIndexGeneratedAt();
-  const synonyms = getSearchSynonyms();
   const sortedCards = sortActionCards(cards);
+  const whatNextCards = getWhatNextCards(cards, { limit: 6 });
   const criticalCards = sortedCards.filter((card) => card.priority === 'high').slice(0, 4);
   const relevantCards = sortedCards.filter((card) => card.priority !== 'high').slice(0, 6);
   return (
@@ -32,8 +40,21 @@ export default function HurtigkortPage() {
         <p className="mt-1 text-sm font-semibold text-sky-100">Søk først. Bla kompakt når du ikke vet nøyaktig hva du trenger.</p>
         <p className="mt-3 text-xs font-bold text-sky-200">Innhold oppdatert: <span data-testid="content-version">{formatNbDateTime(manifest.contentVersion)}</span></p>
       </section>
-      <SearchBox documents={searchDocuments} generatedAt={searchIndexGeneratedAt} showFreshnessIndicator />
+      <SearchBox documents={searchDocuments} externalSynonyms={synonyms} generatedAt={searchIndexGeneratedAt} showFreshnessIndicator />
       <RecentCardsRow cards={sortedCards} />
+
+      {whatNextCards.length > 0 ? (
+        <section className="space-y-3 rounded-2xl border border-sky-200 bg-sky-50 p-4" aria-labelledby="hurtigkort-what-next-heading">
+          <div>
+            <p className="text-xs font-black uppercase tracking-wide text-sky-800">Stresskort</p>
+            <h2 id="hurtigkort-what-next-heading" className="text-xl font-black text-slate-950">Hva nå?</h2>
+            <p className="mt-1 text-sm font-semibold text-slate-700">Kort for de første tiltakene når situasjonen endrer seg eller neste handling er uklar.</p>
+          </div>
+          <div className="space-y-2">
+            {whatNextCards.map((card) => <TiltakCardRow key={card.slug} card={card} />)}
+          </div>
+        </section>
+      ) : null}
 
       {criticalCards.length > 0 ? (
         <section className="space-y-3" aria-labelledby="hurtigkort-critical-heading">

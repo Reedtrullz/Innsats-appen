@@ -1,3 +1,36 @@
+- id: hva-na-stresskort-batch
+  date: 2026-06-19
+  title: Hva nå-stresskort lagt til
+  summary: Tolv korte tiltakskort for første avklaring når oppdrag, ordre, samband, CBRNE/RADIAC/MRE, MFE, pumpe, evakuering eller transport endrer seg er lagt til. Kortene er markert for faggjennomgang og er beslutningsstøtte, ikke ordre, dispatch eller sporing.
+  changeType: added
+  contentRefs:
+    - kind: action-card
+      id: oppdrag-mottatt-hva-na
+    - kind: action-card
+      id: fremme-innsatssted-forste-minutter
+    - kind: action-card
+      id: ordre-uklar-hva-na
+    - kind: action-card
+      id: samband-brutt-hva-na
+    - kind: action-card
+      id: eget-personell-skadet-hva-na
+    - kind: action-card
+      id: cbrne-mistanke-hva-na
+    - kind: action-card
+      id: radiac-hoy-verdi-hva-na
+    - kind: action-card
+      id: mre-kontaminert-person-hva-na
+    - kind: action-card
+      id: mfe-ankomst-hva-na
+    - kind: action-card
+      id: pumpe-vann-ikke-fram-hva-na
+    - kind: action-card
+      id: evakuering-mottak-hva-na
+    - kind: action-card
+      id: transport-avvik-hva-na
+  sourceIds: [src-tiltakskort-for-innsats, src-5-punktsordre, src-kommunikasjons-og-sambandsdiagram, src-tiltakskort-cbrne, src-veileder-for-sivilforsvarets-renseenheter-cbrn, src-grunnopplaering-mfe-10-mannskap]
+  mustRead: true
+
 - id: skogbrann-vannforsyning-detaljert
   date: 2026-06-19
   title: Skogbrann vannforsyningsplan utvidet

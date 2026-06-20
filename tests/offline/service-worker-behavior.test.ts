@@ -5,6 +5,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { GENERATED_ROUTE_DISCOVERY_ENDPOINTS, STATIC_APP_SHELL_ROUTES } from '@/lib/offline/static-app-shell';
 
 type ServiceWorkerHandler = (event: { waitUntil: (promise: Promise<unknown>) => void }) => void;
+type ServiceWorkerFetchHandler = (event: {
+  request: Request;
+  respondWith: (promise: Promise<Response> | Response) => void;
+}) => void;
 
 describe('service worker offline behavior', () => {
   it('precaches the static shell and generated browser-safe routes during install', async () => {
@@ -110,5 +114,71 @@ describe('service worker offline behavior', () => {
     for (const endpoint of GENERATED_ROUTE_DISCOVERY_ENDPOINTS) {
       expect(fetchMock).toHaveBeenCalledWith(endpoint, { cache: 'reload' });
     }
+  });
+
+  it('keeps context API offline fallback private and ignores cross-origin app-like paths', async () => {
+    const sw = fs.readFileSync(path.join(process.cwd(), 'public', 'sw.js'), 'utf8');
+    const eventHandlers = new Map<string, ServiceWorkerFetchHandler>();
+    const fetchMock = vi.fn(async () => {
+      throw new Error('offline');
+    });
+
+    const self = {
+      location: new URL('https://example.test/'),
+      clients: { matchAll: vi.fn(async () => []) },
+      registration: { waiting: null },
+      skipWaiting: vi.fn(),
+      addEventListener: vi.fn((type: string, handler: ServiceWorkerFetchHandler) => {
+        eventHandlers.set(type, handler);
+      }),
+    };
+
+    vm.runInNewContext(sw, {
+      self,
+      caches: { open: vi.fn(), keys: vi.fn(async () => []), delete: vi.fn() },
+      fetch: fetchMock,
+      Headers,
+      Request,
+      Response,
+      URL,
+      Date,
+      JSON,
+      Promise,
+      Set,
+    });
+
+    const fetchHandler = eventHandlers.get('fetch');
+    expect(fetchHandler).toBeDefined();
+
+    let contextResponsePromise: Promise<Response> | Response | undefined;
+    fetchHandler!({
+      request: new Request('https://example.test/api/context/weather?lat=abc&lon=10'),
+      respondWith: (promise) => {
+        contextResponsePromise = promise;
+      },
+    });
+
+    const contextResponse = await contextResponsePromise;
+    expect(contextResponse?.status).toBe(503);
+    expect(contextResponse?.headers.get('content-type')).toContain('application/json');
+    expect(contextResponse?.headers.get('cache-control')).toBe('private, no-store');
+    await expect(contextResponse?.json()).resolves.toEqual({ error: 'Context API unavailable offline' });
+
+    let crossOriginHandled = false;
+    fetchHandler!({
+      request: new Request('https://cdn.example/generated-content/manifest.json'),
+      respondWith: () => {
+        crossOriginHandled = true;
+      },
+    });
+    expect(crossOriginHandled).toBe(false);
+
+    fetchHandler!({
+      request: new Request('https://api.example/api/context/weather'),
+      respondWith: () => {
+        crossOriginHandled = true;
+      },
+    });
+    expect(crossOriginHandled).toBe(false);
   });
 });

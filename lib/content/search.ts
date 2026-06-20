@@ -14,6 +14,7 @@ export interface SearchDocument {
   sourceStatus?: SourceDocument['status'];
   sourceIds?: string[];
   priority?: ActionCard['priority'];
+  reviewStatus?: ActionCard['reviewStatus'];
 }
 
 export type SearchHit = SearchDocument & { score?: number; terms?: string[] };
