@@ -64,6 +64,8 @@ import { createMreZonePlanObjects, type MreZonePlanObjects } from '@/lib/maps/mr
 import { createRadiacMeasurementPlanObjects, type RadiacMeasurementPlanObjects } from '@/lib/maps/radiac-measurement-plan';
 import { createSearchSectorPlanObjects, type SearchSectorPlanObjects } from '@/lib/maps/search-sector-plan';
 import { createWaterSupplyPlanObjects, type WaterSupplyPlanObjects } from '@/lib/maps/water-supply-plan';
+import { deriveWaterSupplyAdvisory, deriveSearchSectorAdvisory } from '@/lib/maps/map-advisory';
+import { AdvisorySuggestionCard } from '@/components/maps/advisory-suggestion-card';
 
 import { buildFieldLogEntryFromMapObject } from '@/lib/mission/map-log-link';
 import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
@@ -543,6 +545,20 @@ export function OfflineMapPanel() {
     }
   }
 
+  function scrollToElement(id: string) {
+    if (typeof document === 'undefined') return;
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // "+ Logg" from an advisory card: prefill the field-log text with the
+  // recommendation so the user can confirm and save it to the active mission.
+  // No persondata or coordinates — only the advisory headline.
+  function prefillMapLogFromAdvisory(suggestion: string) {
+    setMapLogText(`Rådgivende forslag vurdert: ${suggestion}`);
+    scrollToElement('map-log-text');
+    setStatusMessage('Forslag lagt i loggtekst — bekreft og lagre på aktivt oppdrag.');
+  }
+
   async function createLogFromMapObject(mapObject: MissionMapMarker | MissionMapDrawing) {
     if (!activeMission) {
       setStatusMessage('Opprett aktivt oppdrag før feltlogg fra kart.');
@@ -829,6 +845,13 @@ export function OfflineMapPanel() {
             ]).map((prompt) => <li key={prompt}>{prompt}</li>)}
           </ul>
         </div>
+        {lastWaterSupplyPlan ? (
+          <AdvisorySuggestionCard
+            {...deriveWaterSupplyAdvisory(lastWaterSupplyPlan)}
+            onLog={() => prefillMapLogFromAdvisory(deriveWaterSupplyAdvisory(lastWaterSupplyPlan).suggestion)}
+            onAdjust={() => scrollToElement('water-supply-plan-summary')}
+          />
+        ) : null}
       </section>
 
       <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="RADIAC målepunktplanlegger">
@@ -915,6 +938,13 @@ export function OfflineMapPanel() {
             ]).map((prompt) => <li key={prompt}>{prompt}</li>)}
           </ul>
         </div>
+        {lastSearchSectorPlan ? (
+          <AdvisorySuggestionCard
+            {...deriveSearchSectorAdvisory(lastSearchSectorPlan)}
+            onLog={() => prefillMapLogFromAdvisory(deriveSearchSectorAdvisory(lastSearchSectorPlan).suggestion)}
+            onAdjust={() => scrollToElement('search-sector-plan-summary')}
+          />
+        ) : null}
       </section>
 
       <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="MRE ren/uren-side planlegger">
