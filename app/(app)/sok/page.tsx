@@ -23,8 +23,8 @@ export default function SokPage() {
           <OperationalIcon name="search" className="h-5 w-5" />
         </span>
         <div className="min-w-0">
-          <p className="text-xs font-black uppercase tracking-wide text-sky-700">Operativt søk</p>
-          <h1 className="text-2xl font-black tracking-tight text-slate-950">Søk i tiltak, kilder og moduler</h1>
+          <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[#38bdf8]">Operativt søk</p>
+          <h1 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">Søk i tiltak, kilder og moduler</h1>
         </div>
       </div>
       <SearchBox

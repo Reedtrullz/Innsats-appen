@@ -50,23 +50,23 @@ function HeroButtonComponent({ button, large }: { button: HeroButton; large?: bo
   }
   if (button.tone === 'critical') {
     return (
-      <Link className={`${cls} bg-white text-[#082F49] hover:bg-sky-50 focus-visible:outline-[#082F49]`} href={button.href}>
+      <Link className={`${cls} bg-[var(--surface)] text-[var(--text-primary)] hover:bg-[var(--surface-muted)] focus-visible:outline-[#38bdf8]`} href={button.href}>
         <span>
           <span className="block text-base">{button.label}</span>
-          <span className="mt-1 block text-xs font-semibold text-slate-600">{button.sublabel}</span>
+          <span className="mt-1 block text-xs font-semibold text-[var(--text-muted)]">{button.sublabel}</span>
         </span>
-        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-red-200 bg-red-50 text-red-700">
+        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--critical-surface)] text-[var(--critical-fg)]">
           <OperationalIcon name="alert" className="h-5 w-5" />
         </span>
       </Link>
     );
   }
-  const iconBg = button.tone === 'slate' ? 'border border-slate-200 bg-white text-[#082F49]' : 'bg-sky-50 text-sky-800';
+  const iconBg = button.tone === 'slate' ? 'border border-[var(--border)] bg-[var(--surface-muted)] text-[var(--text-primary)]' : 'bg-[var(--info-surface)] text-[var(--info-fg)]';
   return (
-    <Link className={`${cls} bg-white text-[#082F49] hover:bg-sky-50 focus-visible:outline-[#082F49]`} href={button.href}>
+    <Link className={`${cls} bg-[var(--surface)] text-[var(--text-primary)] hover:bg-[var(--surface-muted)] focus-visible:outline-[#38bdf8]`} href={button.href}>
       <span>
         <span className="block text-base">{button.label}</span>
-        <span className="mt-1 block text-xs font-semibold text-slate-600">{button.sublabel}</span>
+        <span className="mt-1 block text-xs font-semibold text-[var(--text-muted)]">{button.sublabel}</span>
       </span>
       <span className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${iconBg}`}>
         <OperationalIcon name={button.icon} className="h-5 w-5" />
@@ -176,7 +176,7 @@ function CriticalNowSection({ roleGroup }: { roleGroup: RoleGroup }) {
   }, [roleGroup]);
 
   return (
-    <SectionCard className="bg-white" labelledBy="critical-shortcuts-heading">
+    <SectionCard labelledBy="critical-shortcuts-heading">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 id="critical-shortcuts-heading" className="text-xl font-black tracking-tight">Snarveier</h2>
@@ -232,9 +232,9 @@ export function HomeRoleContent() {
 
       {roleGroup === 'lagforer' ? (
         <div className="mt-4">
-          <SectionCard className="bg-white" labelledBy="sector-heading">
-            <h2 id="sector-heading" className="text-xl font-black tracking-tight">Sektor/teig</h2>
-            <p className="mt-1 text-sm font-semibold text-slate-600">Sektorverktøy for avgrensning, søk og kartlegging.</p>
+          <SectionCard labelledBy="sector-heading">
+            <h2 id="sector-heading" className="text-xl font-black tracking-tight text-[var(--text-primary)]">Sektor/teig</h2>
+            <p className="mt-1 text-sm font-semibold text-[var(--text-muted)]">Sektorverktøy for avgrensning, søk og kartlegging.</p>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               <QuickActionButton href="/kort/soketeig-sektor" label="Søkesektor og teig" description="Avgrensning, søk og kartlegging" icon="search" tone="sky" />
               <QuickActionButton href="/kart" label="Kart" description="Offline-kart og orientering" icon="shield" tone="slate" />
@@ -243,22 +243,22 @@ export function HomeRoleContent() {
         </div>
       ) : null}
 
-      <details className="mt-5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <summary className="min-h-11 cursor-pointer list-none text-base font-black text-slate-950">Faser og kilder</summary>
+      <details className="mt-5 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-sm">
+        <summary className="min-h-11 cursor-pointer list-none text-base font-black text-[var(--text-primary)]">Faser og kilder</summary>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {phaseLinks.map((link) => (
             <Link
               key={link.href}
               aria-label={link.label}
-              className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm font-bold text-slate-900 transition hover:border-sky-200 hover:bg-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49]"
+              className="rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-3 text-sm font-bold text-[var(--text-primary)] transition hover:border-[#38bdf8]/40 hover:bg-[var(--info-surface)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#38bdf8]"
               href={link.href}
             >
               <span className="block text-base font-black">{link.label}</span>
-              <span className="mt-1 block text-sm font-semibold text-slate-600">{link.description}</span>
+              <span className="mt-1 block text-sm font-semibold text-[var(--text-muted)]">{link.description}</span>
             </Link>
           ))}
-          <Link className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-base font-black text-slate-900" href="/kilder">Kilder</Link>
-          <Link className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-base font-black text-slate-900" href="/hjelp">Hjelp og demo</Link>
+          <Link className="rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-3 text-base font-black text-[var(--text-primary)] transition hover:border-[#38bdf8]/40 hover:bg-[var(--info-surface)]" href="/kilder">Kilder</Link>
+          <Link className="rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-3 text-base font-black text-[var(--text-primary)] transition hover:border-[#38bdf8]/40 hover:bg-[var(--info-surface)]" href="/hjelp">Hjelp og demo</Link>
         </div>
       </details>
     </div>

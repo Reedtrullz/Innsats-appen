@@ -34,17 +34,17 @@ export function PhaseStepper({
   }
 
   return (
-    <nav aria-label="Faser" className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-      <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Fase — anbefalt rekkefølge, ikke en kommando</p>
+    <nav aria-label="Faser" className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-sm">
+      <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[var(--text-muted)]">Fase — anbefalt rekkefølge, ikke en kommando</p>
       <ol className="mt-2 grid grid-cols-3 gap-2">
         {phases.map((phase) => {
           const isCurrent = phase === mission.phase;
           const complete = isPhaseComplete(checklists, mission, checklistRuns, phase);
           const tone = isCurrent
-            ? 'bg-[#082F49] text-white ring-2 ring-[#082F49]'
+            ? 'bg-[#082F49] text-white ring-2 ring-[#082F49]/80 shadow-[0_0_0_1px_rgba(56,189,248,.3),0_4px_12px_rgba(56,189,248,.15)]'
             : complete
-              ? 'bg-emerald-100 text-emerald-900 ring-1 ring-emerald-200'
-              : 'bg-slate-100 text-slate-700 ring-1 ring-slate-200';
+              ? 'bg-[var(--success-surface)] text-[var(--success-fg)] ring-1 ring-[#34d399]/30'
+              : 'bg-[var(--surface-muted)] text-[var(--text-secondary)] ring-1 ring-[var(--border)]';
           return (
             <li key={phase}>
               <button

@@ -27,26 +27,26 @@ function CompetenceGuardrail({ card }: { card: ActionCard }) {
   if (competenceRequired.length === 0 && !card.competenceRationale) return null;
 
   return (
-    <details className="rounded-2xl border border-amber-300 bg-amber-50 text-amber-950 shadow-sm">
+    <details className="rounded-2xl border border-[#fbbf24]/30 bg-[var(--warning-surface)] text-[var(--warning-fg)] shadow-sm">
       <summary className="flex min-h-11 cursor-pointer list-none flex-wrap items-center gap-2 px-4 py-2">
         <OperationalIcon name="shield" className="h-4 w-4 shrink-0" />
         <span className="text-sm font-black">
           {competenceRequired.length > 0 ? 'Kun for trent personell' : 'Kompetansevurdering'}
         </span>
         {competenceRequired.map((competence) => (
-          <span key={competence} className="rounded-full bg-white px-2 py-0.5 text-xs font-black ring-1 ring-amber-300">
+          <span key={competence} className="rounded-full bg-[var(--surface)] px-2 py-0.5 text-xs font-black ring-1 ring-[#fbbf24]/30">
             {competence}
           </span>
         ))}
         <span className="ml-auto text-xs font-bold underline underline-offset-2">Detaljer</span>
       </summary>
-      <div className="border-t border-amber-200 px-4 py-3 text-sm font-semibold">
+      <div className="border-t border-[#fbbf24]/20 px-4 py-3 text-sm font-semibold">
         {competenceRequired.length > 0 ? (
           <>
             <p>Dette tiltakskortet er kompetansegatet. Denne appen gir ikke kompetanse, autorisasjon eller sertifisering.</p>
             <ul className="mt-2 flex flex-wrap gap-2 text-xs font-black">
               {competenceRequired.map((competence) => (
-                <li key={competence} className="rounded-full bg-white px-2.5 py-1 ring-1 ring-amber-300">
+                <li key={competence} className="rounded-full bg-[var(--surface)] px-2.5 py-1 ring-1 ring-[#fbbf24]/30">
                   {competence} · {competenceLabels[competence]}
                 </li>
               ))}
@@ -69,16 +69,16 @@ function CompetenceGuardrail({ card }: { card: ActionCard }) {
 }
 
 function sourceStatusClasses(status: SourceDocument['status']) {
-  if (status === 'verified') return 'border-emerald-200 bg-emerald-50 text-emerald-800';
-  if (status === 'expired') return 'border-red-200 bg-red-50 text-red-800';
-  return 'border-amber-200 bg-amber-50 text-amber-900';
+  if (status === 'verified') return 'border-[#34d399]/30 bg-[var(--success-surface)] text-[var(--success-fg)]';
+  if (status === 'expired') return 'border-[#f87171]/30 bg-[var(--critical-surface)] text-[var(--critical-fg)]';
+  return 'border-[#fbbf24]/30 bg-[var(--warning-surface)] text-[var(--warning-fg)]';
 }
 
 function freshnessClasses(tone: ReturnType<typeof sourceFreshness>['tone']) {
-  if (tone === 'red') return 'border-red-200 bg-red-50 text-red-700';
-  if (tone === 'amber') return 'border-amber-200 bg-amber-50 text-amber-800';
-  if (tone === 'emerald') return 'border-emerald-200 bg-emerald-50 text-emerald-700';
-  return 'border-slate-200 bg-slate-50 text-slate-700';
+  if (tone === 'red') return 'border-[#f87171]/30 bg-[var(--critical-surface)] text-[var(--critical-fg)]';
+  if (tone === 'amber') return 'border-[#fbbf24]/30 bg-[var(--warning-surface)] text-[var(--warning-fg)]';
+  if (tone === 'emerald') return 'border-[#34d399]/30 bg-[var(--success-surface)] text-[var(--success-fg)]';
+  return 'border-[var(--border)] bg-[var(--surface-muted)] text-[var(--text-secondary)]';
 }
 
 /**
@@ -94,7 +94,7 @@ function SourceGovernancePanel({ card, linkedSources, missingSourceIds, sourceWa
   return (
     <details
       open={!hasVerifiedSourceBase || undefined}
-      className={`rounded-2xl border shadow-sm ${hasVerifiedSourceBase ? 'border-emerald-200 bg-emerald-50 text-emerald-950' : 'border-amber-300 bg-amber-50 text-amber-950'}`}
+      className={`rounded-2xl border shadow-sm ${hasVerifiedSourceBase ? 'border-[#34d399]/30 bg-[var(--success-surface)] text-[var(--success-fg)]' : 'border-[#fbbf24]/30 bg-[var(--warning-surface)] text-[var(--warning-fg)]'}`}
     >
       <summary className="flex min-h-11 cursor-pointer list-none flex-wrap items-center gap-2 px-4 py-2">
         <span className="text-sm font-black">{hasVerifiedSourceBase ? 'Verifisert kildegrunnlag' : 'Kilde krever kontroll'}</span>
@@ -144,9 +144,9 @@ function SourceGovernancePanel({ card, linkedSources, missingSourceIds, sourceWa
         <section aria-label="Kortets metadata">
           <h3 className="text-base font-black">Gjelder for</h3>
           <div className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
-            {card.roles.map((role) => <span key={role} className="rounded-full bg-white px-2.5 py-1 ring-1 ring-slate-200">{roleLabels[role]}</span>)}
-            {card.scenarios.map((scenario) => <span key={scenario} className="rounded-full bg-white px-2.5 py-1 ring-1 ring-emerald-200">{scenarioLabels[scenario]}</span>)}
-            {(card.equipmentRequired ?? []).map((term) => <span key={term} className="rounded-full bg-white px-2.5 py-1 ring-1 ring-indigo-200">Utstyr: {term}</span>)}
+            {card.roles.map((role) => <span key={role} className="rounded-full bg-[var(--surface)] px-2.5 py-1 ring-1 ring-[var(--border)]">{roleLabels[role]}</span>)}
+            {card.scenarios.map((scenario) => <span key={scenario} className="rounded-full bg-[var(--surface)] px-2.5 py-1 ring-1 ring-[#34d399]/30">{scenarioLabels[scenario]}</span>)}
+            {(card.equipmentRequired ?? []).map((term) => <span key={term} className="rounded-full bg-[var(--surface)] px-2.5 py-1 ring-1 ring-[#38bdf8]/30">Utstyr: {term}</span>)}
           </div>
         </section>
       </div>
@@ -179,12 +179,12 @@ export function ActionCardDetail({ card, sources, images = [], referenceVideos =
   return (
     <article className="space-y-3">
       <RecordCardVisit slug={card.slug} />
-      <div className="rounded-3xl bg-white p-5 shadow-sm">
-        <p className="text-sm font-bold uppercase tracking-wide text-sky-700">{phaseLabels[card.phase]}</p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">{card.title}</h1>
+      <div className="rounded-3xl bg-[var(--surface)] p-5 shadow-sm">
+        <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[#38bdf8]">{phaseLabels[card.phase]}</p>
+        <h1 className="mt-1 text-3xl font-black tracking-tight text-[var(--text-primary)]">{card.title}</h1>
         {card.authority ? (
           <p className="mt-2 flex items-center gap-2 text-xs font-bold">
-            <span className="uppercase tracking-wide text-slate-600">Beslutningsmyndighet:</span>
+            <span className="uppercase tracking-wide text-[var(--text-muted)]">Beslutningsmyndighet:</span>
             <span className="inline-flex items-center gap-1 rounded-full bg-[#082F49] px-2.5 py-1 text-white">
               <OperationalIcon name="shield" className="h-3.5 w-3.5" />
               {authorityLabels[card.authority]}
@@ -194,7 +194,7 @@ export function ActionCardDetail({ card, sources, images = [], referenceVideos =
       </div>
       {card.warning ? <WarningBanner>{card.warning}</WarningBanner> : null}
       {card.reviewStatus === 'pending-fagperson' ? (
-        <section className="rounded-2xl border-2 border-indigo-300 bg-indigo-50 px-4 py-3 text-indigo-950 shadow-sm">
+        <section className="rounded-2xl border border-[#38bdf8]/30 bg-[var(--info-surface)] px-4 py-3 text-[var(--info-fg)] shadow-sm">
           <h2 className="flex items-center gap-2 text-base font-black">
             <OperationalIcon name="shield" className="h-5 w-5" />
             Til faggjennomgang
@@ -206,7 +206,7 @@ export function ActionCardDetail({ card, sources, images = [], referenceVideos =
         </section>
       ) : null}
       {(card.doNot ?? []).length > 0 ? (
-        <section className="rounded-2xl border-2 border-red-300 bg-red-50 px-4 py-3 text-red-950 shadow-sm">
+        <section className="rounded-2xl border-2 border-[#f87171]/30 bg-[var(--critical-surface)] px-4 py-3 text-[var(--critical-fg)] shadow-sm">
           <h2 className="flex items-center gap-2 text-base font-black">
             <OperationalIcon name="alert" className="h-5 w-5" />
             Ikke gjør
@@ -217,9 +217,9 @@ export function ActionCardDetail({ card, sources, images = [], referenceVideos =
         </section>
       ) : null}
       <CompetenceGuardrail card={card} />
-      <section className="rounded-3xl bg-white p-5 shadow-sm">
-        <h2 className="text-xl font-black">Tiltak</h2>
-        <ol className="mt-3 list-decimal space-y-3 pl-6 text-base font-semibold leading-6 text-slate-900 marker:font-black marker:text-sky-800">
+      <section className="rounded-3xl bg-[var(--surface)] p-5 shadow-sm">
+        <h2 className="text-xl font-black text-[var(--text-primary)]">Tiltak</h2>
+        <ol className="mt-3 list-decimal space-y-3 pl-6 text-base font-semibold leading-6 text-[var(--text-primary)] marker:font-black marker:text-[#38bdf8]">
           {normalizedSteps.map((step, index) => {
             const stepImages = step.imageIds.map((id) => imageById.get(id)).filter((image): image is ImageMetadata => Boolean(image));
             return (
@@ -227,17 +227,17 @@ export function ActionCardDetail({ card, sources, images = [], referenceVideos =
                 {step.action}
                 {step.how ? (
                   <details className="mt-1">
-                    <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-sm font-bold text-sky-800">Vis hvordan</summary>
-                    <p className="mt-1 text-sm font-medium leading-6 text-slate-700">{step.how}</p>
+                    <summary className="inline-flex min-h-11 cursor-pointer list-none items-center text-sm font-bold text-[#38bdf8]">Vis hvordan</summary>
+                    <p className="mt-1 text-sm font-medium leading-6 text-[var(--text-secondary)]">{step.how}</p>
                   </details>
                 ) : null}
                 {stepImages.length > 0 ? (
                   <div className="mt-2 space-y-3">
                     {stepImages.map((image) => (
-                      <figure key={image.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                      <figure key={image.id} className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)]">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={image.publicPath} alt={image.alt} className="block h-auto w-full" loading="lazy" />
-                        {image.caption ? <figcaption className="border-t border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600">{image.caption}</figcaption> : null}
+                        {image.caption ? <figcaption className="border-t border-[var(--border)] px-3 py-2 text-xs font-semibold text-[var(--text-muted)]">{image.caption}</figcaption> : null}
                       </figure>
                     ))}
                   </div>
@@ -248,18 +248,18 @@ export function ActionCardDetail({ card, sources, images = [], referenceVideos =
         </ol>
       </section>
       {overviewImages.length > 0 ? (
-        <section className="rounded-3xl bg-white p-5 shadow-sm" aria-labelledby="card-illustrations-heading">
-          <h2 id="card-illustrations-heading" className="text-xl font-black">Illustrasjon / utlegg</h2>
+        <section className="rounded-3xl bg-[var(--surface)] p-5 shadow-sm" aria-labelledby="card-illustrations-heading">
+          <h2 id="card-illustrations-heading" className="text-xl font-black text-[var(--text-primary)]">Illustrasjon / utlegg</h2>
           <div className="mt-3 space-y-4">
             {overviewImages.map((image) => (
-              <figure key={image.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+              <figure key={image.id} className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)]">
                 {/* Plain img is deliberate: assets are same-origin under /content-assets
                     (CSP img-src 'self') and precached by the service worker for offline
                     use; the next/image optimizer route is unavailable offline. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={image.publicPath} alt={image.alt} className="block h-auto w-full" loading="lazy" />
                 {image.caption ? (
-                  <figcaption className="border-t border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600">{image.caption}</figcaption>
+                  <figcaption className="border-t border-[var(--border)] px-3 py-2 text-xs font-semibold text-[var(--text-muted)]">{image.caption}</figcaption>
                 ) : null}
               </figure>
             ))}
@@ -267,9 +267,9 @@ export function ActionCardDetail({ card, sources, images = [], referenceVideos =
         </section>
       ) : null}
       {[...(card.safety ?? []), ...(card.reporting ?? [])].length > 0 ? (
-        <section className="rounded-3xl bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-black">Sikkerhet og rapportering</h2>
-          <ul className="mt-3 list-disc space-y-2 pl-5 text-slate-800">
+        <section className="rounded-3xl bg-[var(--surface)] p-5 shadow-sm">
+          <h2 className="text-xl font-black text-[var(--text-primary)]">Sikkerhet og rapportering</h2>
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-[var(--text-secondary)]">
             {[...(card.safety ?? []), ...(card.reporting ?? [])].map((item) => <li key={item}>{item}</li>)}
           </ul>
         </section>
