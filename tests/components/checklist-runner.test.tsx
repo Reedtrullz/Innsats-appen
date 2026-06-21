@@ -164,3 +164,28 @@ it('restores the previous safe checklist note when an unsafe edit is blocked', a
   await waitFor(() => expect(notes).toHaveValue('Tidligere trygg note'));
   expect((await getChecklistRun('mission-sensitive-existing:tilfluktsrom-teknisk-status'))?.notesByItemId.ventilasjon).toBe('Tidligere trygg note');
 });
+
+it('locks higher-role steps in the Work tab so the runbook lens cannot be bypassed', async () => {
+  const { RoleProvider } = await import('@/lib/role/role-context');
+  const { saveLocalProfile } = await import('@/lib/privacy/local-profile');
+  saveLocalProfile({ preferredRole: 'mannskap' });
+
+  const lensChecklist = {
+    slug: 'skogbrann-under-innsats', title: 'Brann/skogbrann under innsats', phase: 'under',
+    roles: ['leder', 'lagforer', 'mannskap'], scenarios: ['skogbrann'], sourceIds: ['src-tiltakskort-under-innsats'],
+    items: [
+      { id: 'sikkerhet', label: 'Sikkerhet avklart', required: true, sourceIds: [] },
+      { id: 'planlegg-vann', label: 'Planlegg vannforsyning', required: true, sourceIds: [], minRoleGroup: 'lagforer', roleNote: 'Planlegging — vises for lagfører og leder' },
+    ],
+  } as unknown as OperationalChecklist;
+
+  render(<RoleProvider><ChecklistRunner checklist={lensChecklist} missionId="mission-lens" /></RoleProvider>);
+
+  // The crew-actionable step is a real checkbox; the planning step is locked.
+  await screen.findByText('Planlegging — vises for lagfører og leder');
+  expect(screen.getByRole('checkbox', { name: /Sikkerhet avklart/i })).toBeInTheDocument();
+  expect(screen.queryByRole('checkbox', { name: /Planlegg vannforsyning/i })).toBeNull();
+  // Locked step is excluded from the role's denominator (1 actionable, not 2).
+  expect(screen.getByText('0/1 fullført')).toBeInTheDocument();
+  expect(screen.getByText(/Påkrevd: 0\/1 kontrollert/i)).toBeInTheDocument();
+});

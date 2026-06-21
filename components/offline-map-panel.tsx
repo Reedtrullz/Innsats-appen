@@ -833,7 +833,7 @@ export function OfflineMapPanel() {
           </label>
           <button type="submit" className={`${primaryButtonClass} md:col-span-3`}>Lag pumpe- og slangeplan</button>
         </form>
-        <div data-testid="water-supply-plan-summary" className="space-y-2 rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-800">
+        <div id="water-supply-plan-summary" data-testid="water-supply-plan-summary" className="space-y-2 rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-800">
           <p className="font-black text-slate-950">
             {lastWaterSupplyPlan
               ? `Slangevei ${lastWaterSupplyPlan.summary.hoseLengthSchematicUnits} skjematiske enheter · ${lastWaterSupplyPlan.summary.markerCount} markører · ${lastWaterSupplyPlan.summary.drawingCount} linje`
@@ -932,7 +932,7 @@ export function OfflineMapPanel() {
           </label>
           <button type="submit" className={`${primaryButtonClass} md:col-span-2`}>Lag søketeig plan</button>
         </form>
-        <div data-testid="search-sector-plan-summary" className="space-y-2 rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-800">
+        <div id="search-sector-plan-summary" data-testid="search-sector-plan-summary" className="space-y-2 rounded-2xl bg-slate-50 p-3 text-sm font-semibold text-slate-800">
           <p className="font-black text-slate-950">
             {lastSearchSectorPlan
               ? `${lastSearchSectorPlan.summary.boundaryPointCount} grensepunkt · ${lastSearchSectorPlan.summary.markerCount} møtepunkt · areal ${lastSearchSectorPlan.summary.areaSchematicUnits} skjematiske enheter`

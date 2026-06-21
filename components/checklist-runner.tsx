@@ -7,6 +7,8 @@ import { equipmentStatusLabels, equipmentStatuses } from '@/lib/mission/equipmen
 import type { EquipmentStatus } from '@/lib/mission/schemas';
 import { detectSensitiveOperationalText, sensitiveTextFieldError } from '@/lib/privacy/sensitive-text';
 import { formatSourceList } from '@/lib/content/source-titles';
+import { useRole } from '@/lib/role/role-context';
+import { roleGroupMeetsMinimum } from '@/lib/role/role-groups';
 
 export function ChecklistRunner({ checklist, missionId, sourceTitleById, onRunSaved }: { checklist: OperationalChecklist; missionId: string; sourceTitleById?: Record<string, string>; onRunSaved?: () => void }) {
   const runId = `${missionId}:${checklist.slug}`;
@@ -24,11 +26,22 @@ function ChecklistRunnerState({ checklist, missionId, runId, sourceTitleById, on
   const persistedNotesByItemIdRef = useRef<Record<string, string>>({});
   const equipmentStatusByItemIdRef = useRef<Record<string, EquipmentStatus>>({});
   const writeQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const { roleGroup } = useRole();
+  // Role lens (rollelinse): planning/decision steps tagged for a higher role are
+  // locked for lower roles here too, so the Arbeid tab can't bypass the runbook
+  // lock. Gated on `hydrated` so SSR and the first client render (which use the
+  // default role) match — locks appear only after the stored role loads.
+  const isLocked = (item: OperationalChecklist['items'][number]) =>
+    hydrated && Boolean(item.minRoleGroup) && !roleGroupMeetsMinimum(roleGroup, item.minRoleGroup!);
   const sourceIds = useMemo(() => [...new Set([...(checklist.sourceIds ?? []), ...checklist.items.flatMap((item) => item.sourceIds ?? [])])], [checklist]);
   const isEquipmentChecklist = checklist.slug.startsWith('mbk-') || (checklist.equipmentRequired ?? []).length > 0;
+  // Locked steps are excluded from the active role's counts (same mission, role depth).
   const requiredItems = useMemo(() => checklist.items.filter((item) => item.required), [checklist]);
-  const requiredDone = requiredItems.filter((item) => checked.has(item.id)).length;
-  const progress = checklist.items.length > 0 ? Math.round((checked.size / checklist.items.length) * 100) : 0;
+  const requiredActionable = requiredItems.filter((item) => !isLocked(item));
+  const requiredDone = requiredActionable.filter((item) => checked.has(item.id)).length;
+  const actionableItems = checklist.items.filter((item) => !isLocked(item));
+  const actionableChecked = actionableItems.filter((item) => checked.has(item.id)).length;
+  const progress = actionableItems.length > 0 ? Math.round((actionableChecked / actionableItems.length) * 100) : 0;
 
   useEffect(() => {
     let cancelled = false;
@@ -71,6 +84,8 @@ function ChecklistRunnerState({ checklist, missionId, runId, sourceTitleById, on
   }
 
   async function toggle(itemId: string) {
+    const item = checklist.items.find((candidate) => candidate.id === itemId);
+    if (item && isLocked(item)) return; // role-locked steps are not actionable
     const next = new Set(checkedRef.current);
     if (next.has(itemId)) next.delete(itemId);
     else next.add(itemId);
@@ -133,17 +148,25 @@ function ChecklistRunnerState({ checklist, missionId, runId, sourceTitleById, on
           <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-[var(--accent-fg)]">Aktiv sjekkliste</p>
           <h2 className="text-xl font-black text-[var(--text-primary)]">{checklist.title}</h2>
         </div>
-        <span className="rounded-full bg-[var(--surface-muted)] px-3 py-1 text-xs font-black text-[var(--text-secondary)]">{checked.size}/{checklist.items.length} fullført</span>
+        <span className="rounded-full bg-[var(--surface-muted)] px-3 py-1 text-xs font-black text-[var(--text-secondary)]">{actionableChecked}/{actionableItems.length} fullført</span>
       </div>
       <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--surface-muted)]" aria-hidden="true">
         <div className="h-full rounded-full bg-[#34d399]" style={{ width: `${progress}%` }} />
       </div>
-      {requiredItems.length > 0 ? <p className="mt-2 text-sm font-semibold text-[var(--text-secondary)]">Påkrevd: {requiredDone}/{requiredItems.length} kontrollert</p> : null}
+      {requiredActionable.length > 0 ? <p className="mt-2 text-sm font-semibold text-[var(--text-secondary)]">Påkrevd: {requiredDone}/{requiredActionable.length} kontrollert</p> : null}
       {!hydrated ? <p className="mt-2 text-sm font-semibold text-[var(--text-muted)]">Laster lokal sjekklistestatus før redigering.</p> : null}
       {checklist.warning ? <p className="mt-2 text-sm font-semibold text-[var(--warning-fg)]">{checklist.warning}</p> : null}
       <ul className="mt-3 space-y-3">
-        {checklist.items.map((item) => (
-          <li key={item.id} className={`rounded-2xl border p-3 ${item.required ? 'border-[#fbbf24]/30 bg-[var(--warning-surface)]' : 'border-[var(--border)] bg-[var(--surface-muted)]'}`}>
+        {checklist.items.map((item) => {
+          const locked = isLocked(item);
+          return (
+          <li key={item.id} className={`rounded-2xl border p-3 ${locked ? 'border-dashed border-[var(--border)] bg-[var(--surface)] opacity-80' : item.required ? 'border-[#fbbf24]/30 bg-[var(--warning-surface)]' : 'border-[var(--border)] bg-[var(--surface-muted)]'}`}>
+            {locked ? (
+              <div className="flex items-center gap-2">
+                <span aria-hidden="true" className="text-sm text-[var(--text-muted)]">🔒</span>
+                <span className="flex-1 text-sm font-semibold text-[var(--text-muted)]">{item.label}</span>
+              </div>
+            ) : (
             <label className="flex min-h-11 items-center gap-3 font-semibold text-[var(--text-primary)]">
               <input type="checkbox" checked={checked.has(item.id)} disabled={!hydrated} onChange={() => void toggle(item.id)} className="h-5 w-5" />
               <span>
@@ -151,6 +174,14 @@ function ChecklistRunnerState({ checklist, missionId, runId, sourceTitleById, on
                 {item.required ? <span className="ml-2 rounded-full bg-[var(--warning-surface)] px-2 py-0.5 text-xs font-black text-[var(--warning-fg)]">Påkrevd</span> : null}
               </span>
             </label>
+            )}
+            {locked ? (
+              <p className="mt-1 pl-6 font-mono text-[0.6rem] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
+                {item.roleNote ?? (item.minRoleGroup === 'leder' ? 'Vises for leder' : 'Vises for lagfører og leder')}
+              </p>
+            ) : null}
+            {!locked ? (
+            <>
             <p className="mt-1 text-xs text-[var(--text-muted)]">Kilder: {formatSourceList(item.sourceIds, sourceTitleById)}</p>
             {/* Note/status one tap away so the checkbox list stays scannable (P3-2);
                 the privacy error lives outside the details so it can never hide. */}
@@ -184,8 +215,11 @@ function ChecklistRunnerState({ checklist, missionId, runId, sourceTitleById, on
             {notePrivacyError?.itemId === item.id ? (
               <p role="alert" className="mt-2 rounded-xl border border-[#f87171]/30 bg-[var(--critical-surface)] p-2 text-sm font-semibold text-[var(--critical-fg)]">{notePrivacyError.message}</p>
             ) : null}
+            </>
+            ) : null}
           </li>
-        ))}
+          );
+        })}
       </ul>
       <p className="mt-3 text-xs text-[var(--text-muted)]">Sjekklistekilder: {formatSourceList(sourceIds, sourceTitleById)}</p>
     </section>
