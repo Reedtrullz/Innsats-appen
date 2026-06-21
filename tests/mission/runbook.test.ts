@@ -121,3 +121,51 @@ describe('buildMissionRunbook', () => {
     expect(buildMissionRunbook(checklists, { scenario: 'skogbrann', phase: 'under' }).isGenericFallback).toBe(false);
   });
 });
+
+describe('role lens (rollelinse)', () => {
+  const lensChecklist = {
+    slug: 'lens-test', title: 'Lens test', phase: 'under', roles: ['leder'], scenarios: ['skogbrann'],
+    sourceIds: ['src-tiltakskort-under-innsats'], items: [
+      { id: 'sikkerhet', label: 'Sikkerhet', required: true, sourceIds: [] },
+      { id: 'planlegg-vann', label: 'Planlegg vannforsyning', required: true, sourceIds: [], minRoleGroup: 'lagforer', roleNote: 'Planlegging — vises for lagfører og leder' },
+      { id: 'beslutt', label: 'Beslutt tiltak', required: false, sourceIds: [], minRoleGroup: 'leder' },
+    ],
+  } as unknown as OperationalChecklist;
+
+  it('does not lock anything when no role is chosen', () => {
+    const runbook = buildChecklistRunbook(lensChecklist, null, { roleGroup: 'ikke-valgt' });
+    expect(runbook.steps.every((step) => !step.locked)).toBe(true);
+    expect(runbook.total).toBe(3);
+  });
+
+  it('locks higher-role steps for mannskap and excludes them from the denominator', () => {
+    const runbook = buildChecklistRunbook(lensChecklist, null, { roleGroup: 'mannskap' });
+    const byId = Object.fromEntries(runbook.steps.map((step) => [step.itemId, step]));
+    expect(byId['planlegg-vann'].status).toBe('locked');
+    expect(byId['planlegg-vann'].lockReason).toBe('Planlegging — vises for lagfører og leder');
+    expect(byId['beslutt'].status).toBe('locked');
+    // Active step is the first non-locked unresolved step.
+    expect(byId['sikkerhet'].status).toBe('now');
+    expect(runbook.total).toBe(1);
+  });
+
+  it('unlocks planning for lagfører but keeps leder-only steps locked', () => {
+    const runbook = buildChecklistRunbook(lensChecklist, null, { roleGroup: 'lagforer' });
+    const byId = Object.fromEntries(runbook.steps.map((step) => [step.itemId, step]));
+    expect(byId['planlegg-vann'].locked).toBe(false);
+    expect(byId['beslutt'].status).toBe('locked');
+    expect(runbook.total).toBe(2);
+  });
+
+  it('unlocks every step for leder', () => {
+    const runbook = buildChecklistRunbook(lensChecklist, null, { roleGroup: 'leder' });
+    expect(runbook.steps.every((step) => !step.locked)).toBe(true);
+    expect(runbook.total).toBe(3);
+  });
+
+  it('supplies a default lock reason when roleNote is absent', () => {
+    const runbook = buildChecklistRunbook(lensChecklist, null, { roleGroup: 'mannskap' });
+    const beslutt = runbook.steps.find((step) => step.itemId === 'beslutt');
+    expect(beslutt?.lockReason).toBe('Vises for leder');
+  });
+});

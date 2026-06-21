@@ -140,3 +140,9 @@ it('sanitizes and caps local audit log export', () => {
   resetLocalAuditLog(storage);
   expect(readLocalAuditLog(storage)).toEqual([]);
 });
+
+it('defaults mode to innsats and accepts only valid modes', () => {
+  expect(sanitizeLocalProfile({}).mode).toBe('innsats');
+  expect(sanitizeLocalProfile({ mode: 'personlig' }).mode).toBe('personlig');
+  expect(sanitizeLocalProfile({ mode: 'bogus' }).mode).toBe('innsats');
+});

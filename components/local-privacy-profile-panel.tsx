@@ -27,6 +27,7 @@ import {
   type LocalProfile,
   type LocalProfileRole,
   type RetentionSettings,
+  DEFAULT_APP_MODE,
 } from '@/lib/privacy/local-profile';
 
 function emptyProfile(): LocalProfile {
@@ -36,6 +37,7 @@ function emptyProfile(): LocalProfile {
     displayName: '',
     callsign: '',
     preferredRole: 'ikke-valgt',
+    mode: DEFAULT_APP_MODE,
     updatedAt: new Date().toISOString(),
   };
 }

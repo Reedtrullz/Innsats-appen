@@ -639,10 +639,14 @@
     - id: vannforsyning-utlegg
       label: Vannforsyning, vannkilde, pumpeplass og slangevei er planlagt mot vannføring, trykktap og rekkevidde
       required: true
+      minRoleGroup: lagforer
+      roleNote: Planlegging — vises for lagfører og leder
       sourceIds: [src-eksempler-pa-utlegg-fra-pumpe, src-kursplan-grunnkurs-fig10]
     - id: trykkforsterkning-avklart
       label: Behov for trykkforsterkning, seriekjøring eller parallelle utlegg er avklart med leder før langt slangeutlegg
       required: false
+      minRoleGroup: lagforer
+      roleNote: Trykkforsterkning og seriekjøring — vises for lagfører og leder
       sourceIds: [src-kursplan-grunnkurs-fig10, src-eksempler-pa-utlegg-fra-pumpe]
     - id: samband-statusrapport
       label: Jevnlig statusrapport gitt på avtalt samband; endringer i fare meldt umiddelbart

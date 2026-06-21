@@ -2,10 +2,16 @@ import Link from 'next/link';
 import { InstallPrompt } from '@/components/install-prompt';
 import { OperationalStatus } from '@/components/operational-status';
 import { ThemeSelector } from '@/components/theme-selector';
+import { ModeSwitcher } from '@/components/mode-switcher';
 import { getContentManifest } from '@/lib/content/load-content';
 import { formatNbDateTime } from '@/lib/formatting/format-date';
 
 const operationalLinks = [
+  {
+    href: '/egenberedskap',
+    label: 'Egenberedskap',
+    description: 'Personlig forberedelse før vakt — pakk sekken, verneutstyr, helse og varsling.',
+  },
   {
     href: '/hjelp',
     label: 'Hjelp og demo',
@@ -112,6 +118,8 @@ export default function MorePage() {
           <OperationalStatus showConnectivity={false} />
         </div>
       </section>
+
+      <ModeSwitcher />
 
       <ThemeSelector />
 

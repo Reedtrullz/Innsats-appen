@@ -24,6 +24,7 @@ const routeHeadings: Record<string, RegExp> = {
   '/laering': /Opplæring/i,
   '/kart': /^Kart$/i,
   '/feltmodus': /Feltmodus/i,
+  '/egenberedskap': /^Egenberedskap$/i,
   '/personvern': /Lokal profil og personvern/i,
   '/release': /Innsats-app pilot/i,
   '/kildegjennomgang': /Kildegjennomgang/i,

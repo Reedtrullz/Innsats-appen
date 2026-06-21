@@ -106,6 +106,15 @@ export const ChecklistItemSchema = z.object({
   label: z.string().min(1),
   required: z.boolean().default(false),
   sourceIds: z.array(z.string().min(1)).default([]),
+  /**
+   * Role-lens depth (rollelinse): the minimum role group this step is *for*.
+   * Crew (`mannskap`) see steps tagged `lagforer`/`leder` as locked, never
+   * hidden — planning and decision steps belong to higher roles. Omitted means
+   * the step is shown unlocked to every role.
+   */
+  minRoleGroup: z.enum(['lagforer', 'leder']).optional(),
+  /** Caption shown on a locked step, e.g. "Planlegging — vises for lagfører/leder". */
+  roleNote: z.string().min(1).optional(),
 });
 
 export const OperationalChecklistSchema = z.object({

@@ -38,7 +38,9 @@ export function RoleProvider({ children }: { children: ReactNode }) {
 
   const setPreferredRole = useCallback((newRole: LocalProfileRole) => {
     try {
-      const updated = saveLocalProfile({ preferredRole: newRole });
+      // Merge with the stored profile so selecting a role preserves mode,
+      // display name and other fields (saveLocalProfile replaces, not merges).
+      const updated = saveLocalProfile({ ...(readLocalProfile() ?? {}), preferredRole: newRole });
       setRole(updated.preferredRole);
     } catch {
       setRole(newRole);

@@ -13,6 +13,15 @@ export const MAX_COMPETENCE_REMINDERS = 12;
 
 export type LocalProfileRole = Role | 'ikke-valgt';
 
+/**
+ * App mode (board: Personlig vs Innsats). Shares the operational design
+ * foundation and the same bottom nav; only the home content and tempo change.
+ * Defaults to the operational mode so returning users land where they were.
+ */
+export type AppMode = 'innsats' | 'personlig';
+export const APP_MODES: readonly AppMode[] = ['innsats', 'personlig'] as const;
+export const DEFAULT_APP_MODE: AppMode = 'innsats';
+
 export type LocalPinLock = {
   algorithm: 'PBKDF2-SHA-256';
   saltBase64: string;
@@ -35,6 +44,7 @@ export type LocalProfile = {
   displayName: string;
   callsign: string;
   preferredRole: LocalProfileRole;
+  mode: AppMode;
   pinLock?: LocalPinLock;
   encryptedProfilePayload?: EncryptedLocalProfilePayload;
   updatedAt: string;
@@ -167,6 +177,10 @@ function sanitizeRole(value: unknown): LocalProfileRole {
   return roles.includes(role as Role) ? role as LocalProfileRole : 'ikke-valgt';
 }
 
+function sanitizeMode(value: unknown): AppMode {
+  return APP_MODES.includes(value as AppMode) ? value as AppMode : DEFAULT_APP_MODE;
+}
+
 function sanitizePositiveDays(value: unknown, fallback: number): number {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
@@ -218,6 +232,7 @@ export function sanitizeLocalProfile(input: unknown, now = new Date().toISOStrin
     displayName: sanitizeLocalProfileText(record.displayName),
     callsign: sanitizeLocalProfileText(record.callsign, 32),
     preferredRole: sanitizeRole(record.preferredRole),
+    mode: sanitizeMode(record.mode),
     ...(pinLock ? { pinLock } : {}),
     ...(encryptedProfilePayload ? { encryptedProfilePayload } : {}),
     updatedAt: sanitizeLocalProfileText(record.updatedAt, 40) || now,

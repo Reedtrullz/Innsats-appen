@@ -4,6 +4,7 @@ import { ACTIVE_MISSION_STORAGE_KEY } from '@/lib/mission/active-mission-selecti
 import { OFFLINE_MAP_CACHE_EVENT, OFFLINE_MAP_CACHE_STORAGE_KEY, normalizeCachedOfflineMapPackage } from '@/lib/maps/offline-map';
 import { OPERATIONS_MAP_EVENT, OPERATIONS_MAP_STORAGE_KEY, normalizeMissionMapState, retainMissionMapObjects } from '@/lib/maps/operations-map';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
+import { PERSONAL_PREP_STORAGE_KEY, sanitizePersonalPrepState } from '@/lib/personlig/personal-prep-store';
 import {
   DB_NAME,
   LOCAL_MISSION_DB_VERSION,
@@ -46,6 +47,7 @@ export const LOCAL_DATA_STORE_KEYS = [
   EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY,
   RELEASE_READINESS_STORAGE_KEY,
   ACTIVE_MISSION_STORAGE_KEY,
+  PERSONAL_PREP_STORAGE_KEY,
 ] as const;
 
 export type LocalDataStoreKey = typeof LOCAL_DATA_STORE_KEYS[number];
@@ -444,6 +446,7 @@ function normalizeAllowedLocalStorageValue(key: LocalDataStoreKey, value: string
     return JSON.stringify(readLocalAuditLog(storageForValue(key, value)));
   }
   if (key === RELEASE_READINESS_STORAGE_KEY) return JSON.stringify(normalizeReleaseReadinessPlan(parsedValue));
+  if (key === PERSONAL_PREP_STORAGE_KEY) return JSON.stringify(sanitizePersonalPrepState(parsedValue));
   return undefined;
 }
 

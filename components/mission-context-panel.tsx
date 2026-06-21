@@ -7,6 +7,7 @@ import { phaseLabels, roleLabels, roles, scenarioLabels, scenarios, phases, type
 import { archiveMission, clearArchivedMissions, clearLocalMissionData, deleteArchivedMission, listArchivedMissions, listMissions, saveMission } from '@/lib/mission/local-store';
 import { readSelectedActiveMissionId, saveSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/active-mission-selection';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
+import { resetPersonalPrep } from '@/lib/personlig/personal-prep-store';
 import type { MissionContext } from '@/lib/mission/schemas';
 import { findSensitiveOperationalTextInValue, sensitiveTextFieldError } from '@/lib/privacy/sensitive-text';
 import { useRole } from '@/lib/role/role-context';
@@ -112,6 +113,7 @@ export function MissionContextPanel({ mode = 'list', contentVersion, checklists,
 
   async function reset() {
     await clearLocalMissionData();
+    resetPersonalPrep();
     appendLocalAuditEntry('local-reset', { resetScope: 'mission-data' });
     latestMissionsRef.current = [];
     saveSelectedActiveMissionId(null);
