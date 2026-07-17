@@ -2,6 +2,7 @@ import { FIELD_FEEDBACK_STORAGE_KEY, FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAG
 import { EXTERNAL_DATA_SOURCE_SETTINGS_EVENT, EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY, normalizeExternalDataSourceSettings } from '@/lib/integrations/source-settings';
 import { ACTIVE_MISSION_STORAGE_KEY } from '@/lib/mission/active-mission-selection';
 import { OFFLINE_MAP_CACHE_EVENT, OFFLINE_MAP_CACHE_STORAGE_KEY, normalizeCachedOfflineMapPackage } from '@/lib/maps/offline-map';
+import { MAP_PACKAGE_SELECTION_EVENT, MAP_PACKAGE_SELECTION_STORAGE_KEY, normalizeMapPackageSelection } from '@/lib/maps/map-package-selection';
 import { OPERATIONS_MAP_EVENT, OPERATIONS_MAP_STORAGE_KEY, normalizeMissionMapState, retainMissionMapObjects } from '@/lib/maps/operations-map';
 import { assertNoSensitiveOperationalTextInValue } from '@/lib/privacy/sensitive-text';
 import { PERSONAL_PREP_STORAGE_KEY, sanitizePersonalPrepState } from '@/lib/personlig/personal-prep-store';
@@ -44,6 +45,7 @@ export const LOCAL_DATA_STORE_KEYS = [
   FIELD_FEEDBACK_STORAGE_KEY,
   OPERATIONS_MAP_STORAGE_KEY,
   OFFLINE_MAP_CACHE_STORAGE_KEY,
+  MAP_PACKAGE_SELECTION_STORAGE_KEY,
   EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY,
   RELEASE_READINESS_STORAGE_KEY,
   ACTIVE_MISSION_STORAGE_KEY,
@@ -206,6 +208,7 @@ function emitLocalDataImportEvents(): void {
     FIELD_MODE_STORAGE_EVENT,
     OPERATIONS_MAP_EVENT,
     OFFLINE_MAP_CACHE_EVENT,
+    MAP_PACKAGE_SELECTION_EVENT,
     EXTERNAL_DATA_SOURCE_SETTINGS_EVENT,
   ]) {
     window.dispatchEvent(new Event(eventName));
@@ -439,6 +442,7 @@ function normalizeAllowedLocalStorageValue(key: LocalDataStoreKey, value: string
     if (!normalized) throw new Error(`Local import rejected: localStorage.${key} has invalid offline map cache data.`);
     return JSON.stringify(normalized);
   }
+  if (key === MAP_PACKAGE_SELECTION_STORAGE_KEY) return JSON.stringify(normalizeMapPackageSelection(parsedValue));
   if (key === EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY) return JSON.stringify(normalizeExternalDataSourceSettings(parsedValue));
   if (key === LOCAL_RETENTION_STORAGE_KEY) return JSON.stringify(readRetentionSettings(storageForValue(key, value)));
   if (key === LOCAL_AUDIT_LOG_STORAGE_KEY) {

@@ -56,12 +56,15 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
     location: 'Skjematisk øvingsområde',
   });
 
+  await page.goto('/data-pa-enheten');
+  await expect(page.getByRole('heading', { name: /Kartdata og offline/i })).toBeVisible();
+  await page.getByRole('combobox', { name: /Velg skjematisk kartpakke/i }).selectOption('trondelag-oversikt');
+  await expect(page.getByRole('combobox', { name: /Velg lokal kartpakke/i })).toBeVisible();
+
   await page.goto('/kart');
   await expect(page.getByRole('heading', { name: 'Kart', exact: true })).toBeVisible();
   await expect(page.getByText(new RegExp(`Aktivt oppdrag: ${missionTitle}`))).toBeVisible();
-  await page.getByRole('combobox', { name: /Velg skjematisk kartpakke/i }).selectOption('trondelag-oversikt');
   await expect(page.getByTestId('map-performance-guard')).toContainText(/viser maks 12/i);
-  await expect(page.getByRole('combobox', { name: /Velg lokal kartpakke/i })).toBeVisible();
   await page.getByRole('combobox', { name: /Markørtype/i }).selectOption('hazard');
   await page.getByPlaceholder(/Sanitert lokal etikett/i).fill(markerLabel);
   await page.getByRole('spinbutton', { name: /X 0-100/i }).fill('22');

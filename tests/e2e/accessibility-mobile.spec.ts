@@ -6,7 +6,7 @@ import { clearBrowserLocalState, createLocalMission, openMissionDetails, openMis
 
 test.use({ viewport: { width: 360, height: 740 }, isMobile: true, hasTouch: true });
 
-const mobileLayoutRoutes = ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/hjelp', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/under', '/etter', '/feltmodus', '/moduler/tilfluktsrom', '/release'];
+const mobileLayoutRoutes = ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/hjelp', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/data-pa-enheten', '/under', '/etter', '/feltmodus', '/moduler/tilfluktsrom', '/release'];
 
 async function expectNoHorizontalOverflow(page: import('@playwright/test').Page) {
   const overflow = await page.evaluate(() => ({
@@ -41,7 +41,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('critical mobile routes have no automated WCAG A/AA accessibility violations', async ({ page }) => {
-  for (const route of ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/hjelp', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/feltmodus', '/release']) {
+  for (const route of ['/', '/sok', '/oppdrag', '/hurtigkort', '/mer', '/hjelp', '/kort/tilfluktsrom-klargjoring', '/oppdrag/ny', '/kart', '/data-pa-enheten', '/feltmodus', '/release']) {
     await page.goto(route);
     if (route === '/release') {
       await expect(page.getByRole('heading', { name: /Pilotklar sjekkliste/i })).toBeVisible();
@@ -187,7 +187,7 @@ test('mission and local export form controls have accessible labels', async ({ p
 });
 
 test('map and field-mode controls expose screen-reader labels', async ({ page }) => {
-  await page.goto('/kart');
+  await page.goto('/data-pa-enheten');
   const mapPackageRegion = page.getByRole('region', { name: /Lokale kartpakker/i });
   await expect(mapPackageRegion.getByRole('combobox', { name: /Velg skjematisk kartpakke/i })).toBeVisible();
   // Approved OSM-derived PMTiles packages expose a labelled selector and save control.
@@ -195,6 +195,12 @@ test('map and field-mode controls expose screen-reader labels', async ({ page })
   await mapPackageRegion.getByRole('combobox', { name: /Velg lokal kartpakke/i }).selectOption('trondheim-osm');
   await expect(page.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toBeVisible();
 
+  const exportRegion = page.getByRole('region', { name: /Kart eksport og import/i });
+  await expect(exportRegion.getByRole('button', { name: /Lag kartbilde/i })).toBeVisible();
+  await expect(exportRegion.getByRole('button', { name: /Lag GeoJSON eksport/i })).toBeVisible();
+  await expect(exportRegion.getByRole('textbox', { name: /Importer GeoJSON/i })).toBeVisible();
+
+  await page.goto('/kart');
   const markerRegion = page.getByRole('region', { name: /Lokale markører og lag/i });
   await expect(markerRegion.getByRole('combobox', { name: /Markørtype/i })).toBeVisible();
   await expect(markerRegion.getByRole('textbox', { name: /Etikett/i })).toBeVisible();
@@ -208,11 +214,6 @@ test('map and field-mode controls expose screen-reader labels', async ({ page })
   const drawingRegion = page.getByRole('region', { name: /Tegneverktøy og sektorer/i });
   await expect(drawingRegion.getByRole('combobox', { name: /Tegnetype/i })).toBeVisible();
   await expect(drawingRegion.getByRole('textbox', { name: /Tegnekoordinater/i })).toBeVisible();
-
-  const exportRegion = page.getByRole('region', { name: /Kart eksport og import/i });
-  await expect(exportRegion.getByRole('button', { name: /Lag kartbilde/i })).toBeVisible();
-  await expect(exportRegion.getByRole('button', { name: /Lag GeoJSON eksport/i })).toBeVisible();
-  await expect(exportRegion.getByRole('textbox', { name: /Importer GeoJSON/i })).toBeVisible();
 
   await page.goto('/feltmodus');
   const fieldQuickActions = page.getByRole('region', { name: /Én trykkflate til operativt arbeid/i });

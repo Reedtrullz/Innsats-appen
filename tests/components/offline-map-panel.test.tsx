@@ -140,9 +140,9 @@ function mission(overrides: Partial<MissionContext> = {}): MissionContext {
 }
 
 
-async function renderOfflineMapPanel(): Promise<RenderResult> {
+async function renderOfflineMapPanel(variant: 'operations' | 'administration' | 'combined' = 'combined'): Promise<RenderResult> {
   const { OfflineMapPanel } = await import('@/components/offline-map-panel');
-  const result = render(<OfflineMapPanel />);
+  const result = render(<OfflineMapPanel variant={variant} />);
   await flushAsyncEffects();
   return result;
 }
@@ -166,7 +166,7 @@ it('renders a static offline map with attribution and local-only limitations', a
 });
 
 it('presents a compact map tool sheet and routes package administration to device data', async () => {
-  await renderOfflineMapPanel();
+  await renderOfflineMapPanel('operations');
 
   const tools = screen.getByRole('navigation', { name: /Kartverktøy/i });
   expect(within(tools).getByRole('link', { name: 'Markør' })).toHaveAttribute('href', '#map-marker-tool');
@@ -174,6 +174,8 @@ it('presents a compact map tool sheet and routes package administration to devic
   expect(within(tools).getByRole('link', { name: 'Sektor' })).toHaveAttribute('href', '#map-drawing-tool');
   expect(within(tools).getByRole('link', { name: 'Lag' })).toHaveAttribute('href', '#map-layer-tool');
   expect(screen.getByRole('link', { name: /Administrer kartdata/i })).toHaveAttribute('href', '/data-pa-enheten');
+  expect(screen.queryByRole('region', { name: /Lokale kartpakker/i })).not.toBeInTheDocument();
+  expect(screen.queryByRole('region', { name: /Kart eksport og import/i })).not.toBeInTheDocument();
 });
 
 it('shows map work actions before advanced local map package controls', async () => {

@@ -3,6 +3,7 @@ import { FIELD_MODE_STORAGE_EVENT, FIELD_MODE_STORAGE_KEY, FIELD_FEEDBACK_STORAG
 import { EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY } from '@/lib/integrations/source-settings';
 import { ACTIVE_MISSION_STORAGE_KEY } from '@/lib/mission/active-mission-selection';
 import { OFFLINE_MAP_CACHE_STORAGE_KEY } from '@/lib/maps/offline-map';
+import { MAP_PACKAGE_SELECTION_STORAGE_KEY } from '@/lib/maps/map-package-selection';
 import { OPERATIONS_MAP_STORAGE_KEY } from '@/lib/maps/operations-map';
 import {
   LOCAL_DATA_EXPORT_KIND,
@@ -90,6 +91,7 @@ it('exposes schema/export versions and allowlisted localStorage keys', () => {
   expect(LOCAL_DATA_STORE_KEYS).not.toContain(LOCAL_COMPETENCE_REMINDERS_STORAGE_KEY);
   expect(LOCAL_DATA_STORE_KEYS).toContain(FIELD_MODE_STORAGE_KEY);
   expect(LOCAL_DATA_STORE_KEYS).toContain(ACTIVE_MISSION_STORAGE_KEY);
+  expect(LOCAL_DATA_STORE_KEYS).toContain(MAP_PACKAGE_SELECTION_STORAGE_KEY);
 });
 
 it('migrates legacy v0 export shapes and stored mission records to current v1', () => {
@@ -214,6 +216,7 @@ it('normalizes allowed localStorage import values before writing', async () => {
         drawings: [],
       }),
       [OFFLINE_MAP_CACHE_STORAGE_KEY]: JSON.stringify({ packageId: 'ovelse-liten', title: 'tampered', estimatedSizeMb: 999, version: 3, cachedAt: '2026-06-04T12:00:00.000Z', runtimeFormat: 'evil' }),
+      [MAP_PACKAGE_SELECTION_STORAGE_KEY]: JSON.stringify({ schematicPackageId: 'trondelag-oversikt', pmtilesPackageId: 'trondheim-osm', unknown: 'drop' }),
       [EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY]: JSON.stringify({ kartverket: false, met: 'no', nve: true, extra: 'drop' }),
       [LOCAL_RETENTION_STORAGE_KEY]: JSON.stringify({ missionRetentionDays: 7.4, archiveRetentionDays: '45', profileRetentionDays: 'bad', auditRetentionDays: 0, updatedAt: '2026-06-04T12:00:00.000Z', extra: 'drop' }),
       [LOCAL_AUDIT_LOG_STORAGE_KEY]: JSON.stringify([{ id: 'audit-1', type: 'local-reset', createdAt: '2026-06-04T12:00:00.000Z', details: { resetScope: 'mission-data', unknown: 'drop', backupBytes: 1200 } }]),
@@ -243,6 +246,7 @@ it('normalizes allowed localStorage import values before writing', async () => {
   expect(JSON.parse(storage.getItem(FIELD_FEEDBACK_STORAGE_KEY) ?? '[]')).toEqual([{ id: 'fb-1', createdAt: '2026-06-04T12:00:00.000Z', conditions: '<regn>', observations: 'obs', blockers: 'ingen', suggestedChange: 'større knapper' }]);
   expect(JSON.parse(storage.getItem(OPERATIONS_MAP_STORAGE_KEY) ?? '{}').markers.map((marker: { id: string }) => marker.id)).toEqual(['map-a', 'map-legacy']);
   expect(JSON.parse(storage.getItem(OFFLINE_MAP_CACHE_STORAGE_KEY) ?? '{}')).toMatchObject({ packageId: 'ovelse-liten', title: 'Øvelse liten pakke', estimatedSizeMb: 6, runtimeFormat: 'schematic' });
+  expect(JSON.parse(storage.getItem(MAP_PACKAGE_SELECTION_STORAGE_KEY) ?? '{}')).toEqual({ schematicPackageId: 'trondelag-oversikt', pmtilesPackageId: 'trondheim-osm' });
   expect(JSON.parse(storage.getItem(EXTERNAL_DATA_SOURCE_SETTINGS_STORAGE_KEY) ?? '{}')).toEqual({ kartverket: false, met: true, nve: true });
   expect(JSON.parse(storage.getItem(LOCAL_RETENTION_STORAGE_KEY) ?? '{}')).toMatchObject({ missionRetentionDays: 7, archiveRetentionDays: 45, profileRetentionDays: 365, auditRetentionDays: 1 });
   expect(JSON.parse(storage.getItem(LOCAL_AUDIT_LOG_STORAGE_KEY) ?? '[]')).toEqual([{ id: 'audit-1', type: 'local-reset', createdAt: '2026-06-04T12:00:00.000Z', details: { resetScope: 'mission-data', backupBytes: 1200 } }]);
@@ -298,11 +302,15 @@ it('rejects malformed allowed localStorage JSON and drops active mission ids mis
 it('reads only known localStorage keys for backup', () => {
   const storage = new MemoryStorage();
   storage.setItem(FIELD_MODE_STORAGE_KEY, '{"enabled":true}');
+  storage.setItem(MAP_PACKAGE_SELECTION_STORAGE_KEY, '{"schematicPackageId":"trondelag-oversikt"}');
   storage.setItem(LOCAL_PROFILE_STORAGE_KEY, '{"schemaVersion":1,"profileEnabled":true,"displayName":"ALFA"}');
   storage.setItem(LOCAL_COMPETENCE_REMINDERS_STORAGE_KEY, '[{"id":"reminder-1","label":"Pumpe"}]');
   storage.setItem('random-third-party-key', 'must not export');
 
-  expect(readKnownLocalStorage(storage)).toEqual({ [FIELD_MODE_STORAGE_KEY]: '{"enabled":true}' });
+  expect(readKnownLocalStorage(storage)).toEqual({
+    [FIELD_MODE_STORAGE_KEY]: '{"enabled":true}',
+    [MAP_PACKAGE_SELECTION_STORAGE_KEY]: '{"schematicPackageId":"trondelag-oversikt"}',
+  });
 });
 
 it('formats storage quota status with warning and unknown fallbacks', () => {

@@ -4,8 +4,6 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react';
 import {
-  OFFLINE_MAP_ATTRIBUTION,
-  OFFLINE_MAP_LIMITATION_COPY,
   OFFLINE_MAP_PACKAGES,
   cacheSizeWarningForPackage,
   getOfflineMapPackage,
@@ -23,15 +21,11 @@ import {
 } from '@/lib/maps/offline-map-package-manifest';
 import { cacheLocalMapPackageAssets } from '@/lib/maps/map-package-cache';
 import {
-  BLUE_FORCE_TRACKING_RESEARCH,
   DEFAULT_ENABLED_MAP_LAYERS,
-  KML_IMPORT_EVALUATION,
-  LOCATION_EXPORT_PRIVACY_WARNING,
   MAP_DRAWING_KINDS,
   MAP_DRAWING_LABELS,
   MAP_MARKER_KINDS,
   MAP_MARKER_LABELS,
-  QR_SECTOR_IMPORT_DESIGN,
   SCHEMATIC_GEOJSON_COORDINATE_SYSTEM,
   buildMapImageSvg,
   createMissionMapDrawing,
@@ -75,6 +69,8 @@ import { getMission, listMissions, saveMission } from '@/lib/mission/local-store
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import { SchematicMap } from '@/components/offline-map/schematic-map';
 import { MapToolSheet, type SpecialistMapTool } from '@/components/offline-map/map-tool-sheet';
+import { MapAdministrationSurface } from '@/components/offline-map/map-administration-surface';
+import { mapPackageSelectionSnapshot, parseMapPackageSelection, subscribeMapPackageSelection, writeMapPackageSelection } from '@/lib/maps/map-package-selection';
 import { SENSITIVE_TEXT_EXPLANATIONS, SensitiveTextError, detectSensitiveOperationalText, sensitiveTextFieldError, type SensitiveTextMatch } from '@/lib/privacy/sensitive-text';
 import {
   geoJsonImportBlockedMapTextKinds,
@@ -171,11 +167,13 @@ function parseMarkerEditCoordinate(value: string) {
   return Number.isFinite(coordinate) && coordinate >= 0 && coordinate <= 100 ? coordinate : null;
 }
 
-export function OfflineMapPanel() {
+export function OfflineMapPanel({ variant = 'operations' }: { variant?: 'operations' | 'administration' | 'combined' }) {
   const cacheSnapshot = useSyncExternalStore(subscribeOfflineMapCache, offlineMapCacheSnapshot, () => 'null');
   const cachedPackage = useMemo(() => parseCachedOfflineMapPackage(cacheSnapshot), [cacheSnapshot]);
-  const [selectedSchematicPackageId, setSelectedSchematicPackageId] = useState<string>(OFFLINE_MAP_PACKAGES[0].id);
-  const [selectedPmtilesPackageId, setSelectedPmtilesPackageId] = useState<string>(approvedLocalMapPackages[0]?.id ?? '');
+  const packageSelectionSnapshot = useSyncExternalStore(subscribeMapPackageSelection, mapPackageSelectionSnapshot, () => '{}');
+  const packageSelection = useMemo(() => parseMapPackageSelection(packageSelectionSnapshot), [packageSelectionSnapshot]);
+  const selectedSchematicPackageId = packageSelection.schematicPackageId ?? OFFLINE_MAP_PACKAGES[0].id;
+  const selectedPmtilesPackageId = packageSelection.pmtilesPackageId ?? approvedLocalMapPackages[0]?.id ?? '';
   const mapStateSnapshot = useSyncExternalStore(subscribeMissionMapState, missionMapStateSnapshot, () => JSON.stringify({ markers: [], drawings: [] }));
   const mapState = useMemo(() => {
     try {
@@ -223,7 +221,6 @@ export function OfflineMapPanel() {
 
   const selectedSchematicPackage = getOfflineMapPackage(selectedSchematicPackageId) ?? OFFLINE_MAP_PACKAGES[0];
   const selectedPmtilesPackage = approvedLocalMapPackages.find((mapPackage) => mapPackage.id === selectedPmtilesPackageId) ?? approvedLocalMapPackages[0];
-  const hasApprovedPmtilesPackages = approvedLocalMapPackages.length > 0;
   const selectedWarning = selectedPmtilesPackage ? cacheSizeWarningForPackage(selectedPmtilesPackage) : null;
   const selectedQuotaCopy = selectedPmtilesPackage ? offlineMapQuotaCopy({
     estimatedSizeMb: selectedPmtilesPackage.estimatedSizeMb,
@@ -313,12 +310,12 @@ export function OfflineMapPanel() {
   }
 
   function selectSchematicPackage(packageId: string) {
-    setSelectedSchematicPackageId(packageId);
+    writeMapPackageSelection({ ...packageSelection, schematicPackageId: packageId });
   }
 
   function selectPmtilesPackage(packageId: string) {
     latestSelectedPackageIdRef.current = packageId;
-    setSelectedPmtilesPackageId(packageId);
+    writeMapPackageSelection({ ...packageSelection, pmtilesPackageId: packageId });
   }
 
   async function cacheSelectedPackage() {
@@ -782,6 +779,35 @@ export function OfflineMapPanel() {
     }
   }
 
+  const administrationSurface = (
+    <MapAdministrationSurface
+      selectedSchematicPackage={selectedSchematicPackage}
+      selectedPmtilesPackage={selectedPmtilesPackage}
+      approvedPmtilesPackages={approvedLocalMapPackages}
+      selectedWarning={selectedWarning}
+      selectedQuotaCopy={selectedQuotaCopy}
+      cachedPackage={cachedPackage}
+      cacheSaving={mapPackageCacheSaving}
+      showRuntimeStatus={variant === 'administration'}
+      statusMessage={statusMessage}
+      privacyError={mapPrivacyError}
+      imageExport={imageExport}
+      geoJsonExport={geoJsonExport}
+      geoJsonImport={geoJsonImport}
+      primaryButtonClass={primaryButtonClass}
+      onSelectSchematicPackage={selectSchematicPackage}
+      onSelectPmtilesPackage={selectPmtilesPackage}
+      onCacheSelectedPackage={() => void cacheSelectedPackage()}
+      onResetCache={resetCache}
+      onExportSvg={exportSvg}
+      onExportGeoJson={exportGeoJson}
+      onGeoJsonImportChange={setGeoJsonImport}
+      onImportGeoJson={importGeoJson}
+    />
+  );
+
+  if (variant === 'administration') return administrationSurface;
+
   return (
     <section className="space-y-5" aria-label="Offline kart">
       <div className="rounded-3xl bg-sky-950 p-5 text-white">
@@ -1180,104 +1206,7 @@ export function OfflineMapPanel() {
         </div>
       </section>
 
-      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Lokale kartpakker">
-        <div>
-          <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Avansert kartoppsett</p>
-          <h2 className="text-2xl font-black">Velg skjematisk område og lokal kartpakke</h2>
-          <p className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">
-            Skjematiske lokalkart fungerer alltid offline i appen. Godkjente lokale kartpakker kan lagres på enheten for bruk uten nett. Ingen kart deles med oppdrag eller andre enheter.
-          </p>
-        </div>
-        <Link href="/data-pa-enheten" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-black text-slate-950">Åpne Data og offline</Link>
-        <label className="block text-sm font-black text-slate-800" htmlFor="offline-schematic-map-package">Velg skjematisk kartpakke</label>
-        <select id="offline-schematic-map-package" aria-label="Velg skjematisk kartpakke" value={selectedSchematicPackage.id} onChange={(event) => selectSchematicPackage(event.target.value)} className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-3 text-base font-semibold text-slate-950">
-          {OFFLINE_MAP_PACKAGES.map((mapPackage) => (
-            <option key={mapPackage.id} value={mapPackage.id}>
-              {mapPackage.title} ({mapPackage.estimatedSizeMb} MB skjematisk)
-            </option>
-          ))}
-        </select>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700">
-          <p className="font-black text-slate-950">{selectedSchematicPackage.title}</p>
-          <p className="mt-1">Område: {selectedSchematicPackage.district}</p>
-          <p className="mt-1">{selectedSchematicPackage.description}</p>
-          <p className="mt-1">Skjematisk anslag: {selectedSchematicPackage.estimatedSizeMb} MB. Versjon: {selectedSchematicPackage.version}.</p>
-          <p className="mt-3 rounded-xl bg-sky-50 p-3 font-black text-sky-950">Skjematisk kart beholdes som reserve når lokal kartpakke ikke er lagret eller aktivert.</p>
-        </div>
-
-        {hasApprovedPmtilesPackages && selectedPmtilesPackage ? (
-          <>
-            <label className="block text-sm font-black text-slate-800" htmlFor="offline-map-package">Velg lokal kartpakke</label>
-            <select id="offline-map-package" aria-label="Velg lokal kartpakke" value={selectedPmtilesPackage.id} onChange={(event) => selectPmtilesPackage(event.target.value)} className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-3 text-base font-semibold text-slate-950">
-              {approvedLocalMapPackages.map((mapPackage) => (
-                <option key={mapPackage.id} value={mapPackage.id}>
-                  {mapPackage.title} (lokal PMTiles)
-                </option>
-              ))}
-            </select>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700">
-              <p className="font-black text-slate-950">{selectedPmtilesPackage.title}</p>
-              <p className="mt-1">Godkjent lokal kartpakke fra app-lokal fil.</p>
-              <p className="mt-1">PMTiles: {selectedPmtilesPackage.url}. Stil: {selectedPmtilesPackage.styleUrl}.</p>
-              <p className="mt-1">Skjematisk kart beholdes som reserve når lokal kartpakke ikke er lagret eller aktivert.</p>
-              <p className="mt-1">Anslått lokal lagring: {selectedPmtilesPackage.estimatedSizeMb} MB. Versjon: {selectedPmtilesPackage.version}.</p>
-              {selectedWarning ? <p className="mt-3 rounded-xl bg-orange-100 p-3 font-black text-orange-950">{selectedWarning}</p> : null}
-              <p className="mt-3 rounded-xl bg-sky-50 p-3 font-black text-sky-950" data-testid="offline-map-quota-copy">{selectedQuotaCopy}</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <button type="button" onClick={() => void cacheSelectedPackage()} disabled={mapPackageCacheSaving} className="min-h-11 rounded-xl bg-sky-900 px-4 font-black text-white disabled:cursor-wait disabled:bg-slate-500">{mapPackageCacheSaving ? 'Lagrer kartpakke lokalt...' : 'Lagre valgt kartpakke lokalt'}</button>
-              <button type="button" onClick={resetCache} className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 font-black text-slate-950">Tilbakestill kartcache</button>
-            </div>
-          </>
-        ) : (
-          <p className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm font-semibold text-amber-950">
-            Ingen godkjente lokale kartpakker er tilgjengelige ennå. Det skjematiske lokalkartet fungerer fortsatt offline; full kartpakke krever egen kilde-, lisens- og pilotgodkjenning før lokal lagring.
-          </p>
-        )}
-
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700" data-testid="offline-map-cache-status">
-          {cachedPackage ? (
-            <>
-              <p>Lagret lokalt: {cachedPackage.title} ({cachedPackage.estimatedSizeMb} MB), versjon {cachedPackage.version}. Lagret {cachedPackage.cachedAt.slice(0, 10)}.</p>
-              <p>Lokal kartpakke aktiv: {cachedPackage.title}{cachedPackage.runtimeFormat === 'pmtiles' ? ' (lokal PMTiles)' : ' (skjematisk reserve)'}</p>
-            </>
-          ) : <p>Ingen kartpakke er lagret lokalt.</p>}
-        </div>
-      </section>
-
-      <section className="space-y-4 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-sm font-semibold text-amber-950" aria-label="Personvern ved kartdata">
-        <h2 className="text-xl font-black">Personvern ved kartdata</h2>
-        <p>{LOCATION_EXPORT_PRIVACY_WARNING}</p>
-        <p>Bruk skjematiske 0-100-koordinater. Ikke skriv ekte adresser, personnavn, pasientdata eller skjermede posisjoner.</p>
-      </section>
-
-      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Kart eksport og import">
-        <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Eksport/import</p>
-        <h2 className="text-2xl font-black">Lokal SVG og GeoJSON</h2>
-        <p className="rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">{LOCATION_EXPORT_PRIVACY_WARNING}</p>
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <button type="button" onClick={exportSvg} className={`${primaryButtonClass} w-full sm:w-auto`}>Lag kartbilde (SVG)</button>
-          <button type="button" onClick={exportGeoJson} className={`${primaryButtonClass} w-full sm:w-auto`}>Lag GeoJSON eksport</button>
-        </div>
-        <label className="block text-sm font-bold">Kartbilde SVG<textarea id="map-image-export" readOnly value={imageExport} className="mt-1 min-h-32 w-full rounded-xl border p-3 font-mono text-xs" /></label>
-        <label className="block text-sm font-bold">GeoJSON eksport<textarea id="map-geojson-export" readOnly value={geoJsonExport} className="mt-1 min-h-32 w-full rounded-xl border p-3 font-mono text-xs" /></label>
-        <label className="block text-sm font-bold">Importer sanitert GeoJSON<textarea aria-label="Importer GeoJSON" value={geoJsonImport} onChange={(event) => setGeoJsonImport(event.target.value)} className="mt-1 min-h-32 w-full rounded-xl border p-3 font-mono text-xs" placeholder="Lim inn FeatureCollection med skjematiske 0-100-koordinater" /></label>
-        <button type="button" onClick={importGeoJson} className="min-h-11 rounded-xl border border-slate-300 px-4 font-black text-slate-950">Importer GeoJSON lokalt</button>
-      </section>
-
-      <section className="space-y-3 rounded-3xl border border-slate-200 bg-white p-5 text-sm font-semibold text-slate-700" aria-label="Fremtidige kartvalg">
-        <h2 className="text-xl font-black text-slate-950">Fremtidige kartvalg</h2>
-        <p><span className="font-black">KML:</span> {KML_IMPORT_EVALUATION.decision}</p>
-        <p><span className="font-black">QR/fil for sektor:</span> {QR_SECTOR_IMPORT_DESIGN.summary}</p>
-        <p><span className="font-black">Blue-force/live posisjon:</span> {BLUE_FORCE_TRACKING_RESEARCH.decision}</p>
-      </section>
-
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 text-sm font-semibold text-slate-700">
-        <h2 className="text-xl font-black text-slate-950">Attribusjon og begrensninger</h2>
-        <p className="mt-2">{OFFLINE_MAP_ATTRIBUTION}</p>
-        <p className="mt-2">{OFFLINE_MAP_LIMITATION_COPY}</p>
-        <p className="mt-2">Appen bruker bare godkjente lokale kartpakker når de er lagret på enheten. Den bruker ikke rå kartdata fra eksterne kilder eller delt live-posisjon.</p>
-      </section>
+      {variant === 'combined' ? administrationSurface : null}
     </section>
   );
 }

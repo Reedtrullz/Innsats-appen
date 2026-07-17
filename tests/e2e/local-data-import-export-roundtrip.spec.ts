@@ -25,6 +25,7 @@ test('exports local app data and imports it back to restore mission and checklis
 
   await page.goto('/data-pa-enheten');
   await expect(page.getByRole('heading', { name: /Data lagret på denne enheten/i })).toBeVisible();
+  await page.getByRole('combobox', { name: /Velg skjematisk kartpakke/i }).selectOption('trondelag-oversikt');
   await page.getByRole('button', { name: /Lag lokal JSON-backup/i }).click();
   await expect(page.getByTestId('local-data-backup-message')).toHaveText(/JSON-backup generert/i);
   const backupText = await page.getByLabel(/^Lokal JSON backup$/i).inputValue();
@@ -56,6 +57,7 @@ test('exports local app data and imports it back to restore mission and checklis
   await page.getByLabel(/Jeg forstår at importen erstatter eksisterende lokale appdata/i).check();
   await page.getByRole('button', { name: /Importer JSON lokalt/i }).click();
   await expect(page.getByTestId('local-data-backup-message')).toHaveText(/Import fullført lokalt/i);
+  await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-map-package-selection-v1') ?? '')).toContain('trondelag-oversikt');
 
   await page.goto('/oppdrag');
   await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();

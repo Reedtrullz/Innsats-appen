@@ -1,4 +1,5 @@
 import { LocalDataBackupPanel } from '@/components/local-data-backup-panel';
+import { OfflineMapPanel } from '@/components/offline-map-panel';
 
 export default function DataOnDevicePage() {
   return (
@@ -21,6 +22,7 @@ export default function DataOnDevicePage() {
         <p className="mt-2">Data blir liggende til du sletter lokale data i appen, tømmer nettleserdata eller avinstallerer PWA-en. Eksporterte filer er manuell lokal JSON og kan inneholde operasjonelt sensitiv informasjon. Del, lagre og slett eksporterte filer etter lokale rutiner.</p>
       </section>
       <LocalDataBackupPanel />
+      <OfflineMapPanel variant="administration" />
     </article>
   );
 }

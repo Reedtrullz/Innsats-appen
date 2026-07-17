@@ -50,6 +50,9 @@ it('renders the in-app boundary, known limitations, and device data pages', asyn
   render(<DataOnDevicePage />);
   await flushAsyncEffects();
   expect(screen.getByRole('heading', { name: /Data lagret på denne enheten/i })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Kartdata og offline/i })).toBeInTheDocument();
+  expect(screen.getByRole('combobox', { name: /Velg skjematisk kartpakke/i })).toBeInTheDocument();
+  expect(screen.getByRole('region', { name: /Kart eksport og import/i })).toBeInTheDocument();
   const localStorageSection = screen.getByRole('heading', { name: /Hva lagres lokalt/i }).closest('section');
   expect(localStorageSection).not.toBeNull();
   expect(within(localStorageSection as HTMLElement).getByText(/IndexedDB/i)).toBeInTheDocument();
