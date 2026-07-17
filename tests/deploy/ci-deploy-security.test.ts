@@ -13,6 +13,10 @@ function readCiWorkflow() {
   return readWorkflow('.github/workflows/ci.yml');
 }
 
+function readStagingWorkflow() {
+  return readWorkflow('.github/workflows/staging.yml');
+}
+
 function readPackageJson() {
   return JSON.parse(readWorkflow('package.json')) as {
     scripts: Record<string, string>;
@@ -255,6 +259,29 @@ describe('CI workflow checks', () => {
     expect(workflow).toMatch(/name:\s*Validate local map packages/i);
     expect(workflow).toMatch(/npm run validate:maps/);
     expect(workflow.indexOf('npm run validate:maps')).toBeLessThan(workflow.indexOf('npm run build:app'));
+  });
+
+  it('fetches release map packages before staging checks and image build', () => {
+    const workflow = readStagingWorkflow();
+    const fetchMatches = workflow.match(/run:\s*npm run map:fetch/g) ?? [];
+    const stagingChecks = workflow.slice(
+      workflow.indexOf('staging-checks:'),
+      workflow.indexOf('build-staging-image:'),
+    );
+    const stagingImageBuild = workflow.slice(
+      workflow.indexOf('build-staging-image:'),
+      workflow.indexOf('deploy-staging:'),
+    );
+
+    expect(fetchMatches).toHaveLength(2);
+    expect(stagingChecks.indexOf('npm run map:fetch')).toBeLessThan(
+      stagingChecks.indexOf('npm run check:ci'),
+    );
+    expect(stagingImageBuild).toContain('npm run map:fetch');
+    expect(stagingImageBuild.indexOf('npm run map:fetch')).toBeLessThan(
+      stagingImageBuild.indexOf('docker/build-push-action@'),
+    );
+    expect(stagingImageBuild).toContain('NODE_VERSION=${{ env.NODE_VERSION }}');
   });
 
   it('checks tracked generated artifact freshness after content build in package CI', () => {
