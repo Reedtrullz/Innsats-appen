@@ -13,9 +13,9 @@ it('shows the operational command-surface landing page', async () => {
   expect(screen.getByRole('heading', { name: /Beredskapsboka/i })).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /Hva trenger du nå/i })).toBeInTheDocument();
   expect(screen.getByText(/lokal, kildebelagt beslutningsstøtte/i)).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: /Fortsett\/start oppdrag/i })).toHaveAttribute('href', '/oppdrag');
+  expect(screen.getByRole('link', { name: /Start oppdrag/i })).toHaveAttribute('href', '/oppdrag/ny');
+  expect(screen.getByRole('link', { name: /Finn tiltak/i })).toHaveAttribute('href', '/sok?intent=action');
   expect(screen.getAllByRole('link', { name: /^Søk/i }).some((link) => link.getAttribute('href') === '/sok')).toBe(true);
-  expect(screen.getByRole('link', { name: /Finn kritisk tiltak/i })).toHaveAttribute('href', '/kort/alvorlig-ulykke-dod-eget-personell');
   await userEvent.click(screen.getByText(/Faser og kilder/i));
   expect(screen.getByRole('link', { name: /^Før innsats$/i })).toHaveAttribute('href', '/for');
   expect(screen.getByRole('link', { name: /^Under innsats$/i })).toHaveAttribute('href', '/under');

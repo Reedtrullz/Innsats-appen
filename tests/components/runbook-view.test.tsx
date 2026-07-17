@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it } from 'vitest';
 import type { OperationalChecklist } from '@/lib/content/schemas';
@@ -134,5 +134,22 @@ it('lets the user reopen (undo) a completed step', async () => {
     const [runRecord] = await listChecklistRuns('m-runbook');
     expect(runRecord?.checkedItemIds ?? []).not.toContain('ordre');
     expect(runRecord?.skippedItemIds ?? []).not.toContain('ordre');
+  });
+});
+
+it('serializes rapid progress choices so the latest explicit choice wins', async () => {
+  await seedActiveMission();
+  render(<RunbookView checklists={checklists} />);
+  await flushAsyncEffects();
+
+  const doneButton = await screen.findByRole('button', { name: /Gjort · neste/i });
+  const skipButton = screen.getByRole('button', { name: /Hopp over/i });
+  fireEvent.click(doneButton);
+  fireEvent.click(skipButton);
+
+  await waitFor(async () => {
+    const [runRecord] = await listChecklistRuns('m-runbook');
+    expect(runRecord?.checkedItemIds ?? []).not.toContain('ordre');
+    expect(runRecord?.skippedItemIds ?? []).toContain('ordre');
   });
 });

@@ -93,7 +93,7 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await checklistItem.check();
   await expect(checklistItem).toBeChecked();
 
-  await openMissionDetails(page, /Feltlogg/i, 'Arbeid');
+  await openMissionDetails(page, /^Feltlogg$/i, 'Arbeid');
   await page.getByLabel(/Feltlogg lokasjon/i).fill('Testområde A');
   await page.getByLabel(/Feltlogg kategori/i).selectOption('hms-avvik');
   await page.getByLabel(/Feltlogg tekst/i).fill('Våt terskel observert og merket med sperrebånd.');
@@ -169,6 +169,6 @@ test('runs a full Før-Under-Etter local mission journey with real curated data'
   await expectOfflineReloadPreservesMission(page, context, missionTitle);
   await openMissionMode(page, 'Arbeid');
   await expect(page.getByRole('checkbox', { name: /Kontroller ventilasjon/i })).toBeChecked();
-  await openMissionDetails(page, /Feltlogg/i);
+  await openMissionDetails(page, /^Feltlogg$/i);
   await expect(page.locator('#feltlogg').getByText(/Våt terskel observert/i).first()).toBeVisible();
 });

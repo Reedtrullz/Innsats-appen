@@ -92,6 +92,8 @@ test('offline map page is local-only, schematic and tile-free', async ({ page, c
   await expect(page.getByTestId('operations-marker-list')).toContainText(/IL-KO — KO lokal/i);
   await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1'))).toContain('il-ko');
 
+  await page.getByText(/Spesialistverktøy og kartdata/i).click();
+  await page.getByRole('button', { name: 'Pumpe' }).click();
   const waterSupplyPlanner = page.getByRole('region', { name: /Pumpe- og slangeplanlegger/i });
   await waterSupplyPlanner.getByLabel(/Planetikett/i).fill('Skogbrann vest');
   await waterSupplyPlanner.getByLabel(/Vannkilde X-koordinat/i).fill('10');
@@ -109,6 +111,8 @@ test('offline map page is local-only, schematic and tile-free', async ({ page, c
   await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).toContain('"kind":"pump-location"');
   await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).not.toMatch(/\b\d+\s*(?:l\/min|liter\/min|bar|m3\/t)\b/i);
 
+  await page.getByRole('button', { name: 'RADIAC' }).click();
+  await expect(waterSupplyPlanner).toHaveCount(0);
   const radiacPlanner = page.getByRole('region', { name: /RADIAC målepunktplanlegger/i });
   await radiacPlanner.getByLabel(/RADIAC planetikett/i).fill('RAD nord');
   await radiacPlanner.getByLabel(/Målepunkter som x,y/i).fill('15,30 35,40 55,45');
@@ -120,6 +124,8 @@ test('offline map page is local-only, schematic and tile-free', async ({ page, c
   await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).toContain('Målerute RAD nord');
   await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).not.toMatch(/\b\d+\s*(?:µ?Sv\/h|mSv|dosegrense|oppholdstid)\b/i);
 
+  await page.getByRole('button', { name: 'Søketeig' }).click();
+  await expect(radiacPlanner).toHaveCount(0);
   const searchPlanner = page.getByRole('region', { name: /Søketeig planlegger/i });
   await searchPlanner.getByLabel(/Søketeig etikett/i).fill('Teig alfa');
   await searchPlanner.getByLabel(/Teiggrense som x,y/i).fill('10,20 42,18 48,52 14,58');
@@ -135,6 +141,8 @@ test('offline map page is local-only, schematic and tile-free', async ({ page, c
   await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).toContain('Søketeig Teig alfa');
   await expect.poll(async () => page.evaluate(() => localStorage.getItem('beredskapsboka-operations-map-v1') ?? '')).not.toMatch(/\b(?:personnummer|\+47|pasient|GPS-sporing|blue-force|sanntidsposisjon)\b/i);
 
+  await page.getByRole('button', { name: 'MRE' }).click();
+  await expect(searchPlanner).toHaveCount(0);
   const mrePlanner = page.getByRole('region', { name: /MRE ren\/uren-side planlegger/i });
   await mrePlanner.getByLabel(/MRE planetikett/i).fill('Rens nord');
   await mrePlanner.getByLabel(/Uren side som x,y/i).fill('10,20 38,18 36,46 12,48');

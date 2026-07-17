@@ -7,6 +7,8 @@ import { RelatedDemonstrationLinks } from './reference-videos';
 import { SourceBadge } from './source-badge';
 import { WarningBanner } from './warning-banner';
 import { OperationalIcon } from './ui/operational-icons';
+import { ActionCardReviewNotice } from './action-card-review-status';
+import { ActionCardMissionActions } from './action-card-mission-actions';
 
 type Authority = NonNullable<ActionCard['authority']>;
 
@@ -193,18 +195,7 @@ export function ActionCardDetail({ card, sources, images = [], referenceVideos =
         ) : null}
       </div>
       {card.warning ? <WarningBanner>{card.warning}</WarningBanner> : null}
-      {card.reviewStatus === 'pending-fagperson' ? (
-        <section className="rounded-2xl border border-[#38bdf8]/30 bg-[var(--info-surface)] px-4 py-3 text-[var(--info-fg)] shadow-sm">
-          <h2 className="flex items-center gap-2 text-base font-black">
-            <OperationalIcon name="shield" className="h-5 w-5" />
-            Til faggjennomgang
-          </h2>
-          <p className="mt-1 text-sm font-semibold">
-            Innholdet er utvidet fra kildedokumentene, men er ennå ikke faggodkjent. Bruk det som støtte, ikke som
-            fasit, og kontroller alltid mot gjeldende ordre, innsatsledelse og fagmyndighet før operativ bruk.
-          </p>
-        </section>
-      ) : null}
+      <ActionCardReviewNotice card={card} />
       {(card.doNot ?? []).length > 0 ? (
         <section className="rounded-2xl border-2 border-[#f87171]/30 bg-[var(--critical-surface)] px-4 py-3 text-[var(--critical-fg)] shadow-sm">
           <h2 className="flex items-center gap-2 text-base font-black">
@@ -217,6 +208,7 @@ export function ActionCardDetail({ card, sources, images = [], referenceVideos =
         </section>
       ) : null}
       <CompetenceGuardrail card={card} />
+      <ActionCardMissionActions cardSlug={card.slug} />
       <section className="rounded-3xl bg-[var(--surface)] p-5 shadow-sm">
         <h2 className="text-xl font-black text-[var(--text-primary)]">Tiltak</h2>
         <ol className="mt-3 list-decimal space-y-3 pl-6 text-base font-semibold leading-6 text-[var(--text-primary)] marker:font-black marker:text-[var(--accent-fg)]">

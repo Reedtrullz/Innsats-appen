@@ -1,7 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { CbrnModuleContent } from '@/app/(app)/moduler/cbrn/page';
-import { MfeModuleContent } from '@/app/(app)/moduler/mfe/page';
-import { RadiacModuleContent } from '@/app/(app)/moduler/radiac/page';
+import { SpecialistModuleContent, specialistModuleConfigs } from '@/components/specialist-module-page';
 import type { ActionCard } from '@/lib/content/schemas';
 
 const cards = [
@@ -63,7 +61,7 @@ const cards = [
 ] satisfies ActionCard[];
 
 it('shows CBRN module-specific cards and source warnings', () => {
-  render(<CbrnModuleContent cards={cards} />);
+  render(<SpecialistModuleContent cards={cards} config={specialistModuleConfigs.cbrn} />);
   expect(screen.getByRole('heading', { name: /CBRN\/CBRNE/i, level: 1 })).toBeInTheDocument();
   expect(screen.getByText(/Startkort CBRN\/CBRNE/i)).toBeInTheDocument();
   expect(screen.getAllByText(/Faglig støtte/i).length).toBeGreaterThan(0);
@@ -72,7 +70,7 @@ it('shows CBRN module-specific cards and source warnings', () => {
 });
 
 it('shows RADIAC module-specific cards and source warnings', () => {
-  render(<RadiacModuleContent cards={cards} />);
+  render(<SpecialistModuleContent cards={cards} config={specialistModuleConfigs.radiac} />);
   expect(screen.getByRole('heading', { name: /RADIAC/i, level: 1 })).toBeInTheDocument();
   expect(screen.getByText(/RADIAC dosekontroll/i)).toBeInTheDocument();
   expect(screen.getAllByText(/radiacbestemmelse/i).length).toBeGreaterThan(0);
@@ -81,7 +79,7 @@ it('shows RADIAC module-specific cards and source warnings', () => {
 });
 
 it('shows MFE module-specific cards and source warnings', () => {
-  render(<MfeModuleContent cards={cards} />);
+  render(<SpecialistModuleContent cards={cards} config={specialistModuleConfigs.mfe} />);
   expect(screen.getByRole('heading', { name: /MFE/i, level: 1 })).toBeInTheDocument();
   expect(screen.getByText(/Anmodning om MFE-støtte/i)).toBeInTheDocument();
   expect(screen.getAllByText(/gjeldende distriktets tiltakskort/i).length).toBeGreaterThan(0);

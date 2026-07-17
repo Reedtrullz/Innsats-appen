@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getContentChangelog, getMustReadNotices, getSourceDocuments } from '@/lib/content/load-content';
 import { buildSourceTitleById, formatSourceList } from '@/lib/content/source-titles';
+import { MustReadAcknowledgementButton } from '@/components/must-read-acknowledgement-button';
 
 export const revalidate = 3600;
 
@@ -39,6 +40,7 @@ export default function MustReadPage() {
               ) : null}
               {changelog ? <p className="mt-3 text-xs font-semibold">Endringslogg: {changelog.title}</p> : null}
               <p className="mt-2 text-xs font-semibold">Kilder: {formatSourceList(notice.sourceIds, sourceTitleById)}</p>
+              <MustReadAcknowledgementButton notice={notice} />
             </article>
           );
         })}

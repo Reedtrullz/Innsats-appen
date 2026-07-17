@@ -28,7 +28,7 @@ function ChecklistRunnerState({ checklist, missionId, runId, sourceTitleById, on
   const writeQueueRef = useRef<Promise<void>>(Promise.resolve());
   const { roleGroup } = useRole();
   // Role lens (rollelinse): planning/decision steps tagged for a higher role are
-  // locked for lower roles here too, so the Arbeid tab can't bypass the runbook
+  // locked for lower roles here too, so the full checklist cannot bypass the runbook
   // lock. Gated on `hydrated` so SSR and the first client render (which use the
   // default role) match — locks appear only after the stored role loads.
   const isLocked = (item: OperationalChecklist['items'][number]) =>

@@ -1,7 +1,7 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { readLocalProfile, saveLocalProfile, subscribeLocalProfile, type LocalProfileRole } from '@/lib/privacy/local-profile';
+import { createContext, useCallback, useContext, useMemo, useSyncExternalStore, type ReactNode } from 'react';
+import { localProfileSnapshot, readLocalProfile, saveLocalProfile, subscribeLocalProfile, type LocalProfileRole } from '@/lib/privacy/local-profile';
 import { roleGroup, ROLE_GROUP_LABELS, type RoleGroup } from '@/lib/role/role-groups';
 import type { Role } from '@/lib/content/taxonomy';
 
@@ -24,14 +24,18 @@ export function useRole(): RoleContextValue {
 }
 
 export function RoleProvider({ children }: { children: ReactNode }) {
-  const [role, setRole] = useState<LocalProfileRole>(() => {
-    if (typeof window === 'undefined') return 'ikke-valgt';
+  const profileSnapshot = useSyncExternalStore(
+    subscribeLocalProfile,
+    localProfileSnapshot,
+    () => 'null',
+  );
+  const role = useMemo<LocalProfileRole>(() => {
     try {
-      return readLocalProfile()?.preferredRole ?? 'ikke-valgt';
+      return (JSON.parse(profileSnapshot) as { preferredRole?: LocalProfileRole } | null)?.preferredRole ?? 'ikke-valgt';
     } catch {
       return 'ikke-valgt';
     }
-  });
+  }, [profileSnapshot]);
 
   const group = useMemo(() => roleGroup(role), [role]);
   const groupLabel = useMemo(() => ROLE_GROUP_LABELS[group], [group]);
@@ -40,23 +44,10 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     try {
       // Merge with the stored profile so selecting a role preserves mode,
       // display name and other fields (saveLocalProfile replaces, not merges).
-      const updated = saveLocalProfile({ ...(readLocalProfile() ?? {}), preferredRole: newRole });
-      setRole(updated.preferredRole);
+      saveLocalProfile({ ...(readLocalProfile() ?? {}), preferredRole: newRole });
     } catch {
-      setRole(newRole);
+      // Keep the last stable external-store snapshot when browser storage fails.
     }
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = subscribeLocalProfile(() => {
-      try {
-        const profile = readLocalProfile();
-        if (profile) setRole(profile.preferredRole);
-      } catch {
-        // Keep current role on read failure.
-      }
-    });
-    return unsubscribe;
   }, []);
 
   const value = useMemo<RoleContextValue>(() => ({

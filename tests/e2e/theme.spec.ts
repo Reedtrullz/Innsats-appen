@@ -60,8 +60,8 @@ test('core dark-mode surfaces remain coherent on home, bottom nav and Oppdrag N�
 
   await createLocalMission(page, { title: `Dark mode ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Dark QA' });
   await expectDarkMode(page);
-  await expect(page.getByRole('tab', { name: 'Nå' })).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByRole('heading', { name: /Situasjon og neste grep/i })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: /Oppdragsflyt/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Neste handling/i })).toBeVisible();
   await expect(page.locator('#hurtiglogg')).toBeVisible();
   await expect(page.getByLabel(/Kompakt fremdrift/i)).toBeVisible();
 });
@@ -82,7 +82,7 @@ test('dark mode keeps quick cards, map and field log controls usable', async ({ 
   await createLocalMission(page, { title: `Dark field log ${Date.now()}`, phase: 'under', scenario: 'flom', location: 'Field Log Dark QA' });
   await page.goto('/oppdrag#feltlogg');
   await expectDarkMode(page);
-  await expect(page.getByRole('tab', { name: 'Arbeid' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('heading', { name: /Sjekkliste og verktøy/i })).toBeVisible();
   const fieldLog = page.locator('#feltlogg');
   await expect(fieldLog).toBeVisible();
   await expect(fieldLog.getByLabel(/Feltlogg tekst/i)).toBeVisible();
@@ -95,7 +95,7 @@ test('dark mode preserves export review and hash-routed export workflow readabil
 
   await page.goto('/oppdrag#etterrapport');
   await expectDarkMode(page);
-  await expect(page.getByRole('tab', { name: 'Eksport' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('heading', { name: /Avslutt oppdrag/i })).toBeVisible();
   const afterAction = page.locator('#etterrapport');
   await expect(afterAction).toBeVisible();
   await afterAction.getByRole('button', { name: /Bygg etterrapport/i }).click();
@@ -120,9 +120,10 @@ test('dark-mode priority surfaces meet WCAG AA contrast (regression lock for P0-
   await expect(criticalTitle).toBeVisible();
   expect(await getTextContrastRatio(page, criticalTitle)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
 
-  // High-priority search result row (red surface).
+  // Search result title on the priority surface. Priority metadata is no longer
+  // repeated in the compact row, but the surface still conveys urgency.
   await page.getByRole('searchbox').first().fill('tilfluktsrom');
-  const highPriorityResult = page.locator('a', { has: page.getByText('Kritisk prioritet') }).first();
+  const highPriorityResult = page.getByLabel('Lokalt søk').locator('article').first().getByRole('link').first();
   await expect(highPriorityResult).toBeVisible();
   expect(await getTextContrastRatio(page, highPriorityResult)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
 
@@ -148,7 +149,7 @@ test('light-mode priority surfaces also meet WCAG AA contrast', async ({ page })
   expect(await getTextContrastRatio(page, criticalTitle)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
 
   await page.getByRole('searchbox').first().fill('tilfluktsrom');
-  const highPriorityResult = page.locator('a', { has: page.getByText('Kritisk prioritet') }).first();
+  const highPriorityResult = page.getByLabel('Lokalt søk').locator('article').first().getByRole('link').first();
   await expect(highPriorityResult).toBeVisible();
   expect(await getTextContrastRatio(page, highPriorityResult)).toBeGreaterThanOrEqual(WCAG_AA_NORMAL_TEXT);
 

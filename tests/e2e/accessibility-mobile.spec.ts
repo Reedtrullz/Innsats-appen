@@ -255,9 +255,10 @@ test('screen-reader labels remain available on active mission operational contro
   });
 
   await openMissionMode(page, 'Arbeid');
+  await openMissionDetails(page, /Oppdragsverktøy/i);
   await expect(page.getByRole('heading', { name: /Kart og logg/i })).toBeVisible();
   await openMissionDetails(page, /Loggoversikt og lokale oppgaver/i);
-  await openMissionDetails(page, /Feltlogg/i);
+  await openMissionDetails(page, /^Feltlogg$/i);
 
   for (const label of [
     'Ny lokal oppgave',
@@ -296,13 +297,14 @@ test('screen-reader labels remain available on active mission operational contro
   }
 
   await openMissionDetails(page, /Etterrapport/i, 'Eksport');
-  await page.locator('#etterrapport').getByText(/Legg til notater/i).click();
+  const afterActionSection = page.locator('#etterrapport');
+  await afterActionSection.getByText(/Legg til notater/i).click();
   for (const label of [
     'Lokal ordretekst',
     'Lokalt samband',
     'Lokal logg',
   ]) {
-    await expect(page.getByLabel(new RegExp(label.replaceAll('/', '\\/'), 'i')).first()).toBeVisible();
+    await expect(afterActionSection.getByLabel(new RegExp(label.replaceAll('/', '\\/'), 'i')).first()).toBeVisible();
   }
 
   await openMissionDetails(page, /Samlet lokal oppdragsmappe/i, 'Eksport');
@@ -324,7 +326,7 @@ test('mission quick actions resolve to real dashboard targets', async ({ page })
     location: 'Ankertest',
   });
 
-  for (const [label, targetId, mode] of [
+  for (const [label, targetId] of [
     ['Hurtiglogg', 'hurtiglogg', false],
     ['Sjekkliste', 'sjekkliste', 'Arbeid'],
     ['5-punktsordre', '5-punktsordre', 'Eksport'],
@@ -342,8 +344,7 @@ test('mission quick actions resolve to real dashboard targets', async ({ page })
     await expect(target).toBeVisible();
     await expect(target).toBeInViewport();
 
-    const modeControl = page.getByRole('tablist', { name: /Oppdragsmodus/i });
-    await expect(modeControl.getByRole('tab', { name: mode || 'Nå' })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByRole('navigation', { name: /Oppdragsflyt/i })).toBeVisible();
 
     await page.evaluate(() => window.scrollTo(0, 0));
   }

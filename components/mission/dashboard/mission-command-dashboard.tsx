@@ -2,45 +2,31 @@
 
 import { useEffect, useMemo, useState, useSyncExternalStore, type MouseEvent } from 'react';
 import type { ActionCard, OperationalChecklist } from '@/lib/content/schemas';
-import { filterActionCards, sortActionCards } from '@/lib/content/filters';
-import { isWhatNextCard } from '@/lib/content/what-next-cards';
 import { DEFAULT_EXTERNAL_DATA_SOURCE_SETTINGS, disabledExternalDataSources, displaySignalsForExternalDataSourceSettings, externalDataSourceSettingsSnapshot, parseExternalDataSourceSettings, subscribeExternalDataSourceSettings } from '@/lib/integrations/source-settings';
 import { missionMapStateSnapshot, normalizeMissionMapState, subscribeMissionMapState, mapStateForMission } from '@/lib/maps/operations-map';
 import { listChecklistRuns } from '@/lib/mission/local-store';
 import { buildOrderUpdateSuggestions } from '@/lib/mission/order-update-suggestions';
 import type { MissionContext } from '@/lib/mission/schemas';
+import { selectMissionRecommendations } from '@/lib/mission/recommendations';
 import { markStoredContextSignalsStale } from '../../context-signal-panel';
 import type { MissionUpdate } from './dashboard-types';
-import { missionDashboardHashTargets, modeForHashTarget, type MissionMode } from './hash-navigation';
+import { missionDashboardHashTargets } from './hash-navigation';
 import { MissionExportPanel } from './mission-export-panel';
-import { MissionModeControl } from './mission-mode-control';
 import { MissionNowPanel } from './mission-now-panel';
+import { MissionStickyHeader } from './mission-sticky-header';
 import { MissionWorkPanel } from './mission-work-panel';
 
-function missionCards(cards: ActionCard[], mission: MissionContext) {
-  const exact = filterActionCards(cards, { phase: mission.phase, role: mission.role, scenario: mission.scenario });
-  const fallback = exact.length > 0 ? exact : filterActionCards(cards, { phase: mission.phase, scenario: mission.scenario });
-  const wider = fallback.length > 0 ? fallback : filterActionCards(cards, { scenario: mission.scenario });
-  const sortedCards = sortActionCards(wider);
-  const firstActions = sortedCards.slice(0, 3);
-  const firstWhatNextCard = sortedCards.find(isWhatNextCard);
-
-  if (!firstWhatNextCard || firstActions.some((card) => card.slug === firstWhatNextCard.slug)) {
-    return firstActions;
-  }
-
-  const replaceableIndex = firstActions.findLastIndex((card) => card.priority === firstWhatNextCard.priority);
-  if (replaceableIndex === -1) {
-    return firstActions;
-  }
-
-  return firstActions.map((card, index) => (index === replaceableIndex ? firstWhatNextCard : card));
-}
-
 export function MissionCommandDashboard({ mission, cards, checklist, checklists, contentVersion, sourceTitleById, sourceRiskById, onMissionChange, onArchive }: { mission: MissionContext; cards: ActionCard[]; checklist?: OperationalChecklist; checklists: OperationalChecklist[]; contentVersion: string; sourceTitleById?: Record<string, string>; sourceRiskById?: Record<string, 'caution' | 'ok'>; onMissionChange: (missionId: string, update: MissionUpdate) => Promise<void>; onArchive: (missionId: string) => Promise<void> }) {
-  const firstActions = missionCards(cards, mission);
+  const recommendations = useMemo(() => selectMissionRecommendations(cards, mission), [cards, mission]);
+  const recommendationContextKey = `${mission.phase}|${mission.role}|${mission.scenario}`;
+  const [otherPhaseContextKey, setOtherPhaseContextKey] = useState<string | null>(null);
+  const showOtherPhases = otherPhaseContextKey === recommendationContextKey;
+  const firstActions = useMemo(() => (
+    showOtherPhases
+      ? [...recommendations.currentPhaseCards, ...recommendations.otherPhaseCards].slice(0, 3)
+      : recommendations.currentPhaseCards
+  ), [recommendations, showOtherPhases]);
   const [checklistRuns, setChecklistRuns] = useState<Awaited<ReturnType<typeof listChecklistRuns>>>([]);
-  const [activeMode, setActiveMode] = useState<MissionMode>('now');
   const [pendingHashTarget, setPendingHashTarget] = useState<string | null>(null);
   const settingsSnapshot = useSyncExternalStore(
     subscribeExternalDataSourceSettings,
@@ -91,8 +77,6 @@ export function MissionCommandDashboard({ mission, cards, checklist, checklists,
 
   function activateHashTarget(targetId: string) {
     if (!missionDashboardHashTargets.has(targetId)) return;
-    const targetMode = modeForHashTarget(targetId);
-    if (targetMode) setActiveMode(targetMode);
     setPendingHashTarget(targetId);
   }
 
@@ -181,7 +165,7 @@ export function MissionCommandDashboard({ mission, cards, checklist, checklists,
       cancelled = true;
       window.cancelAnimationFrame(initialFrame);
     };
-  }, [activeMode, pendingHashTarget]);
+  }, [pendingHashTarget]);
 
   function handleDashboardAnchorClick(event: MouseEvent<HTMLElement>) {
     const anchor = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
@@ -195,47 +179,47 @@ export function MissionCommandDashboard({ mission, cards, checklist, checklists,
 
   return (
     <article className="space-y-4" onClickCapture={handleDashboardAnchorClick}>
-      <MissionModeControl activeMode={activeMode} onModeChange={setActiveMode} />
-      {activeMode === 'now' ? (
-        <MissionNowPanel
-          mission={mission}
-          checklists={checklists}
-          checklistRuns={checklistRuns}
-          commandMapSummary={commandMapSummary}
-          firstActions={firstActions}
-          criticalActions={criticalActions}
-          recommendedLabel={recommendedLabel}
-          sourceTitleById={sourceTitleById}
-          sourceRiskById={sourceRiskById}
-          onMissionChange={onMissionChange}
-          onChecklistRunSaved={refreshChecklistRuns}
-        />
-      ) : activeMode === 'work' ? (
-        <MissionWorkPanel
-          mission={mission}
-          checklist={checklist}
-          checklists={checklists}
-          checklistRuns={checklistRuns}
-          staleSignals={staleSignals}
-          scopedMapState={scopedMapState}
-          orderSuggestions={orderSuggestions}
-          sourceTitleById={sourceTitleById}
-          onMissionChange={onMissionChange}
-          onChecklistRunSaved={refreshChecklistRuns}
-        />
-      ) : (
-        <MissionExportPanel
-          mission={mission}
-          contentVersion={contentVersion}
-          checklists={checklists}
-          checklist={checklist}
-          staleSignals={staleSignals}
-          disabledSources={disabledSources}
-          scopedMapState={scopedMapState}
-          onMissionChange={onMissionChange}
-          onArchive={onArchive}
-        />
-      )}
+      <MissionStickyHeader mission={mission} />
+      <MissionNowPanel
+        mission={mission}
+        checklists={checklists}
+        checklistRuns={checklistRuns}
+        commandMapSummary={commandMapSummary}
+        firstActions={firstActions}
+        criticalActions={criticalActions}
+        recommendedLabel={recommendedLabel}
+        recommendationScope={recommendations.scope}
+        otherPhaseCount={recommendations.otherPhaseCards.length}
+        showOtherPhases={showOtherPhases}
+        onShowOtherPhases={() => setOtherPhaseContextKey(recommendationContextKey)}
+        sourceTitleById={sourceTitleById}
+        sourceRiskById={sourceRiskById}
+        onMissionChange={onMissionChange}
+        onChecklistRunSaved={refreshChecklistRuns}
+      />
+      <MissionWorkPanel
+        mission={mission}
+        checklist={checklist}
+        checklists={checklists}
+        checklistRuns={checklistRuns}
+        staleSignals={staleSignals}
+        scopedMapState={scopedMapState}
+        orderSuggestions={orderSuggestions}
+        sourceTitleById={sourceTitleById}
+        onMissionChange={onMissionChange}
+        onChecklistRunSaved={refreshChecklistRuns}
+      />
+      <MissionExportPanel
+        mission={mission}
+        contentVersion={contentVersion}
+        checklists={checklists}
+        checklist={checklist}
+        staleSignals={staleSignals}
+        disabledSources={disabledSources}
+        scopedMapState={scopedMapState}
+        onMissionChange={onMissionChange}
+        onArchive={onArchive}
+      />
     </article>
   );
 }

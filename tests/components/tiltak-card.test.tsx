@@ -32,6 +32,16 @@ it('renders standardized priority, phase, source, first steps, safety and CTA fo
   expect(screen.getByRole('link', { name: /Åpne tiltakskort/i })).toHaveAttribute('href', '/kort/alvorlig-ulykke-dod-eget-personell');
 });
 
+it.each([
+  ['reviewed', 'Faglig godkjent'],
+  ['pending-fagperson', 'Til gjennomgang'],
+  ['unreviewed', 'Ikke faglig vurdert'],
+] as const)('renders the professional review state %s', (reviewStatus, label) => {
+  render(<TiltakCard card={{ ...card, reviewStatus }} compact />);
+
+  expect(screen.getByText(label)).toBeInTheDocument();
+});
+
 it('renders only the first two steps and hides safety in compact mode', () => {
   render(<TiltakCard card={card} compact />);
 

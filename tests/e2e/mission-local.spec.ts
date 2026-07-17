@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { createLocalMission, openMissionMode } from './helpers';
+import { createLocalMission, openMissionDetails, openMissionMode } from './helpers';
 
 test('creates and reopens a local mission offline', async ({ page, context }) => {
   await page.goto('/oppdrag/ny');
@@ -45,7 +45,7 @@ test('advances Før → Under by confirmation and preserves per-phase progress w
   await advance.click();
 
   // Phase swapped: the runbook now reflects the 'under' checklist.
-  await expect(page.getByText('Brann/skogbrann under innsats')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Brann/skogbrann under innsats' })).toBeVisible();
 
   // Free navigation back to 'for' must keep its checkmarks (own ChecklistRun).
   await page.getByRole('navigation', { name: 'Faser' }).getByRole('button', { name: /Før/ }).click();
@@ -62,6 +62,7 @@ test('uses the local MFE reception board without official request actions', asyn
   });
 
   await openMissionMode(page, 'Arbeid');
+  await openMissionDetails(page, /Oppdragsverktøy/i);
   const board = page.getByRole('region', { name: /MFE mottaksboard/i });
   await expect(board).toBeVisible();
   await expect(board).toContainText(/ikke offisiell anmodning/i);
@@ -85,6 +86,7 @@ test('uses the local transport logistics board without dispatch or tracking acti
   });
 
   await openMissionMode(page, 'Arbeid');
+  await openMissionDetails(page, /Oppdragsverktøy/i);
   const board = page.getByRole('region', { name: /Transportlogistikk board/i });
   await expect(board).toBeVisible();
   await expect(board).toContainText(/ikke offisiell ordre/i);

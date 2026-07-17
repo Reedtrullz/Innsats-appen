@@ -165,6 +165,17 @@ it('renders a static offline map with attribution and local-only limitations', a
   expect(screen.getByTestId('offline-map-cache-status')).toHaveTextContent(/Ingen kartpakke/i);
 });
 
+it('presents a compact map tool sheet and routes package administration to device data', async () => {
+  await renderOfflineMapPanel();
+
+  const tools = screen.getByRole('navigation', { name: /Kartverktøy/i });
+  expect(within(tools).getByRole('link', { name: 'Markør' })).toHaveAttribute('href', '#map-marker-tool');
+  expect(within(tools).getByRole('link', { name: 'Hurtiglogg' })).toHaveAttribute('href', '#map-quick-log-tool');
+  expect(within(tools).getByRole('link', { name: 'Sektor' })).toHaveAttribute('href', '#map-drawing-tool');
+  expect(within(tools).getByRole('link', { name: 'Lag' })).toHaveAttribute('href', '#map-layer-tool');
+  expect(screen.getByRole('link', { name: /Administrer kartdata/i })).toHaveAttribute('href', '/data-pa-enheten');
+});
+
 it('shows map work actions before advanced local map package controls', async () => {
   await renderOfflineMapPanel();
 
@@ -943,6 +954,9 @@ it('creates a local skogbrann water-supply plan as pump markers and a hose-line 
 
   await renderOfflineMapPanel();
 
+  expect(screen.queryByRole('region', { name: /Pumpe- og slangeplanlegger/i })).not.toBeInTheDocument();
+  await user.click(screen.getByText(/Spesialistverktøy og kartdata/i));
+  await user.click(screen.getByRole('button', { name: 'Pumpe' }));
   const waterSupplyPlanner = screen.getByRole('region', { name: /Pumpe- og slangeplanlegger/i });
   expect(waterSupplyPlanner).toBeInTheDocument();
   const waterControls = within(waterSupplyPlanner);
@@ -985,6 +999,8 @@ it('creates a local RADIAC measurement plan as observation markers and a route l
 
   await renderOfflineMapPanel();
 
+  await user.click(screen.getByText(/Spesialistverktøy og kartdata/i));
+  await user.click(screen.getByRole('button', { name: 'RADIAC' }));
   const radiacPlanner = screen.getByRole('region', { name: /RADIAC målepunktplanlegger/i });
   expect(radiacPlanner).toBeInTheDocument();
   const radiacControls = within(radiacPlanner);
@@ -1017,6 +1033,8 @@ it('creates a local search-sector plan as a sector drawing with start and return
 
   await renderOfflineMapPanel();
 
+  await user.click(screen.getByText(/Spesialistverktøy og kartdata/i));
+  await user.click(screen.getByRole('button', { name: 'Søketeig' }));
   const searchPlanner = screen.getByRole('region', { name: /Søketeig planlegger/i });
   expect(searchPlanner).toBeInTheDocument();
   const searchControls = within(searchPlanner);
@@ -1056,6 +1074,8 @@ it('creates a local MRE zone plan with clean and dirty zones, rinse line and che
 
   await renderOfflineMapPanel();
 
+  await user.click(screen.getByText(/Spesialistverktøy og kartdata/i));
+  await user.click(screen.getByRole('button', { name: 'MRE' }));
   const mrePlanner = screen.getByRole('region', { name: /MRE ren\/uren-side planlegger/i });
   expect(mrePlanner).toBeInTheDocument();
   const mreControls = within(mrePlanner);

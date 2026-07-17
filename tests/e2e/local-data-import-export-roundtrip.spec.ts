@@ -17,7 +17,7 @@ test('exports local app data and imports it back to restore mission and checklis
   });
   await openMissionMode(page, 'Arbeid');
   await page.getByRole('checkbox', { name: /Kontroller ventilasjon/i }).check();
-  await openMissionDetails(page, /Feltlogg/i, 'Arbeid');
+  await openMissionDetails(page, /^Feltlogg$/i, 'Arbeid');
   await page.getByLabel(/Feltlogg tekst/i).fill('Roundtrip feltlogg uten persondata.');
   await page.getByRole('button', { name: /Legg til feltlogg/i }).click();
   await openMissionDetails(page, /Loggoversikt og lokale oppgaver/i, 'Arbeid');

@@ -64,13 +64,19 @@ async function seedMissions(missions: MissionContext[]) {
 }
 
 async function openMissionMode(label: 'Nå' | 'Arbeid' | 'Eksport') {
-  const modeControl = await screen.findByRole('tablist', { name: /Oppdragsmodus/i });
-  await userEvent.click(within(modeControl).getByRole('tab', { name: label }));
+  const heading = label === 'Nå' ? /Neste handling/i : label === 'Arbeid' ? /Sjekkliste og verktøy/i : /Avslutt oppdrag/i;
+  await screen.findByRole('heading', { name: heading });
 }
 
 async function openWorkDetails(summary: RegExp | string) {
   await openMissionMode('Arbeid');
-  await userEvent.click(await findDetailsSummary(summary));
+  const summaryElement = await findDetailsSummary(summary);
+  const parentDetails = summaryElement.closest('details');
+  const ancestorDetails = parentDetails?.parentElement?.closest('details');
+  if (ancestorDetails && !ancestorDetails.open) {
+    await userEvent.click(ancestorDetails.querySelector(':scope > summary') as HTMLElement);
+  }
+  await userEvent.click(summaryElement);
 }
 
 async function openExportDetails(summary: RegExp | string) {
@@ -129,6 +135,23 @@ it('wires Hurtiglogg composer and log overview into the active mission dashboard
   expect(document.getElementById('loggoversikt')).toHaveTextContent('Dashboard loggoversikt entry');
 });
 
+it('renders one continuous mission spine without a top-level mode switch', async () => {
+  await saveMission(mission({
+    id: 'mission-continuous-spine',
+    title: 'Sammenhengende oppdrag',
+    locationText: 'Øvingsfelt',
+  }));
+
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[]} />);
+
+  expect(screen.queryByRole('tablist', { name: /Oppdragsmodus/i })).not.toBeInTheDocument();
+  expect(screen.getByRole('navigation', { name: /Oppdragsflyt/i })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Neste handling/i })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Sjekkliste og verktøy/i })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Avslutt oppdrag/i })).toBeInTheDocument();
+  expect(document.querySelector('#hurtiglogg')).not.toBeNull();
+});
+
 it('surfaces secondary relevant checklists in the mission work panel', async () => {
   await saveMission(mission({
     id: 'mission-secondary-checklists',
@@ -177,6 +200,58 @@ it('surfaces secondary relevant checklists in the mission work panel', async () 
   expect(relevantControls).toHaveTextContent(/Flom sikring og avløsning/i);
   expect(relevantControls).toHaveTextContent(/FIG under innsats/i);
   expect(relevantControls).not.toHaveTextContent(/Flom pumpe under innsats/i);
+});
+
+it('labels same-phase recommendations widened to other roles', async () => {
+  await saveMission(mission({
+    id: 'mission-widened-role-cards',
+    title: 'Flom uten eksakt rolletreff',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'flom',
+  }));
+  const widenedRoleCard = {
+    slug: 'flom-mannskap-only',
+    title: 'Flomtiltak for annet rollenivå',
+    phase: 'under',
+    roles: ['mannskap'],
+    scenarios: ['flom'],
+    priority: 'medium',
+    steps: ['Avklar med leder'],
+    sourceIds: ['src-known'],
+  } as ActionCard;
+
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[widenedRoleCard]} />);
+
+  expect(await screen.findByText('Flomtiltak for annet rollenivå')).toBeInTheDocument();
+  expect(screen.getByText(/Utvidet til andre roller i samme fase/i)).toBeInTheDocument();
+});
+
+it('requires explicit consent before showing recommendations from other phases', async () => {
+  await saveMission(mission({
+    id: 'mission-cross-phase-cards',
+    title: 'Flom med annet fasetreff',
+    phase: 'under',
+    role: 'lagforer',
+    scenario: 'flom',
+  }));
+  const otherPhaseCard = {
+    slug: 'flom-for-only',
+    title: 'Flomtiltak fra førfasen',
+    phase: 'for',
+    roles: ['lagforer'],
+    scenarios: ['flom'],
+    priority: 'medium',
+    steps: ['Forbered laget'],
+    sourceIds: ['src-known'],
+  } as ActionCard;
+
+  await renderMissionPanel(<MissionContextPanel contentVersion="test-v1" checklists={[]} actionCards={[otherPhaseCard]} />);
+
+  expect(screen.queryByText('Flomtiltak fra førfasen')).not.toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: /Vis også andre faser/i }));
+  expect(await screen.findByText('Flomtiltak fra førfasen')).toBeInTheDocument();
+  expect(screen.getByText(/Viser tiltak fra andre faser etter ditt valg/i)).toBeInTheDocument();
 });
 
 it('discloses the outbound boundary for public context lookups in mission creation', async () => {
@@ -1083,8 +1158,8 @@ it('shows a situation-first mission dashboard with next action, progress and exp
   expect(await screen.findByRole('heading', { name: 'Oppdrag' })).toBeInTheDocument();
   expect(screen.getByText(/Flom Jaren · Jaren/i)).toBeInTheDocument();
   expect(screen.getByText(/Lokal lagring · Ikke delt/i)).toBeInTheDocument();
-  const modeControl = screen.getByRole('tablist', { name: /Oppdragsmodus/i });
-  expect(within(modeControl).getByRole('tab', { name: 'Nå' })).toHaveAttribute('aria-selected', 'true');
+  const flowNavigation = screen.getByRole('navigation', { name: /Oppdragsflyt/i });
+  expect(within(flowNavigation).getByRole('link', { name: 'Neste' })).toHaveAttribute('href', '#mission-now-panel');
   // The guided runbook is the default Nå experience and leads the panel;
   // mission context and recommendations follow it.
   const runbookSteps = await screen.findByRole('region', { name: 'Neste steg' });
@@ -1096,14 +1171,16 @@ it('shows a situation-first mission dashboard with next action, progress and exp
   expect(nowText.indexOf('Anbefalt rekkefølge')).toBeLessThan(nowText.indexOf('Oppdragsledelse'));
   expect(nowText.indexOf('Oppdragsledelse')).toBeLessThan(nowText.indexOf('Kritiske tiltak'));
   expect(nowText.indexOf('Kritiske tiltak')).toBeLessThan(nowText.indexOf('Fremdrift'));
-  expect(screen.queryByRole('heading', { name: /Hurtighandlinger/i })).not.toBeInTheDocument();
-  expect(screen.queryByRole('heading', { name: /Kart og logg/i })).not.toBeInTheDocument();
-  expect(screen.queryByText('Avansert / dokumentasjon')).not.toBeInTheDocument();
+  const toolsMenu = document.getElementById('mission-tools') as HTMLDetailsElement | null;
+  expect(toolsMenu?.open).toBe(false);
+  expect(screen.getByRole('heading', { name: /Hurtighandlinger/i })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Kart og logg/i })).toBeInTheDocument();
+  expect(screen.getByText('Avansert / dokumentasjon')).toBeInTheDocument();
 
   await openMissionMode('Arbeid');
   expect(document.getElementById('sjekkliste')).not.toBeNull();
   expect(document.getElementById('kart')).not.toBeNull();
-  expect(screen.queryByText('Avansert / dokumentasjon')).not.toBeInTheDocument();
+  expect(screen.getByText('Avansert / dokumentasjon')).toBeInTheDocument();
 
   await openMissionMode('Eksport');
   expect(screen.getAllByText(/Ordre, samband og status/i).length).toBeGreaterThan(0);
@@ -1119,7 +1196,7 @@ it('shows a situation-first mission dashboard with next action, progress and exp
     expect(ruhTarget).not.toBeNull();
     expect((ruhTarget?.closest('details') as HTMLDetailsElement | null)?.open).toBe(true);
   });
-  expect(within(modeControl).getByRole('tab', { name: 'Eksport' })).toHaveAttribute('aria-selected', 'true');
+  expect(within(flowNavigation).getByRole('link', { name: 'Avslutt' })).toHaveAttribute('href', '#mission-export-panel');
 });
 
 it('keeps a matching what-now card visible in mission critical actions', async () => {
@@ -1410,7 +1487,7 @@ it('shows current situation and lets users add local tasks, quick status and res
   await openWorkDetails(/Loggoversikt og lokale oppgaver/i);
   expect(await screen.findByRole('heading', { name: /Situasjonsoversikt nå/i })).toBeInTheDocument();
   expect(screen.getByText(/Sikre adkomst/)).toBeInTheDocument();
-  expect(screen.getByText(/fig-under-innsats/)).toBeInTheDocument();
+  expect(screen.getAllByText(/fig-under-innsats/).length).toBeGreaterThan(0);
   expect(screen.getByText(/ikke legg inn navn, ID, pasientdetaljer, helsejournal/i)).toBeInTheDocument();
 
   await userEvent.type(screen.getByLabelText(/Ny lokal oppgave/i), 'Avklar ekstra lys');

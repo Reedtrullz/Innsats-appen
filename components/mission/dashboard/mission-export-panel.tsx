@@ -38,8 +38,8 @@ export function MissionExportPanel({
   onArchive: (missionId: string) => Promise<void>;
 }) {
   return (
-    <section id="mission-export-panel" role="tabpanel" aria-labelledby="mission-export-tab" className="space-y-4">
-      <PanelHeading eyebrow="Eksport" title="Dokumentasjon og lokale eksportfiler" id="mission-export-heading" />
+    <section id="mission-export-panel" role="region" aria-labelledby="mission-export-heading" className="scroll-mt-28 space-y-4">
+      <PanelHeading eyebrow="Avslutning" title="Avslutt oppdrag" id="mission-export-heading" />
       <ExportGroup eyebrow="Primært" title="Ordre, samband og status">
         <ExportToolDetails eyebrow="Ordre" title="5-punktsordre">
           <div id="5-punktsordre" className="scroll-mt-28">

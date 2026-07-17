@@ -8,14 +8,13 @@ test.beforeEach(async ({ page }) => {
   await clearBrowserLocalState(page);
 });
 
-test('home first viewport keeps triage to three primary actions', async ({ page }) => {
+test('home first viewport keeps triage to two state-aware primary actions', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Hva trenger du nå/i })).toBeVisible();
   const primaryActions = page.locator('[data-primary-actions="home"] a');
-  await expect(primaryActions).toHaveCount(3);
-  await expect(primaryActions.nth(0)).toContainText(/Fortsett\/start oppdrag/i);
-  await expect(primaryActions.nth(1)).toContainText(/Finn kritisk tiltak/i);
-  await expect(primaryActions.nth(2)).toContainText(/^Søk/i);
+  await expect(primaryActions).toHaveCount(2);
+  await expect(primaryActions.nth(0)).toContainText(/Start oppdrag/i);
+  await expect(primaryActions.nth(1)).toContainText(/Finn tiltak/i);
 });
 
 test('hurtigkort defaults to compact browsing rows with filters behind disclosure', async ({ page }) => {
@@ -34,24 +33,22 @@ test('oppdrag opens on Nå and keeps export tools secondary', async ({ page }) =
     location: 'Mobil QA',
   });
 
-  await expect(page.getByRole('heading', { name: /Situasjon og neste grep/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Neste handling/i })).toBeVisible();
   // The guided runbook is the default Nå experience (replaced the old
   // "Gjør dette først" card).
   await expect(page.getByText(/Anbefalt rekkefølge — ikke en kommando/i)).toBeVisible();
-  await expect(page.getByText('Avansert / dokumentasjon')).toHaveCount(0);
-  await expect(page.getByText('Primært')).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: /Kart og logg/i })).toHaveCount(0);
-  await expect(page.getByText('RUH og velferd')).toHaveCount(0);
-  await expect(page.getByText('MBK / materiellberedskap')).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: /Sjekkliste og verktøy/i })).toBeVisible();
+  await expect(page.getByText('Oppdragsverktøy', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Avslutt oppdrag/i })).toBeVisible();
 
   await openMissionMode(page, 'Eksport');
   await expect(page.getByText('Avansert / dokumentasjon')).toBeVisible();
   await expect(page.locator('details').filter({ hasText: 'Avansert / dokumentasjon' })).not.toHaveAttribute('open', '');
   await expect(page.getByText('Primært', { exact: true })).toBeVisible();
-  await expect(page.locator('details').filter({ hasText: /5-punktsordre/ })).not.toHaveAttribute('open', '');
+  await expect(page.locator('details').filter({ has: page.getByText('5-punktsordre', { exact: true }) }).last()).not.toHaveAttribute('open', '');
 });
 
-test('oppdrag hash targets switch to the correct calmer mode', async ({ page }) => {
+test('oppdrag hash targets resolve within the continuous mission spine', async ({ page }) => {
   await createLocalMission(page, {
     title: `Hashmodus ${Date.now()}`,
     phase: 'under',
@@ -60,12 +57,12 @@ test('oppdrag hash targets switch to the correct calmer mode', async ({ page }) 
   });
 
   await page.goto('/oppdrag#etterrapport');
-  await expect(page.getByRole('tab', { name: 'Eksport' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('heading', { name: /Avslutt oppdrag/i })).toBeVisible();
   await expect(page.locator('#etterrapport')).toBeVisible();
   await expect(page.locator('#etterrapport')).toBeInViewport();
 
   await page.goto('/oppdrag#sjekkliste');
-  await expect(page.getByRole('tab', { name: 'Arbeid' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('heading', { name: /Sjekkliste og verktøy/i })).toBeVisible();
   await expect(page.locator('#sjekkliste')).toBeVisible();
   await expect(page.locator('#sjekkliste')).toBeInViewport();
 });

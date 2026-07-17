@@ -15,6 +15,8 @@ export interface SearchDocument {
   sourceIds?: string[];
   priority?: ActionCard['priority'];
   reviewStatus?: ActionCard['reviewStatus'];
+  firstAction?: string;
+  authority?: string;
 }
 
 export type SearchHit = SearchDocument & { score?: number; terms?: string[] };
@@ -179,7 +181,7 @@ export function buildSearchIndex(docs: SearchDocument[]) {
   const index = new MiniSearch<SearchDocument>({
     idField: 'id',
     fields: ['title', 'body', 'scenario', 'role', 'phase', 'synonyms'],
-    storeFields: ['id', 'title', 'body', 'scenario', 'role', 'phase', 'synonyms', 'type', 'href', 'sourceStatus', 'sourceIds', 'priority'],
+    storeFields: ['id', 'title', 'body', 'scenario', 'role', 'phase', 'synonyms', 'type', 'href', 'sourceStatus', 'sourceIds', 'priority', 'reviewStatus', 'firstAction', 'authority'],
     searchOptions: { boost: { title: 3, synonyms: 2 }, prefix: true, fuzzy: 0.2 },
   });
   index.addAll(docs);

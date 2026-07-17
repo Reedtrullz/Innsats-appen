@@ -76,18 +76,29 @@ export async function createLocalMission(page: Page, options: {
 }
 
 export async function openMissionMode(page: Page, label: 'Nå' | 'Arbeid' | 'Eksport') {
-  const modeControl = page.getByRole('tablist', { name: /Oppdragsmodus/i });
-  await modeControl.getByRole('tab', { name: label }).click();
+  const linkLabel = label === 'Nå' ? 'Neste' : label === 'Arbeid' ? 'Sjekkliste' : 'Avslutt';
+  const flowNavigation = page.getByRole('navigation', { name: /Oppdragsflyt/i });
+  await flowNavigation.getByRole('link', { name: linkLabel, exact: true }).click();
+  const target = label === 'Nå' ? '#mission-now-panel' : label === 'Arbeid' ? '#sjekkliste' : '#mission-export-panel';
+  await expect(page.locator(target)).toBeInViewport();
 }
 
 export async function openMissionDetails(page: Page, summary: string | RegExp, mode?: 'Nå' | 'Arbeid' | 'Eksport') {
   if (mode) await openMissionMode(page, mode);
   const summaryLocator = page.locator('details > summary').filter({ hasText: summary }).first();
-  await expect(summaryLocator).toBeVisible();
-  const isOpen = await summaryLocator.evaluate((element) => (element.parentElement as HTMLDetailsElement | null)?.open ?? false);
-  if (!isOpen) {
-    await summaryLocator.click();
+  const detailChain: import('@playwright/test').Locator[] = [];
+  let currentDetails = summaryLocator.locator('..');
+  while (await currentDetails.count()) {
+    detailChain.push(currentDetails);
+    currentDetails = currentDetails.locator('xpath=ancestor::details[1]');
   }
+  for (const details of detailChain.reverse()) {
+    if (await details.getAttribute('open') === null) {
+      await details.locator(':scope > summary').click();
+    }
+    await expect(details).toHaveAttribute('open', '');
+  }
+  await expect(summaryLocator).toBeVisible();
 }
 
 export async function readLocalDatabaseCounts(page: Page) {

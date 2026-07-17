@@ -59,7 +59,7 @@ export function SchematicMap({ packageId, state, enabledLayers }: { packageId: s
 
   return (
     <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 text-white shadow-sm" aria-label="Skjematisk lokalkart">
-      <svg viewBox="0 0 100 100" role="img" aria-labelledby="offline-map-title offline-map-desc" className="h-72 w-full bg-slate-900">
+      <svg viewBox="0 0 100 100" role="img" aria-labelledby="offline-map-title offline-map-desc" className="h-[min(58vh,34rem)] min-h-72 w-full bg-slate-900">
         <title id="offline-map-title">{`Skjematisk lokalt kart for ${selectedPackage.title}`}</title>
         <desc id="offline-map-desc">Statisk kartbilde uten eksterne kartkall.</desc>
         <defs>

@@ -4,7 +4,7 @@ const PROFILE_KEY = 'beredskapsboka-local-profile-v1';
 
 // Navigation is deliberately identical for every role: spatial memory matters
 // more in the field than per-role ranking. Role adapts page content only.
-const STABLE_NAV = ['Hjem', 'Søk', 'Oppdrag', 'Kort', 'Mer'];
+const STABLE_NAV = ['Hjem', 'Søk', 'Oppdrag', 'Kart', 'Mer'];
 
 function setProfileRole(page: import('@playwright/test').Page, role: string) {
   return page.addInitScript(([key, r]) => {
@@ -47,7 +47,7 @@ test('mannskap role shows simplified hero and keeps the same nav order', async (
   await setProfileRole(page, 'mannskap');
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: /Enkel tilgang/i })).toBeVisible();
-  await expect(page.getByText(/Hurtigkort/i).first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /Finn tiltak/i })).toBeVisible();
   expect(await navLabels(page)).toEqual(STABLE_NAV);
 });
 

@@ -18,6 +18,7 @@ describe('QuickFieldLogComposer', () => {
     await user.click(screen.getByRole('button', { name: /lagre hurtiglogg/i }));
 
     expect(onMissionChange).toHaveBeenCalledTimes(1);
+    expect(await screen.findByRole('status')).toHaveTextContent(/hurtiglogg lagret lokalt/i);
     expect(onMissionChange).toHaveBeenCalledWith(mission.id, expect.any(Function));
     const updated = onMissionChange.mock.calls[0][1](mission);
     expect(updated.fieldLogEntries[0]).toMatchObject({

@@ -47,6 +47,10 @@ function searchSynonymsForCard(slug: string, synonyms: SearchSynonymGroup[] = []
     .join(' ');
 }
 
+function authorityLabel(sourceStatus: SourceDocument['status'] | undefined) {
+  return sourceStatus === 'verified' ? 'Kildegrunnlag kontrollert' : 'Kildegrunnlag må kontrolleres';
+}
+
 export function buildSearchDocuments({
   queryBasePath = '/hurtigkort',
   cards,
@@ -61,7 +65,9 @@ export function buildSearchDocuments({
   const sourcesById = new Map(sources.map((source) => [source.id, source]));
 
   return [
-    ...cards.map<SearchDocument>((card) => ({
+    ...cards.map<SearchDocument>((card) => {
+      const sourceStatus = sourceStatusFor(card.sourceIds, sourcesById);
+      return ({
       id: `kort:${card.slug}`,
       title: card.title,
       body: joinSearchText([card.steps.map(stepSearchText), card.safety, card.reporting, card.warning, card.competenceRequired, card.equipmentRequired]),
@@ -71,11 +77,13 @@ export function buildSearchDocuments({
       synonyms: searchSynonymsForCard(card.slug, searchSynonyms),
       type: 'kort',
       href: `/kort/${card.slug}`,
-      sourceStatus: sourceStatusFor(card.sourceIds, sourcesById),
+      sourceStatus,
       sourceIds: card.sourceIds,
       priority: card.priority,
       reviewStatus: card.reviewStatus,
-    })),
+      firstAction: card.steps[0] ? stepSearchText(card.steps[0]) : undefined,
+      authority: authorityLabel(sourceStatus),
+    }); }),
     ...checklists.map<SearchDocument>((checklist) => ({
       id: `sjekkliste:${checklist.slug}`,
       title: checklist.title,

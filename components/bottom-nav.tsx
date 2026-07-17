@@ -12,7 +12,7 @@ const navItems: NavItem[] = [
   { href: '/', label: 'Hjem', icon: 'home' },
   { href: '/sok', label: 'Søk', icon: 'search' },
   { href: '/oppdrag', label: 'Oppdrag', icon: 'briefcase' },
-  { href: '/hurtigkort', label: 'Kort', icon: 'shield' },
+  { href: '/kart', label: 'Kart', icon: 'map' },
   { href: '/mer', label: 'Mer', icon: 'more' },
 ];
 

@@ -65,6 +65,7 @@ import { createRadiacMeasurementPlanObjects, type RadiacMeasurementPlanObjects }
 import { createSearchSectorPlanObjects, type SearchSectorPlanObjects } from '@/lib/maps/search-sector-plan';
 import { createWaterSupplyPlanObjects, type WaterSupplyPlanObjects } from '@/lib/maps/water-supply-plan';
 import { deriveWaterSupplyAdvisory, deriveSearchSectorAdvisory } from '@/lib/maps/map-advisory';
+import { scrollMapElementIntoView } from '@/lib/maps/map-scrolling';
 import { AdvisorySuggestionCard } from '@/components/maps/advisory-suggestion-card';
 import { AdvisoryStateCard } from '@/components/maps/advisory-state-card';
 
@@ -73,6 +74,7 @@ import { readSelectedActiveMissionId, selectActiveMission } from '@/lib/mission/
 import { getMission, listMissions, saveMission } from '@/lib/mission/local-store';
 import { appendLocalAuditEntry } from '@/lib/privacy/local-profile';
 import { SchematicMap } from '@/components/offline-map/schematic-map';
+import { MapToolSheet, type SpecialistMapTool } from '@/components/offline-map/map-tool-sheet';
 import { SENSITIVE_TEXT_EXPLANATIONS, SensitiveTextError, detectSensitiveOperationalText, sensitiveTextFieldError, type SensitiveTextMatch } from '@/lib/privacy/sensitive-text';
 import {
   geoJsonImportBlockedMapTextKinds,
@@ -100,6 +102,13 @@ type DrawingEditDraft = {
   label: string;
   coordinates: string;
   note: string;
+};
+
+const specialistPlannerTarget: Record<SpecialistMapTool, string> = {
+  water: 'map-water-planner',
+  radiac: 'map-radiac-planner',
+  search: 'map-search-planner',
+  mre: 'map-mre-planner',
 };
 
 function operationMeasurement(drawing: MissionMapDrawing | undefined) {
@@ -200,7 +209,14 @@ export function OfflineMapPanel() {
   const [mapLogText, setMapLogText] = useState('');
   const [mapLogSaving, setMapLogSaving] = useState(false);
   const [mapPackageCacheSaving, setMapPackageCacheSaving] = useState(false);
+  const [selectedSpecialistTool, setSelectedSpecialistTool] = useState<SpecialistMapTool | null>(null);
   const [storageEstimate, setStorageEstimate] = useState<{ quota?: number; usage?: number }>({});
+
+  useEffect(() => {
+    if (!selectedSpecialistTool) return undefined;
+    const frame = window.requestAnimationFrame(() => scrollMapElementIntoView(specialistPlannerTarget[selectedSpecialistTool]));
+    return () => window.cancelAnimationFrame(frame);
+  }, [selectedSpecialistTool]);
   const mapLogSavingRef = useRef(false);
   const mapPackageCacheSavingRef = useRef(false);
   const latestSelectedPackageIdRef = useRef(selectedPmtilesPackageId);
@@ -546,17 +562,12 @@ export function OfflineMapPanel() {
     }
   }
 
-  function scrollToElement(id: string) {
-    if (typeof document === 'undefined') return;
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
   // "+ Logg" from an advisory card: prefill the field-log text with the
   // recommendation so the user can confirm and save it to the active mission.
   // No persondata or coordinates — only the advisory headline.
   function prefillMapLogFromAdvisory(suggestion: string) {
     setMapLogText(`Rådgivende forslag vurdert: ${suggestion}`);
-    scrollToElement('map-log-text');
+    scrollMapElementIntoView('map-log-text');
     setStatusMessage('Forslag lagt i loggtekst — bekreft og lagre på aktivt oppdrag.');
   }
 
@@ -796,7 +807,13 @@ export function OfflineMapPanel() {
         <SchematicMap packageId={selectedSchematicPackage.id} state={filteredState} enabledLayers={enabledLayers} />
       )}
 
-      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Pumpe- og slangeplanlegger">
+      <MapToolSheet
+        packageStatus={cachedPackage ? `${cachedPackage.title} · lokal` : 'skjematisk reserve'}
+        selectedSpecialistTool={selectedSpecialistTool}
+        onSelectSpecialistTool={setSelectedSpecialistTool}
+      />
+
+      {selectedSpecialistTool === 'water' ? <section id="map-water-planner" className="scroll-mt-28 space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Pumpe- og slangeplanlegger">
         <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Skogbrann vannforsyning</p>
@@ -851,7 +868,7 @@ export function OfflineMapPanel() {
             {...deriveWaterSupplyAdvisory(lastWaterSupplyPlan)}
             compact={fieldMode.enabled}
             onLog={() => prefillMapLogFromAdvisory(deriveWaterSupplyAdvisory(lastWaterSupplyPlan).suggestion)}
-            onAdjust={() => scrollToElement('water-supply-plan-summary')}
+            onAdjust={() => scrollMapElementIntoView('water-supply-plan-summary')}
           />
         ) : (
           <AdvisoryStateCard
@@ -859,9 +876,9 @@ export function OfflineMapPanel() {
             body="Marker vannkilde, pumpeplass og leveringspunkt over — appen foreslår trasé, relébehov og konfidens."
           />
         )}
-      </section>
+      </section> : null}
 
-      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="RADIAC målepunktplanlegger">
+      {selectedSpecialistTool === 'radiac' ? <section id="map-radiac-planner" className="scroll-mt-28 space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="RADIAC målepunktplanlegger">
         <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-wide text-sky-700">RADIAC måletjeneste</p>
@@ -896,9 +913,9 @@ export function OfflineMapPanel() {
             ]).map((prompt) => <li key={prompt}>{prompt}</li>)}
           </ul>
         </div>
-      </section>
+      </section> : null}
 
-      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Søketeig planlegger">
+      {selectedSpecialistTool === 'search' ? <section id="map-search-planner" className="scroll-mt-28 space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Søketeig planlegger">
         <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Søk og redning</p>
@@ -950,7 +967,7 @@ export function OfflineMapPanel() {
             {...deriveSearchSectorAdvisory(lastSearchSectorPlan)}
             compact={fieldMode.enabled}
             onLog={() => prefillMapLogFromAdvisory(deriveSearchSectorAdvisory(lastSearchSectorPlan).suggestion)}
-            onAdjust={() => scrollToElement('search-sector-plan-summary')}
+            onAdjust={() => scrollMapElementIntoView('search-sector-plan-summary')}
           />
         ) : (
           <AdvisoryStateCard
@@ -958,9 +975,9 @@ export function OfflineMapPanel() {
             body="Tegn teiggrense og start-/returpunkt over — appen foreslår prioritert sone basert på terreng og savnetatferd."
           />
         )}
-      </section>
+      </section> : null}
 
-      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="MRE ren/uren-side planlegger">
+      {selectedSpecialistTool === 'mre' ? <section id="map-mre-planner" className="scroll-mt-28 space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="MRE ren/uren-side planlegger">
         <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-wide text-sky-700">CBRN/MRE rens</p>
@@ -1019,9 +1036,9 @@ export function OfflineMapPanel() {
             ]).map((prompt) => <li key={prompt}>{prompt}</li>)}
           </ul>
         </div>
-      </section>
+      </section> : null}
 
-      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Lokale markører og lag">
+      <section id="map-marker-tool" className="scroll-mt-28 space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Lokale markører og lag">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Markører</p>
@@ -1045,7 +1062,7 @@ export function OfflineMapPanel() {
           <label className="text-sm font-bold md:col-span-2">Notat uten persondata<textarea name="markerNote" className="mt-1 min-h-20 w-full rounded-xl border p-3" placeholder="Valgfritt, kort og sanitert" /></label>
           <button type="submit" className={`${primaryButtonClass} md:col-span-2`}>Legg til lokal markør</button>
         </form>
-        <div className="grid gap-2 md:grid-cols-2" aria-label="Kartlag">
+        <div id="map-layer-tool" className="scroll-mt-28 grid gap-2 md:grid-cols-2" aria-label="Kartlag">
           {[...MAP_MARKER_KINDS, ...MAP_DRAWING_KINDS].map((layer) => (
             <label key={layer} className="flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold">
               <input type="checkbox" checked={enabledLayers.includes(layer)} onChange={() => toggleLayer(layer)} />
@@ -1096,7 +1113,7 @@ export function OfflineMapPanel() {
         </ul>
       </section>
 
-      <section className="space-y-3 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Logg fra kartpunkt">
+      <section id="map-quick-log-tool" className="scroll-mt-28 space-y-3 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Logg fra kartpunkt">
         <div>
           <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Kart → feltlogg</p>
           <h2 className="text-2xl font-black">Opprett logg fra synlig kartobjekt</h2>
@@ -1109,7 +1126,7 @@ export function OfflineMapPanel() {
         <button type="button" onClick={createLogFromNewestVisibleMarker} disabled={mapLogSaving} className={`${primaryButtonClass} disabled:cursor-wait disabled:bg-slate-500`}>Logg fra nyeste synlige markør</button>
       </section>
 
-      <section className="space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Tegneverktøy og sektorer">
+      <section id="map-drawing-tool" className="scroll-mt-28 space-y-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-label="Tegneverktøy og sektorer">
         <p className="text-sm font-bold uppercase tracking-wide text-sky-700">Tegning</p>
         <h2 className="text-2xl font-black">Punkt, linje, polygon og sektor/teig</h2>
         <form action={addDrawing} className="grid gap-3">
@@ -1171,6 +1188,7 @@ export function OfflineMapPanel() {
             Skjematiske lokalkart fungerer alltid offline i appen. Godkjente lokale kartpakker kan lagres på enheten for bruk uten nett. Ingen kart deles med oppdrag eller andre enheter.
           </p>
         </div>
+        <Link href="/data-pa-enheten" className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-black text-slate-950">Åpne Data og offline</Link>
         <label className="block text-sm font-black text-slate-800" htmlFor="offline-schematic-map-package">Velg skjematisk kartpakke</label>
         <select id="offline-schematic-map-package" aria-label="Velg skjematisk kartpakke" value={selectedSchematicPackage.id} onChange={(event) => selectSchematicPackage(event.target.value)} className="min-h-12 w-full rounded-2xl border border-slate-300 bg-white px-3 text-base font-semibold text-slate-950">
           {OFFLINE_MAP_PACKAGES.map((mapPackage) => (

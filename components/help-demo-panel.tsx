@@ -19,7 +19,7 @@ const DEMO_CHECKLIST_ID = `${DEMO_MISSION_ID}:fig-under-innsats`;
 const demoSteps = [
   {
     title: 'Åpne oppdragstavlen',
-    body: 'Se Nå-fanen, aktiv sjekkliste, hurtiglogg, lokale oppgaver og status.',
+    body: 'Følg oppdragsflyten fra neste handling til sjekkliste, hurtiglogg, verktøy og avslutning.',
     href: '/oppdrag',
     cta: 'Åpne demooppdrag',
   },

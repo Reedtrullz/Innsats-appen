@@ -29,6 +29,14 @@ describe('mission dashboard architecture guards', () => {
     expect(source).not.toContain('bg-emerald-50');
   });
 
+  it('hydrates the role lens through a stable external-store snapshot', () => {
+    const source = read('lib/role/role-context.tsx');
+
+    expect(source).toContain('useSyncExternalStore');
+    expect(source).toContain('localProfileSnapshot');
+    expect(source).not.toContain('useState<LocalProfileRole>');
+  });
+
   it('uses shared export review and context notice primitives for mission export flows', () => {
     const exportFlowFiles = [
       'components/forms/five-point-order-form.tsx',

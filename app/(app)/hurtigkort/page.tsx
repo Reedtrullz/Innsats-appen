@@ -17,7 +17,7 @@ export default function HurtigkortPage() {
   const sources = getSourceDocuments();
   const synonyms = getSearchSynonyms();
   const searchDocuments = buildSearchDocuments({
-    queryBasePath: '/hurtigkort',
+    queryBasePath: '/sok',
     cards,
     checklists,
     sources,
@@ -37,10 +37,11 @@ export default function HurtigkortPage() {
     <div className="space-y-5">
       <section className="rounded-3xl bg-sky-950 p-5 text-white shadow-sm">
         <h1 className="text-3xl font-black">Hurtigkort</h1>
-        <p className="mt-1 text-sm font-semibold text-sky-100">Søk først. Bla kompakt når du ikke vet nøyaktig hva du trenger.</p>
+        <p className="mt-1 text-sm font-semibold text-sky-100">Hurtigkort er nå samlet i Søk. Denne adressen beholdes for gamle lenker og offline-bruk.</p>
+        <a href="/sok?intent=action" className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-sky-300 px-4 text-sm font-black text-sky-950">Åpne nye Søk</a>
         <p className="mt-3 text-xs font-bold text-sky-200">Innhold oppdatert: <span data-testid="content-version">{formatNbDateTime(manifest.contentVersion)}</span></p>
       </section>
-      <SearchBox documents={searchDocuments} externalSynonyms={synonyms} generatedAt={searchIndexGeneratedAt} showFreshnessIndicator />
+      <SearchBox documents={searchDocuments} externalSynonyms={synonyms} generatedAt={searchIndexGeneratedAt} showFreshnessIndicator suggestionBasePath="/sok" initialIntent="action" />
       <RecentCardsRow cards={sortedCards} />
 
       {whatNextCards.length > 0 ? (

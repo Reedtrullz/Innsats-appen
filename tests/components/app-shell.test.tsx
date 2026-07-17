@@ -1,8 +1,9 @@
 import { render, screen, waitFor, within, type RenderResult } from '@testing-library/react';
-import { afterEach } from 'vitest';
+import { afterEach, beforeEach, vi } from 'vitest';
 import { AppShell } from '@/components/app-shell';
 import { FIELD_MODE_STORAGE_KEY, serializeFieldModeSettings } from '@/lib/field-mode/field-mode';
 import { flushAsyncEffects } from '../helpers/react-effects';
+import { getMustReadNotices } from '@/lib/content/load-content';
 
 
 async function renderAndFlush(ui: React.ReactElement): Promise<RenderResult> {
@@ -10,6 +11,10 @@ async function renderAndFlush(ui: React.ReactElement): Promise<RenderResult> {
   await flushAsyncEffects();
   return result;
 }
+
+beforeEach(() => {
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+});
 
 afterEach(() => {
   localStorage.clear();
@@ -21,12 +26,38 @@ afterEach(() => {
 it('shows five mobile navigation tabs with current route', async () => {
   await renderAndFlush(<AppShell currentPath="/sok"><p>Innhold</p></AppShell>);
   const navigation = within(screen.getByRole('navigation', { name: /Hovednavigasjon/i }));
-  for (const label of ['Hjem', 'Søk', 'Oppdrag', 'Kort', 'Mer']) {
+  for (const label of ['Hjem', 'Søk', 'Oppdrag', 'Kart', 'Mer']) {
     expect(navigation.getByRole('link', { name: label })).toBeInTheDocument();
   }
   expect(navigation.getByRole('link', { name: 'Søk' })).toHaveAttribute('aria-current', 'page');
   expect(navigation.getByRole('link', { name: 'Hjem' })).not.toHaveAttribute('aria-current');
   expect(navigation.queryByRole('link', { name: 'Release' })).not.toBeInTheDocument();
+});
+
+it('marks only new critical must-read notices as urgent', async () => {
+  const acknowledgements = Object.fromEntries(getMustReadNotices().map((notice) => [notice.id, notice.changedAt]));
+  localStorage.setItem('beredskapsboka-must-read-ack-v1', JSON.stringify(acknowledgements));
+
+  await renderAndFlush(<AppShell currentPath="/"><p>Innhold</p></AppShell>);
+
+  const mustRead = screen.getByRole('link', { name: /Må leses 0 nye/i });
+  expect(mustRead).not.toHaveClass('bg-red-600');
+});
+
+it('restores the route top unless navigation targets a hash', async () => {
+  const scrollTo = vi.mocked(window.scrollTo);
+  const { rerender } = await renderAndFlush(<AppShell currentPath="/"><h1>Hjem</h1></AppShell>);
+  scrollTo.mockClear();
+
+  rerender(<AppShell currentPath="/sok"><h1>Søk</h1></AppShell>);
+  await flushAsyncEffects();
+  expect(scrollTo).toHaveBeenCalledWith({ top: 0, left: 0, behavior: 'auto' });
+
+  scrollTo.mockClear();
+  window.history.replaceState(null, '', '/oppdrag#hurtiglogg');
+  rerender(<AppShell currentPath="/oppdrag"><h1>Oppdrag</h1></AppShell>);
+  await flushAsyncEffects();
+  expect(scrollTo).not.toHaveBeenCalled();
 });
 
 it('suppresses the mobile bottom navigation on release routes', async () => {

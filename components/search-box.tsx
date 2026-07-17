@@ -5,6 +5,7 @@ import { useMemo, useState, useSyncExternalStore, type MouseEvent } from 'react'
 import { searchDocuments, searchIndexFreshnessLabel, suggestSearchQueries, type SearchContext, type SearchDocument, type SearchHit, type SearchSynonymGroup } from '@/lib/content/search';
 import { OperationalIcon } from './ui/operational-icons';
 import { StatusPill } from './ui/operational-primitives';
+import { ActionCardReviewBadge } from './action-card-review-status';
 
 const LOCATION_CHANGE_EVENT = 'beredskapsboka:locationchange';
 let historyEventsPatched = false;
@@ -51,6 +52,12 @@ function browserContextSnapshot() {
   const phase = params.get('phase')?.slice(0, 80) ?? '';
   const scenario = params.get('scenario')?.slice(0, 80) ?? '';
   return `${role}|${phase}|${scenario}`;
+}
+
+function browserIntentSnapshot(defaultIntent: 'incident' | 'action' | 'source') {
+  if (typeof window === 'undefined') return defaultIntent;
+  const intent = new URLSearchParams(window.location.search).get('intent');
+  return intent === 'incident' || intent === 'action' || intent === 'source' ? intent : defaultIntent;
 }
 
 function parseContextSnapshot(snapshot: string): SearchContext {
@@ -101,29 +108,33 @@ function typeMetadataLabel(type: string) {
 function SearchResultRow({ doc }: { doc: SearchHit }) {
   const highPriority = doc.type === 'kort' && doc.priority === 'high';
   return (
-    <Link
-      className={`group block rounded-2xl border p-3 shadow-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#38bdf8] ${highPriority ? 'border-[#f87171]/30 bg-[var(--critical-surface)] hover:border-[#f87171]/50' : 'border-[var(--border)] bg-[var(--surface)] hover:border-[#38bdf8]/40 hover:bg-[var(--info-surface)]'}`}
-      href={doc.href ?? '#'}
-      aria-label={doc.title}
-    >
-      <span className="flex items-start gap-3">
+    <article className={`rounded-2xl border p-3 shadow-sm ${highPriority ? 'border-[#f87171]/30 bg-[var(--critical-surface)]' : 'border-[var(--border)] bg-[var(--surface)]'}`}>
+      <div className="flex items-start gap-3">
         <span className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${highPriority ? 'bg-[var(--critical-surface)] text-[var(--critical-fg)]' : 'bg-[var(--info-surface)] text-[var(--info-fg)]'}`}>
           <OperationalIcon name={doc.type === 'kilde' ? 'book' : doc.type === 'kort' ? 'shield' : 'document'} className="h-5 w-5" />
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-sm font-black leading-5 text-[var(--text-primary)]">{doc.title}</span>
-          <span className="mt-2 flex flex-wrap gap-1.5 text-xs font-semibold text-[var(--text-secondary)]">
-            {highPriority ? <StatusPill label="Kritisk prioritet" tone="critical" compact /> : null}
-            {doc.reviewStatus === 'pending-fagperson' ? <StatusPill label="Til faggjennomgang" tone="warning" compact /> : null}
-            {doc.type ? <StatusPill label={`Type: ${typeMetadataLabel(doc.type)}`} tone="slate" compact /> : null}
+        <div className="min-w-0 flex-1">
+          <Link className="group inline-flex min-h-11 items-center gap-2 text-sm font-black leading-5 text-[var(--text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#38bdf8]" href={doc.href ?? '#'} aria-label={doc.title}>
+            {doc.title}
+            <OperationalIcon name="chevron" className="h-4 w-4 shrink-0 text-[var(--text-muted)] group-hover:text-[var(--accent-fg)]" />
+          </Link>
+          {doc.firstAction ? <p className="mt-1 text-sm font-semibold leading-5 text-[var(--text-secondary)]"><span className="font-black">Først:</span> {doc.firstAction}</p> : null}
+          <div className="mt-2 flex flex-wrap gap-1.5 text-xs font-semibold text-[var(--text-secondary)]">
+            {doc.type === 'kort' ? <ActionCardReviewBadge reviewStatus={doc.reviewStatus} /> : null}
             {doc.phase ? <StatusPill label={`Fase: ${doc.phase}`} tone="sky" compact /> : null}
-            {doc.sourceStatus ? <StatusPill label={`Kilde: ${doc.sourceStatus}`} tone={doc.sourceStatus === 'verified' ? 'success' : 'warning'} compact /> : null}
-          </span>
-          {termsLabel(doc.terms) ? <span className="mt-2 block text-xs font-semibold text-[var(--text-muted)]">Søkeord: {termsLabel(doc.terms)}</span> : null}
-        </span>
-        <OperationalIcon name="chevron" className="mt-3 h-4 w-4 shrink-0 text-[var(--text-muted)] group-hover:text-[var(--accent-fg)]" />
-      </span>
-    </Link>
+          </div>
+          {doc.authority ? <p className="mt-2 text-xs font-bold text-[var(--text-muted)]">{doc.authority}</p> : null}
+          <details className="mt-2 text-xs text-[var(--text-muted)]">
+            <summary className="inline-flex min-h-11 cursor-pointer items-center font-bold">Detaljer</summary>
+            <div className="space-y-1 border-t border-[var(--border)] pt-2">
+              {doc.type ? <p>Type: {typeMetadataLabel(doc.type)}</p> : null}
+              {doc.sourceStatus ? <p>Kilde: {doc.sourceStatus}</p> : null}
+              {termsLabel(doc.terms) ? <p>Søkeord: {termsLabel(doc.terms)}</p> : null}
+            </div>
+          </details>
+        </div>
+      </div>
+    </article>
   );
 }
 
@@ -137,6 +148,7 @@ export function SearchBox({
   showFreshnessIndicator = false,
   suggestionBasePath = '/hurtigkort',
   enableFilters = false,
+  initialIntent = 'incident',
 }: {
   documents: SearchDocument[];
   externalSynonyms?: SearchSynonymGroup[];
@@ -147,15 +159,19 @@ export function SearchBox({
   showFreshnessIndicator?: boolean;
   suggestionBasePath?: string;
   enableFilters?: boolean;
+  initialIntent?: 'incident' | 'action' | 'source';
 }) {
   const urlQuery = useSyncExternalStore(subscribeToLocationChanges, () => browserQuery(initialQuery), () => initialQuery);
   const contextSnapshot = useSyncExternalStore(subscribeToLocationChanges, browserContextSnapshot, () => '||');
+  const selectedIntent = useSyncExternalStore(subscribeToLocationChanges, () => browserIntentSnapshot(initialIntent), () => initialIntent);
   const urlContext = useMemo(() => parseContextSnapshot(contextSnapshot), [contextSnapshot]);
   const rankingContext = context ?? urlContext;
   const [manualQuery, setManualQuery] = useState<string | null>(null);
   const [activePhase, setActivePhase] = useState<string | null>(null);
   const [activeType, setActiveType] = useState<string | null>(null);
   const [activeSourceStatus, setActiveSourceStatus] = useState<string | null>(null);
+  const intentType = selectedIntent === 'action' ? 'kort' : selectedIntent === 'source' ? 'kilde' : null;
+  const effectiveType = activeType ?? intentType;
   const query = manualQuery ?? urlQuery;
   const rawResults = useMemo(() => {
     const q = query.trim();
@@ -164,10 +180,10 @@ export function SearchBox({
   }, [documents, query, rankingContext, externalSynonyms]);
   const filteredResults = useMemo(() => rawResults.filter((doc) => {
     if (activePhase && doc.phase !== activePhase) return false;
-    if (activeType && doc.type !== activeType) return false;
+    if (effectiveType && doc.type !== effectiveType) return false;
     if (activeSourceStatus && doc.sourceStatus !== activeSourceStatus) return false;
     return true;
-  }), [activePhase, activeSourceStatus, activeType, rawResults]);
+  }), [activePhase, activeSourceStatus, effectiveType, rawResults]);
   const results = useMemo(() => filteredResults.slice(0, 12), [filteredResults]);
   const suggestions = useMemo(() => {
     const q = query.trim();
@@ -192,6 +208,13 @@ export function SearchBox({
     setActivePhase(null);
     setActiveType(null);
     setActiveSourceStatus(null);
+  }
+
+  function selectIntent(intent: 'incident' | 'action' | 'source') {
+    const params = new URLSearchParams(window.location.search);
+    params.set('intent', intent);
+    window.history.pushState(null, '', `${suggestionBasePath}?${params.toString()}`);
+    setActiveType(null);
   }
 
   function resetFiltersAndPreserveQuery(event: MouseEvent<HTMLAnchorElement>) {
@@ -326,6 +349,15 @@ export function SearchBox({
 
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-sm" aria-label="Lokalt søk">
+      <div className="mb-4 grid gap-2 sm:grid-cols-3" aria-label="Hva vil du finne?">
+        {([
+          ['incident', 'Hva har skjedd?'],
+          ['action', 'Hva må jeg gjøre?'],
+          ['source', 'Finn kilde'],
+        ] as const).map(([intent, label]) => (
+          <button key={intent} type="button" aria-pressed={selectedIntent === intent} className={chipClass(selectedIntent === intent)} onClick={() => selectIntent(intent)}>{label}</button>
+        ))}
+      </div>
       <label className="text-sm font-black text-[var(--text-primary)]" htmlFor="stress-search">Søk lokalt i tiltak, kilder og moduler</label>
       <div className="mt-2 flex min-h-12 items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] px-3 focus-within:border-[#38bdf8] focus-within:ring-2 focus-within:ring-[#38bdf8]/20">
         <OperationalIcon name="search" className="h-5 w-5 shrink-0 text-[var(--text-muted)]" />

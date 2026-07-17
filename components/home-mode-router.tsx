@@ -2,9 +2,9 @@
 
 import type { OperationalChecklist } from '@/lib/content/schemas';
 import { useMode } from '@/lib/mode/mode-context';
-import { HomeActiveMission } from '@/components/home-active-mission';
 import { HomeRoleContent } from '@/components/home-role-content';
 import { PersonalHome } from '@/components/personlig/personal-home';
+import { useActiveMission } from '@/lib/mission/use-active-mission';
 
 /**
  * Switches the home surface by app mode (board: "Hardt skille ved oppstart,
@@ -20,15 +20,11 @@ export function HomeModeRouter({
   sourceTitleById?: Record<string, string>;
 }) {
   const { mode } = useMode();
+  const { mission } = useActiveMission();
 
   if (mode === 'personlig') {
     return <PersonalHome packingChecklist={packingChecklist} sourceTitleById={sourceTitleById} />;
   }
 
-  return (
-    <>
-      <HomeActiveMission />
-      <HomeRoleContent />
-    </>
-  );
+  return <HomeRoleContent activeMission={mission} />;
 }

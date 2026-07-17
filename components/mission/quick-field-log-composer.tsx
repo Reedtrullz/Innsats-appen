@@ -33,6 +33,7 @@ export function QuickFieldLogComposer({
   const [mustBeForwarded, setMustBeForwarded] = useState(false);
   const [error, setError] = useState('');
   const [overridableWarning, setOverridableWarning] = useState<string | null>(null);
+  const [savedMessage, setSavedMessage] = useState('');
   const selectedCategoryHelp = FIELD_LOG_CATEGORY_OPTIONS.find((option) => option.value === category)?.helpText;
 
   async function addQuickFieldLogEntry(event: FormEvent<HTMLFormElement>, overrideConfirmed = false) {
@@ -86,6 +87,7 @@ export function QuickFieldLogComposer({
     setMustBeForwarded(false);
     setCategory(defaultCategory);
     setError('');
+    setSavedMessage('Hurtiglogg lagret lokalt.');
   }
 
   return (
@@ -117,6 +119,7 @@ export function QuickFieldLogComposer({
           onChange={(event) => {
             setText(event.target.value);
             setOverridableWarning(null);
+            setSavedMessage('');
           }}
           className="mt-1 min-h-24 w-full rounded-xl border border-slate-300 p-3"
           placeholder="Kort observasjon. Ikke persondata, pasientdata eller skjermet operativ informasjon."
@@ -125,6 +128,7 @@ export function QuickFieldLogComposer({
 
       {selectedCategoryHelp ? <p className="rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-950">{selectedCategoryHelp}</p> : null}
       {error ? <p role="alert" aria-label="hurtiglogg personvern" className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-900">{error}</p> : null}
+      {savedMessage ? <p role="status" className="rounded-xl bg-emerald-50 p-3 text-sm font-bold text-emerald-950">{savedMessage}</p> : null}
       {overridableWarning ? (
         <div role="alert" aria-label="hurtiglogg personvernadvarsel" className="space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-3">
           <p className="text-sm font-bold text-amber-950">{overridableWarning}</p>

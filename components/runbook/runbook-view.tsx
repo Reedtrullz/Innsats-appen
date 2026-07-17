@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { OperationalChecklist } from '@/lib/content/schemas';
 import type { ChecklistRun, MissionContext } from '@/lib/mission/schemas';
@@ -83,6 +83,8 @@ export function RunbookView({
   const [openStepId, setOpenStepId] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [saving, setSaving] = useState(false);
+  const writeQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const pendingWritesRef = useRef(0);
 
   useEffect(() => {
     let alive = true;
@@ -123,8 +125,8 @@ export function RunbookView({
     void onMissionChange(mission.id, (current) => withPhaseChange(current, target));
   }
 
-  // In "Nå" only the active step and the next couple are shown; the full board
-  // lives in "Arbeid". Falls back to the first unresolved steps if none is active.
+  // In the next-action section only the active step and the next couple are shown;
+  // the full board follows under Sjekkliste. Falls back to the first unresolved steps.
   const allSteps = runbook?.steps ?? [];
   const nowIndex = allSteps.findIndex((step) => step.status === 'now');
   const compactSteps = nowIndex >= 0
@@ -133,37 +135,46 @@ export function RunbookView({
   const visibleSteps = compact ? compactSteps : allSteps;
   const hiddenStepCount = allSteps.length - visibleSteps.length;
 
-  // Serialized via the `saving` guard so rapid taps can't race the read-modify-write
-  // and silently drop progress. 'reopen' clears the step back to active.
+  // Queue every explicit choice before React has time to disable the buttons.
+  // Each operation re-reads IndexedDB, so rapid taps cannot race and silently
+  // overwrite progress. The latest queued choice for a step wins.
   async function writeProgress(itemId: string, mark: 'done' | 'skip' | 'reopen') {
-    if (!missionId || !checklistSlug || saving) return;
+    if (!missionId || !checklistSlug) return;
+    const queuedMissionId = missionId;
+    const queuedChecklistSlug = checklistSlug;
+    pendingWritesRef.current += 1;
     setSaving(true);
-    try {
-      const runs = await listChecklistRuns(missionId);
-      const existing = runs.find((item) => item.templateSlug === checklistSlug);
-      const checked = new Set(existing?.checkedItemIds ?? []);
-      const skipped = new Set(existing?.skippedItemIds ?? []);
-      checked.delete(itemId);
-      skipped.delete(itemId);
-      if (mark === 'done') checked.add(itemId);
-      else if (mark === 'skip') skipped.add(itemId);
-      await saveChecklistRun({
-        id: existing?.id ?? crypto.randomUUID(),
-        missionId,
-        templateSlug: checklistSlug,
-        checkedItemIds: [...checked],
-        skippedItemIds: [...skipped],
-        notesByItemId: existing?.notesByItemId ?? {},
-        equipmentStatusByItemId: existing?.equipmentStatusByItemId ?? {},
-        updatedAt: new Date().toISOString(),
-        schemaVersion: 1,
-      });
-      setOpenStepId(null);
-      setRefreshKey((key) => key + 1);
-      onRunSaved?.();
-    } finally {
-      setSaving(false);
-    }
+    const operation = writeQueueRef.current.catch(() => undefined).then(async () => {
+      try {
+        const runs = await listChecklistRuns(queuedMissionId);
+        const existing = runs.find((item) => item.templateSlug === queuedChecklistSlug);
+        const checked = new Set(existing?.checkedItemIds ?? []);
+        const skipped = new Set(existing?.skippedItemIds ?? []);
+        checked.delete(itemId);
+        skipped.delete(itemId);
+        if (mark === 'done') checked.add(itemId);
+        else if (mark === 'skip') skipped.add(itemId);
+        await saveChecklistRun({
+          id: existing?.id ?? crypto.randomUUID(),
+          missionId: queuedMissionId,
+          templateSlug: queuedChecklistSlug,
+          checkedItemIds: [...checked],
+          skippedItemIds: [...skipped],
+          notesByItemId: existing?.notesByItemId ?? {},
+          equipmentStatusByItemId: existing?.equipmentStatusByItemId ?? {},
+          updatedAt: new Date().toISOString(),
+          schemaVersion: 1,
+        });
+        setOpenStepId(null);
+        setRefreshKey((key) => key + 1);
+        onRunSaved?.();
+      } finally {
+        pendingWritesRef.current -= 1;
+        if (pendingWritesRef.current === 0) setSaving(false);
+      }
+    });
+    writeQueueRef.current = operation;
+    await operation;
   }
 
   if (!loaded) {
@@ -338,8 +349,8 @@ export function RunbookView({
                             <button
                               type="button"
                               onClick={() => void writeProgress(step.itemId, 'reopen')}
-                              disabled={saving}
-                              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-4 text-sm font-bold text-[var(--text-secondary)] disabled:opacity-50"
+                              aria-busy={saving}
+                              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[var(--border)] px-4 text-sm font-bold text-[var(--text-secondary)]"
                             >
                               Angre · sett aktiv igjen
                             </button>
@@ -348,16 +359,16 @@ export function RunbookView({
                               <button
                                 type="button"
                                 onClick={() => void writeProgress(step.itemId, 'done')}
-                                disabled={saving}
-                                className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#38bdf8] px-4 text-sm font-bold text-[#04141f] disabled:opacity-50"
+                                aria-busy={saving}
+                                className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#38bdf8] px-4 text-sm font-bold text-[#04141f]"
                               >
                                 Gjort · neste
                               </button>
                               <button
                                 type="button"
                                 onClick={() => void writeProgress(step.itemId, 'skip')}
-                                disabled={saving}
-                                className="min-h-12 rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text-muted)] disabled:opacity-50"
+                                aria-busy={saving}
+                                className="min-h-12 rounded-xl border border-[var(--border)] px-4 text-sm font-semibold text-[var(--text-muted)]"
                               >
                                 Hopp over
                               </button>
@@ -374,7 +385,7 @@ export function RunbookView({
         </section>
         {compact && hiddenStepCount > 0 ? (
           <p className="rounded-xl bg-[var(--surface)] px-3 py-2 font-mono text-xs font-semibold text-[var(--text-muted)]">
-            +{hiddenStepCount} flere steg — se hele tavla i <span className="font-bold">Arbeid</span>.
+            +{hiddenStepCount} flere steg — se hele tavla under <span className="font-bold">Sjekkliste</span>.
           </p>
         ) : null}
         </>

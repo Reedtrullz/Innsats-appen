@@ -1699,10 +1699,8 @@
   authority: leder
   reviewStatus: pending-fagperson
   doNot:
-    [
-      Ikke send lag ut før oppdrag, oppmøtested, lederkontakt og sambandsvei er forstått.,
-      Ikke registrer persondata eller skjermede lokasjoner i appen.
-    ]
+    - Ikke send lag ut før oppdrag, oppmøtested, lederkontakt og sambandsvei er forstått.
+    - Ikke registrer persondata eller skjermede lokasjoner i appen.
 
 - slug: fremme-innsatssted-forste-minutter
   title: Fremme på innsatssted - første minutter
@@ -1745,10 +1743,8 @@
   authority: lagforer
   reviewStatus: pending-fagperson
   doNot:
-    [
-      Ikke spre laget før lederkontakt, sikker sone og første oppgave er avklart.,
-      Ikke gå inn i ukjent fareområde for å få bedre oversikt.
-    ]
+    - Ikke spre laget før lederkontakt, sikker sone og første oppgave er avklart.
+    - Ikke gå inn i ukjent fareområde for å få bedre oversikt.
 
 - slug: ordre-uklar-hva-na
   title: Uklar ordre - hva nå?
@@ -1829,10 +1825,8 @@
   authority: lagforer
   reviewStatus: pending-fagperson
   doNot:
-    [
-      Ikke del abonnentlister, private kontaktdata eller skjermede sambandstabeller i appen.,
-      Ikke fortsett farlig arbeid hvis samband er en forutsetning for sikkerhet.
-    ]
+    - Ikke del abonnentlister, private kontaktdata eller skjermede sambandstabeller i appen.
+    - Ikke fortsett farlig arbeid hvis samband er en forutsetning for sikkerhet.
 
 - slug: eget-personell-skadet-hva-na
   title: Eget personell skadet - hva nå?
@@ -1874,10 +1868,8 @@
   authority: leder
   reviewStatus: pending-fagperson
   doNot:
-    [
-      Ikke registrer navn, helseopplysninger eller pasientdetaljer i appen.,
-      Ikke gjennomfør tvungen debrief eller press personell til å fortelle detaljer.
-    ]
+    - Ikke registrer navn, helseopplysninger eller pasientdetaljer i appen.
+    - Ikke gjennomfør tvungen debrief eller press personell til å fortelle detaljer.
 
 - slug: cbrne-mistanke-hva-na
   title: Mistanke om CBRNE - hva nå?
@@ -1919,10 +1911,8 @@
   authority: leder
   reviewStatus: pending-fagperson
   doNot:
-    [
-      Ikke gå inn for å identifisere stoff uten ordre, verneutstyr og kompetanse.,
-      Ikke flytt mulig forurenset personell eller materiell inn på ren side uten renselogikk.
-    ]
+    - Ikke gå inn for å identifisere stoff uten ordre, verneutstyr og kompetanse.
+    - Ikke flytt mulig forurenset personell eller materiell inn på ren side uten renselogikk.
 
 - slug: radiac-hoy-verdi-hva-na
   title: RADIAC høy verdi - hva nå?
@@ -1964,10 +1954,8 @@
   authority: leder
   reviewStatus: pending-fagperson
   doNot:
-    [
-      Ikke bruk appen til å beregne dose, dosegrenser eller oppholdstid.,
-      Ikke gjenta målinger i høy verdi uten ordre, dosekontroll og faglig grunnlag.
-    ]
+    - Ikke bruk appen til å beregne dose, dosegrenser eller oppholdstid.
+    - Ikke gjenta målinger i høy verdi uten ordre, dosekontroll og faglig grunnlag.
 
 - slug: mre-kontaminert-person-hva-na
   title: Mulig kontaminert person - hva nå?
@@ -2010,10 +1998,8 @@
   authority: leder
   reviewStatus: pending-fagperson
   doNot:
-    [
-      Ikke slipp mulig kontaminert person eller materiell over på ren side uten renselogikk.,
-      Ikke registrer navn, pasientdetaljer eller helseopplysninger i appen.
-    ]
+    - Ikke slipp mulig kontaminert person eller materiell over på ren side uten renselogikk.
+    - Ikke registrer navn, pasientdetaljer eller helseopplysninger i appen.
 
 - slug: mfe-ankomst-hva-na
   title: MFE ankommer - hva nå?
@@ -2054,10 +2040,8 @@
   authority: leder
   reviewStatus: pending-fagperson
   doNot:
-    [
-      Ikke bruk kortet som ressursanmodning, dispatch eller sporingssystem.,
-      Ikke lagre private ressursdetaljer, detalj-ID-er eller skjermede lokasjoner i appen.
-    ]
+    - Ikke bruk kortet som ressursanmodning, dispatch eller sporingssystem.
+    - Ikke lagre private ressursdetaljer, detalj-ID-er eller skjermede lokasjoner i appen.
 
 - slug: pumpe-vann-ikke-fram-hva-na
   title: Pumpe går, vann ikke fram - hva nå?
@@ -2100,10 +2084,8 @@
   authority: lagforer
   reviewStatus: pending-fagperson
   doNot:
-    [
-      Ikke øk trykk ukritisk før sugeside, knekk, ventiler, lekkasje og vannkilde er sjekket.,
-      Ikke send mannskap inn i brann-/fareområde basert på en vannforsyning som ikke er etablert.
-    ]
+    - Ikke øk trykk ukritisk før sugeside, knekk, ventiler, lekkasje og vannkilde er sjekket.
+    - Ikke send mannskap inn i brann-/fareområde basert på en vannforsyning som ikke er etablert.
 
 - slug: evakuering-mottak-hva-na
   title: Evakuerte ankommer - hva nå?
@@ -2145,10 +2127,8 @@
   authority: leder
   reviewStatus: pending-fagperson
   doNot:
-    [
-      Ikke registrer identifiserende detaljer, helsedetaljer eller pårørendeinformasjon i appen.,
-      Ikke bland evakuerte, skadde og kjøretøyflyt uten tydelig skille.
-    ]
+    - Ikke registrer identifiserende detaljer, helsedetaljer eller pårørendeinformasjon i appen.
+    - Ikke bland evakuerte, skadde og kjøretøyflyt uten tydelig skille.
 
 - slug: transport-avvik-hva-na
   title: Transportavvik - hva nå?
@@ -2192,7 +2172,5 @@
   authority: lagforer
   reviewStatus: pending-fagperson
   doNot:
-    [
-      Ikke bruk appen som kjørebok, ruteordre eller sporingssystem.,
-      Ikke lagre private posisjoner, detalj-ID-er eller depotdetaljer.
-    ]
+    - Ikke bruk appen som kjørebok, ruteordre eller sporingssystem.
+    - Ikke lagre private posisjoner, detalj-ID-er eller depotdetaljer.

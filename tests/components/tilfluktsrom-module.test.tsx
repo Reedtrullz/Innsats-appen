@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { TilfluktsromModuleContent } from '@/app/(app)/moduler/tilfluktsrom/page';
+import { TilfluktsromModuleContent } from '@/components/tilfluktsrom-module-content';
 import type { ActionCard, OperationalChecklist, ProtectionMeasure } from '@/lib/content/schemas';
 
 const cards = [

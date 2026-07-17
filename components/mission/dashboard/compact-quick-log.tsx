@@ -12,7 +12,7 @@ export function CompactQuickLog({ mission, onMissionChange }: { mission: Mission
       <summary className="min-h-11 cursor-pointer list-none rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#082F49]">
         <span className="block text-xs font-black uppercase tracking-wide text-sky-700">Hurtiglogg</span>
         <span className="block text-lg font-black text-slate-950">Logg observasjon</span>
-        <span className="block text-sm font-semibold text-slate-600">Full loggflate med historikk ligger under Arbeid → Feltlogg.</span>
+        <span className="block text-sm font-semibold text-slate-600">Full loggflate med historikk ligger under Verktøy → Feltlogg.</span>
       </summary>
       <div className="mt-3">
         <QuickFieldLogComposer mission={mission} onMissionChange={onMissionChange} sourceLabel="Oppdragstavle" criticalObservationAriaLabel="Hurtiglogg kritisk flagg" mustBeForwardedAriaLabel="Hurtiglogg videresending flagg" />

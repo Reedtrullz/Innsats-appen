@@ -26,12 +26,12 @@ test('hurtigkort cold start keeps local search reachable without scrolling', asy
   await expect(page.locator('input[type="search"]')).toBeInViewport();
 });
 
-test('oppdrag keeps the mission mode tabs in the first viewport', async ({ page }) => {
+test('oppdrag keeps the continuous mission spine navigation in the first viewport', async ({ page }) => {
   await createLocalMission(page, {
     title: `Chrome-budsjett ${Date.now()}`,
     phase: 'under',
     scenario: 'flom',
     location: 'QA',
   });
-  await expect(page.getByRole('tab', { name: 'Nå' })).toBeInViewport();
+  await expect(page.getByRole('navigation', { name: /Oppdragsflyt/i })).toBeInViewport();
 });

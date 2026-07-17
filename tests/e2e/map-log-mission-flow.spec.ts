@@ -75,6 +75,7 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
   await page.goto('/oppdrag');
   await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
   await openMissionMode(page, 'Arbeid');
+  await openMissionDetails(page, /Oppdragsverktøy/i);
   await expect(page.getByRole('heading', { name: /Kart og logg/i })).toBeVisible();
   await expect(page.locator('#kart').getByText(/Fare nord/i).first()).toBeVisible();
   await expect(page.locator('#kart').getByText(/Fare observert uten persondata/i).first()).toBeVisible();
@@ -95,6 +96,7 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
     await page.goto('/oppdrag', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Oppdrag', exact: true })).toBeVisible();
     await openMissionMode(page, 'Arbeid');
+    await openMissionDetails(page, /Oppdragsverktøy/i);
     const mapLogSummary = page.locator('#kart');
     await expect(mapLogSummary).toContainText(/1 markør/i);
     await expect(mapLogSummary).toContainText(/1 kartkoblet logg/i);
@@ -115,6 +117,7 @@ test('mobile offline user logs from map into mission and exports oppdragsmappe',
     await expect(page.locator('#hurtiglogg')).toBeInViewport();
     await page.locator('#hurtiglogg').getByLabel(/Hurtiglogg tekst/i).fill(offlineQuickLogText);
     await page.locator('#hurtiglogg').getByRole('button', { name: /Lagre hurtiglogg/i }).click();
+    await expect(page.locator('#hurtiglogg').getByRole('status')).toHaveText(/Hurtiglogg lagret lokalt/i);
     await openMissionDetails(page, /Loggoversikt og lokale oppgaver/i, 'Arbeid');
     await expect(page.locator('#loggoversikt').getByText(new RegExp(escapeRegex(offlineQuickLogText), 'i')).first()).toBeVisible();
   } finally {
@@ -174,6 +177,7 @@ test('map marker and field log stay scoped when switching between two missions',
   await page.goto('/oppdrag');
   await expect(page.getByText(missionSummaryPattern(missionB, locationB))).toBeVisible();
   await openMissionMode(page, 'Arbeid');
+  await openMissionDetails(page, /Oppdragsverktøy/i);
   await expect(page.locator('#kart').getByText(new RegExp(escapeRegex(markerLabel), 'i')).first()).toBeVisible();
   await expect(page.locator('#kart').getByText(new RegExp(escapeRegex(fieldLogText), 'i')).first()).toBeVisible();
 
@@ -181,6 +185,7 @@ test('map marker and field log stay scoped when switching between two missions',
   await openMissionMode(page, 'Nå');
   await expect(page.getByText(missionSummaryPattern(missionA, locationA))).toBeVisible();
   await openMissionMode(page, 'Arbeid');
+  await openMissionDetails(page, /Oppdragsverktøy/i);
   await expect(page.locator('#kart').getByText(new RegExp(escapeRegex(markerLabel), 'i'))).toHaveCount(0);
   await expect(page.locator('#kart').getByText(new RegExp(escapeRegex(fieldLogText), 'i'))).toHaveCount(0);
 
@@ -188,6 +193,7 @@ test('map marker and field log stay scoped when switching between two missions',
   await openMissionMode(page, 'Nå');
   await expect(page.getByText(missionSummaryPattern(missionB, locationB))).toBeVisible();
   await openMissionMode(page, 'Arbeid');
+  await openMissionDetails(page, /Oppdragsverktøy/i);
   await expect(page.locator('#kart').getByText(new RegExp(escapeRegex(markerLabel), 'i')).first()).toBeVisible();
   await expect(page.locator('#kart').getByText(new RegExp(escapeRegex(fieldLogText), 'i')).first()).toBeVisible();
 });

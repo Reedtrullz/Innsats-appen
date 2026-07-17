@@ -77,24 +77,55 @@ it('shows missing offline search-index indicator when explicitly requested witho
   expect(screen.getByText(/Lokalt søkeindeks/i)).toHaveTextContent(/mangler genereringstidspunkt/i);
 });
 
-it('shows operational result metadata and query terms', async () => {
-  render(<SearchBox documents={[{ ...docs[2], sourceStatus: 'verified', sourceIds: ['src-flom'] }]} />);
+it('keeps implementation metadata behind details and leads with the first action', async () => {
+  render(<SearchBox documents={[{ ...docs[2], firstAction: 'Kontroller sikker adkomst.', authority: 'Kildegrunnlag kontrollert', sourceStatus: 'verified', sourceIds: ['src-flom'] }]} />);
   await userEvent.type(screen.getByRole('searchbox'), 'pumpe');
 
   expect(screen.getByRole('link', { name: /Pumpe og vannforsyning/i })).toBeInTheDocument();
-  expect(screen.getByText(/Søkeord:/i)).toHaveTextContent(/pumpe/i);
+  expect(screen.getByText(/Kontroller sikker adkomst/i)).toBeInTheDocument();
+  expect(screen.getByText(/Kildegrunnlag kontrollert/i)).toBeInTheDocument();
   expect(screen.getByText(/Fase:/i)).toHaveTextContent(/under/i);
+  const details = screen.getByText('Detaljer').closest('details') as HTMLDetailsElement;
+  expect(details.open).toBe(false);
+  await userEvent.click(screen.getByText('Detaljer'));
+  expect(details.open).toBe(true);
+  expect(screen.getByText(/Søkeord:/i)).toHaveTextContent(/pumpe/i);
   expect(screen.getByText(/Kilde: verified/i)).toBeInTheDocument();
 });
 
-it('marks high-priority tiltak results with an explicit critical badge', async () => {
+it('offers incident, action and source entry intents', async () => {
+  render(<SearchBox documents={docs} suggestionBasePath="/sok" />);
+
+  expect(screen.getByRole('button', { name: 'Hva har skjedd?' })).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Hva må jeg gjøre?' }));
+  expect(window.location.search).toContain('intent=action');
+  await userEvent.click(screen.getByRole('button', { name: 'Finn kilde' }));
+  expect(window.location.search).toContain('intent=source');
+});
+
+it('uses one review badge instead of a default metadata badge cloud', async () => {
   render(<SearchBox documents={[{ ...docs[2], priority: 'high', reviewStatus: 'pending-fagperson' }]} />);
 
   await userEvent.type(screen.getByRole('searchbox'), 'pumpe');
 
   expect(screen.getByRole('link', { name: /Pumpe og vannforsyning/i })).toBeInTheDocument();
-  expect(screen.getByText(/Kritisk prioritet/i)).toBeInTheDocument();
-  expect(screen.getByText(/Til faggjennomgang/i)).toBeInTheDocument();
+  expect(screen.getByText(/Til gjennomgang/i)).toBeInTheDocument();
+  expect(screen.queryByText(/Kritisk prioritet/i)).not.toBeInTheDocument();
+});
+
+it.each([
+  ['reviewed', 'Faglig godkjent'],
+  ['unreviewed', 'Ikke faglig vurdert'],
+] as const)('shows card review state %s separately from source state', async (reviewStatus, label) => {
+  render(<SearchBox documents={[{ ...docs[2], reviewStatus, sourceStatus: 'verified' }]} />);
+  await userEvent.type(screen.getByRole('searchbox'), 'pumpe');
+
+  expect(screen.getByText(label)).toBeInTheDocument();
+  const details = screen.getByText('Detaljer').closest('details') as HTMLDetailsElement;
+  expect(details.open).toBe(false);
+  await userEvent.click(screen.getByText('Detaljer'));
+  expect(details.open).toBe(true);
+  expect(screen.getByText(/Kilde: verified/i)).toBeInTheDocument();
 });
 
 it('filters operational search results by phase, type and source status', async () => {

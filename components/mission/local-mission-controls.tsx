@@ -108,6 +108,7 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange,
     displaySummary: localDisplayText(signal.summary, 'Skjult lokalt sammendrag', `localStatus.displaySignals[${index}].summary`),
   })), [displaySignals]);
   const renderedStatusSummaryMarkdown = showStatusSummary && statusSummaryMarkdownKey === currentStatusSummaryKey ? statusSummaryMarkdown : '';
+  const sectionHeading = variant === 'export' ? 'Grunnlag for lokal statusrapport' : 'Situasjonsoversikt nå';
 
   const generateStatusSummary = useCallback(({ audit = true }: { audit?: boolean } = {}) => {
     let markdown: string;
@@ -204,9 +205,9 @@ export function LocalMissionControls({ mission, displaySignals, onMissionChange,
   return (
     <section id={showStatusExport ? 'statusrapport' : undefined} className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div>
-        <p className="text-xs font-black uppercase tracking-wide text-sky-700">Situasjonsoversikt nå</p>
-        <h3 className="text-xl font-black">Situasjonsoversikt nå</h3>
-        <ContextNotice variant="privacy" className="mt-1">Lokalt og offline. Ekstern kontekst (posisjon/søk til MET/Kartverket/NVE) legges til post-MVP. Ikke legg inn navn, ID, pasientdetaljer, helsejournal eller skjermet operativ informasjon.</ContextNotice>
+        <p className="text-xs font-black uppercase tracking-wide text-sky-700">{sectionHeading}</p>
+        <h3 className="text-xl font-black">{sectionHeading}</h3>
+        {variant !== 'export' ? <ContextNotice variant="privacy" className="mt-1">Lokalt og offline. Ekstern kontekst (posisjon/søk til MET/Kartverket/NVE) legges til post-MVP. Ikke legg inn navn, ID, pasientdetaljer, helsejournal eller skjermet operativ informasjon.</ContextNotice> : null}
       </div>
       <dl className="grid gap-2 text-sm sm:grid-cols-2">
         <div className="rounded-xl bg-slate-100 p-3"><dt className="font-black">Oppdrag</dt><dd>{displayMissionTitle} / {displayMissionLocation}</dd></div>

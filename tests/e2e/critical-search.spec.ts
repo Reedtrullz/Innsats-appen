@@ -37,7 +37,7 @@ test('search typo with no direct hit suggests canonical operational query and fo
   await search.fill('jodddttabl');
   await expect(page.getByText(/Ingen treff/i)).toBeVisible();
   const suggestion = page.getByRole('link', { name: /^jod$/i });
-  await expect(suggestion).toHaveAttribute('href', '/hurtigkort?q=jod');
+  await expect(suggestion).toHaveAttribute('href', '/sok?q=jod');
   await suggestion.click();
   await expect(search).toHaveValue('jod');
   await expect(page.getByText(/Ingen treff/i)).toHaveCount(0);
@@ -49,8 +49,11 @@ test('search tab opens first-class operational search', async ({ page }) => {
   await page.goto('/sok');
   await expect(page.getByRole('heading', { name: /Søk i tiltak, kilder og moduler/i })).toBeVisible();
   await page.getByRole('searchbox').fill('pumpe');
-  await expect(page.getByText(/Søkeord:/i).first()).toBeVisible();
-  await expect(page.getByText(/Kilde:/i).first()).toBeVisible();
+  const firstResult = page.getByLabel('Lokalt søk').locator('article').first();
+  await expect(firstResult.getByText(/Først:/i)).toBeVisible();
+  await firstResult.getByText('Detaljer', { exact: true }).click();
+  await expect(firstResult.getByText(/Søkeord:/i)).toBeVisible();
+  await expect(firstResult.getByText(/Kilde:/i)).toBeVisible();
   const order = await page.getByLabel('Lokalt søk').evaluate((section) => {
     const firstResult = section.querySelector('a');
     const filters = section.querySelector('fieldset');
@@ -94,7 +97,7 @@ test('forest fire water-supply card exposes relay-pump planning details', async 
   const card = page.locator('article');
 
   await expect(page.getByRole('heading', { name: 'Skogbrann vannforsyningsplan' })).toBeVisible();
-  await expect(card.getByText(/Til faggjennomgang/i)).toBeVisible();
+  await expect(card.getByText(/Til gjennomgang/i)).toBeVisible();
   await expect(card.getByText(/Velg mellom enkelt utlegg, parallelt\/dobbelt utlegg og seriekjøring/i)).toBeVisible();
   await expect(page.getByAltText(/pumpeutlegg/i).first()).toBeVisible();
 

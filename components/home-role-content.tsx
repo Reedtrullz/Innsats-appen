@@ -8,6 +8,7 @@ import { OperationalIcon } from '@/components/ui/operational-icons';
 import { useRole } from '@/lib/role/role-context';
 import { ROLE_GROUP_CANONICAL_ROLE, ROLE_GROUP_LABELS, type RoleGroup } from '@/lib/role/role-groups';
 import type { LocalProfileRole } from '@/lib/privacy/local-profile';
+import type { MissionContext } from '@/lib/mission/schemas';
 
 const phaseLinks = [
   { label: 'Før innsats', href: '/for', description: 'Avklar risiko, kilder og første tiltak før oppstart.' },
@@ -75,43 +76,18 @@ function HeroButtonComponent({ button, large }: { button: HeroButton; large?: bo
   );
 }
 
-function HeroButtons({ roleGroup }: { roleGroup: RoleGroup }) {
-  const large = roleGroup === 'mannskap';
-
-  const buttons = useMemo<HeroButton[]>(() => {
-    switch (roleGroup) {
-      case 'leder':
-        return [
-          { label: 'Fortsett/start oppdrag', sublabel: 'Oppdrag, sjekkliste og logg.', href: '/oppdrag', icon: 'chevron', tone: 'primary' },
-          { label: 'Samband / ordre', sublabel: 'Mal for 5-punktsordre og samband.', href: '/oppdrag#5-punktsordre', icon: 'radio', tone: 'white' },
-          { label: 'Søk', sublabel: 'Kort, moduler og kilder.', href: '/sok', icon: 'search', tone: 'slate' },
-        ];
-      case 'lagforer':
-        return [
-          { label: 'Fortsett/start oppdrag', sublabel: 'Oppdrag, sjekkliste og logg.', href: '/oppdrag', icon: 'chevron', tone: 'primary' },
-          { label: 'Søk', sublabel: 'Kort, moduler og kilder.', href: '/sok', icon: 'search', tone: 'slate' },
-          { label: 'Finn kritisk tiltak', sublabel: 'Gå rett til første tiltak.', href: '/kort/alvorlig-ulykke-dod-eget-personell', icon: 'alert', tone: 'critical' },
-        ];
-      case 'mannskap':
-        return [
-          { label: 'Hurtigkort', sublabel: 'Første tiltak og enkel tilgang.', href: '/hurtigkort', icon: 'shield', tone: 'primary' },
-          { label: 'Søk', sublabel: 'Kort, moduler og kilder.', href: '/sok', icon: 'search', tone: 'slate' },
-        ];
-      default:
-        return [
-          { label: 'Fortsett/start oppdrag', sublabel: 'Oppdrag, sjekkliste og logg.', href: '/oppdrag', icon: 'chevron', tone: 'primary' },
-          { label: 'Finn kritisk tiltak', sublabel: 'Gå rett til første tiltak.', href: '/kort/alvorlig-ulykke-dod-eget-personell', icon: 'alert', tone: 'critical' },
-          { label: 'Søk', sublabel: 'Kort, moduler og kilder.', href: '/sok', icon: 'search', tone: 'slate' },
-        ];
-    }
-  }, [roleGroup]);
-
-  const gridCols = buttons.length === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3';
+function HeroButtons({ activeMission }: { activeMission?: MissionContext | null }) {
+  const buttons: HeroButton[] = [
+    activeMission
+      ? { label: 'Fortsett oppdrag', sublabel: activeMission.title, href: '/oppdrag', icon: 'chevron', tone: 'primary' }
+      : { label: 'Start oppdrag', sublabel: 'Opprett lokal oppdragstavle.', href: '/oppdrag/ny', icon: 'chevron', tone: 'primary' },
+    { label: 'Finn tiltak', sublabel: 'Søk etter det du må gjøre.', href: '/sok?intent=action', icon: 'search', tone: 'slate' },
+  ];
 
   return (
-    <div className={`grid gap-px bg-white/10 ${gridCols}`} data-primary-actions="home">
+    <div className="grid gap-px bg-white/10 sm:grid-cols-2" data-primary-actions="home">
       {buttons.map((button) => (
-        <HeroButtonComponent key={button.href} button={button} large={large} />
+        <HeroButtonComponent key={`${button.href}-${button.label}`} button={button} large />
       ))}
     </div>
   );
@@ -191,7 +167,7 @@ function CriticalNowSection({ roleGroup }: { roleGroup: RoleGroup }) {
   );
 }
 
-export function HomeRoleContent() {
+export function HomeRoleContent({ activeMission = null }: { activeMission?: MissionContext | null }) {
   const { roleGroup } = useRole();
 
   const heroTitle = roleGroup === 'leder'
@@ -218,10 +194,13 @@ export function HomeRoleContent() {
           </div>
           <div>
             <h2 className="text-3xl font-black tracking-tight">{heroTitle}</h2>
+            {activeMission ? <p className="mt-1 text-sm font-bold text-sky-100">Aktivt: {activeMission.title}</p> : null}
           </div>
+        </div>
+        <HeroButtons activeMission={activeMission} />
+        <div className="border-t border-white/10 p-3">
           <HomeRoleLens />
         </div>
-        <HeroButtons roleGroup={roleGroup} />
       </section>
 
       <FieldModeQuickToggle />

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
-import { TrainingPathDetail } from '@/app/(app)/laering/[slug]/page';
-import { TrainingPathsPageContent } from '@/app/(app)/laering/page';
+import { TrainingPathDetail } from '@/components/training-path-detail';
+import { TrainingPathsPageContent } from '@/components/training-paths-page-content';
 import type { ActionCard, SourceDocument, TrainingPath } from '@/lib/content/schemas';
 
 const paths = [

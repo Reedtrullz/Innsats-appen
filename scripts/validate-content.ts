@@ -330,6 +330,18 @@ function validateEquipmentValues(errors: string[], label: string, values: unknow
   }
 }
 
+function validateSafetySentenceFragments(errors: string[], card: any) {
+  for (const field of ['doNot', 'safety', 'reporting'] as const) {
+    const values = Array.isArray(card?.[field]) ? card[field] : [];
+    values.forEach((value: unknown, index: number) => {
+      const text = String(value ?? '').trim();
+      if (/^[a-zæøå]/u.test(text)) {
+        errors.push(`${card.slug ?? 'card'} ${field}[${index}] appears to be a sentence fragment`);
+      }
+    });
+  }
+}
+
 function safeAssetNameFromReference(ref: string): string | null {
   const clean = ref.split('|')[0]?.trim().replace(/^<|>$/g, '');
   if (!clean) return null;
@@ -458,6 +470,7 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
     }
     const needsWarning = collectRefs(card).some((sourceId) => ['historical', 'unverified', 'draft', 'expired'].includes(String(sourceStatus.get(sourceId))));
     if (needsWarning && !card.warning) errors.push(`${card.slug ?? 'card'} uses non-verified source without visible warning`);
+    validateSafetySentenceFragments(errors, card);
   });
   checklists.forEach((checklist, index) => {
     const result = OperationalChecklistSchema.safeParse(checklist);

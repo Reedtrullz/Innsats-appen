@@ -5,5 +5,5 @@ export const metadata = {
 };
 
 export default function KartPage() {
-  return <OfflineMapPanel />;
+  return <div className="min-h-[calc(100dvh-10rem)]"><OfflineMapPanel /></div>;
 }

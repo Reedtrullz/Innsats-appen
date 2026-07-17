@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import ChangelogPage from '@/app/(app)/endringer/page';
 import FAQPage from '@/app/(app)/faq/page';
 import HurtigkortPage from '@/app/(app)/hurtigkort/page';
+import SokPage from '@/app/(app)/sok/page';
 import MustReadPage from '@/app/(app)/ma-leses/page';
 import WhatsNewPage from '@/app/(app)/nytt/page';
 
@@ -42,17 +43,17 @@ it('renders must-read notices linked to cards and changelog', () => {
   expect(screen.getAllByText(/Kilder:/i).length).toBeGreaterThan(0);
 });
 
-it('includes FAQ entries and glossary aliases in the visible local quick-card search', () => {
-  window.history.replaceState(null, '', '/hurtigkort?q=kommando');
-  const faqRender = render(<HurtigkortPage />);
+it('includes FAQ entries and glossary aliases in the visible local search', () => {
+  window.history.replaceState(null, '', '/sok?q=kommando');
+  const faqRender = render(<SokPage />);
 
-  expect(screen.getByRole('heading', { name: /Hurtigkort/i })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Søk i tiltak, kilder og moduler/i })).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /Er Beredskapsboka en offisiell ordre/i })).toHaveAttribute('href', '/faq#beslutningsstotte-og-ordre');
   faqRender.unmount();
 
-  window.history.replaceState(null, '', '/hurtigkort?q=kaliumjodid');
-  render(<HurtigkortPage />);
-  expect(screen.getByRole('link', { name: 'jod' })).toHaveAttribute('href', '/hurtigkort?q=jod');
+  window.history.replaceState(null, '', '/sok?q=kaliumjodid');
+  render(<SokPage />);
+  expect(screen.getByRole('link', { name: 'jod' })).toHaveAttribute('href', '/sok?q=jod');
 });
 
 it('surfaces what-next operational cards on the quick-card page', () => {

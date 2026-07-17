@@ -1,5 +1,6 @@
 import { OfflineStatus } from './offline-status';
 import { OperationalStatusPills } from './operational-status-pills';
+import Link from 'next/link';
 
 /**
  * Single shared operational-status surface. Compact (shell chrome) shows one
@@ -12,16 +13,24 @@ export function OperationalStatus({
   variant = 'full',
   showConnectivity = true,
   className = '',
+  showBoundary = false,
 }: {
   variant?: 'compact' | 'full';
   showConnectivity?: boolean;
   className?: string;
+  showBoundary?: boolean;
 }) {
   if (variant === 'compact') {
     return (
       <div className={className}>
         <OfflineStatus compact>
           <OperationalStatusPills compact className="gap-1.5" />
+          {showBoundary ? (
+            <p className="mt-2 text-[0.7rem] font-semibold text-[var(--warning-fg)]">
+              Beslutningsstøtte, ikke et offisielt kommandosystem. Data lagres bare lokalt; ikke legg inn persondata.{' '}
+              <Link href="/begrensninger" className="inline-flex min-h-11 items-center font-black underline underline-offset-2">Les grensene</Link>
+            </p>
+          ) : null}
         </OfflineStatus>
       </div>
     );

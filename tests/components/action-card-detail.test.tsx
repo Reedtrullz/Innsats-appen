@@ -28,6 +28,32 @@ it('shows source-backed tilfluktsrom warnings', () => {
   expect(screen.getByText(/ikke offisiell ordre/i)).toBeInTheDocument();
 });
 
+it.each([
+  ['reviewed', 'Faglig godkjent'],
+  ['pending-fagperson', 'Til gjennomgang'],
+  ['unreviewed', 'Ikke faglig vurdert'],
+] as const)('shows professional review state %s separately from source governance', (reviewStatus, label) => {
+  const card = {
+    slug: 'review-state-card',
+    title: 'Review state card',
+    phase: 'under',
+    roles: ['lagforer'],
+    scenarios: ['generelt'],
+    priority: 'medium',
+    steps: ['Gjør noe'],
+    safety: [],
+    reporting: [],
+    sourceIds: ['src-test'],
+    competenceRequired: [],
+    reviewStatus,
+  } as ActionCard;
+
+  render(<ActionCardDetail card={card} sources={[testSource({})]} />);
+
+  expect(screen.getByText(label)).toBeInTheDocument();
+  expect(screen.getByText(/Verifisert kildegrunnlag/i)).toBeInTheDocument();
+});
+
 it('keeps card-level safety warning visible when the linked source is pilot-approved but high risk', () => {
   const card = { slug: 'tilfluktsrom-klargjoring', title: 'Klargjør offentlig tilfluktsrom', phase: 'for', roles: ['leder'], scenarios: ['tilfluktsrom'], priority: 'high', steps: ['Bruk bare godkjent informasjon'], safety: ['Ikke publiser private data'], reporting: ['Rapporter status'], sourceIds: ['src-operativt-konsept-for-sivilforsvaret'], competenceRequired: [], warning: 'Ikke offisiell ordre eller fullstendig oversikt; ikke publiser private eller skjermede data' } as ActionCard;
   const sources = [testSource({ id: 'src-operativt-konsept-for-sivilforsvaret', title: 'SRC - Operativt konsept for Sivilforsvaret', status: 'verified', pilotReviewStatus: 'approved-for-pilot', publicationStatus: 'approved-public', reviewRisk: 'high', verifiedAt: '2026-06-06', body: 'Tilfluktsrom' })];
@@ -105,7 +131,7 @@ it('renders expanded how examples and step-linked pump illustrations', () => {
   expect(screen.getByText(/Vis hvordan/i)).toBeInTheDocument();
   expect(screen.getByText(/mellompumpe for trykkforsterkning/i)).toBeInTheDocument();
   expect(screen.getByAltText(/Illustrasjon av pumpeutlegg/i)).toBeInTheDocument();
-  expect(screen.getByText(/Til faggjennomgang/i)).toBeInTheDocument();
+  expect(screen.getByText(/Til gjennomgang/i)).toBeInTheDocument();
 });
 
 it('summarizes source confidence before the full source list', () => {
