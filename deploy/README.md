@@ -7,7 +7,7 @@ This deploys Beredskapsboka to the Racknerd VPS at:
 - VPS: 198.23.137.16 (`Racknerd-Deploy`, user `deploy`)
 - Container image: `ghcr.io/reedtrullz/innsats-appen:<git-sha>`
 - Container: `beredskapsboka`
-- Host port: `127.0.0.1:3006 -> container:3000`
+- Host port: `127.0.0.1:3016 -> container:3000`
 - Remote app dir: `/opt/apps/beredskapsboka`
 
 The VPS never clones this source repository. The intended flow is:
@@ -50,7 +50,7 @@ Staging environment configuration:
 STAGING_SSH_PRIVATE_KEY = repository secret for the staging deploy user (configured by owner; do not log or commit)
 STAGING_SSH_HOST_KEY = exact pinned known_hosts line for STAGING_HOST
 STAGING_DOMAIN = staging.innsats.reidar.tech
-STAGING_PORT = 3007
+STAGING_PORT = 3017
 STAGING_HOST = 198.23.137.16
 STAGING_USER = deploy
 ```
@@ -156,7 +156,7 @@ Rollback restores the previous image/version for the current configured domain a
 - GHCR image is pulled.
 - Compose starts/recreates the container and waits for Docker health.
 - Local health endpoint answers healthy and exposes the exact `APP_VERSION` SHA:
-  `http://127.0.0.1:3006/api/health`
+  `http://127.0.0.1:3016/api/health`
 - Caddy config validates before reload.
 - Public HTTPS health endpoint answers healthy and exposes the exact `APP_VERSION` SHA:
   `https://innsats.reidar.tech/api/health`

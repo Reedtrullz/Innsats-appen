@@ -11,7 +11,7 @@ Required GitHub environment/secret configuration before the workflow can run:
 - `STAGING_HOST` variable, defaulting to `198.23.137.16` only if the repo environment does not override it.
 - `STAGING_USER` variable, defaulting to `deploy`.
 - `STAGING_DOMAIN` variable or workflow input, default `staging.198.23.137.16.nip.io`.
-- `STAGING_PORT` variable or workflow input, default `3007`.
+- `STAGING_PORT` variable or workflow input, default `3017`.
 
 Current canonical staging verification host is `https://staging.198.23.137.16.nip.io` until `staging.innsats.reidar.tech` has public DNS/TLS pointing at the staging app. Any evidence using another host must state the host and exact `/api/health.version` SHA.
 

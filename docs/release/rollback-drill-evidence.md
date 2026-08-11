@@ -4,7 +4,7 @@ Status: pass-staging-drill
 
 ## Staging drill — 2026-06-06
 
-- Environment: staging (`https://staging.198.23.137.16.nip.io`, VPS host port `3007`, container `beredskapsboka-staging`).
+- Environment: staging (`https://staging.198.23.137.16.nip.io`, VPS host port `3017`, container `beredskapsboka-staging`).
 - Starting SHA: `d3ac6b46658bbbe0d737364e5e5f3a1683aa2d3f`.
 - Candidate SHA: `0000000000000000000000000000000000000000` (intentionally nonexistent immutable-style GHCR tag used to force the playbook rescue path).
 - Candidate image: `ghcr.io/reedtrullz/innsats-appen:0000000000000000000000000000000000000000`.

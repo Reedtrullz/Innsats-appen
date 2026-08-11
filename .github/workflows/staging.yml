@@ -13,7 +13,7 @@ on:
       staging_port:
         description: Host port bound on the VPS for the staging container
         required: true
-        default: "3007"
+        default: "3017"
 
 permissions:
   contents: read
@@ -126,7 +126,7 @@ jobs:
       STAGING_HOST: ${{ vars.STAGING_HOST || '198.23.137.16' }}
       STAGING_USER: ${{ vars.STAGING_USER || 'deploy' }}
       STAGING_DOMAIN: ${{ inputs.staging_domain || vars.STAGING_DOMAIN || 'staging.198.23.137.16.nip.io' }}
-      STAGING_PORT: ${{ inputs.staging_port || vars.STAGING_PORT || '3007' }}
+      STAGING_PORT: ${{ inputs.staging_port || vars.STAGING_PORT || '3017' }}
       STAGING_SSH_HOST_KEY: ${{ vars.STAGING_SSH_HOST_KEY }}
     steps:
       - name: Check out repository
