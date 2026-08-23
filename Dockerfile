@@ -9,9 +9,8 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 COPY package.json package-lock.json ./
-COPY scripts/install-linux-native-deps.mjs ./scripts/install-linux-native-deps.mjs
-RUN npm ci --include=optional \
-  && node scripts/install-linux-native-deps.mjs
+# Keep platform-specific optional packages in the same npm transaction.
+RUN npm ci --include=optional
 
 FROM node:${NODE_VERSION}-slim AS builder
 WORKDIR /app
