@@ -32,6 +32,7 @@ export default function WhatsNewPage() {
           <p><strong>Må-leses:</strong> {notes.mustReadCount}</p>
           <p><strong>Generert:</strong> {formatNbDateTime(notes.generatedAt)}</p>
         </div>
+        <Link href="/nytt/sok-og-redning" className="mt-3 inline-flex min-h-11 items-center rounded-full bg-amber-100 px-4 text-sm font-black text-amber-950">Studer HRS 2026-veilederen før neste søk</Link>
         <Link href="/endringer" className="mt-3 inline-flex min-h-11 items-center rounded-full bg-slate-900 px-4 text-sm font-black text-white">
           Åpne full endringslogg
         </Link>

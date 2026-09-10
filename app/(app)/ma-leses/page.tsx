@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getContentChangelog, getMustReadNotices, getSourceDocuments } from '@/lib/content/load-content';
+import { getContentChangelog, getMustReadNotices, getSourceDocuments, getStudyGuides } from '@/lib/content/load-content';
 import { buildSourceTitleById, formatSourceList } from '@/lib/content/source-titles';
 import { MustReadAcknowledgementButton } from '@/components/must-read-acknowledgement-button';
 
@@ -15,6 +15,7 @@ export default function MustReadPage() {
   const notices = getMustReadNotices();
   const changelogById = new Map(getContentChangelog().map((entry) => [entry.id, entry]));
   const sourceTitleById = buildSourceTitleById(getSourceDocuments());
+  const studyGuideBySlug = new Map(getStudyGuides().map((guide) => [guide.slug, guide]));
 
   return (
     <div className="space-y-4">
@@ -38,6 +39,10 @@ export default function MustReadPage() {
                   {notice.linkedCardSlugs.map((slug) => <Link key={slug} href={`/kort/${slug}`} className="rounded-full bg-white/80 px-3 py-1 text-xs font-black underline">Kort: {slug}</Link>)}
                 </div>
               ) : null}
+              {notice.linkedStudyGuideSlugs?.map((slug) => {
+                const guide = studyGuideBySlug.get(slug);
+                return guide ? <Link key={slug} href={`/nytt/sok-og-redning`} className="mt-3 inline-flex rounded-full bg-white/80 px-3 py-2 text-sm font-black underline">Studiepakke: {guide.title}</Link> : null;
+              })}
               {changelog ? <p className="mt-3 text-xs font-semibold">Endringslogg: {changelog.title}</p> : null}
               <p className="mt-2 text-xs font-semibold">Kilder: {formatSourceList(notice.sourceIds, sourceTitleById)}</p>
               <MustReadAcknowledgementButton notice={notice} />
