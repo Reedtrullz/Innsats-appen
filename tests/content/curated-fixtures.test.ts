@@ -985,3 +985,36 @@ it('curated operational next-action cards give first-aid-style what-next overvie
   expect(cardText(bySlug.get('pumpe-vann-ikke-fram-hva-na'))).toMatch(/sugeside|knekk|kavitasjon|samlerør/i);
   expect(cardText(bySlug.get('transport-avvik-hva-na'))).toMatch(/framkommelighet|førerkompetanse|last/i);
 });
+
+it('curated HRS 2026 content contract is source-backed and linked', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const checklists = readYaml('content/curated/checklists.yaml');
+  const glossary = readYaml('content/curated/glossary.yaml');
+  const faq = readYaml('content/curated/faq.yaml');
+  const synonyms = readYaml('content/curated/search-synonyms.yaml');
+  const changelog = readYaml('content/curated/changelog.yaml');
+  const mustRead = readYaml('content/curated/must-read.yaml');
+  const sourceId = 'src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026';
+  const cardBySlug = new Map(cards.map((card) => [card.slug, card]));
+  const checklistBySlug = new Map(checklists.map((checklist) => [checklist.slug, checklist]));
+  for (const slug of [
+    'sok-og-redning-startkort', 'soketeig-sektor', 'soketeig-plan-kart', 'ledelse-kommando-kontroll',
+    'sok-og-redning-planlegging', 'sok-og-redning-funn-og-redning', 'sok-og-redning-faks-og-analogt-ko',
+  ]) {
+    const card = cardBySlug.get(slug);
+    expect(card, `missing HRS card ${slug}`).toBeTruthy();
+    expect(card?.sourceIds).toContain(sourceId);
+    expect(card?.reviewStatus).toBe('pending-fagperson');
+    expect(card?.warning).toEqual(expect.any(String));
+  }
+  expect(cardBySlug.get('sok-og-redning-planlegging')?.steps.length).toBeGreaterThanOrEqual(5);
+  expect(cardBySlug.get('sok-og-redning-funn-og-redning')?.steps.length).toBeGreaterThanOrEqual(5);
+  expect(cardBySlug.get('sok-og-redning-faks-og-analogt-ko')?.steps.length).toBeGreaterThanOrEqual(5);
+  expect(checklistBySlug.get('sok-og-redning-sektor-under')?.sourceIds).toContain(sourceId);
+  expect(checklistBySlug.get('sok-og-redning-kvalitetssikring')?.sourceIds).toContain(sourceId);
+  expect(glossary.map((term) => term.term)).toEqual(expect.arrayContaining(['IPP', 'LKP', 'POI', 'POA', 'POD', 'POS', 'ledeline', 'sykkelhjulmodellen', 'FAKS', 'SEAO', 'søksfaser']));
+  expect(faq.filter((entry) => entry.scenarios?.includes('sok-og-redning')).length).toBeGreaterThanOrEqual(4);
+  expect(synonyms.map((group) => group.canonical)).toEqual(expect.arrayContaining(['IPP', 'søksplanlegging', 'ledeline', 'SEAO', 'sykkelhjul']));
+  expect(changelog.map((entry) => entry.id)).toContain('hrs-sok-etter-savnet-2026-studiepakke');
+  expect(mustRead.find((notice) => notice.id === 'sok-og-redning-2026-studiepakke')?.linkedStudyGuideSlugs).toContain('sok-etter-savnet-2026');
+});

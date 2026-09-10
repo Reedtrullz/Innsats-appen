@@ -33,3 +33,12 @@
   sourceIds: [src-operativt-konsept-for-sivilforsvaret]
   linkedCardSlugs: [tilfluktsrom-klargjoring]
   changelogEntryId: group-1c-content-governance
+- id: sok-og-redning-2026-studiepakke
+  title: Dette er nytt – studer før neste søk og redningsaksjon
+  body: Dette er lokal beslutningsstøtte basert på en uverifisert høyrisikokilde, ikke en offisiell ordre. Studer veiledningen før neste søk, og følg alltid gjeldende ordre, innsatsledelse og fagmyndighet.
+  severity: critical
+  changedAt: 2026-09-10
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+  linkedCardSlugs: [sok-og-redning-startkort, sok-og-redning-planlegging, sok-og-redning-funn-og-redning, sok-og-redning-faks-og-analogt-ko]
+  linkedStudyGuideSlugs: [sok-etter-savnet-2026]
+  changelogEntryId: hrs-sok-etter-savnet-2026-studiepakke

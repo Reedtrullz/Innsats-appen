@@ -374,29 +374,111 @@
   scenarios: [ generelt ]
   priority: high
   steps:
-    - Etabler hvem som leder laget, hvem som er kontaktpunkt, og hvordan ordre
-      mottas.
-    - Hold oversikt over oppdrag, ressursstatus, risiko, samband og avløsning.
-    - Gi korte ordre, sjekk forståelse og oppdater laget ved endret situasjon.
+    - "Avklar IL-KO, fagleder søk, søksplanlegger, ressurskontroller og relevante organisasjonsledere som kontaktpunkter."
+    - "Etabler hvem som leder laget, hvem som gir lokal føring, og hvordan ordre mottas."
+    - "Skill mellom lokal beslutningsstøtte og offisiell kommando, og send spørsmål til riktig organisasjonsleder."
+    - "Hold oversikt over oppdrag, ressursstatus, risiko, samband og avløsning."
+    - "Gi korte ordre, sjekk forståelse og oppdater laget ved endret situasjon."
+    - "Samordne status fra søketeiger uten å fremstille appens oversikt som offisiell situasjonsledelse."
+  safety:
+    - "Stans eller avklar når ansvar, ordrelinje eller risikobilde er uklart."
   reporting:
-    - Rapporter status, avvik, ressursbehov og beslutninger etter avtalt
-      intervall.
+    - "Rapporter status, avvik, ressursbehov og beslutninger etter avtalt intervall."
   sourceIds:
     [
       src-enhetlig-ledelsessystem-els,
       src-operativt-konsept-for-sivilforsvaret,
-      src-vedlegg-a-styrende-dokumenter
+      src-vedlegg-a-styrende-dokumenter,
+      src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026
     ]
   competenceRequired: [ FIG20 ]
   equipmentRequired: [ samband ]
-  warning: Offentlig rolle- og ordrestøtte; ikke legg inn sensitive
-    sambandstabeller eller interne lister.
+  warning: "Offentlig rolle- og ordrestøtte fra en uverifisert høyrisikokilde; ikke legg inn sensitive sambandstabeller eller interne lister."
   authority: leder
+  reviewStatus: pending-fagperson
   doNot:
     [
-      Unngå parallelle ordrelinjer; avklar konfliktende beskjeder før tiltak
-        fortsetter.
+      "Unngå parallelle ordrelinjer; avklar konfliktende beskjeder før tiltak fortsetter.",
+      "Ikke bruk rollebeskrivelsen som bevis på offisiell kommandomyndighet."
     ]
+
+- slug: sok-og-redning-planlegging
+  title: Søk og redning planlegging
+  phase: under
+  roles: [lagforer, leder, beredskapsvakt]
+  scenarios: [sok-og-redning]
+  priority: high
+  steps:
+    - "Samle relevant informasjon og skill mellom refleks-, analyse- og formell planlegging."
+    - "Avklar IPP, POA, POD og POS som planens beslutningsgrunnlag."
+    - "Velg søksmetode og avgrens område etter terreng, fase, ressurser og risiko."
+    - "Bruk sykkelhjulmodellen til å oppdatere plan, gjennomføring, observasjon og ny vurdering."
+    - "Planlegg blocking posts og observation posts når det er relevant og besluttet lokalt."
+    - "Dokumenter planlagt område, forventet dekning, begrensninger og rapporteringspunkt."
+  safety:
+    - "Stans planleggingen og be om faglig eller operativ avklaring ved uakseptabel risiko eller uklare forutsetninger."
+  reporting:
+    - "Rapporter plan, prioriteringer, begrensninger og endringer til avtalt lederlinje."
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+  competenceRequired: [FIG20]
+  competenceRationale: "Planlegging krever lokal opplæring og skal kvalitetssikres av fagperson før operativ bruk."
+  warning: "Lokal beslutningsstøtte fra en uverifisert høyrisikokilde; gjeldende ordre og fagperson bestemmer plan og metode."
+  authority: leder
+  reviewStatus: pending-fagperson
+  doNot:
+    - "Ikke presenter en lokal plan som offisiell søksordre eller fullstendig dekning."
+
+- slug: sok-og-redning-funn-og-redning
+  title: Funn og redning i søk
+  phase: under
+  roles: [mannskap, lagforer, leder]
+  scenarios: [sok-og-redning]
+  priority: high
+  steps:
+    - "Sikre egen og lagets sikkerhet før dere nærmer dere funnet."
+    - "Observer situasjonen, gi grunnleggende førstehjelp innen egen kompetanse og varsle leder."
+    - "Oppgi funnets eksakte posisjon gjennom tildelt lokal prosess uten å legge persondata i appen."
+    - "Følg ordre om sikring, tilkomst, evakuering eller videre redning."
+    - "Behold eller overfør tildelte søksoppgaver til laget har fått ny føring."
+    - "Håndter mulig dødsfall rolig og diskret, og la ansvarlig myndighet og fagperson lede videre oppfølging."
+  safety:
+    - "Stans egen fremrykning ved fare, og vent på nødvendig sikring eller faglig avklaring."
+  reporting:
+    - "Rapporter funn, tilstand, posisjon, sikkerhet og ressursbehov gjennom avtalt lederlinje."
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+  competenceRequired: [FIG10]
+  competenceRationale: "Førstehjelp, redning og håndtering av dødsfall krever kompetanse og lokal prosedyre."
+  warning: "Lokal beslutningsstøtte fra en uverifisert høyrisikokilde; følg alltid innsatsleders ordre og fagmyndighet."
+  authority: leder
+  reviewStatus: pending-fagperson
+  doNot:
+    - "Ikke flytt eller eksponer en mulig avdød mer enn sikkerhet og livreddende tiltak krever."
+
+- slug: sok-og-redning-faks-og-analogt-ko
+  title: FAKS-bortfall og analogt KO
+  phase: under
+  roles: [lagforer, leder, beredskapsvakt]
+  scenarios: [sok-og-redning]
+  priority: medium
+  steps:
+    - "Bekreft bortfall og avklar lokal fallback med leder før oversikten bygges manuelt."
+    - "Før manuell logg over oppdrag, tid, status og meldinger på godkjent lokalt medium."
+    - "Bruk et manuelt kart med separate lag for etterretning, plan og resultat."
+    - "Bruk to avtalte kommunikasjonsveier i prinsippet, med bekreftet mottak og korte meldinger."
+    - "Samordne ressursstatus og oppgaver gjennom analogt KO etter lokal ordre."
+    - "Overfør og kontroller logg og kart når ordinær løsning er tilbake."
+  safety:
+    - "Stans eller begrens oppdraget når oversikt, samband eller ansvar ikke kan opprettholdes sikkert."
+  reporting:
+    - "Rapporter FAKS-bortfall, fallback, status og manglende dekning til avtalt lederlinje."
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+  competenceRequired: [FIG20]
+  competenceRationale: "Analog drift krever lokal øving, sambandsdisiplin og godkjente hjelpemidler."
+  warning: "Lokal fallback-støtte fra en uverifisert høyrisikokilde; bruk bare godkjente lokale rutiner og systemer."
+  authority: leder
+  reviewStatus: pending-fagperson
+  doNot:
+    - "Ikke bruk eller lagre tilgangskoder, reelle talkgroups eller live-systemdata i appen."
 
 - slug: presse-og-mediahandtering
   title: Presse- og mediahåndtering
@@ -902,36 +984,30 @@
   scenarios: [ sok-og-redning ]
   priority: high
   steps:
-    - Motta oppdrag, siste kjente punkt, tildelt søksområde, samband og
-      sikkerhetsbrief fra innsatsledelse.
-    - Vurder egen sikkerhet og plassering, og revurder personlig utrustning og
-      felles utstyr, kart, kompass og GPS.
-    - Lag en foreløpig plan, forbered 5-punktsordre og gi ordre til laget før
-      innrykk.
-    - Gjennomfør søk etter tildelt metode, hold laget samlet eller etter avtalt
-      makkerordning.
-    - Hold kontinuerlig kontroll over personellet, løpende dialog med
-      innsatsleder, og før logg.
-    - Merk funn og observasjoner lokalt og meld raskt, uten å spre private
-      opplysninger.
-    - Påse behov for mat, vann og hvile, og vurder behov for avløsning i god tid.
+    - "Motta oppdrag, siste kjente punkt, tildelt søksområde, samband og sikkerhetsbrief fra innsatsledelsen."
+    - "Bruk IPP til å avklare relevante linjer og punkter som kan gi rask søksverdi."
+    - "Vurder egen sikkerhet, plassering, utrustning, kart, kompass og GPS før innrykk."
+    - "Lag en foreløpig plan, forbered 5-punktsordre og gi ordre til laget før innrykk."
+    - "Gjennomfør søk etter tildelt metode og hold laget samlet eller etter avtalt makkerordning."
+    - "Revurder risiko kontinuerlig når observasjoner, vær, terreng eller oppdrag endrer seg."
+    - "Hold kontroll over laget, før lokal logg og meld funn, dekningsgrad og avvik raskt."
   safety:
-    - Vurder aktivitet i forhold til sikkerhet, og foreta ny analyse ved endring
-      av oppdraget.
+    - "Vurder aktivitet i forhold til sikkerhet, og foreta ny analyse ved endring av oppdraget."
+    - "Ikke tolk tracklogg eller sensorsignal som bevis på faktisk bakkedekning."
   reporting:
-    - Rapporter dekningsgrad, funn, mangler, posisjon og behov til KO/leder.
-    - Rapporter til beredskapsvakt/sivilforsvarsdistrikt etter innsats.
-  sourceIds: [ src-vedlegg-c-operative-forhold, src-tiltakskort-under-innsats ]
+    - "Rapporter dekningsgrad, funn, mangler, posisjon og behov til KO eller leder."
+    - "Rapporter faktisk gjennomgått område separat fra teknisk registrert tilstedeværelse."
+    - "Rapporter til beredskapsvakt eller sivilforsvarsdistrikt etter innsats."
+  sourceIds: [ src-vedlegg-c-operative-forhold, src-tiltakskort-under-innsats, src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026 ]
   competenceRequired: [ FIG10 ]
   equipmentRequired: [ personlig-utrustning, samband ]
-  warning: Lokal/offline søksstøtte; ikke lagre personsensitiv informasjon eller
-    operative søksplaner for videre deling.
+  warning: "Lokal/offline søksstøtte fra en uverifisert høyrisikokilde; følg alltid gjeldende ordre og fagperson."
   authority: leder
   reviewStatus: pending-fagperson
   doNot:
     [
-      "Stans søk ved tap av samband, farlig terreng, mørke/ vær eller uklar
-        lagstatus."
+      "Stans søk ved tap av samband, farlig terreng, mørke, vær eller uklar lagstatus.",
+      "Ikke fortsett på grunnlag av tracklogg eller sensorsignal alene når faktisk dekning er uklar."
     ]
 
 - slug: soketeig-sektor
@@ -941,24 +1017,25 @@
   scenarios: [ sok-og-redning ]
   priority: medium
   steps:
-    - Bekreft teiggrense, startpunkt, sluttpunkt, metode og forventet
-      rapporteringsintervall.
-    - Hold oversikt over hva som faktisk er gjennomsøkt og hvilke hindringer som
-      står igjen.
-    - Meld avvik, usikre grenser og behov for ny teig før laget flyttes.
+    - "Bekreft teiggrense, startpunkt, sluttpunkt, metode og forventet rapporteringsintervall."
+    - "Bekreft IPP og søksmetode før laget går inn i sektoren."
+    - "Søk etter avtalt metode, og husk at området mellom ledelinjer ikke søkes med en ledelinje alene."
+    - "Hold oversikt over hva som faktisk er gjennomsøkt og hvilke hindringer som står igjen."
+    - "Stopp og revurder risiko når terreng, vær, samband eller lagstatus endrer seg."
+    - "Meld avvik, usikre grenser og behov for ny teig før laget flyttes."
+  safety:
+    - "Stans og revurder risiko ved uakseptable forhold, uklar lagstatus eller usikker teiggrense."
   reporting:
-    - Rapporter teigstatus, dekningsgrad, hindringer og lokale
-      posisjonsreferanser.
-  sourceIds: [ src-vedlegg-c-operative-forhold ]
+    - "Rapporter teigstatus, faktisk dekningsgrad, hindringer og lokale posisjonsreferanser."
+  sourceIds: [ src-vedlegg-c-operative-forhold, src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026 ]
   competenceRequired: [ FIG10 ]
   equipmentRequired: [ samband ]
-  warning: Bruk kun som lokal huskeliste; søksledelse og KO bestemmer sektor,
-    metode og prioritet.
+  warning: "Bruk kun som lokal huskeliste fra en uverifisert høyrisikokilde; søksledelse og KO bestemmer sektor, metode og prioritet."
   authority: lagforer
+  reviewStatus: pending-fagperson
   doNot:
     [
-      Ikke kryss inn i ny sektor uten ordre når det kan skape dobbeltarbeid
-        eller risiko.
+      "Ikke kryss inn i ny sektor uten ordre når det kan skape dobbeltarbeid eller risiko."
     ]
 
 - slug: soketeig-plan-kart
@@ -968,36 +1045,28 @@
   scenarios: [ sok-og-redning ]
   priority: high
   steps:
-    - Bekreft oppdrag, teiggrense, metode, laginndeling, samband og
-      rapporteringsintervall med KO/leder før laget starter søk.
-    - Tegn teiggrensen som skjematiske lokale kartpunkt uten ekte koordinater,
-      navn, identitet eller private opplysninger.
-    - Marker startpunkt og returpunkt slik at laget vet hvor søket begynner,
-      hvor status meldes og hvor laget samles ved avbrudd.
-    - Avklar hvordan dekningsgrad, hindringer, funn, avvik og usikre grenser
-      skal meldes.
-    - Oppdater planen ved ordreendring, tap av samband, farlig terreng,
-      mørke/vær eller uklar lagstatus.
+    - "Bekreft oppdrag, teiggrense, metode, laginndeling, samband og rapporteringsintervall med KO eller leder før laget starter søk."
+    - "Tegn et skjematisk lokalt kart uten ekte koordinater, navn, identitet eller private opplysninger."
+    - "Skill mellom etterretningslaget for opplysninger, planlaget for tildelte områder og resultatlaget for faktisk observasjon og dekning."
+    - "Marker startpunkt og returpunkt slik at laget vet hvor søket begynner og hvor laget samles ved avbrudd."
+    - "Avklar hvordan dekningsgrad, hindringer, funn, avvik og usikre grenser skal meldes."
+    - "Oppdater planen ved ordreendring, tap av samband, farlig terreng, mørke, vær eller uklar lagstatus."
   safety:
-    - Stans eller trekk laget ut ved tap av samband, ukjent lagstatus, farlig
-      terreng, trafikkfare eller ny ordre.
-    - Ikke bruk kartplanen til live tracking eller deling av sensitive
-      posisjoner.
+    - "Stans eller trekk laget ut ved tap av samband, ukjent lagstatus, farlig terreng, trafikkfare eller ny ordre."
+    - "Ikke bruk kartplanen til live tracking eller deling av sensitive posisjoner."
   reporting:
-    - Rapporter teigstatus, dekningsgrad, hindringer, funn, avvik og behov via
-      avtalt sambandsvei.
-    - Meld uavklarte teiggrenser til KO/innsatsleder før laget flyttes til ny
-      sektor.
+    - "Rapporter teigstatus, dekningsgrad, hindringer, funn, avvik og behov via avtalt sambandsvei."
+    - "Meld uavklarte teiggrenser til KO eller innsatsleder før laget flyttes til ny sektor."
   sourceIds:
     [
       src-vedlegg-c-operative-forhold,
       src-tiltakskort-under-innsats,
-      src-kommunikasjons-og-sambandsdiagram
+      src-kommunikasjons-og-sambandsdiagram,
+      src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026
     ]
   competenceRequired: [ FIG10, FIG20 ]
   equipmentRequired: [ personlig-utrustning, samband ]
-  warning: Lokal beslutningsstøtte for tildelt søketeig. KO/innsatsleder
-    bestemmer teig, metode og prioritet; appen deler ikke posisjon.
+  warning: "Lokal beslutningsstøtte for tildelt søketeig fra en uverifisert høyrisikokilde. KO eller innsatsleder bestemmer teig, metode og prioritet; appen deler ikke posisjon."
   authority: leder
   reviewStatus: pending-fagperson
   doNot:

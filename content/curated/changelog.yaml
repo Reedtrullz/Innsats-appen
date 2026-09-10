@@ -103,3 +103,31 @@
       id: jod-atomberedskap
   sourceIds: [src-jodtabletter-i-sivilforsvaret]
   mustRead: false
+- id: hrs-sok-etter-savnet-2026-studiepakke
+  date: 2026-09-10
+  title: HRS 2026 studiepakke for søk etter savnet person
+  summary: HRS 2026-kilden er koblet til studieguide, SAR-kort og sjekklister for lokal, kildebelagt beslutningsstøtte.
+  changeType: added
+  contentRefs:
+    - kind: study-guide
+      id: sok-etter-savnet-2026
+    - kind: action-card
+      id: sok-og-redning-startkort
+    - kind: action-card
+      id: soketeig-sektor
+    - kind: action-card
+      id: soketeig-plan-kart
+    - kind: action-card
+      id: ledelse-kommando-kontroll
+    - kind: action-card
+      id: sok-og-redning-planlegging
+    - kind: action-card
+      id: sok-og-redning-funn-og-redning
+    - kind: action-card
+      id: sok-og-redning-faks-og-analogt-ko
+    - kind: checklist
+      id: sok-og-redning-sektor-under
+    - kind: checklist
+      id: sok-og-redning-kvalitetssikring
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+  mustRead: true

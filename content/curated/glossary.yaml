@@ -81,3 +81,47 @@
   definition: Grunnkurs for FIG/FIGP-mannskap.
   synonyms: [grunnkurs, mannskap, opplæring]
   sourceIds: [src-kursplan-grunnkurs-fig10]
+- term: IPP
+  definition: Initialt prioriteringspunkt som brukes til å rette første innsats mot relevante opplysninger, linjer eller punkter.
+  synonyms: [initialt prioriteringspunkt, prioriteringspunkt]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+- term: LKP
+  definition: Siste kjente punkt i en savnetsak, brukt som del av beslutningsgrunnlaget for videre søk.
+  synonyms: [last known point, siste kjente punkt]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+- term: POI
+  definition: Punkt av interesse som bør vurderes eller undersøkes i søket.
+  synonyms: [point of interest, interessepunkt]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+- term: POA
+  definition: Point of arrival, et ankomstpunkt som inngår i søksplanleggingen.
+  synonyms: [point of arrival, ankomstpunkt]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+- term: POD
+  definition: Probability of detection, en vurdering av sannsynligheten for at søksmetoden oppdager et relevant funn.
+  synonyms: [probability of detection, deteksjonssannsynlighet]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+- term: POS
+  definition: Point of safety, et avtalt sikkerhetspunkt eller område for laget.
+  synonyms: [point of safety, sikkerhetspunkt]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+- term: ledeline
+  definition: En tydelig linje i terrenget som kan brukes til å strukturere søk, men som ikke alene dekker området mellom linjer.
+  synonyms: [ledelinjesøk, linjesøk, ledelinje-søk]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+- term: sykkelhjulmodellen
+  definition: En arbeidsmodell der planlegging, gjennomføring, observasjon og ny vurdering gjentas i en løpende søkssyklus.
+  synonyms: [sykkelhjul, sykkelhjulmodell]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+- term: FAKS
+  definition: En lokal støtte for å holde oversikt over søksinformasjon, oppgaver og status.
+  synonyms: [faks, søksstøtte]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+- term: SEAO
+  definition: En søksfase eller arbeidsform som skal vurderes og gjennomføres etter lokal faglig prosess.
+  synonyms: [seao, søksfase]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+- term: søksfaser
+  definition: Faser i en søksaksjon som styrer prioritering, metode, kvalitetssikring og videre beslutninger.
+  synonyms: [søkefase, søksfase, søksforløp]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]

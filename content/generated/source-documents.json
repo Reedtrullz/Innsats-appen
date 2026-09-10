@@ -399,6 +399,24 @@
     ]
   },
   {
+    "id": "src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026",
+    "title": "SRC - Nasjonal veileder søk etter savnet person på land 2026",
+    "sourcePath": "source-extracts/SRC - Nasjonal veileder søk etter savnet person på land 2026.md",
+    "sourceType": "source-extract",
+    "status": "unverified",
+    "verifiedAt": "2026-09-10",
+    "reviewAfter": "2026-12-09",
+    "owner": "content-team",
+    "reviewer": "fagansvarlig",
+    "reviewRisk": "high",
+    "pilotReviewStatus": "not-reviewed",
+    "publicationStatus": "needs-permission",
+    "body": "# Nasjonal veileder for redningstjenesten ved søk etter savnet person på land\n\nDette er et kort, offentlig trygt og kildebelagt parafraseuttrekk av *Nasjonal veileder for redningstjenesten ved søk etter savnet person på land*, nivå 3, 2026-utgaven, 112 sider. SHA-256: `104283948169d7b5f257f553446d23f9803d89182425870cb302fc0ed244cd34`.\n\nUttrekket er ikke det komplette offisielle dokumentet. Det er ikke en full gjengivelse eller en linje-for-linje-sammenligning, og må faglig gjennomgås mot gjeldende planverk før operativ bruk.\n\n## Tematiske holdepunkter\n\n- **Sikkerhet og førsteinnsats (s. 12–18):** Egen sikkerhet, risikovurdering, oppdragsforståelse og kontrollert førsteinnsats kommer før fremdrift.\n- **Organisering og etterretning (s. 19–29):** Tydelige roller, informasjonsinnhenting, hypoteser og kvalitet i observasjoner gir bedre beslutningsgrunnlag.\n- **Taktikk og planlegging (s. 30–43):** Søksplanen tilpasses terreng, sannsynlighet, ressurser og mål; planlagt dekning må ikke forveksles med bekreftet funn.\n- **Faser og metoder (s. 44–65):** Søksfaser, punkt-, ledelinje- og områdesøk velges etter situasjon. Metodene og begrensningene for hund, kjøretøy, drone og luftressurser må vurderes.\n- **Ressurser og kvalitetssikring (s. 66–78):** Ressurskontroll, rapportering og løpende kvalitetssikring støtter omprioritering og avslutning.\n- **Frivillige, funn og redning (s. 79–94):** Uorganiserte frivillige trenger sikker oppgaveavgrensning. Funn skal sikres, meldes og håndteres etter kompetanse og ordre; redning prioriteres.\n- **Mulig dødsfall (s. 95–99):** Ved mulig dødsfall skal området og opplysninger håndteres varsomt og i samvirke med ansvarlig myndighet.\n- **FAKS og analogt KO (s. 100–106):** FAKS, analog dokumentasjon og analogt KO kan opprettholde oversikt når digitale hjelpemidler ikke er tilgjengelige, etter lokal ordre.\n- **Kommunikasjon (s. 107–112):** Samband skal være kort, tydelig og bekreftet. Uttrekket inneholder ingen virkelige talegrupper, kallesignaler eller tilgangsopplysninger.\n\n## Publiseringsgrense\n\nIngen person- eller helsedata, reelle talkgrupper, tilgangskoder, live-sporing eller FAKS-integrasjon er del av dette uttrekket. Alt nytt operativt innhold er `pending-fagperson` inntil kvalifisert gjennomgang foreligger.",
+    "warnings": [
+      "Kontroller alltid mot gjeldende offisielt planverk før operativ bruk."
+    ]
+  },
+  {
     "id": "src-operativt-konsept-for-sivilforsvaret",
     "title": "SRC - Operativt konsept for Sivilforsvaret",
     "sourcePath": "source-extracts/SRC - Operativt konsept for Sivilforsvaret.md",

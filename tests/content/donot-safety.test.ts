@@ -24,4 +24,20 @@ describe('action-card doNot vs safety', () => {
     });
     expect(offenders, `doNot lines duplicated in safety:\n${offenders.join('\n')}`).toEqual([]);
   });
+
+  it('keeps HRS 2026 SAR safety and prohibition guidance visible', () => {
+    for (const slug of [
+      'sok-og-redning-startkort',
+      'soketeig-sektor',
+      'soketeig-plan-kart',
+      'ledelse-kommando-kontroll',
+      'sok-og-redning-planlegging',
+      'sok-og-redning-funn-og-redning',
+      'sok-og-redning-faks-og-analogt-ko',
+    ]) {
+      const card = cards.find((item) => item.slug === slug);
+      expect(card?.safety?.length, `${slug} safety`).toBeGreaterThan(0);
+      expect(card?.doNot?.length, `${slug} doNot`).toBeGreaterThan(0);
+    }
+  });
 });
