@@ -45,8 +45,8 @@
       keyPoints:
         - Bruk riktig tilnærming for fasen og oppdater planen når ny informasjon kommer.
         - Kvalitetssikre rapporter, avgrensning og avslutning før ressurser omdisponeres.
-      linkedCardSlugs: [sok-og-redning-kvalitetssikring]
-      linkedChecklistSlugs: [sok-og-redning-sektor-under]
+      linkedCardSlugs: []
+      linkedChecklistSlugs: [sok-og-redning-sektor-under, sok-og-redning-kvalitetssikring]
     - id: funn-redning-og-frivillige
       title: Funn, redning og frivillige
       summary: Håndter funn, redning og uorganiserte frivillige med tydelig ledelse.
