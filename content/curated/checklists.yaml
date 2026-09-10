@@ -727,47 +727,47 @@
   equipmentRequired: [personlig-utrustning, samband]
   items:
     - id: oppdrag-og-teig
-      label: Oppdrag, teig, metode, startpunkt og sluttpunkt er bekreftet med KO eller leder
+      label: "Oppdrag, teig, metode, startpunkt og sluttpunkt er bekreftet med KO eller leder"
       required: true
       sourceIds: [src-vedlegg-c-operative-forhold, src-tiltakskort-under-innsats, src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
     - id: ipp-og-metode
-      label: IPP, søksmetode og metodebegrensninger er bekreftet før innrykk
+      label: "IPP, søksmetode og metodebegrensninger er bekreftet før innrykk"
       required: true
       sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
     - id: samband-og-lagkontroll
-      label: Samband, makkerordning, rapporteringsintervall og stoppkriterier er kjent for laget
+      label: "Samband, makkerordning, rapporteringsintervall og stoppkriterier er kjent for laget"
       required: true
       sourceIds: [src-kommunikasjons-og-sambandsdiagram, src-tiltakskort-under-innsats]
     - id: sikkerhet-og-utrustning
-      label: Terreng, vær, mørke, personlig utrustning, kart, kompass og GPS er vurdert før innrykk
+      label: "Terreng, vær, mørke, personlig utrustning, kart, kompass og GPS er vurdert før innrykk"
       required: true
       sourceIds: [src-kursplan-grunnkurs-fig10, src-vedlegg-c-operative-forhold]
     - id: dekning-og-observasjoner
-      label: Dekningsgrad, hindringer, observasjonskvalitet og usikre områder logges lokalt uten persondata
+      label: "Dekningsgrad, hindringer, observasjonskvalitet og usikre områder logges lokalt uten persondata"
       required: true
       sourceIds: [src-tiltakskort-under-innsats, src-vedlegg-c-operative-forhold, src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
     - id: faktisk-dekning
-      label: Faktisk gjennomsøkt område er skilt fra tracklogg, sensorsignal eller registrert tilstedeværelse
+      label: "Faktisk gjennomsøkt område er skilt fra tracklogg, sensorsignal eller registrert tilstedeværelse"
       required: true
       sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
     - id: risikostopp
-      label: Risiko er revurdert, og søket er stoppet eller endret ved uakseptable forhold
+      label: "Risiko er revurdert, og søket er stoppet eller endret ved uakseptable forhold"
       required: true
       sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
     - id: funn-og-avvik
-      label: Funn, spor, avvik, farer og behov meldes straks til KO eller leder via avtalt samband
+      label: "Funn, spor, avvik, farer og behov meldes straks til KO eller leder via avtalt samband"
       required: true
       sourceIds: [src-kommunikasjons-og-sambandsdiagram, src-tiltakskort-under-innsats, src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
     - id: avslutning-teig
-      label: Teigstatus, dekningsgrad, utestående punkter og mannskapsstatus er meldt før laget flyttes
+      label: "Teigstatus, dekningsgrad, utestående punkter og mannskapsstatus er meldt før laget flyttes"
       required: true
       sourceIds: [src-tiltakskort-under-innsats, src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
     - id: overlevering
-      label: Teigstatus, faktisk dekning, funn, avvik og utestående oppgaver er overlevert før laget flyttes
+      label: "Teigstatus, faktisk dekning, funn, avvik og utestående oppgaver er overlevert før laget flyttes"
       required: true
       sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
   sourceIds: [src-vedlegg-c-operative-forhold, src-tiltakskort-under-innsats, src-kursplan-grunnkurs-fig10, src-kommunikasjons-og-sambandsdiagram, src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
-  warning: Lokal beslutningsstøtte for tildelt søketeig fra en uverifisert høyrisikokilde. Følg KO/innsatsleders ordre og lagre ikke personsensitiv informasjon. Ingen persondata.
+  warning: "Lokal beslutningsstøtte for tildelt søketeig fra en uverifisert høyrisikokilde. Følg KO/innsatsleders ordre og lagre ikke personsensitiv informasjon. Ingen persondata."
 
 - slug: sok-og-redning-kvalitetssikring
   title: Søk og redning kvalitetssikring
@@ -776,31 +776,31 @@
   scenarios: [sok-og-redning]
   items:
     - id: etterretning-og-omrade
-      label: Etterretning, søksområder og avgrensninger er kontrollert på nytt
+      label: "Etterretning, søksområder og avgrensninger er kontrollert på nytt"
       required: true
       sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
     - id: gjenta-eller-utvide
-      label: Beslutning om å gjenta søk eller utvide område er begrunnet i lederlinjen
+      label: "Beslutning om å gjenta søk eller utvide område er begrunnet i lederlinjen"
       required: true
       sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
     - id: seao-overgang
-      label: Overgang til SEAO er vurdert og fulgt etter lokal faglig prosess
+      label: "Overgang til SEAO er vurdert og fulgt etter lokal faglig prosess"
       required: true
       sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
     - id: rapportkvalitet
-      label: Rapporten skiller mellom observasjon, faktisk dekning, avvik og vurdering
+      label: "Rapporten skiller mellom observasjon, faktisk dekning, avvik og vurdering"
       required: true
       sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
     - id: debrief
-      label: Debrief og behov for oppfølging er gjennomført etter lokal rutine
+      label: "Debrief og behov for oppfølging er gjennomført etter lokal rutine"
       required: true
       sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
     - id: sar-rapport
-      label: SAR-rapport og læringspunkter er overlevert til ansvarlig organisasjonsledd
+      label: "SAR-rapport og læringspunkter er overlevert til ansvarlig organisasjonsledd"
       required: true
       sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
   sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
-  warning: Lokal kvalitetssikringsstøtte fra en uverifisert høyrisikokilde. Følg gjeldende ordre, fagmyndighet og lokal SAR-prosedyre.
+  warning: "Lokal kvalitetssikringsstøtte fra en uverifisert høyrisikokilde. Følg gjeldende ordre, fagmyndighet og lokal SAR-prosedyre."
 
 - slug: mfe-mottak-under
   title: MFE mottak og oppfølging under innsats

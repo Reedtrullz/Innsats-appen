@@ -23,3 +23,20 @@
 - No person/health data, real names/photos/coordinates, real talkgroups, access codes, live tracking, FAKS integration, or technical-presence-as-coverage claim was added.
 - Generated source artifacts changed because the existing import/compile pipeline had not yet materialized the Task 1 source ID; they are required for source-reference validation and search-index traceability.
 - No full CI, deployment, live-route, or field acceptance claim is made.
+
+## Fix round 1 — review findings
+
+- Added exact fixture assertions for FAQ IDs and content, all HRS synonym aliases/card bindings, the changelog fields and complete content references, and the must-read title, severity, body, source, guide/card links, and changelog link.
+- Added HRS-specific safety/doNot visibility coverage in `tests/content/donot-safety.test.ts`.
+- Quoted comma-containing changed checklist labels and warnings in `content/curated/checklists.yaml`.
+
+### Covering test command and output
+
+```text
+source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && env PATH=/Users/reidar/.nvm/versions/node/v22.22.3/bin:/usr/bin:/bin /Users/reidar/.nvm/versions/node/v22.22.3/bin/npm test -- tests/content/curated-fixtures.test.ts tests/content/donot-safety.test.ts
+
+Test Files  2 passed (2)
+Tests       26 passed (26)
+```
+
+`git diff --check` also passed. Self-review found no scope expansion; the HRS source and all operational cards remain unverified/high-risk and pending-fagperson.
