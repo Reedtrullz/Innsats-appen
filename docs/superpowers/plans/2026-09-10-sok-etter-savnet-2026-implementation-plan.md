@@ -398,7 +398,7 @@ git commit -m "feat: add missing-person search study surface"
 - Modify: `docs/superpowers/plans/2026-09-10-sok-etter-savnet-2026-implementation-plan.md` only for checked task status/ledger bookkeeping
 - Generated: `content/generated/source-documents.json`, `content/generated/source-snapshot-metadata.json`, and `public/sw.js` as produced by the existing scripts
 
-- [ ] **Step 1: Rebuild the complete content graph with Node 22.**
+- [x] **Step 1: Rebuild the complete content graph with Node 22.**
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use 22
@@ -411,7 +411,7 @@ npm run validate:content
 
 Expected: source import finds at least 62 extracts, the HRS source is present with its source ID, the guide count is 1, generated/public mirrors validate, and the content coverage report records the new source as referenced but not pilot-approved.
 
-- [ ] **Step 2: Run focused and project gates.**
+- [x] **Step 2: Run focused and project gates.**
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use 22
@@ -423,7 +423,7 @@ npm run build:app
 
 For route behavior, run the smallest production E2E smoke that covers `/nytt/sok-og-redning`, `/nytt`, `/ma-leses`, `/sok?q=FAKS`, and offline app-shell loading. If the existing E2E suite is the only supported runner, run `npm run e2e:prod:no-build` after `npm run build:app`.
 
-- [ ] **Step 3: Inspect the final diff and content boundaries.**
+- [x] **Step 3: Inspect the final diff and content boundaries.**
 
 ```bash
 git diff --check
@@ -434,9 +434,11 @@ rg -n -i 'ISSI|tilgangskode|SAR talkgroup|private coordinates|pasientjournal|fø
 
 Confirm that no raw PDF or temporary extraction directory is tracked, all new/changed operational cards remain `pending-fagperson`, and no generated public source body is exposed while the source remains `needs-permission`.
 
-- [ ] **Step 4: Complete the handoff.**
+- [x] **Step 4: Complete the handoff.**
 
 Record exact local commands/results, final commit SHAs, source review non-claims, and the Obsidian daily-log path. State explicitly that fagperson review, field exercise, official FAKS use, live deployment, and external acceptance were not verified unless those checks were actually performed.
+
+Task 5 result: `DONE_WITH_CONCERNS`. The local content, typecheck, lint, Vitest, production-build, diff, generated/public-boundary, source-metadata, and `pending-fagperson` checks passed under Node `v22.22.3`. The supported production E2E runner reached the server and ran 77 tests; 6 API tests passed and 71 browser tests could not launch because the Playwright Chromium executable is absent. Browser installation, fagperson approval, field exercise, official FAKS use, live deployment, and external acceptance remain unverified.
 
 ## Synthesis and review gates
 
