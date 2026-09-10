@@ -413,6 +413,8 @@ Expected: source import finds at least 62 extracts, the HRS source is present wi
 
 - [x] **Step 2: Run focused and project gates.**
 
+The checked Step 2 gates are typecheck, lint, full Vitest, and production build. Production E2E is tracked separately below.
+
 ```bash
 source ~/.nvm/nvm.sh && nvm use 22
 npm run typecheck
@@ -421,7 +423,7 @@ npm test
 npm run build:app
 ```
 
-For route behavior, run the smallest production E2E smoke that covers `/nytt/sok-og-redning`, `/nytt`, `/ma-leses`, `/sok?q=FAKS`, and offline app-shell loading. If the existing E2E suite is the only supported runner, run `npm run e2e:prod:no-build` after `npm run build:app`.
+- [ ] **Production E2E smoke (BLOCKED):** Run the smallest supported production E2E smoke covering `/nytt/sok-og-redning`, `/nytt`, `/ma-leses`, `/sok?q=FAKS`, and offline app-shell loading. The existing runner reached the server but could not launch Chromium; 6 API tests passed and 71 browser tests remain unverified.
 
 - [x] **Step 3: Inspect the final diff and content boundaries.**
 
