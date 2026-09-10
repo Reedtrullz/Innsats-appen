@@ -394,6 +394,7 @@ async function readManifest(generatedDir: string): Promise<ContentManifest> {
       actionCardCount: 0,
       checklistCount: 0,
       trainingPathCount: 0,
+      studyGuideCount: 0,
       protectionMeasureCount: 0,
       glossaryCount: 0,
       faqCount: 0,

@@ -86,6 +86,7 @@ export function generatedContentFallbackPayload(pathname: string) {
       sourceCount: 0,
       actionCardCount: 0,
       checklistCount: 0,
+      studyGuideCount: 0,
       fallback: true,
       message: 'Generated content manifest could not be loaded from network or cache.',
     };

@@ -10,6 +10,7 @@ import {
   MustReadNoticeSchema,
   OperationalChecklistSchema,
   ProtectionMeasureSchema,
+  StudyGuideSchema,
   SourceDocumentSchema,
   TrainingPathSchema,
 } from '@/lib/content/schemas';
@@ -203,4 +204,27 @@ it('accepts curated FAQ, equipment, export template, image, overlay, changelog a
   expect(LocalOverlayDeclarationSchema.parse({ id: 'trondelag', districtName: 'Trøndelag', scopeNote: 'Fremtidig godkjent overlay', appliesToScenarios: ['flom'] })).toBeTruthy();
   expect(ContentChangelogEntrySchema.parse({ id: 'nytt-kort', date: '2026-06-03', title: 'Nytt kort', summary: 'Lagt til', changeType: 'added', contentRefs: [{ kind: 'action-card', id: 'kort' }], mustRead: true })).toBeTruthy();
   expect(MustReadNoticeSchema.parse({ id: 'les-kort', title: 'Les kort', body: 'Oppdatert prosedyre', severity: 'warning', changedAt: '2026-06-03', linkedCardSlugs: ['kort'], changelogEntryId: 'nytt-kort' })).toBeTruthy();
+});
+
+it('accepts a study guide with linked cards and checklists', () => {
+  const guide = StudyGuideSchema.parse({
+    slug: 'sok-etter-savnet-2026',
+    title: 'Søk etter savnet på land 2026',
+    summary: 'Kort studiepakke før neste søk.',
+    audienceRoles: ['mannskap', 'lagforer', 'leder'],
+    estimatedMinutes: 25,
+    mustStudyBeforeNextSearch: true,
+    provenanceNote: 'HRS nivå 3, 2026 · SHA-256: test',
+    sourceIds: ['src-hrs-2026'],
+    sections: [{
+      id: 'sikkerhet',
+      title: 'Sikkerhet',
+      summary: 'Vurder risiko først.',
+      keyPoints: ['Stans ved uakseptabel risiko.'],
+      linkedCardSlugs: ['sok-og-redning-startkort'],
+      linkedChecklistSlugs: ['sok-og-redning-sektor-under'],
+    }],
+    updatedAt: '2026-09-10',
+  });
+  expect(guide.sections[0].linkedCardSlugs).toContain('sok-og-redning-startkort');
 });

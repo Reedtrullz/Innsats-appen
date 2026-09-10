@@ -17,6 +17,7 @@ import {
   SearchSynonymGroupSchema,
   SourceDocumentSchema,
   TrainingPathSchema,
+  StudyGuideSchema,
   type ActionCard,
   type ContentChangelogEntry,
   type ContentManifest,
@@ -33,6 +34,7 @@ import {
   type SearchSynonymGroup,
   type SourceDocument,
   type TrainingPath,
+  type StudyGuide,
 } from './schemas';
 
 const generatedRoot = path.join(process.cwd(), 'content/generated');
@@ -72,6 +74,10 @@ export function getChecklists(): OperationalChecklist[] {
 
 export function getTrainingPaths(): TrainingPath[] {
   return loadArray('training-paths.json', 'training paths', (value) => TrainingPathSchema.parse(value));
+}
+
+export function getStudyGuides(): StudyGuide[] {
+  return loadArray('study-guides.json', 'study guides', (value) => StudyGuideSchema.parse(value));
 }
 
 export function getProtectionMeasures(): ProtectionMeasure[] {

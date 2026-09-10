@@ -12,6 +12,7 @@ const manifest: ContentManifest = {
   actionCardCount: 3,
   checklistCount: 1,
   trainingPathCount: 0,
+  studyGuideCount: 0,
   protectionMeasureCount: 0,
   glossaryCount: 0,
   faqCount: 1,
