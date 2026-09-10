@@ -1,6 +1,6 @@
 import { SearchBox } from '@/components/search-box';
 import { OperationalIcon } from '@/components/ui/operational-icons';
-import { getActionCards, getChecklists, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSearchSynonyms, getSourceDocuments, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
+import { getActionCards, getChecklists, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSearchSynonyms, getSourceDocuments, getStudyGuides, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
 import { buildSearchDocuments } from '@/lib/content/search-documents';
 
 export default function SokPage() {
@@ -9,6 +9,7 @@ export default function SokPage() {
     queryBasePath: '/sok',
     cards: getActionCards(),
     checklists: getChecklists(),
+    studyGuides: getStudyGuides(),
     sources: getSourceDocuments(),
     glossary: getGlossaryTerms(),
     training: getTrainingPaths(),

@@ -27,6 +27,7 @@ const report = buildSourceGovernanceReport({
   cards: readGeneratedJson('action-cards.json'),
   checklists: readGeneratedJson('checklists.json'),
   trainingPaths: readGeneratedJson('training-paths.json'),
+  studyGuides: readGeneratedJson('study-guides.json'),
   protectionMeasures: readGeneratedJson('protection-measures.json'),
   glossary: readGeneratedJson('glossary.json'),
 });

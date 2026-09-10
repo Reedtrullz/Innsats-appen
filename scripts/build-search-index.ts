@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildSearchDocuments } from '@/lib/content/search-documents';
 import { buildSearchIndex } from '@/lib/content/search';
-import type { ActionCard, FAQEntry, GlossaryTerm, OperationalChecklist, ProtectionMeasure, SearchSynonymGroup, SourceDocument, TrainingPath } from '@/lib/content/schemas';
+import type { ActionCard, FAQEntry, GlossaryTerm, OperationalChecklist, ProtectionMeasure, SearchSynonymGroup, SourceDocument, StudyGuide, TrainingPath } from '@/lib/content/schemas';
 
 async function readJson<T>(filePath: string): Promise<T> {
   return JSON.parse(await fs.readFile(filePath, 'utf8')) as T;
@@ -15,9 +15,10 @@ async function writeJson(filePath: string, value: unknown) {
 }
 
 export async function buildGeneratedSearchIndex(generatedDir = 'content/generated', publicGeneratedDir = 'public/generated-content') {
-  const [actionCards, checklists, sources, glossary, trainingPaths, protectionMeasures, faq, searchSynonyms] = await Promise.all([
+  const [actionCards, checklists, studyGuides, sources, glossary, trainingPaths, protectionMeasures, faq, searchSynonyms] = await Promise.all([
     readJson<ActionCard[]>(path.join(generatedDir, 'action-cards.json')),
     readJson<OperationalChecklist[]>(path.join(generatedDir, 'checklists.json')),
+    readJson<StudyGuide[]>(path.join(generatedDir, 'study-guides.json')),
     readJson<SourceDocument[]>(path.join(generatedDir, 'source-documents.json')),
     readJson<GlossaryTerm[]>(path.join(generatedDir, 'glossary.json')),
     readJson<TrainingPath[]>(path.join(generatedDir, 'training-paths.json')),
@@ -28,6 +29,7 @@ export async function buildGeneratedSearchIndex(generatedDir = 'content/generate
   const docs = buildSearchDocuments({
     cards: actionCards,
     checklists,
+    studyGuides,
     sources,
     glossary,
     training: trainingPaths,

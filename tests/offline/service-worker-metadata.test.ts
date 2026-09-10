@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import manifest from '@/app/manifest';
-import { GENERATED_CONTENT_ROUTES, GENERATED_ROUTE_DISCOVERY_ENDPOINTS, STATIC_APP_SHELL_ROUTES } from '@/lib/offline/static-app-shell';
+import { APP_SHELL_ROUTES, GENERATED_CONTENT_ROUTES, GENERATED_ROUTE_DISCOVERY_ENDPOINTS, STATIC_APP_SHELL_ROUTES } from '@/lib/offline/static-app-shell';
 import {
   GENERATED_CONTENT_STALE_MS,
   SW_CACHE_VERSION,
@@ -30,6 +30,8 @@ describe('service worker metadata helpers', () => {
     expect(sw).toContain('BEREDSKAPSBOKA_GET_SW_STATUS');
     expect(sw).toContain('BEREDSKAPSBOKA_SKIP_WAITING');
     expect(staticAppShell).toEqual([...STATIC_APP_SHELL_ROUTES]);
+    expect(APP_SHELL_ROUTES).toContain('/nytt/sok-og-redning');
+    expect(GENERATED_CONTENT_ROUTES).toContain('/generated-content/study-guides.json');
     expect(GENERATED_CONTENT_ROUTES.every((route) => route.startsWith('/generated-content/'))).toBe(true);
     expect(staticAppShell.some((route) => /^\/api\//.test(route))).toBe(false);
     expect(staticAppShell.some((route) => /^\/content\//.test(route))).toBe(false);

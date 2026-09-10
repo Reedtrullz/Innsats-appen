@@ -1,5 +1,5 @@
 import { buildSearchDocuments } from '@/lib/content/search-documents';
-import type { ActionCard, FAQEntry, GlossaryTerm, OperationalChecklist, ProtectionMeasure, SourceDocument, TrainingPath } from '@/lib/content/schemas';
+import type { ActionCard, FAQEntry, GlossaryTerm, OperationalChecklist, ProtectionMeasure, SourceDocument, StudyGuide, TrainingPath } from '@/lib/content/schemas';
 
 it('builds routeable search documents with operational metadata', () => {
   const docs = buildSearchDocuments({
@@ -32,6 +32,26 @@ it('builds routeable search documents with operational metadata', () => {
     type: 'kilde',
     href: '/kilder/src-flom',
     sourceStatus: 'verified',
+  });
+});
+
+it('builds the stable search document for a study guide', () => {
+  const docs = buildSearchDocuments({
+    cards: [],
+    sources: [{ id: 'src-hrs', title: 'HRS', sourcePath: 'source-extracts/HRS.md', sourceType: 'source-extract', status: 'unverified', verifiedAt: '2026-06-04', reviewAfter: '2026-12-04', owner: 'content-team', reviewer: 'fag', reviewRisk: 'high', body: 'HRS', warnings: [] }] as SourceDocument[],
+    glossary: [],
+    training: [],
+    protection: [],
+    faq: [],
+    studyGuides: [{ slug: 'sok-etter-savnet-2026', title: 'Søk etter savnet', summary: 'Finn savnet person.', audienceRoles: ['leder'], estimatedMinutes: 10, mustStudyBeforeNextSearch: true, provenanceNote: 'Kildebasert.', sourceIds: ['src-hrs'], updatedAt: '2026-06-04', sections: [{ id: 'grunnlag', title: 'Grunnlag', summary: 'Start trygt.', keyPoints: ['Avklar søket.'], linkedCardSlugs: [], linkedChecklistSlugs: [] }] }] as StudyGuide[],
+  });
+
+  expect(docs.find((doc) => doc.id === 'studieguide:sok-etter-savnet-2026')).toMatchObject({
+    title: 'Søk etter savnet',
+    type: 'studieguide',
+    href: '/nytt/sok-og-redning',
+    sourceStatus: 'unverified',
+    sourceIds: ['src-hrs'],
   });
 });
 

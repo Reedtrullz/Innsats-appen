@@ -7,6 +7,7 @@ export interface ContentCoverageGraph {
   actionCards?: any[];
   checklists?: any[];
   trainingPaths?: any[];
+  studyGuides?: any[];
   protectionMeasures?: any[];
   glossary?: any[];
 }
@@ -145,10 +146,11 @@ export function buildContentCoverageReport(graph: ContentCoverageGraph, generate
   const actionCards = graph.actionCards ?? [];
   const checklists = graph.checklists ?? [];
   const trainingPaths = graph.trainingPaths ?? [];
+  const studyGuides = graph.studyGuides ?? [];
   const protectionMeasures = graph.protectionMeasures ?? [];
   const glossary = graph.glossary ?? [];
   const referencedSourceIds = new Set<string>();
-  for (const collection of [actionCards, checklists, trainingPaths, protectionMeasures, glossary]) {
+  for (const collection of [actionCards, checklists, trainingPaths, studyGuides, protectionMeasures, glossary]) {
     for (const item of collection) collectRefs(item).forEach((id) => referencedSourceIds.add(id));
   }
   const sourceById = new Map(sources.map((source) => [String(source.id), source]));
@@ -221,7 +223,7 @@ export function buildContentCoverageReport(graph: ContentCoverageGraph, generate
   const sourceGovernancePublicationBlockers = sorted(new Set(publicSources.filter(hasPublicBodyWithoutApproval).map((source) => String(source.id))));
 
   const gaps: ReleaseCoverageGap[] = [];
-  addReleaseGap(gaps, 'content-orphan-sources', 'Sources without linked content', sourcesWithoutReferences.length, 'medium', `${sourcesWithoutReferences.length} sources are not linked from cards, checklists, training, protection measures, or glossary.`);
+  addReleaseGap(gaps, 'content-orphan-sources', 'Sources without linked content', sourcesWithoutReferences.length, 'medium', `${sourcesWithoutReferences.length} sources are not linked from cards, checklists, training, study guides, protection measures, or glossary.`);
   addReleaseGap(gaps, 'content-cards-without-sources', 'Cards without linked sources', cardsWithoutSources.length, 'high', `${cardsWithoutSources.length} cards have no sourceIds.`);
   addReleaseGap(gaps, 'content-high-risk-card-warnings', 'High-risk cards missing warnings', highRiskCardsWithoutWarnings.length, 'high', `${highRiskCardsWithoutWarnings.length} high-risk cards lack visible warning copy.`);
   addReleaseGap(gaps, 'content-high-risk-card-competence', 'High-risk cards missing competence or rationale', highRiskCardsWithoutCompetenceOrRationale.length, 'medium', `${highRiskCardsWithoutCompetenceOrRationale.length} high-risk cards lack competence requirements or explicit rationale.`);

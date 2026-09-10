@@ -30,6 +30,7 @@ export type BuildSourceGovernanceReportInput = {
   cards: ReferencingItem[];
   checklists: ReferencingItem[];
   trainingPaths: ReferencingItem[];
+  studyGuides?: ReferencingItem[];
   protectionMeasures?: ReferencingItem[];
   glossary?: ReferencingItem[];
 };
@@ -98,6 +99,8 @@ function sourceReferences(input: BuildSourceGovernanceReportInput) {
   }
 
   for (const trainingPath of input.trainingPaths) addReferences(references, trainingPath.sourceIds, `training:${referenceKey(trainingPath)}`);
+
+  for (const studyGuide of input.studyGuides ?? []) addReferences(references, studyGuide.sourceIds, `studyguide:${referenceKey(studyGuide)}`);
 
   for (const protection of input.protectionMeasures ?? []) addReferences(references, protection.sourceIds, `protection:${referenceKey(protection)}`);
 
