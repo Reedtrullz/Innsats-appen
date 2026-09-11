@@ -209,6 +209,7 @@ it('accepts curated FAQ, equipment, export template, image, overlay, changelog a
 it('accepts a study guide with linked cards and checklists', () => {
   const guide = StudyGuideSchema.parse({
     slug: 'sok-etter-savnet-2026',
+    route: '/nytt/sok-og-redning',
     title: 'Søk etter savnet på land 2026',
     summary: 'Kort studiepakke før neste søk.',
     audienceRoles: ['mannskap', 'lagforer', 'leder'],

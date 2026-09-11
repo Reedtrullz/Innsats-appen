@@ -39,5 +39,9 @@ describe('action-card doNot vs safety', () => {
       expect(card?.safety?.length, `${slug} safety`).toBeGreaterThan(0);
       expect(card?.doNot?.length, `${slug} doNot`).toBeGreaterThan(0);
     }
+
+    const startCard = cards.find((item) => item.slug === 'sok-og-redning-startkort');
+    expect(startCard?.doNot?.join(' ')).toMatch(/ikke fortsett søket/i);
+    expect(startCard?.doNot?.join(' ')).not.toMatch(/^stans søk/i);
   });
 });

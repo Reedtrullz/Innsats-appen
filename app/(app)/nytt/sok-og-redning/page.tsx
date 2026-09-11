@@ -59,7 +59,7 @@ export default function StudyGuidePage() {
               </ul>
               {section.linkedCardSlugs.some((slug) => cardsBySlug.has(slug)) ? (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {section.linkedCardSlugs.map((slug) => { const card = cardsBySlug.get(slug); return card ? <Link key={slug} href={`/kort/${slug}`} className="rounded-full bg-sky-100 px-3 py-2 text-sm font-black text-sky-900 underline">{slug === 'sok-og-redning-planlegging' ? 'Søk etter savnet planlegging' : card.title}</Link> : null; })}
+                  {section.linkedCardSlugs.map((slug) => { const card = cardsBySlug.get(slug); return card ? <Link key={slug} href={`/kort/${slug}`} className="rounded-full bg-sky-100 px-3 py-2 text-sm font-black text-sky-900 underline">{card.title}</Link> : null; })}
                 </div>
               ) : null}
               {section.linkedChecklistSlugs.some((slug) => checklistsBySlug.has(slug)) ? (

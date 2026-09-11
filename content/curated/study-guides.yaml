@@ -1,4 +1,5 @@
 - slug: sok-etter-savnet-2026
+  route: /nytt/sok-og-redning
   title: Søk etter savnet på land 2026
   summary: Guiden fremhever revisjonen i kapitlene 5, 6, 7 og 12. Dette er guidens fremhevede revisjonstemaer, ikke en komplett historisk diff.
   audienceRoles: [mannskap, lagforer, leder]

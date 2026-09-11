@@ -1007,7 +1007,7 @@
   reviewStatus: pending-fagperson
   doNot:
     [
-      "Stans søk ved tap av samband, farlig terreng, mørke, vær eller uklar lagstatus.",
+      "Ikke fortsett søket ved tap av samband, farlig terreng, mørke, vær eller uklar lagstatus; stans, trekk ut og meld til leder.",
       "Ikke fortsett på grunnlag av tracklogg eller sensorsignal alene når faktisk dekning er uklar."
     ]
 

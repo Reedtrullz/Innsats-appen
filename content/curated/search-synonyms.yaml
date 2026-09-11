@@ -349,9 +349,12 @@
 - canonical: ledeline
   aliases: [ledelinjesøk, punkt-søk, punktsøk, områdesøk, omradesok, ledelinje-søk]
   cardIds: [soketeig-sektor, sok-og-redning-startkort]
+- canonical: FAKS
+  aliases: [faks, søksstøtte, analogt KO, analog KO]
+  cardIds: [sok-og-redning-faks-og-analogt-ko]
 - canonical: SEAO
-  aliases: [seao, FAKS, faks, analogt KO, analog KO]
-  cardIds: [sok-og-redning-faks-og-analogt-ko, sok-og-redning-kvalitetssikring]
+  aliases: [seao, søksfase]
+  cardIds: [sok-og-redning-kvalitetssikring]
 - canonical: sykkelhjul
   aliases: [sykkelhjulmodell, sykkelhjulmodellen]
   cardIds: [sok-og-redning-planlegging, sok-og-redning-kvalitetssikring]

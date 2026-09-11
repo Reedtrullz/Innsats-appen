@@ -152,6 +152,7 @@ export const StudyGuideSectionSchema = z.object({
 
 export const StudyGuideSchema = z.object({
   slug: z.string().min(1).regex(slugPattern),
+  route: z.string().min(1).regex(/^\/(?!\/)/, 'study guide route must be a local path'),
   title: z.string().min(1),
   summary: z.string().min(1),
   audienceRoles: z.array(RoleSchema).min(1),

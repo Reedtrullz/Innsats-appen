@@ -115,7 +115,7 @@ export function buildSearchDocuments({
       body: joinSearchText([guide.summary, guide.provenanceNote, guide.sections.map((section) => [section.title, section.summary, section.keyPoints])]),
       role: guide.audienceRoles.join(' '),
       type: 'studieguide',
-      href: '/nytt/sok-og-redning',
+      href: guide.route,
       sourceStatus: sourceStatusFor(guide.sourceIds, sourcesById),
       sourceIds: guide.sourceIds,
     })),

@@ -69,7 +69,7 @@ it('reports training paths linked to missing action cards', async () => {
 it('reports study guides linked to missing action cards and checklists', async () => {
   const errors = await validateContentGraph({
     sources: [knownSource],
-    studyGuides: [{ slug: 'guide', title: 'Guide', summary: 'Summary', audienceRoles: ['leder'], estimatedMinutes: 10, mustStudyBeforeNextSearch: true, provenanceNote: 'Source', sourceIds: ['src-known'], updatedAt: '2026-06-03', sections: [{ id: 'section', title: 'Section', summary: 'Summary', keyPoints: ['Point'], linkedCardSlugs: ['missing-card'], linkedChecklistSlugs: ['missing-checklist'] }] }],
+    studyGuides: [{ slug: 'guide', route: '/nytt/guide', title: 'Guide', summary: 'Summary', audienceRoles: ['leder'], estimatedMinutes: 10, mustStudyBeforeNextSearch: true, provenanceNote: 'Source', sourceIds: ['src-known'], updatedAt: '2026-06-03', sections: [{ id: 'section', title: 'Section', summary: 'Summary', keyPoints: ['Point'], linkedCardSlugs: ['missing-card'], linkedChecklistSlugs: ['missing-checklist'] }] }],
   } as any);
 
   expect(errors).toEqual(expect.arrayContaining([

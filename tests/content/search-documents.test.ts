@@ -43,7 +43,7 @@ it('builds the stable search document for a study guide', () => {
     training: [],
     protection: [],
     faq: [],
-    studyGuides: [{ slug: 'sok-etter-savnet-2026', title: 'Søk etter savnet', summary: 'Finn savnet person.', audienceRoles: ['leder'], estimatedMinutes: 10, mustStudyBeforeNextSearch: true, provenanceNote: 'Kildebasert.', sourceIds: ['src-hrs'], updatedAt: '2026-06-04', sections: [{ id: 'grunnlag', title: 'Grunnlag', summary: 'Start trygt.', keyPoints: ['Avklar søket.'], linkedCardSlugs: [], linkedChecklistSlugs: [] }] }] as StudyGuide[],
+    studyGuides: [{ slug: 'sok-etter-savnet-2026', route: '/nytt/sok-og-redning', title: 'Søk etter savnet', summary: 'Finn savnet person.', audienceRoles: ['leder'], estimatedMinutes: 10, mustStudyBeforeNextSearch: true, provenanceNote: 'Kildebasert.', sourceIds: ['src-hrs'], updatedAt: '2026-06-04', sections: [{ id: 'grunnlag', title: 'Grunnlag', summary: 'Start trygt.', keyPoints: ['Avklar søket.'], linkedCardSlugs: [], linkedChecklistSlugs: [] }] }] as StudyGuide[],
   });
 
   expect(docs.find((doc) => doc.id === 'studieguide:sok-etter-savnet-2026')).toMatchObject({

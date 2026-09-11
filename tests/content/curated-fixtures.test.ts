@@ -1056,8 +1056,10 @@ it('curated HRS 2026 content contract is source-backed and linked', () => {
   expect(synonymByCanonical.get('IPP')).toEqual({ canonical: 'IPP', aliases: ['initialt planleggingspunkt', 'planleggingspunkt', 'LKP', 'POI'], cardIds: ['sok-og-redning-startkort', 'sok-og-redning-planlegging'] });
   expect(synonymByCanonical.get('søksplanlegging')).toEqual({ canonical: 'søksplanlegging', aliases: ['søk planlegging', 'etterretning', 'observasjon', 'analyse', 'planlegging'], cardIds: ['sok-og-redning-planlegging', 'soketeig-plan-kart', 'sok-og-redning-kvalitetssikring'] });
   expect(synonymByCanonical.get('ledeline')).toEqual({ canonical: 'ledeline', aliases: ['ledelinjesøk', 'punkt-søk', 'punktsøk', 'områdesøk', 'omradesok', 'ledelinje-søk'], cardIds: ['soketeig-sektor', 'sok-og-redning-startkort'] });
-  expect(synonymByCanonical.get('SEAO')).toEqual({ canonical: 'SEAO', aliases: ['seao', 'FAKS', 'faks', 'analogt KO', 'analog KO'], cardIds: ['sok-og-redning-faks-og-analogt-ko', 'sok-og-redning-kvalitetssikring'] });
+  expect(synonymByCanonical.get('FAKS')).toEqual({ canonical: 'FAKS', aliases: ['faks', 'søksstøtte', 'analogt KO', 'analog KO'], cardIds: ['sok-og-redning-faks-og-analogt-ko'] });
+  expect(synonymByCanonical.get('SEAO')).toEqual({ canonical: 'SEAO', aliases: ['seao', 'søksfase'], cardIds: ['sok-og-redning-kvalitetssikring'] });
   expect(synonymByCanonical.get('sykkelhjul')).toEqual({ canonical: 'sykkelhjul', aliases: ['sykkelhjulmodell', 'sykkelhjulmodellen'], cardIds: ['sok-og-redning-planlegging', 'sok-og-redning-kvalitetssikring'] });
+  expect(guide?.route).toBe('/nytt/sok-og-redning');
   expect(guide?.summary).toBe('Guiden fremhever revisjonen i kapitlene 5, 6, 7 og 12. Dette er guidens fremhevede revisjonstemaer, ikke en komplett historisk diff.');
   expect(changelogEntry).toEqual({
     id: 'hrs-sok-etter-savnet-2026-studiepakke',

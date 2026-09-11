@@ -41,7 +41,7 @@ export default function MustReadPage() {
               ) : null}
               {notice.linkedStudyGuideSlugs?.map((slug) => {
                 const guide = studyGuideBySlug.get(slug);
-                return guide ? <Link key={slug} href={`/nytt/sok-og-redning`} className="mt-3 inline-flex rounded-full bg-white/80 px-3 py-2 text-sm font-black underline">Studiepakke: {guide.title}</Link> : null;
+                return guide ? <Link key={slug} href={guide.route} className="mt-3 inline-flex rounded-full bg-white/80 px-3 py-2 text-sm font-black underline">Studiepakke: {guide.title}</Link> : null;
               })}
               {changelog ? <p className="mt-3 text-xs font-semibold">Endringslogg: {changelog.title}</p> : null}
               <p className="mt-2 text-xs font-semibold">Kilder: {formatSourceList(notice.sourceIds, sourceTitleById)}</p>
