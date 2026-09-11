@@ -15,11 +15,9 @@ const maplibreMocks = vi.hoisted(() => ({
 }));
 
 vi.mock('maplibre-gl', () => ({
-  default: {
-    addProtocol: maplibreMocks.addProtocol,
-    Map: maplibreMocks.mapConstructor,
-    NavigationControl: vi.fn(),
-  },
+  addProtocol: maplibreMocks.addProtocol,
+  Map: maplibreMocks.mapConstructor,
+  NavigationControl: vi.fn(),
 }));
 
 vi.mock('pmtiles', () => ({ Protocol: maplibreMocks.protocolConstructor }));
