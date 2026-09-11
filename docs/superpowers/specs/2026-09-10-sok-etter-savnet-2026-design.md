@@ -1,7 +1,7 @@
 # Design: kunnskapsdatabase for søk etter savnet på land 2026
 
-**Status:** Draft for user review  
-**Dato:** 2026-09-10  
+**Status:** Draft for user review
+**Dato:** 2026-09-10
 **Kilde:** *Nasjonal veileder for redningstjenesten ved søk etter savnet person på land*, nivå 3, 2026
 
 ## Mål
