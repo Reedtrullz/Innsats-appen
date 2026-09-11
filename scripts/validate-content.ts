@@ -14,6 +14,7 @@ import {
   OperationalChecklistSchema,
   ProtectionMeasureSchema,
   SourceDocumentSchema,
+  StudyGuideSchema,
   TrainingPathSchema,
 } from '@/lib/content/schemas';
 import { WorkplansSnapshotSchema } from '@/lib/workplans/schemas';
@@ -29,6 +30,7 @@ interface GraphInput {
   actionCards?: any[];
   checklists?: any[];
   trainingPaths?: any[];
+  studyGuides?: any[];
   protectionMeasures?: any[];
   glossary?: any[];
   faq?: any[];
@@ -59,6 +61,7 @@ async function readGeneratedGraph(generatedDir = 'content/generated', publicGene
     actionCards: await readJson(path.join(generatedDir, 'action-cards.json')),
     checklists: await readJson(path.join(generatedDir, 'checklists.json')),
     trainingPaths: await readJson(path.join(generatedDir, 'training-paths.json')),
+    studyGuides: await readJson(path.join(generatedDir, 'study-guides.json')),
     protectionMeasures: await readJson(path.join(generatedDir, 'protection-measures.json')),
     glossary: await readJson(path.join(generatedDir, 'glossary.json')),
     faq: await readJson(path.join(generatedDir, 'faq.json')),
@@ -76,6 +79,7 @@ async function readGeneratedGraph(generatedDir = 'content/generated', publicGene
       actionCards: await readJson(path.join(publicGeneratedDir, 'action-cards.json')),
       checklists: await readJson(path.join(publicGeneratedDir, 'checklists.json')),
       trainingPaths: await readJson(path.join(publicGeneratedDir, 'training-paths.json')),
+      studyGuides: await readJson(path.join(publicGeneratedDir, 'study-guides.json')),
       protectionMeasures: await readJson(path.join(publicGeneratedDir, 'protection-measures.json')),
       glossary: await readJson(path.join(publicGeneratedDir, 'glossary.json')),
       faq: await readJson(path.join(publicGeneratedDir, 'faq.json')),
@@ -144,6 +148,7 @@ function validateRestrictedShelterLocationSurfaces(errors: string[], graph: Grap
     actionCards: graph.actionCards,
     checklists: graph.checklists,
     trainingPaths: graph.trainingPaths,
+    studyGuides: graph.studyGuides,
     protectionMeasures: graph.protectionMeasures,
     glossary: graph.glossary,
     faq: graph.faq,
@@ -204,6 +209,7 @@ function validateSensitiveOperationalTextSurfaces(errors: string[], graph: Graph
     actionCards: graph.actionCards,
     checklists: graph.checklists,
     trainingPaths: graph.trainingPaths,
+    studyGuides: graph.studyGuides,
     protectionMeasures: graph.protectionMeasures,
     glossary: graph.glossary,
     faq: graph.faq,
@@ -244,6 +250,7 @@ function validateGeneratedArtifacts(errors: string[], graph: GraphInput) {
     actionCardCount: graph.actionCards?.length ?? 0,
     checklistCount: graph.checklists?.length ?? 0,
     trainingPathCount: graph.trainingPaths?.length ?? 0,
+    studyGuideCount: graph.studyGuides?.length ?? 0,
     protectionMeasureCount: graph.protectionMeasures?.length ?? 0,
     glossaryCount: graph.glossary?.length ?? 0,
     faqCount: publicFaq.length,
@@ -274,7 +281,7 @@ function validateGeneratedArtifacts(errors: string[], graph: GraphInput) {
   const publicGraph = graph.publicGraph;
   if (publicGraph) {
     if (graph.manifest && publicGraph.manifest && !sameJson(graph.manifest, publicGraph.manifest)) errors.push('public generated manifest does not mirror content generated manifest');
-    for (const key of ['actionCards', 'checklists', 'trainingPaths', 'protectionMeasures', 'glossary', 'equipmentTaxonomy', 'exportTemplates', 'imageMetadata', 'localOverlays', 'changelog', 'mustRead', 'workplans'] as const) {
+    for (const key of ['actionCards', 'checklists', 'trainingPaths', 'studyGuides', 'protectionMeasures', 'glossary', 'equipmentTaxonomy', 'exportTemplates', 'imageMetadata', 'localOverlays', 'changelog', 'mustRead', 'workplans'] as const) {
       if (!sameJson(graph[key] ?? [], publicGraph[key] ?? [])) errors.push(`public generated ${key} does not mirror content generated ${key}`);
     }
     if (!sameJson(publicFaq, publicGraph.faq ?? [])) errors.push('public generated faq does not mirror approved content generated faq');
@@ -295,8 +302,9 @@ function validateGeneratedArtifacts(errors: string[], graph: GraphInput) {
     const sourceDocs = docs.filter((doc: any) => String(doc?.id ?? '').startsWith('kilde:'));
     compareIdSets(errors, 'search index source document ids', searchableSources.map((source) => `kilde:${source.id}`), sourceDocs.map((doc: any) => String(doc.id)));
     compareIdSets(errors, 'search index checklist document ids', (graph.checklists ?? []).map((checklist) => `sjekkliste:${checklist.slug}`), docs.filter((doc: any) => String(doc?.id ?? '').startsWith('sjekkliste:')).map((doc: any) => String(doc.id)));
+    compareIdSets(errors, 'search index study guide document ids', (graph.studyGuides ?? []).map((guide) => `studieguide:${guide.slug}`), docs.filter((doc: any) => String(doc?.id ?? '').startsWith('studieguide:')).map((doc: any) => String(doc.id)));
     compareIdSets(errors, 'search index FAQ document ids', publicFaq.map((entry: any) => `faq:${entry.id}`), docs.filter((doc: any) => String(doc?.id ?? '').startsWith('faq:')).map((doc: any) => String(doc.id)));
-    const expectedDocCount = searchableSources.length + counts.actionCardCount + counts.checklistCount + counts.glossaryCount + counts.trainingPathCount + counts.protectionMeasureCount + publicFaq.length;
+    const expectedDocCount = searchableSources.length + counts.actionCardCount + counts.checklistCount + counts.studyGuideCount + counts.glossaryCount + counts.trainingPathCount + counts.protectionMeasureCount + publicFaq.length;
     if (docs.length !== expectedDocCount) errors.push(`search index document count ${docs.length} does not match generated count ${expectedDocCount}`);
     const sourceById = new Map((graph.sources ?? []).map((source) => [String(source.id), source]));
     for (const doc of docs) {
@@ -417,6 +425,7 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
   const actionCards = graph.actionCards ?? [];
   const checklists = graph.checklists ?? [];
   const trainingPaths = graph.trainingPaths ?? [];
+  const studyGuides = graph.studyGuides ?? [];
   const protectionMeasures = graph.protectionMeasures ?? [];
   const glossary = graph.glossary ?? [];
   const faq = graph.faq ?? [];
@@ -431,6 +440,7 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
   const actionCardSlugs = new Set(actionCards.map((card: any) => card.slug));
   const checklistSlugs = new Set(checklists.map((checklist: any) => checklist.slug));
   const trainingPathSlugs = new Set(trainingPaths.map((training: any) => training.slug));
+  const studyGuideSlugs = new Set(studyGuides.map((guide: any) => guide.slug));
   const protectionMeasureSlugs = new Set(protectionMeasures.map((measure: any) => measure.slug));
   const faqIds = new Set(faq.map((entry: any) => entry.id));
   const sourceStatus = new Map(sources.map((source: any) => [source.id, source.status]));
@@ -444,6 +454,7 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
   addDuplicateErrors(errors, 'action card slug', actionCards, (card: any) => card.slug);
   addDuplicateErrors(errors, 'checklist slug', checklists, (checklist: any) => checklist.slug);
   addDuplicateErrors(errors, 'training path slug', trainingPaths, (training: any) => training.slug);
+  addDuplicateErrors(errors, 'study guide slug', studyGuides, (guide: any) => guide.slug);
   addDuplicateErrors(errors, 'protection measure slug', protectionMeasures, (measure: any) => measure.slug);
   addDuplicateErrors(errors, 'glossary term', glossary, (term: any) => term.term);
   addDuplicateErrors(errors, 'FAQ id', faq, (entry: any) => entry.id);
@@ -487,6 +498,16 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
     validateTaxonomyValues(errors, `${training.slug ?? `trainingPaths[${index}]`} competence codes`, [training.courseCode, ...(training.prerequisites ?? [])], competenceSet);
     for (const sourceId of collectRefs(training)) if (!sourceIds.has(sourceId)) errors.push(`${training.slug ?? 'training'} references missing source ${sourceId}`);
     for (const cardSlug of training.linkedCardSlugs ?? []) if (!actionCardSlugs.has(cardSlug)) errors.push(`${training.slug ?? 'training'} links missing action card ${cardSlug}`);
+  });
+  studyGuides.forEach((guide, index) => {
+    const result = StudyGuideSchema.safeParse(guide);
+    if (!result.success) errors.push(`studyGuides[${index}] ${result.error.message}`);
+    validateTaxonomyValues(errors, `${guide.slug ?? `studyGuides[${index}]`} audienceRoles`, guide.audienceRoles, roleSet);
+    for (const sourceId of collectRefs(guide)) if (!sourceIds.has(sourceId)) errors.push(`${guide.slug ?? 'study guide'} references missing source ${sourceId}`);
+    for (const section of guide.sections ?? []) {
+      for (const cardSlug of section.linkedCardSlugs ?? []) if (!actionCardSlugs.has(cardSlug)) errors.push(`${guide.slug ?? 'study guide'} links missing action card ${cardSlug}`);
+      for (const checklistSlug of section.linkedChecklistSlugs ?? []) if (!checklistSlugs.has(checklistSlug)) errors.push(`${guide.slug ?? 'study guide'} links missing checklist ${checklistSlug}`);
+    }
   });
   protectionMeasures.forEach((measure, index) => {
     const result = ProtectionMeasureSchema.safeParse(measure);
@@ -542,6 +563,7 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
     source: sourceIds,
     faq: faqIds,
     'training-path': trainingPathSlugs,
+    'study-guide': studyGuideSlugs,
     'protection-measure': protectionMeasureSlugs,
   };
   changelog.forEach((entry, index) => {
@@ -556,6 +578,7 @@ export async function validateContentGraph(input?: GraphInput): Promise<string[]
     if (!result.success) errors.push(`mustRead[${index}] ${result.error.message}`);
     for (const sourceId of collectRefs(notice)) if (!sourceIds.has(sourceId)) errors.push(`${notice.id ?? 'must-read'} references missing source ${sourceId}`);
     for (const slug of notice.linkedCardSlugs ?? []) if (!actionCardSlugs.has(slug)) errors.push(`${notice.id ?? 'must-read'} links missing action card ${slug}`);
+    for (const slug of notice.linkedStudyGuideSlugs ?? []) if (!studyGuideSlugs.has(slug)) errors.push(`${notice.id ?? 'must-read'} links missing study guide ${slug}`);
     if (notice.changelogEntryId && !changelogIds.has(notice.changelogEntryId)) errors.push(`${notice.id ?? 'must-read'} links missing changelog entry ${notice.changelogEntryId}`);
   });
   await validateImagePublication(errors, graph);

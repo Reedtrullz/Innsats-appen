@@ -15,10 +15,11 @@ export function linkedCardsForSource(source: SourceDocument, cards: ActionCard[]
 }
 
 export function sourceSectionAnchor(source: SourceDocument): string {
-  return source.body.trim().length > 0 ? 'excerpt' : 'metadata';
+  return source.publicationStatus === 'approved-public' && source.body.trim().length > 0 ? 'excerpt' : 'metadata';
 }
 
 export function sourceExcerpt(source: SourceDocument, maxLength = 900): string {
+  if (source.publicationStatus !== 'approved-public') return '';
   const clean = source.body.replace(/\s+/g, ' ').trim();
   if (clean.length <= maxLength) return clean;
   return `${clean.slice(0, maxLength).trim()} …`;

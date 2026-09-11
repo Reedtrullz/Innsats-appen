@@ -1,7 +1,7 @@
 import { RecentCardsRow } from '@/components/recent-cards';
 import { SearchBox } from '@/components/search-box';
 import { TiltakCardRow } from '@/components/tiltak-card';
-import { getActionCards, getChecklists, getContentManifest, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSearchSynonyms, getSourceDocuments, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
+import { getActionCards, getChecklists, getContentManifest, getFAQEntries, getGlossaryTerms, getSearchIndexGeneratedAt, getSearchSynonyms, getSourceDocuments, getStudyGuides, getTrainingPaths, getProtectionMeasures } from '@/lib/content/load-content';
 import { buildSearchDocuments } from '@/lib/content/search-documents';
 import { sortActionCards } from '@/lib/content/filters';
 import { formatNbDateTime } from '@/lib/formatting/format-date';
@@ -10,6 +10,7 @@ import { getWhatNextCards } from '@/lib/content/what-next-cards';
 export default function HurtigkortPage() {
   const cards = getActionCards();
   const checklists = getChecklists();
+  const studyGuides = getStudyGuides();
   const glossary = getGlossaryTerms();
   const training = getTrainingPaths();
   const protection = getProtectionMeasures();
@@ -20,6 +21,7 @@ export default function HurtigkortPage() {
     queryBasePath: '/sok',
     cards,
     checklists,
+    studyGuides,
     sources,
     glossary,
     training,

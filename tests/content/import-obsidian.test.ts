@@ -19,6 +19,7 @@ it('imports source extracts with stable IDs and relative source references', asy
   expect(result.sources.every((source) => source.sourcePath.startsWith('source-extracts/'))).toBe(true);
   expect(result.sources.every((source) => source.status && source.verifiedAt && source.reviewAfter && source.owner && source.reviewer)).toBe(true);
   expect(result.sources.every((source) => source.reviewRisk === 'high')).toBe(true);
+  expect(result.manifest.studyGuideCount).toBe(0);
   expect(JSON.stringify(result.sources)).not.toContain('/Users/');
   expect(JSON.stringify(result.sources)).not.toContain(path.resolve('tests/fixtures/obsidian-mini'));
 });

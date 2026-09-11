@@ -141,6 +141,29 @@ export const TrainingPathSchema = z.object({
   linkedCardSlugs: z.array(z.string().min(1)).default([]),
 });
 
+export const StudyGuideSectionSchema = z.object({
+  id: z.string().min(1).regex(slugPattern),
+  title: z.string().min(1),
+  summary: z.string().min(1),
+  keyPoints: z.array(z.string().min(1)).min(1),
+  linkedCardSlugs: z.array(z.string().min(1)).default([]),
+  linkedChecklistSlugs: z.array(z.string().min(1)).default([]),
+});
+
+export const StudyGuideSchema = z.object({
+  slug: z.string().min(1).regex(slugPattern),
+  route: z.string().min(1).regex(/^\/(?!\/)/, 'study guide route must be a local path'),
+  title: z.string().min(1),
+  summary: z.string().min(1),
+  audienceRoles: z.array(RoleSchema).min(1),
+  estimatedMinutes: z.number().int().positive(),
+  mustStudyBeforeNextSearch: z.boolean(),
+  provenanceNote: z.string().min(1),
+  sourceIds: z.array(z.string().min(1)).min(1),
+  sections: z.array(StudyGuideSectionSchema).min(1),
+  updatedAt: DateOnlySchema,
+});
+
 export const ProtectionMeasureSchema = z
   .object({
     slug: z.string().min(1).regex(slugPattern, 'protection measure slug must be lowercase kebab-case'),
@@ -237,7 +260,7 @@ export const LocalOverlayDeclarationSchema = z.object({
 });
 
 export const ContentRefSchema = z.object({
-  kind: z.enum(['action-card', 'checklist', 'source', 'faq', 'training-path', 'protection-measure']),
+  kind: z.enum(['action-card', 'checklist', 'source', 'faq', 'training-path', 'protection-measure', 'study-guide']),
   id: z.string().min(1),
 });
 
@@ -266,6 +289,7 @@ export const MustReadNoticeSchema = z.object({
   changedAt: DateOnlySchema,
   sourceIds: z.array(z.string().min(1)).default([]),
   linkedCardSlugs: z.array(z.string().min(1)).default([]),
+  linkedStudyGuideSlugs: z.array(z.string().min(1)).default([]),
   changelogEntryId: z.string().min(1).optional(),
 });
 
@@ -279,6 +303,7 @@ export const ContentManifestSchema = z.object({
   actionCardCount: z.number().int().nonnegative().default(0),
   checklistCount: z.number().int().nonnegative().default(0),
   trainingPathCount: z.number().int().nonnegative().default(0),
+  studyGuideCount: z.number().int().nonnegative().default(0),
   protectionMeasureCount: z.number().int().nonnegative().default(0),
   glossaryCount: z.number().int().nonnegative().default(0),
   faqCount: z.number().int().nonnegative().default(0),
@@ -300,6 +325,8 @@ export type ActionCard = z.input<typeof ActionCardSchema>;
 export type OperationalChecklist = z.input<typeof OperationalChecklistSchema>;
 export type ChecklistItem = z.input<typeof ChecklistItemSchema>;
 export type TrainingPath = z.infer<typeof TrainingPathSchema>;
+export type StudyGuideSection = z.infer<typeof StudyGuideSectionSchema>;
+export type StudyGuide = z.infer<typeof StudyGuideSchema>;
 export type ProtectionMeasure = z.infer<typeof ProtectionMeasureSchema>;
 export type GlossaryTerm = z.infer<typeof GlossaryTermSchema>;
 export type FAQEntry = z.infer<typeof FAQEntrySchema>;

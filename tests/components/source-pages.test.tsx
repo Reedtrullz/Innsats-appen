@@ -15,6 +15,7 @@ const source = {
   reviewer: 'fagansvarlig',
   reviewRisk: 'high',
   reviewNotes: 'Kontrolleres hvert kvartal.',
+  publicationStatus: 'approved-public',
   warnings: ['Kontroller mot planverk'],
   body: 'Situasjon og oppdrag',
 } as SourceDocument;
@@ -40,4 +41,15 @@ it('shows source freshness badges on linked source chips', () => {
 
   expect(screen.getByRole('link', { name: /SRC - 5-punktsordre/i })).toHaveAttribute('href', '/kilder/src-5-punktsordre#excerpt');
   expect(screen.getByText(/Gjennomgang forfalt/i)).toBeInTheDocument();
+});
+
+it('does not render source body before public publication approval', () => {
+  const privateSource = { ...source, publicationStatus: 'needs-permission' as const, body: 'PRIVATE SOURCE BODY MUST NOT BE RENDERED' };
+  render(<SourceDocumentView source={privateSource} />);
+
+  expect(screen.getByRole('heading', { name: /Kildeinnhold ikke publisert/i })).toBeInTheDocument();
+  expect(screen.queryByText('PRIVATE SOURCE BODY MUST NOT BE RENDERED')).not.toBeInTheDocument();
+  expect(screen.queryByText(/Vis lengre importert tekst/i)).not.toBeInTheDocument();
+  render(<SourceBadge source={privateSource} withAnchor />);
+  expect(screen.getByRole('link', { name: /SRC - 5-punktsordre/i })).toHaveAttribute('href', '/kilder/src-5-punktsordre#metadata');
 });

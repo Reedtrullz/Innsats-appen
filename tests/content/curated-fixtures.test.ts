@@ -985,3 +985,106 @@ it('curated operational next-action cards give first-aid-style what-next overvie
   expect(cardText(bySlug.get('pumpe-vann-ikke-fram-hva-na'))).toMatch(/sugeside|knekk|kavitasjon|samlerør/i);
   expect(cardText(bySlug.get('transport-avvik-hva-na'))).toMatch(/framkommelighet|førerkompetanse|last/i);
 });
+
+it('curated HRS 2026 content contract is source-backed and linked', () => {
+  const cards = readYaml('content/curated/action-cards.yaml');
+  const checklists = readYaml('content/curated/checklists.yaml');
+  const glossary = readYaml('content/curated/glossary.yaml');
+  const faq = readYaml('content/curated/faq.yaml');
+  const studyGuides = readYaml('content/curated/study-guides.yaml');
+  const synonyms = readYaml('content/curated/search-synonyms.yaml');
+  const changelog = readYaml('content/curated/changelog.yaml');
+  const mustRead = readYaml('content/curated/must-read.yaml');
+  const sourceId = 'src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026';
+  const cardBySlug = new Map(cards.map((card) => [card.slug, card]));
+  const checklistBySlug = new Map(checklists.map((checklist) => [checklist.slug, checklist]));
+  const faqById = new Map(faq.map((entry) => [entry.id, entry]));
+  const synonymByCanonical = new Map(synonyms.map((group) => [group.canonical, group]));
+  const guide = studyGuides.find((item) => item.slug === 'sok-etter-savnet-2026');
+  const changelogEntry = changelog.find((entry) => entry.id === 'hrs-sok-etter-savnet-2026-studiepakke');
+  const mustReadNotice = mustRead.find((notice) => notice.id === 'sok-og-redning-2026-studiepakke');
+  for (const slug of [
+    'sok-og-redning-startkort', 'soketeig-sektor', 'soketeig-plan-kart', 'ledelse-kommando-kontroll',
+    'sok-og-redning-planlegging', 'sok-og-redning-funn-og-redning', 'sok-og-redning-faks-og-analogt-ko',
+  ]) {
+    const card = cardBySlug.get(slug);
+    expect(card, `missing HRS card ${slug}`).toBeTruthy();
+    expect(card?.sourceIds).toContain(sourceId);
+    expect(card?.reviewStatus).toBe('pending-fagperson');
+    expect(card?.warning).toEqual(expect.any(String));
+  }
+  expect(cardBySlug.get('sok-og-redning-planlegging')?.steps.length).toBeGreaterThanOrEqual(5);
+  expect(cardBySlug.get('sok-og-redning-funn-og-redning')?.steps.length).toBeGreaterThanOrEqual(5);
+  expect(cardBySlug.get('sok-og-redning-faks-og-analogt-ko')?.steps.length).toBeGreaterThanOrEqual(5);
+  expect(cardText(cardBySlug.get('sok-og-redning-planlegging'))).toMatch(/IPP som nav|ledelinjer|prioriteringspunkter/i);
+  expect(cardText(cardBySlug.get('sok-og-redning-planlegging'))).toMatch(/ikke.*full arealdekning|ikke.*gjennomsøkt/i);
+  expect(checklistBySlug.get('sok-og-redning-sektor-under')?.sourceIds).toContain(sourceId);
+  expect(checklistBySlug.get('sok-og-redning-kvalitetssikring')?.sourceIds).toContain(sourceId);
+  expect(glossary.map((term) => term.term)).toEqual(expect.arrayContaining(['IPP', 'LKP', 'POI', 'POA', 'POD', 'POS', 'ledeline', 'sykkelhjulmodellen', 'FAKS', 'SEAO', 'søksfaser']));
+  expect(faqById.get('sok-metodevalg')).toMatchObject({
+    question: 'Hvordan velges søksmetode?',
+    answer: 'Søksledelsen velger metode etter tilgjengelig informasjon, terreng, fase, ressurser og risiko. Beredskapsboka gir bare lokal beslutningsstøtte.',
+    aliases: ['metodevalg', 'søksmetode'],
+    scenarios: ['sok-og-redning'],
+    sourceIds: [sourceId],
+    updatedAt: new Date('2026-09-10T00:00:00.000Z'),
+  });
+  expect(faqById.get('sok-sykkelhjulmodell')).toMatchObject({
+    question: 'Hva betyr sykkelhjulmodellen i søk?',
+    answer: 'Sykkelhjulmodellen er en tidlig taktisk modell med IPP som nav. Prioriter terreng, bevegelseslinjer, ledelinjer og prioritetspunkter rundt navet etter lokal plan. Modellen gir ikke full arealdekning og beviser ikke at et område er gjennomsøkt.',
+    aliases: ['sykkelhjul', 'sykkelhjulmodell'],
+    scenarios: ['sok-og-redning'],
+    sourceIds: [sourceId],
+    updatedAt: new Date('2026-09-10T00:00:00.000Z'),
+  });
+  expect(faqById.get('sok-poa-pod-pos')).toMatchObject({
+    question: 'Hva betyr POA, POD og POS?',
+    answer: 'POA er Probability of Area, POD er Probability of Detection, og POS er Probability of Success. Forenklet er POS = POA × POD. Bruk begrepene etter lokal opplæring og plan.',
+    aliases: ['POA', 'POD', 'POS'],
+    scenarios: ['sok-og-redning'],
+    sourceIds: [sourceId],
+    updatedAt: new Date('2026-09-10T00:00:00.000Z'),
+  });
+  expect(faqById.get('sok-funn-frivillige-analog')).toMatchObject({
+    question: 'Hvordan håndteres funn, frivillige og analog drift?',
+    answer: 'Sikre egen sikkerhet, varsle gjennom lokal lederlinje og behold oppgaver til ny føring er gitt. Ta imot frivillige og bruk analog oversikt bare etter lokal ordre.',
+    aliases: ['funn', 'frivillige', 'analogt KO', 'FAKS'],
+    scenarios: ['sok-og-redning'],
+    sourceIds: [sourceId],
+    updatedAt: new Date('2026-09-10T00:00:00.000Z'),
+  });
+  expect(synonymByCanonical.get('IPP')).toEqual({ canonical: 'IPP', aliases: ['initialt planleggingspunkt', 'planleggingspunkt', 'LKP', 'POI'], cardIds: ['sok-og-redning-startkort', 'sok-og-redning-planlegging'] });
+  expect(synonymByCanonical.get('søksplanlegging')).toEqual({ canonical: 'søksplanlegging', aliases: ['søk planlegging', 'etterretning', 'observasjon', 'analyse', 'planlegging'], cardIds: ['sok-og-redning-planlegging', 'soketeig-plan-kart', 'sok-og-redning-kvalitetssikring'] });
+  expect(synonymByCanonical.get('ledeline')).toEqual({ canonical: 'ledeline', aliases: ['ledelinjesøk', 'punkt-søk', 'punktsøk', 'områdesøk', 'omradesok', 'ledelinje-søk'], cardIds: ['soketeig-sektor', 'sok-og-redning-startkort'] });
+  expect(synonymByCanonical.get('FAKS')).toEqual({ canonical: 'FAKS', aliases: ['faks', 'søksstøtte', 'analogt KO', 'analog KO'], cardIds: ['sok-og-redning-faks-og-analogt-ko'] });
+  expect(synonymByCanonical.get('SEAO')).toEqual({ canonical: 'SEAO', aliases: ['seao', 'søksfase'], cardIds: ['sok-og-redning-kvalitetssikring'] });
+  expect(synonymByCanonical.get('sykkelhjul')).toEqual({ canonical: 'sykkelhjul', aliases: ['sykkelhjulmodell', 'sykkelhjulmodellen'], cardIds: ['sok-og-redning-planlegging', 'sok-og-redning-kvalitetssikring'] });
+  expect(guide?.route).toBe('/nytt/sok-og-redning');
+  expect(guide?.summary).toBe('Guiden fremhever revisjonen i kapitlene 5, 6, 7 og 12. Dette er guidens fremhevede revisjonstemaer, ikke en komplett historisk diff.');
+  expect(changelogEntry).toEqual({
+    id: 'hrs-sok-etter-savnet-2026-studiepakke',
+    date: new Date('2026-09-10T00:00:00.000Z'),
+    title: 'HRS 2026 studiepakke for søk etter savnet person',
+    summary: 'HRS 2026-kilden er koblet til studieguide, SAR-kort og sjekklister for lokal, kildebelagt beslutningsstøtte.',
+    changeType: 'added',
+    contentRefs: [
+      { kind: 'study-guide', id: 'sok-etter-savnet-2026' },
+      ...['sok-og-redning-startkort', 'soketeig-sektor', 'soketeig-plan-kart', 'ledelse-kommando-kontroll', 'sok-og-redning-planlegging', 'sok-og-redning-funn-og-redning', 'sok-og-redning-faks-og-analogt-ko'].map((id) => ({ kind: 'action-card', id })),
+      { kind: 'checklist', id: 'sok-og-redning-sektor-under' },
+      { kind: 'checklist', id: 'sok-og-redning-kvalitetssikring' },
+    ],
+    sourceIds: [sourceId],
+    mustRead: true,
+  });
+  expect(mustReadNotice).toEqual({
+    id: 'sok-og-redning-2026-studiepakke',
+    title: 'Dette er nytt – studer før neste søk og redningsaksjon',
+    body: 'Dette er lokal beslutningsstøtte basert på en uverifisert høyrisikokilde, ikke en offisiell ordre. Studer veiledningen før neste søk, og følg alltid gjeldende ordre, innsatsledelse og fagmyndighet.',
+    severity: 'critical',
+    changedAt: new Date('2026-09-10T00:00:00.000Z'),
+    sourceIds: [sourceId],
+    linkedCardSlugs: ['sok-og-redning-startkort', 'sok-og-redning-planlegging', 'sok-og-redning-funn-og-redning', 'sok-og-redning-faks-og-analogt-ko'],
+    linkedStudyGuideSlugs: ['sok-etter-savnet-2026'],
+    changelogEntryId: 'hrs-sok-etter-savnet-2026-studiepakke',
+  });
+});

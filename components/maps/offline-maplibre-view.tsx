@@ -45,7 +45,7 @@ export function OfflineMapLibreView({
 
     async function boot() {
       try {
-        const [{ default: maplibregl }, { Protocol }] = await Promise.all([
+        const [maplibregl, { Protocol }] = await Promise.all([
           import('maplibre-gl'),
           import('pmtiles'),
         ]);
@@ -53,7 +53,7 @@ export function OfflineMapLibreView({
 
         const protocol = new Protocol();
         registerPmtilesProtocolOnce(maplibregl, protocol);
-        map = new maplibregl.Map({
+        const mapInstance = new maplibregl.Map({
           container: containerRef.current,
           style: packageManifest.styleUrl,
           center: packageManifest.center,
@@ -63,7 +63,8 @@ export function OfflineMapLibreView({
           attributionControl: { compact: true },
           cooperativeGestures: true,
         });
-        map.on?.('error', activateFallback);
+        map = mapInstance;
+        mapInstance.on?.('error', activateFallback);
         if (disposed) return;
         setLoadState({
           packageId,

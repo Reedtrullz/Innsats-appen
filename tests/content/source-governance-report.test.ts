@@ -76,6 +76,23 @@ it('reports referenced sources that are not pilot/public approved, including che
   ]);
 });
 
+it('includes study guides in source references', () => {
+  const report = buildSourceGovernanceReport({
+    sources,
+    cards: [],
+    checklists: [],
+    trainingPaths: [],
+    studyGuides: [{ slug: 'sok-etter-savnet-2026', sourceIds: ['src-unverified'] }],
+  });
+
+  expect(report.findings.pilotBlockingReferencedSources).toEqual([
+    expect.objectContaining({
+      sourceId: 'src-unverified',
+      referencedBy: ['studyguide:sok-etter-savnet-2026'],
+    }),
+  ]);
+});
+
 it('includes protection measures and glossary sourceIds in referenced pilot blockers', () => {
   const report = buildSourceGovernanceReport({
     sources: [
@@ -333,17 +350,17 @@ it('exposes source governance npm scripts', () => {
   );
 });
 
-it('keeps strict source-governance output as complete JSON when the gate is clean', () => {
+it('keeps strict source-governance output as complete JSON when the gate is blocked', () => {
   const result = spawnSync('npx', ['tsx', 'scripts/report-source-governance.ts', '--strict'], {
     cwd: process.cwd(),
     encoding: 'utf8',
     maxBuffer: 1024 * 1024 * 10,
   });
 
-  expect(result.status).toBe(0);
-  expect(result.stderr).toBe('');
+  expect(result.status).toBe(2);
+  expect(result.stderr).toMatch(/Source governance strict gate failed/);
   const report = JSON.parse(result.stdout) as ReturnType<typeof buildSourceGovernanceReport>;
-  expect(report.summary.pilotBlockingReferencedSourceCount).toBe(0);
+  expect(report.summary.pilotBlockingReferencedSourceCount).toBe(1);
   expect(report.summary.publicBodyBlockingSourceCount).toBe(0);
   expect(JSON.stringify(report)).not.toContain('"body"');
   expect(JSON.stringify(report)).not.toContain('"owner"');

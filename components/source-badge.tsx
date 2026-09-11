@@ -61,15 +61,24 @@ export function SourceDocumentView({ source, linkedCards = [], now }: { source: 
           </ul>
         ) : <p className="mt-2 text-sm text-slate-600">Ingen kuraterte kort peker til denne kilden ennå.</p>}
       </section>
-      <section id="excerpt" className="rounded-3xl bg-amber-50 p-5 shadow-sm">
-        <h2 className="text-xl font-black text-amber-950">Kildeutdrag</h2>
-        <p className="mt-2 rounded-2xl bg-amber-100 p-3 text-sm font-black text-amber-950">Utdrag – ikke fullstendig offisielt dokument. Kontroller alltid mot gjeldende originalkilde før operativ bruk.</p>
-        <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-800">{sourceExcerpt(source)}</p>
-      </section>
-      <details className="rounded-3xl bg-white p-4 shadow-sm">
-        <summary className="cursor-pointer text-sm font-black text-slate-800">Vis lengre importert tekst fra kildeutdraget</summary>
-        <pre className="mt-3 max-h-[70vh] whitespace-pre-wrap text-sm leading-6 text-slate-800">{source.body}</pre>
-      </details>
+      {source.publicationStatus === 'approved-public' ? (
+        <>
+          <section id="excerpt" className="rounded-3xl bg-amber-50 p-5 shadow-sm">
+            <h2 className="text-xl font-black text-amber-950">Kildeutdrag</h2>
+            <p className="mt-2 rounded-2xl bg-amber-100 p-3 text-sm font-black text-amber-950">Utdrag – ikke fullstendig offisielt dokument. Kontroller alltid mot gjeldende originalkilde før operativ bruk.</p>
+            <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-800">{sourceExcerpt(source)}</p>
+          </section>
+          <details className="rounded-3xl bg-white p-4 shadow-sm">
+            <summary className="cursor-pointer text-sm font-black text-slate-800">Vis lengre importert tekst fra kildeutdraget</summary>
+            <pre className="mt-3 max-h-[70vh] whitespace-pre-wrap text-sm leading-6 text-slate-800">{source.body}</pre>
+          </details>
+        </>
+      ) : (
+        <section className="rounded-3xl border border-amber-300 bg-amber-50 p-5 shadow-sm" aria-labelledby="source-content-not-published-heading">
+          <h2 id="source-content-not-published-heading" className="text-xl font-black text-amber-950">Kildeinnhold ikke publisert</h2>
+          <p className="mt-2 text-sm font-semibold leading-6 text-amber-950">Kildeutdrag og importert tekst vises ikke før eksplisitt offentlig publiseringsgodkjenning foreligger.</p>
+        </section>
+      )}
     </article>
   );
 }

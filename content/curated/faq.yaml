@@ -39,3 +39,47 @@
   updatedAt: 2026-06-03
   status: approved
   mustRead: false
+- id: sok-metodevalg
+  question: Hvordan velges søksmetode?
+  answer: Søksledelsen velger metode etter tilgjengelig informasjon, terreng, fase, ressurser og risiko. Beredskapsboka gir bare lokal beslutningsstøtte.
+  category: Søk og redning
+  aliases: [metodevalg, søksmetode]
+  roles: [mannskap, lagforer, leder]
+  scenarios: [sok-og-redning]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+  updatedAt: 2026-09-10
+  status: approved
+  mustRead: false
+- id: sok-sykkelhjulmodell
+  question: Hva betyr sykkelhjulmodellen i søk?
+  answer: Sykkelhjulmodellen er en tidlig taktisk modell med IPP som nav. Prioriter terreng, bevegelseslinjer, ledelinjer og prioritetspunkter rundt navet etter lokal plan. Modellen gir ikke full arealdekning og beviser ikke at et område er gjennomsøkt.
+  category: Søk og redning
+  aliases: [sykkelhjul, sykkelhjulmodell]
+  roles: [lagforer, leder]
+  scenarios: [sok-og-redning]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+  updatedAt: 2026-09-10
+  status: approved
+  mustRead: false
+- id: sok-poa-pod-pos
+  question: Hva betyr POA, POD og POS?
+  answer: POA er Probability of Area, POD er Probability of Detection, og POS er Probability of Success. Forenklet er POS = POA × POD. Bruk begrepene etter lokal opplæring og plan.
+  category: Søk og redning
+  aliases: [POA, POD, POS]
+  roles: [lagforer, leder]
+  scenarios: [sok-og-redning]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+  updatedAt: 2026-09-10
+  status: approved
+  mustRead: false
+- id: sok-funn-frivillige-analog
+  question: Hvordan håndteres funn, frivillige og analog drift?
+  answer: Sikre egen sikkerhet, varsle gjennom lokal lederlinje og behold oppgaver til ny føring er gitt. Ta imot frivillige og bruk analog oversikt bare etter lokal ordre.
+  category: Søk og redning
+  aliases: [funn, frivillige, analogt KO, FAKS]
+  roles: [mannskap, lagforer, leder, beredskapsvakt]
+  scenarios: [sok-og-redning]
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+  updatedAt: 2026-09-10
+  status: approved
+  mustRead: false

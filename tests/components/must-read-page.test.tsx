@@ -13,4 +13,5 @@ it('stores a versioned acknowledgement for a must-read notice', async () => {
   const stored = JSON.parse(localStorage.getItem('beredskapsboka-must-read-ack-v1') ?? '{}');
   expect(stored[notice.id]).toBe(notice.changedAt);
   expect(screen.getByRole('button', { name: `${notice.title} er lest` })).toBeDisabled();
+  expect(screen.getByRole('link', { name: /Studiepakke: Søk etter savnet på land 2026/i })).toHaveAttribute('href', '/nytt/sok-og-redning');
 });

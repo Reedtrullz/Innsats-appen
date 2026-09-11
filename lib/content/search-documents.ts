@@ -1,12 +1,13 @@
 import type { SearchDocument } from './search';
 import { sourceFreshness } from './source-review';
 import { stepSearchText } from './steps';
-import type { ActionCard, FAQEntry, GlossaryTerm, OperationalChecklist, ProtectionMeasure, SearchSynonymGroup, SourceDocument, TrainingPath } from './schemas';
+import type { ActionCard, FAQEntry, GlossaryTerm, OperationalChecklist, ProtectionMeasure, SearchSynonymGroup, SourceDocument, StudyGuide, TrainingPath } from './schemas';
 
 export interface BuildSearchDocumentsInput {
   queryBasePath?: '/hurtigkort' | '/sok';
   cards: ActionCard[];
   checklists?: OperationalChecklist[];
+  studyGuides?: StudyGuide[];
   sources: SourceDocument[];
   glossary: GlossaryTerm[];
   training: TrainingPath[];
@@ -17,8 +18,10 @@ export interface BuildSearchDocumentsInput {
 
 const PROBLEM_SOURCE_STATUSES = ['expired', 'draft', 'unverified', 'historical'] as const;
 
-function joinSearchText(parts: Array<string | string[] | undefined>) {
-  return parts.flatMap((part) => (Array.isArray(part) ? part : [part ?? ''])).join(' ').trim();
+type SearchTextPart = string | SearchTextPart[] | undefined;
+
+function joinSearchText(parts: SearchTextPart[]): string {
+  return parts.flatMap((part) => (Array.isArray(part) ? joinSearchText(part) : [part ?? ''])).join(' ').trim();
 }
 
 function sourceSearchStatus(source: SourceDocument): SourceDocument['status'] {
@@ -55,6 +58,7 @@ export function buildSearchDocuments({
   queryBasePath = '/hurtigkort',
   cards,
   checklists = [],
+  studyGuides = [],
   sources,
   glossary,
   training,
@@ -104,6 +108,16 @@ export function buildSearchDocuments({
       ], sourcesById),
       sourceIds: checklist.sourceIds,
       priority: checklist.items.some((item) => item.required) ? 'high' : 'medium',
+    })),
+    ...studyGuides.map<SearchDocument>((guide) => ({
+      id: `studieguide:${guide.slug}`,
+      title: guide.title,
+      body: joinSearchText([guide.summary, guide.provenanceNote, guide.sections.map((section) => [section.title, section.summary, section.keyPoints])]),
+      role: guide.audienceRoles.join(' '),
+      type: 'studieguide',
+      href: guide.route,
+      sourceStatus: sourceStatusFor(guide.sourceIds, sourcesById),
+      sourceIds: guide.sourceIds,
     })),
     ...sources
       .filter((source) => source.pilotReviewStatus !== 'rejected-for-pilot')

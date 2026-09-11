@@ -1,0 +1,67 @@
+- slug: sok-etter-savnet-2026
+  route: /nytt/sok-og-redning
+  title: Søk etter savnet på land 2026
+  summary: Guiden fremhever revisjonen i kapitlene 5, 6, 7 og 12. Dette er guidens fremhevede revisjonstemaer, ikke en komplett historisk diff.
+  audienceRoles: [mannskap, lagforer, leder]
+  estimatedMinutes: 25
+  mustStudyBeforeNextSearch: true
+  provenanceNote: 'Nasjonal veileder for redningstjenesten ved søk etter savnet person på land, nivå 3, 2026 · 112 sider · SHA-256: 104283948169d7b5f257f553446d23f9803d89182425870cb302fc0ed244cd34'
+  sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
+  sections:
+    - id: sikkerhet-og-forsteinnsats
+      title: Sikkerhet og førsteinnsats
+      summary: Vurder egen sikkerhet og skap en kontrollert førsteinnsats.
+      keyPoints:
+        - Stans eller endre tiltak ved uakseptabel risiko.
+        - Avklar oppdrag, første observasjoner, ledelinjer og rask ressursutnyttelse.
+      linkedCardSlugs: [sok-og-redning-startkort]
+      linkedChecklistSlugs: [sok-og-redning-sektor-under]
+    - id: organisering-og-etterretning
+      title: Organisering og etterretning
+      summary: Bruk tydelige roller og et kvalitetssikret beslutningsgrunnlag.
+      keyPoints:
+        - Samle, vurder og del relevante opplysninger gjennom kommandolinjen.
+        - Skill mellom observasjon, hypotese og beslutning.
+      linkedCardSlugs: [soketeig-sektor, ledelse-kommando-kontroll]
+      linkedChecklistSlugs: [sok-og-redning-sektor-under]
+    - id: taktikk-og-planlegging
+      title: Taktikk og planlegging
+      summary: Velg søkstaktikk og planlegg med tydelige mål og begrensninger.
+      keyPoints:
+        - Tilpass planleggingen til situasjon, terreng, ressurser og søksfase.
+        - Dokumenter planlagt område og status uten å tolke enkeltspor som full dekning.
+      linkedCardSlugs: [soketeig-plan-kart, sok-og-redning-planlegging]
+      linkedChecklistSlugs: [sok-og-redning-sektor-under]
+    - id: metoder-og-ressurser
+      title: Metoder og ressurser
+      summary: Forstå når ulike søksmetoder og ressurser er egnet.
+      keyPoints:
+        - Bruk punkt-, ledelinje- og områdesøk etter plan og terreng.
+        - Vurder begrensninger og sikkerhet for hund, kjøretøy, drone og luftressurser.
+      linkedCardSlugs: [sok-og-redning-startkort]
+      linkedChecklistSlugs: [sok-og-redning-sektor-under]
+    - id: faser-og-kvalitetssikring
+      title: Faser og kvalitetssikring
+      summary: Følg søksfasene og kvalitetssikre utførelsen underveis.
+      keyPoints:
+        - Bruk riktig tilnærming for fasen og oppdater planen når ny informasjon kommer.
+        - Kvalitetssikre rapporter, avgrensning og avslutning før ressurser omdisponeres.
+      linkedCardSlugs: []
+      linkedChecklistSlugs: [sok-og-redning-sektor-under, sok-og-redning-kvalitetssikring]
+    - id: funn-redning-og-frivillige
+      title: Funn, redning og frivillige
+      summary: Håndter funn, redning og uorganiserte frivillige med tydelig ledelse.
+      keyPoints:
+        - Sikre funnstedet, varsle og prioriter livreddende tiltak etter kompetanse og ordre.
+        - Ta imot frivillige gjennom en kontrollert oppgave- og sikkerhetsramme.
+      linkedCardSlugs: [sok-og-redning-funn-og-redning]
+      linkedChecklistSlugs: [sok-og-redning-sektor-under]
+    - id: faks-analog-drift-og-kommunikasjon
+      title: FAKS, analog drift og kommunikasjon
+      summary: Bevar oversikt og sambandsdisiplin også ved analog drift.
+      keyPoints:
+        - Bruk FAKS og analogt KO som dokumentasjons- og ledelsesstøtte etter lokal ordre.
+        - Hold meldinger korte, verifiser mottak og bruk bare godkjente lokale sambandsopplysninger.
+      linkedCardSlugs: [sok-og-redning-faks-og-analogt-ko]
+      linkedChecklistSlugs: [sok-og-redning-sektor-under]
+  updatedAt: '2026-09-10'

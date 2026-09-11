@@ -17,6 +17,7 @@ import {
   ProtectionMeasureSchema,
   ReferenceVideoSchema,
   SearchSynonymGroupSchema,
+  StudyGuideSchema,
   TrainingPathSchema,
   type ActionCard,
   type ContentChangelogEntry,
@@ -32,6 +33,7 @@ import {
   type ProtectionMeasure,
   type ReferenceVideo,
   type SearchSynonymGroup,
+  type StudyGuide,
   type TrainingPath,
 } from '@/lib/content/schemas';
 
@@ -45,6 +47,7 @@ export interface CompileResult {
   actionCards: ActionCard[];
   checklists: OperationalChecklist[];
   trainingPaths: TrainingPath[];
+  studyGuides: StudyGuide[];
   protectionMeasures: ProtectionMeasure[];
   glossary: GlossaryTerm[];
   faq: FAQEntry[];
@@ -88,6 +91,7 @@ async function readManifest(generatedDir: string): Promise<ContentManifest> {
       actionCardCount: 0,
       checklistCount: 0,
       trainingPathCount: 0,
+      studyGuideCount: 0,
       protectionMeasureCount: 0,
       glossaryCount: 0,
       faqCount: 0,
@@ -118,6 +122,7 @@ export async function compileCuratedContent(options: CompileOptions = {}): Promi
   const actionCards = await readYamlArray(path.join(curatedDir, 'action-cards.yaml'), 'action cards', (v) => ActionCardSchema.parse(v));
   const checklists = await readYamlArray(path.join(curatedDir, 'checklists.yaml'), 'checklists', (v) => OperationalChecklistSchema.parse(v));
   const trainingPaths = await readYamlArray(path.join(curatedDir, 'training-paths.yaml'), 'training paths', (v) => TrainingPathSchema.parse(v));
+  const studyGuides = await readYamlArray(path.join(curatedDir, 'study-guides.yaml'), 'study guides', (v) => StudyGuideSchema.parse(v));
   const protectionMeasures = await readYamlArray(path.join(curatedDir, 'protection-measures.yaml'), 'protection measures', (v) => ProtectionMeasureSchema.parse(v));
   const glossary = await readYamlArray(path.join(curatedDir, 'glossary.yaml'), 'glossary', (v) => GlossaryTermSchema.parse(v));
   const faq = await readYamlArray(path.join(curatedDir, 'faq.yaml'), 'FAQ', (v) => FAQEntrySchema.parse(v));
@@ -134,6 +139,7 @@ export async function compileCuratedContent(options: CompileOptions = {}): Promi
   await writeMirroredJson(generatedDir, publicGeneratedDir, 'action-cards.json', actionCards);
   await writeMirroredJson(generatedDir, publicGeneratedDir, 'checklists.json', checklists);
   await writeMirroredJson(generatedDir, publicGeneratedDir, 'training-paths.json', trainingPaths);
+  await writeMirroredJson(generatedDir, publicGeneratedDir, 'study-guides.json', studyGuides);
   await writeMirroredJson(generatedDir, publicGeneratedDir, 'protection-measures.json', protectionMeasures);
   await writeMirroredJson(generatedDir, publicGeneratedDir, 'glossary.json', glossary);
   await writeJson(path.join(generatedDir, 'faq.json'), faq);
@@ -156,6 +162,7 @@ export async function compileCuratedContent(options: CompileOptions = {}): Promi
     actionCardCount: actionCards.length,
     checklistCount: checklists.length,
     trainingPathCount: trainingPaths.length,
+    studyGuideCount: studyGuides.length,
     protectionMeasureCount: protectionMeasures.length,
     glossaryCount: glossary.length,
     faqCount: publicFaq.length,
@@ -169,7 +176,7 @@ export async function compileCuratedContent(options: CompileOptions = {}): Promi
   };
   await writeJson(path.join(generatedDir, 'manifest.json'), manifest);
   await writeJson(path.join(publicGeneratedDir, 'manifest.json'), manifest);
-  return { actionCards, checklists, trainingPaths, protectionMeasures, glossary, faq, equipmentTaxonomy, exportTemplates, imageMetadata, referenceVideos, localOverlays, searchSynonyms, changelog, mustRead, manifest };
+  return { actionCards, checklists, trainingPaths, studyGuides, protectionMeasures, glossary, faq, equipmentTaxonomy, exportTemplates, imageMetadata, referenceVideos, localOverlays, searchSynonyms, changelog, mustRead, manifest };
 }
 
 async function main() {

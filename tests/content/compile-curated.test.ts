@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import fsSync from 'node:fs';
 import { compileCuratedContent } from '@/scripts/compile-curated';
 
 it('compiles all curated content groups without writing repo generated artifacts', async () => {
@@ -14,6 +15,10 @@ it('compiles all curated content groups without writing repo generated artifacts
   expect(result.checklists.length).toBeGreaterThan(0);
   expect(result.trainingPaths.map((p) => p.slug)).toContain('fig10-grunnkurs');
   expect(result.protectionMeasures.map((p) => p.slug)).toContain('offentlig-tilfluktsrom');
+  expect(result.studyGuides.length).toBe(1);
+  expect(fsSync.existsSync(path.join(outputRoot, 'generated', 'study-guides.json'))).toBe(true);
+  expect(fsSync.existsSync(path.join(outputRoot, 'public-generated', 'study-guides.json'))).toBe(true);
+  expect(result.manifest.studyGuideCount).toBe(1);
 });
 
 it('keeps draft and retired FAQ out of the public generated artifact and manifest count', async () => {
