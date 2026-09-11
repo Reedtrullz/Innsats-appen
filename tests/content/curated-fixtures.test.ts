@@ -991,6 +991,7 @@ it('curated HRS 2026 content contract is source-backed and linked', () => {
   const checklists = readYaml('content/curated/checklists.yaml');
   const glossary = readYaml('content/curated/glossary.yaml');
   const faq = readYaml('content/curated/faq.yaml');
+  const studyGuides = readYaml('content/curated/study-guides.yaml');
   const synonyms = readYaml('content/curated/search-synonyms.yaml');
   const changelog = readYaml('content/curated/changelog.yaml');
   const mustRead = readYaml('content/curated/must-read.yaml');
@@ -999,6 +1000,7 @@ it('curated HRS 2026 content contract is source-backed and linked', () => {
   const checklistBySlug = new Map(checklists.map((checklist) => [checklist.slug, checklist]));
   const faqById = new Map(faq.map((entry) => [entry.id, entry]));
   const synonymByCanonical = new Map(synonyms.map((group) => [group.canonical, group]));
+  const guide = studyGuides.find((item) => item.slug === 'sok-etter-savnet-2026');
   const changelogEntry = changelog.find((entry) => entry.id === 'hrs-sok-etter-savnet-2026-studiepakke');
   const mustReadNotice = mustRead.find((notice) => notice.id === 'sok-og-redning-2026-studiepakke');
   for (const slug of [
@@ -1014,6 +1016,8 @@ it('curated HRS 2026 content contract is source-backed and linked', () => {
   expect(cardBySlug.get('sok-og-redning-planlegging')?.steps.length).toBeGreaterThanOrEqual(5);
   expect(cardBySlug.get('sok-og-redning-funn-og-redning')?.steps.length).toBeGreaterThanOrEqual(5);
   expect(cardBySlug.get('sok-og-redning-faks-og-analogt-ko')?.steps.length).toBeGreaterThanOrEqual(5);
+  expect(cardText(cardBySlug.get('sok-og-redning-planlegging'))).toMatch(/IPP som nav|ledelinjer|prioriteringspunkter/i);
+  expect(cardText(cardBySlug.get('sok-og-redning-planlegging'))).toMatch(/ikke.*full arealdekning|ikke.*gjennomsøkt/i);
   expect(checklistBySlug.get('sok-og-redning-sektor-under')?.sourceIds).toContain(sourceId);
   expect(checklistBySlug.get('sok-og-redning-kvalitetssikring')?.sourceIds).toContain(sourceId);
   expect(glossary.map((term) => term.term)).toEqual(expect.arrayContaining(['IPP', 'LKP', 'POI', 'POA', 'POD', 'POS', 'ledeline', 'sykkelhjulmodellen', 'FAKS', 'SEAO', 'søksfaser']));
@@ -1027,7 +1031,7 @@ it('curated HRS 2026 content contract is source-backed and linked', () => {
   });
   expect(faqById.get('sok-sykkelhjulmodell')).toMatchObject({
     question: 'Hva betyr sykkelhjulmodellen i søk?',
-    answer: 'Den beskriver en gjentakende arbeidsmåte der plan, gjennomføring, observasjon og ny vurdering oppdateres når situasjonen endrer seg.',
+    answer: 'Sykkelhjulmodellen er en tidlig taktisk modell med IPP som nav. Prioriter terreng, bevegelseslinjer, ledelinjer og prioritetspunkter rundt navet etter lokal plan. Modellen gir ikke full arealdekning og beviser ikke at et område er gjennomsøkt.',
     aliases: ['sykkelhjul', 'sykkelhjulmodell'],
     scenarios: ['sok-og-redning'],
     sourceIds: [sourceId],
@@ -1035,7 +1039,7 @@ it('curated HRS 2026 content contract is source-backed and linked', () => {
   });
   expect(faqById.get('sok-poa-pod-pos')).toMatchObject({
     question: 'Hva betyr POA, POD og POS?',
-    answer: 'POA er point of arrival, POD er probability of detection og POS er point of safety. Bruk begrepene etter lokal opplæring og plan.',
+    answer: 'POA er Probability of Area, POD er Probability of Detection, og POS er Probability of Success. Forenklet er POS = POA × POD. Bruk begrepene etter lokal opplæring og plan.',
     aliases: ['POA', 'POD', 'POS'],
     scenarios: ['sok-og-redning'],
     sourceIds: [sourceId],
@@ -1049,11 +1053,12 @@ it('curated HRS 2026 content contract is source-backed and linked', () => {
     sourceIds: [sourceId],
     updatedAt: new Date('2026-09-10T00:00:00.000Z'),
   });
-  expect(synonymByCanonical.get('IPP')).toEqual({ canonical: 'IPP', aliases: ['initialt prioriteringspunkt', 'prioriteringspunkt', 'LKP', 'POI'], cardIds: ['sok-og-redning-startkort', 'sok-og-redning-planlegging'] });
+  expect(synonymByCanonical.get('IPP')).toEqual({ canonical: 'IPP', aliases: ['initialt planleggingspunkt', 'planleggingspunkt', 'LKP', 'POI'], cardIds: ['sok-og-redning-startkort', 'sok-og-redning-planlegging'] });
   expect(synonymByCanonical.get('søksplanlegging')).toEqual({ canonical: 'søksplanlegging', aliases: ['søk planlegging', 'etterretning', 'observasjon', 'analyse', 'planlegging'], cardIds: ['sok-og-redning-planlegging', 'soketeig-plan-kart', 'sok-og-redning-kvalitetssikring'] });
   expect(synonymByCanonical.get('ledeline')).toEqual({ canonical: 'ledeline', aliases: ['ledelinjesøk', 'punkt-søk', 'punktsøk', 'områdesøk', 'omradesok', 'ledelinje-søk'], cardIds: ['soketeig-sektor', 'sok-og-redning-startkort'] });
   expect(synonymByCanonical.get('SEAO')).toEqual({ canonical: 'SEAO', aliases: ['seao', 'FAKS', 'faks', 'analogt KO', 'analog KO'], cardIds: ['sok-og-redning-faks-og-analogt-ko', 'sok-og-redning-kvalitetssikring'] });
   expect(synonymByCanonical.get('sykkelhjul')).toEqual({ canonical: 'sykkelhjul', aliases: ['sykkelhjulmodell', 'sykkelhjulmodellen'], cardIds: ['sok-og-redning-planlegging', 'sok-og-redning-kvalitetssikring'] });
+  expect(guide?.summary).toBe('Guiden fremhever revisjonen i kapitlene 5, 6, 7 og 12. Dette er guidens fremhevede revisjonstemaer, ikke en komplett historisk diff.');
   expect(changelogEntry).toEqual({
     id: 'hrs-sok-etter-savnet-2026-studiepakke',
     date: new Date('2026-09-10T00:00:00.000Z'),

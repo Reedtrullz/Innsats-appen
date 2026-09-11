@@ -82,8 +82,9 @@
   synonyms: [grunnkurs, mannskap, opplæring]
   sourceIds: [src-kursplan-grunnkurs-fig10]
 - term: IPP
-  definition: Initialt prioriteringspunkt som brukes til å rette første innsats mot relevante opplysninger, linjer eller punkter.
-  synonyms: [initialt prioriteringspunkt, prioriteringspunkt]
+  definition: Initialt planleggingspunkt (IPP) er punktet som velges som utgangspunkt for søket.
+  aliases: [initialt planleggingspunkt, planleggingspunkt]
+  synonyms: [initial planning point, startpunkt for søk, søksutgangspunkt]
   sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
 - term: LKP
   definition: Siste kjente punkt i en savnetsak, brukt som del av beslutningsgrunnlaget for videre søk.
@@ -94,23 +95,23 @@
   synonyms: [point of interest, interessepunkt]
   sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
 - term: POA
-  definition: Point of arrival, et ankomstpunkt som inngår i søksplanleggingen.
-  synonyms: [point of arrival, ankomstpunkt]
+  definition: Probability of Area, antatt sannsynlighet for at den savnede befinner seg i et bestemt område eller areal.
+  synonyms: [probability of area, sannsynlighet for område, områdesannsynlighet]
   sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
 - term: POD
-  definition: Probability of detection, en vurdering av sannsynligheten for at søksmetoden oppdager et relevant funn.
+  definition: Probability of Detection, antatt sannsynlighet for at en søksressurs finner den savnede dersom vedkommende faktisk befinner seg i arealet som søkes.
   synonyms: [probability of detection, deteksjonssannsynlighet]
   sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
 - term: POS
-  definition: Point of safety, et avtalt sikkerhetspunkt eller område for laget.
-  synonyms: [point of safety, sikkerhetspunkt]
+  definition: Probability of Success, sannsynlighet for funn. Forenklet uttrykkes dette som POS = POA × POD.
+  synonyms: [probability of success, sannsynlighet for funn, funnsannsynlighet]
   sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
 - term: ledeline
   definition: En tydelig linje i terrenget som kan brukes til å strukturere søk, men som ikke alene dekker området mellom linjer.
   synonyms: [ledelinjesøk, linjesøk, ledelinje-søk]
   sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
 - term: sykkelhjulmodellen
-  definition: En arbeidsmodell der planlegging, gjennomføring, observasjon og ny vurdering gjentas i en løpende søkssyklus.
+  definition: En tidlig taktisk modell med IPP som nav og terreng, bevegelseslinjer, ledelinjer og prioritetspunkter rundt navet. Den gir ikke full arealdekning, og bruk av modellen beviser ikke at et område er gjennomsøkt.
   synonyms: [sykkelhjul, sykkelhjulmodell]
   sourceIds: [src-nasjonal-veileder-sok-etter-savnet-person-pa-land-2026]
 - term: FAKS

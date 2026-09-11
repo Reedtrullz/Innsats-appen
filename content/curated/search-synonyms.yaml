@@ -341,7 +341,7 @@
     - referansekort
   cardIds: []
 - canonical: IPP
-  aliases: [initialt prioriteringspunkt, prioriteringspunkt, LKP, POI]
+  aliases: [initialt planleggingspunkt, planleggingspunkt, LKP, POI]
   cardIds: [sok-og-redning-startkort, sok-og-redning-planlegging]
 - canonical: søksplanlegging
   aliases: [søk planlegging, etterretning, observasjon, analyse, planlegging]

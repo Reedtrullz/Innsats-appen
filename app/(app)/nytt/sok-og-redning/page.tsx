@@ -20,6 +20,10 @@ export default function StudyGuidePage() {
   const sourceTitleById = buildSourceTitleById(sources);
   const source = guide.sourceIds.map((id) => sourcesById.get(id)).find(Boolean);
   const notice = getMustReadNotices().find((item) => item.linkedStudyGuideSlugs?.includes(guide.slug));
+  const linkedChecklists = [...new Set(guide.sections.flatMap((section) => section.linkedChecklistSlugs))].flatMap((slug) => {
+    const checklist = checklistsBySlug.get(slug);
+    return checklist ? [checklist] : [];
+  });
 
   return (
     <div className="space-y-4">
@@ -60,12 +64,28 @@ export default function StudyGuidePage() {
               ) : null}
               {section.linkedChecklistSlugs.some((slug) => checklistsBySlug.has(slug)) ? (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {section.linkedChecklistSlugs.map((slug) => { const checklist = checklistsBySlug.get(slug); return checklist ? <Link key={slug} href="/oppdrag#sjekkliste" className="rounded-full bg-emerald-100 px-3 py-2 text-sm font-black text-emerald-900 underline">Sjekkliste: {checklist.title}</Link> : null; })}
+                  {section.linkedChecklistSlugs.map((slug) => { const checklist = checklistsBySlug.get(slug); return checklist ? <Link key={slug} href={`#sjekkliste-${checklist.slug}`} className="rounded-full bg-emerald-100 px-3 py-2 text-sm font-black text-emerald-900 underline">Sjekkliste: {checklist.title}</Link> : null; })}
                 </div>
               ) : null}
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="rounded-3xl bg-white p-5 shadow-sm" aria-labelledby="study-checklists-heading">
+        <h2 id="study-checklists-heading" className="text-xl font-black">Sjekkliste-lesing uten oppdrag</h2>
+        <p className="mt-2 text-sm font-semibold text-slate-700">Les innholdet her uten å opprette eller velge en lokal oppdragstavle. Dette er ikke en gjennomført sjekk eller dokumentasjon av faktisk søk.</p>
+        <div className="mt-4 space-y-4">
+          {linkedChecklists.map((checklist) => (
+            <article id={`sjekkliste-${checklist.slug}`} key={checklist.slug} tabIndex={-1} className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+              <h3 className="text-lg font-black">{checklist.title}</h3>
+              {checklist.warning ? <p className="mt-1 text-sm font-semibold text-amber-900">{checklist.warning}</p> : null}
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-800">
+                {checklist.items.map((item) => <li key={item.id}>{item.label}</li>)}
+              </ul>
+            </article>
+          ))}
+        </div>
       </section>
 
       {source ? <section className="rounded-3xl bg-white p-5 shadow-sm">

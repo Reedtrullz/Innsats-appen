@@ -52,7 +52,7 @@
   mustRead: false
 - id: sok-sykkelhjulmodell
   question: Hva betyr sykkelhjulmodellen i søk?
-  answer: Den beskriver en gjentakende arbeidsmåte der plan, gjennomføring, observasjon og ny vurdering oppdateres når situasjonen endrer seg.
+  answer: Sykkelhjulmodellen er en tidlig taktisk modell med IPP som nav. Prioriter terreng, bevegelseslinjer, ledelinjer og prioritetspunkter rundt navet etter lokal plan. Modellen gir ikke full arealdekning og beviser ikke at et område er gjennomsøkt.
   category: Søk og redning
   aliases: [sykkelhjul, sykkelhjulmodell]
   roles: [lagforer, leder]
@@ -63,7 +63,7 @@
   mustRead: false
 - id: sok-poa-pod-pos
   question: Hva betyr POA, POD og POS?
-  answer: POA er point of arrival, POD er probability of detection og POS er point of safety. Bruk begrepene etter lokal opplæring og plan.
+  answer: POA er Probability of Area, POD er Probability of Detection, og POS er Probability of Success. Forenklet er POS = POA × POD. Bruk begrepene etter lokal opplæring og plan.
   category: Søk og redning
   aliases: [POA, POD, POS]
   roles: [lagforer, leder]

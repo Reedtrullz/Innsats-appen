@@ -412,7 +412,7 @@
     - "Samle relevant informasjon og skill mellom refleks-, analyse- og formell planlegging."
     - "Avklar IPP, POA, POD og POS som planens beslutningsgrunnlag."
     - "Velg søksmetode og avgrens område etter terreng, fase, ressurser og risiko."
-    - "Bruk sykkelhjulmodellen til å oppdatere plan, gjennomføring, observasjon og ny vurdering."
+    - "Bruk sykkelhjulmodellen tidlig med IPP som nav, og prioriter terreng, bevegelseslinjer, ledelinjer og prioritetspunkter rundt navet."
     - "Planlegg blocking posts og observation posts når det er relevant og besluttet lokalt."
     - "Dokumenter planlagt område, forventet dekning, begrensninger og rapporteringspunkt."
   safety:
@@ -426,6 +426,7 @@
   authority: leder
   reviewStatus: pending-fagperson
   doNot:
+    - "Ikke bruk sykkelhjulmodellen som standardmodell for full arealdekning eller som bevis på at et område er gjennomsøkt."
     - "Ikke presenter en lokal plan som offisiell søksordre eller fullstendig dekning."
 
 - slug: sok-og-redning-funn-og-redning
