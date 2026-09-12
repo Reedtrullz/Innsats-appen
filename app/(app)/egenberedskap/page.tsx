@@ -16,7 +16,7 @@ const prepCards: Array<{ eyebrow: string; title: string; body: string; href: str
   {
     eyebrow: '🎒 Pakk sekken',
     title: 'Pakk innsatssekken',
-    body: 'Tjenestens utstyrskrav, lagt opp som en rolig rekkefølge. Se hvordan alt får plass.',
+    body: 'April-2026-grunnsatsen, fordelt på det du har på kroppen, i ryggsekken og i bagen. Se plasseringen som læringsstøtte.',
     href: '#pakking',
     cta: 'Se pakkeoversikt',
   },
@@ -84,7 +84,7 @@ export default function Page() {
 
       <p className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 font-mono text-xs leading-5 text-[var(--text-muted)]">
         Læringsstøtte og innholdsoversikt, ikke en utstyrsordre eller dokumentasjon på godkjent kompetanse.
-        Den autoritative pakkelisten er tjenestens egen.
+        April-2026-grunnsatsen og tjenestens gjeldende/lokale pakkeplan gjelder foran diagrammet.
       </p>
     </div>
   );

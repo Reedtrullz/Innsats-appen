@@ -304,6 +304,25 @@
     ]
   },
   {
+    "id": "src-klar-til-innsats-pakkesjekk",
+    "title": "SRC - Klar til innsats pakkesjekk",
+    "sourcePath": "source-extracts/SRC - Klar til innsats pakkesjekk.md",
+    "sourceType": "source-extract",
+    "status": "unverified",
+    "verifiedAt": "2026-09-12",
+    "reviewAfter": "2026-12-12",
+    "owner": "content-team",
+    "reviewer": "fagansvarlig",
+    "reviewRisk": "high",
+    "reviewNotes": "Vedlagt PDF mottatt 2026-09-12. Dokumentmetadata viser opprettelse/endring 2024-10-28; gjeldende utgave, offentlig provenance og lokal gyldighet er ikke uavhengig verifisert.",
+    "pilotReviewStatus": "rejected-for-pilot",
+    "publicationStatus": "needs-permission",
+    "body": "# Klar til innsats\n\nDette er et strukturert uttrekk fra den vedlagte PDF-en «KLAR TIL INNSATS». Side 1 er en kort sjekkliste for hva som skal være på kroppen, i ryggsekken og i bag før oppmøte. Side 2 er blank. Kilden holdes utenfor pilotens kildebelagte operative innhold inntil gjeldende utgave og brukstillatelse er avklart.\n\nPDF-metadata viser opprettelse/endring 2024-10-28. Gjeldende utgave, offentlig provenance og lokal gyldighet er ikke uavhengig verifisert. Uttrekket brukes derfor bare som en datert plasseringsstøtte; april-2026-grunnsatsen og tjenestens gjeldende/lokale pakkeplan gjelder foran.\n\n## På kropp\n\n- Bukse og jakke, innsats\n- Refleksvest\n- T-skjorte og annet ullundertøy etter årstid\n- Pussede feltstøvler\n- Caps eller oransje vinterlue\n- Lommepakning i høyre benlomme\n- Arbeidshansker i venstre benlomme\n- Leatherman\n\n## I ryggsekk\n\n- Fleecejakke\n- Headover\n- Flammehemmende vinterhansker\n- Vannflaske, matpakke og drikkekopp\n- Hodelykt med reservebatterier\n- Vernebrille\n- Eget behov\n- Hjelm under topplokk, tilpasset med nakkeskinn og visir påmontert\n\n## I bag\n\n- Vernemaske med reservefilter, sporingspapir og Fullers jord\n- Vindvotter og ullvotter\n- Ullgenser\n- Langermet ulltrøye / longs dersom det ikke er på kroppen\n- Resterende ullundertøy\n- Skift til hjemreise ved skogbrann\n- Eget behov\n\n## Avgrensning\n\nDette er ikke en komplett grunnsats eller en godkjenning av utstyr. Mengder, modeller, CBRN-tilbehør og eventuelle oppdrags-/lokaltillegg kontrolleres mot gjeldende tjenestekilde.",
+    "warnings": [
+      "Kontroller alltid mot gjeldende offisielt planverk før operativ bruk."
+    ]
+  },
+  {
     "id": "src-kommunikasjons-og-sambandsdiagram",
     "title": "SRC - Kommunikasjons og sambandsdiagram",
     "sourcePath": "source-extracts/SRC - Kommunikasjons og sambandsdiagram.md",
