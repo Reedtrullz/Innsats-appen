@@ -130,7 +130,7 @@ export function exportMissionStatusSummaryMarkdown({ mission }: { mission: Missi
 }
 
 const BEFORE_DEPARTURE_EQUIPMENT_ITEM_IDS_BY_CHECKLIST: Record<string, Set<string>> = {
-  'personlig-utstyr-for-utrykning': new Set(['bekledning', 'hjelm-og-verneutstyr']),
+  'personlig-utstyr-for-utrykning': new Set(['pa-kropp', 'i-ryggsekk', 'i-bag', 'utstyrskontroll']),
   'lagsutstyr-for-utrykning': new Set(['fellesutstyr-komplett', 'samband-testet', 'kjoretoy-og-lasting']),
 };
 

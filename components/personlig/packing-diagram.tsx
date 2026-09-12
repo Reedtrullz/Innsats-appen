@@ -1,42 +1,37 @@
 import type { ReactNode } from 'react';
 
 /**
- * "Slik pakker du" — the schematic packing diagram from the redesign board
- * (section 05, Personlig modus). A calm, illustrative layout of an
- * innsatsbekledning bag: numbered zones with what goes where, plus a
- * "slik får du plass" tip. Schematic on purpose — like the offline map
- * fallback, it teaches the layout without pretending to be a photograph.
+ * "Slik pakker du" — a calm, illustrative placement aid for the personal
+ * preparation flow. It separates what belongs on the body, in the day pack,
+ * and in the clothing bag without pretending to be a photograph or a local
+ * issue list.
  *
- * Læringsstøtte, ikke en utstyrsordre — content mirrors the curated example;
- * the authoritative packing list is the tjeneste's own.
+ * Læringsstøtte, ikke en utstyrsordre — the April 2026 baseline and current
+ * local packing plan remain authoritative.
  */
 
 export type PackingZone = {
   /** Number shown on the schematic and in the legend. */
   no: number;
-  /** Short zone name, e.g. "Sidelomme topp". */
+  /** Short placement name, e.g. "I ryggsekk". */
   name: string;
   /** What goes in this zone. */
   contents: string;
-  /** Grid placement on the schematic bag. */
+  /** Grid placement on the schematic placement aid. */
   area: string;
   /** Accent the main compartment a little differently. */
   emphasis?: boolean;
 };
 
 export const INNSATSBEKLEDNING_BAG_ZONES: PackingZone[] = [
-  { no: 1, name: 'Sidelomme topp', contents: 'Vernemaske CBRN + bæreveske, filter, adapter', area: 'top' },
-  { no: 2, name: 'Stor side', contents: 'Hansker, votter, vernebrille', area: 'side-a' },
-  { no: 3, name: 'Stor side', contents: 'Lue, vindlue, hals, caps', area: 'side-b' },
-  { no: 4, name: 'Stor side', contents: 'Hodelykt, multiverktøy, sanitetspakning, refleksvest', area: 'side-c' },
-  { no: 5, name: 'Tynn', contents: 'Notisbok, papirer, navnestriper', area: 'thin' },
-  { no: 6, name: 'Hovedrom', contents: 'Rullet tøy + feltstøvel i bunn + liten ryggsekk med hjelm festet', area: 'main', emphasis: true },
-  { no: 7, name: 'Sidelomme bunn', contents: 'CBRN forts.: klesbørste, påvisningspapir, fullers jord, termos', area: 'bottom' },
+  { no: 1, name: 'På kropp', contents: 'Innsatsjakke og -bukse, feltstøvler, refleksvest, ullundertøy etter årstid, caps/oransje vinterlue, lommepakning, arbeidshansker og multiverktøy', area: 'body', emphasis: true },
+  { no: 2, name: 'I ryggsekk', contents: 'Fleece-/ulljakke, hals/headover, flammehemmede vinterhansker, drikke etter lokal utlevering, matpakke, kopp, hodelykt med reservebatterier, vernebrille og hjelm under topplokk', area: 'backpack', emphasis: true },
+  { no: 3, name: 'I bag', contents: 'Vernemaske med reservefilter og CBRN-tilbehør, påvisnings-/sporingspapir, Fullers jord, vind-/ullvotter, ullgenser, resterende ullundertøy og skift ved skogbrann', area: 'bag' },
 ];
 
 export function PackingDiagram({
   title = 'Slik pakker du',
-  subtitle = 'Bag for innsatsbekledning — få plass til alt',
+  subtitle = 'På kropp, i ryggsekk og i bag — en rolig før-oppmøte-sjekk',
   zones = INNSATSBEKLEDNING_BAG_ZONES,
   tip,
 }: {
@@ -47,8 +42,8 @@ export function PackingDiagram({
 }) {
   const tipContent = tip ?? (
     <>
-      Rull tøyet stramt i Hovedrom og legg den lille ryggsekken (med hjelm festet) øverst der.
-      Maske og CBRN-kit i sidelommene, hardt smågodt i de tre Stor side, kun papirer i Tynn.
+      Hold plasseringen enkel: ha det du trenger først tilgjengelig på kroppen og i ryggsekken.
+      Sikre hjelmen under topplokket og samle maske-/CBRN-utstyret i bagen. Kontroller alltid mot gjeldende lokal pakkeplan.
     </>
   );
 
@@ -58,17 +53,15 @@ export function PackingDiagram({
       <h2 id="packing-diagram-heading" className="text-2xl font-black text-[var(--text-primary)]">{title}</h2>
       <p className="mt-1 text-sm font-semibold text-[var(--text-secondary)]">{subtitle}</p>
 
-      {/* Schematic bag — zones laid out as a simple labelled grid. */}
+      {/* Schematic placement aid — the grid is decorative; the list below is authoritative for reading. */}
       <div
         className="mt-4 grid gap-2"
         style={{
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: '1fr',
           gridTemplateAreas: `
-            "top top thin"
-            "side-a main main"
-            "side-b main main"
-            "side-c main main"
-            "bottom bottom bottom"
+            "body"
+            "backpack"
+            "bag"
           `,
         }}
         aria-hidden="true"
@@ -111,6 +104,9 @@ export function PackingDiagram({
           <p className="mt-1 text-sm font-semibold leading-5 text-[var(--success-fg)]">{tipContent}</p>
         </div>
       </div>
+      <p className="mt-3 text-xs font-semibold leading-5 text-[var(--text-muted)]">
+        Plasseringshjelp basert på «Klar til innsats» (vedlagt PDF med dokumentmetadata fra 2024). Den kan avvike fra gjeldende lokal pakkeplan og er ikke en komplett utstyrsliste.
+      </p>
     </section>
   );
 }

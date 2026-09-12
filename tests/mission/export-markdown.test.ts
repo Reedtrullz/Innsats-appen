@@ -30,19 +30,18 @@ it('exports missing equipment before departure from local checklist state withou
     mission: buildMission({ id: 'm1', title: 'FIG utrykning', createdAt: '2026-06-02T20:00:00.000Z', updatedAt: '2026-06-02T20:00:00.000Z', phase: 'for', role: 'lagforer', scenario: 'generelt', locationText: 'Depot', externalSignals: [], activeChecklistIds: [], notes: '', contentVersion: 'v1' }),
     checklists: equipmentChecklists,
     runs: [
-      { id: 'r1', missionId: 'm1', templateSlug: 'personlig-utstyr-for-utrykning', checkedItemIds: ['hjelm-og-verneutstyr'], notesByItemId: { bekledning: 'Mangler regnjakker i rett størrelse', 'personlig-samband-og-lys': 'Skal ikke eksporteres', 'mangler-notert-lokalt': 'Prosesspunkt skal ikke eksporteres' }, equipmentStatusByItemId: {}, updatedAt: '2026-06-02T20:10:00.000Z', schemaVersion: 1 },
+      { id: 'r1', missionId: 'm1', templateSlug: 'personlig-utstyr-for-utrykning', checkedItemIds: ['i-ryggsekk', 'i-bag', 'utstyrskontroll'], notesByItemId: { 'pa-kropp': 'Mangler regnjakker i rett størrelse', 'eget-behov': 'Skal ikke eksporteres', 'mangler-meldt': 'Prosesspunkt skal ikke eksporteres' }, equipmentStatusByItemId: {}, updatedAt: '2026-06-02T20:10:00.000Z', schemaVersion: 1 },
       { id: 'r2', missionId: 'm1', templateSlug: 'lagsutstyr-for-utrykning', checkedItemIds: ['fellesutstyr-komplett'], notesByItemId: { 'samband-testet': 'Ett reservebatteri mangler', 'kjoretoy-og-lasting': 'Lastestropp mangler', 'mangler-notert-lokalt': 'Note-only punkt skal ikke eksporteres' }, equipmentStatusByItemId: {}, updatedAt: '2026-06-02T20:11:00.000Z', schemaVersion: 1 },
     ],
   });
 
   expect(markdown).toContain('# Manglende utstyr før avreise');
   expect(markdown).toContain('FIG utrykning');
-  expect(markdown).toContain('- [ ] Bekledning valgt etter vær, føre, varighet og oppdragstype — Mangler regnjakker i rett størrelse');
+  expect(markdown).toContain('- [ ] På kropp: Innsatsjakke/-bukse, feltstøvler, refleksvest, ullundertøy etter årstid, caps/oransje vinterlue, lommepakning, arbeidshansker og multiverktøy kontrollert — Mangler regnjakker i rett størrelse');
   expect(markdown).toContain('- [ ] Samband, kallesignal og reservebatterier testet etter lokal sambandsplan — Ett reservebatteri mangler');
   expect(markdown).toContain('- [ ] Kjøretøy, sikring av last og tilgjengelighet for rask avreise kontrollert — Lastestropp mangler');
-  expect(markdown).not.toContain('Hjelm og relevant verneutstyr kontrollert av den enkelte');
-  expect(markdown).not.toContain('Personlig samband/lys/enkle hjelpemidler kontrollert der lokale rutiner krever det');
-  expect(markdown).not.toContain('Eventuelle mangler er notert lokalt');
+  expect(markdown).not.toContain('Eget behov er tilpasset vær, årstid, varighet og oppdragstype');
+  expect(markdown).not.toContain('Mangel eller skade på eget utstyr meldes til leder umiddelbart ved oppmøte');
   expect(markdown).not.toContain('Manglende lagsutstyr er notert lokalt');
   expect(markdown).not.toContain('Skal ikke eksporteres');
   expect(markdown).not.toContain('Note-only punkt skal ikke eksporteres');
@@ -120,13 +119,13 @@ it('rejects sensitive checklist run notes during mission and missing equipment M
     phase: 'for',
     roles: ['lagforer'],
     scenarios: ['generelt'],
-    items: [{ id: 'bekledning', label: 'Bekledning valgt etter vær', required: true, sourceIds: ['src-sjekkliste-fig-og-figp'] }],
+    items: [{ id: 'pa-kropp', label: 'På kropp: Bekledning valgt etter vær', required: true, sourceIds: ['src-sjekkliste-fig-og-figp'] }],
     sourceIds: ['src-sjekkliste-fig-og-figp'],
   } satisfies OperationalChecklist;
-  const runs = [{ id: 'run-sensitive-note', missionId: baseMission.id, templateSlug: checklist.slug, checkedItemIds: [], notesByItemId: { bekledning: 'skjermet tilfluktsrom adresse' }, equipmentStatusByItemId: {}, updatedAt: '2026-06-02T20:10:00.000Z', schemaVersion: 1 }];
+  const runs = [{ id: 'run-sensitive-note', missionId: baseMission.id, templateSlug: checklist.slug, checkedItemIds: [], notesByItemId: { 'pa-kropp': 'skjermet tilfluktsrom adresse' }, equipmentStatusByItemId: {}, updatedAt: '2026-06-02T20:10:00.000Z', schemaVersion: 1 }];
 
-  expect(() => exportMissionMarkdown({ mission: baseMission, checklists: [checklist], runs })).toThrow(/missionMarkdown\.runs\.personlig-utstyr-for-utrykning\.notesByItemId\[bekledning\].*shielded-location/);
-  expect(() => exportMissingEquipmentBeforeDepartureMarkdown({ mission: baseMission, checklists: [checklist], runs })).toThrow(/missingEquipmentBeforeDeparture\.runs\.personlig-utstyr-for-utrykning\.notesByItemId\[bekledning\].*shielded-location/);
+  expect(() => exportMissionMarkdown({ mission: baseMission, checklists: [checklist], runs })).toThrow(/missionMarkdown\.runs\.personlig-utstyr-for-utrykning\.notesByItemId\[pa-kropp\].*shielded-location/);
+  expect(() => exportMissingEquipmentBeforeDepartureMarkdown({ mission: baseMission, checklists: [checklist], runs })).toThrow(/missingEquipmentBeforeDeparture\.runs\.personlig-utstyr-for-utrykning\.notesByItemId\[pa-kropp\].*shielded-location/);
 });
 
 it('rejects sensitive mission, task and resource text during status summary Markdown export', () => {

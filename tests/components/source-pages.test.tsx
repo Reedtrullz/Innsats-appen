@@ -36,6 +36,24 @@ it('shows source document metadata before body', () => {
   expect(screen.getByText(/ikke fullstendig offisielt dokument/i)).toBeInTheDocument();
 });
 
+it('keeps source body hidden until public publication is approved', () => {
+  const unpublishedSource = {
+    ...source,
+    id: 'src-needs-permission',
+    title: 'SRC - Ikke publisert',
+    publicationStatus: 'needs-permission',
+    body: 'INTERN KILDETEKST SOM IKKE SKAL VISES',
+  } as SourceDocument;
+
+  render(<SourceDocumentView source={unpublishedSource} />);
+
+  expect(screen.getByText(/Kildeinnhold ikke publisert/i)).toBeInTheDocument();
+  expect(screen.queryByText(/INTERN KILDETEKST/i)).not.toBeInTheDocument();
+
+  render(<SourceBadge source={unpublishedSource} withAnchor />);
+  expect(screen.getAllByRole('link', { name: /SRC - Ikke publisert/i }).at(-1)).toHaveAttribute('href', '/kilder/src-needs-permission#metadata');
+});
+
 it('shows source freshness badges on linked source chips', () => {
   render(<SourceBadge source={source} now={new Date('2026-10-01T00:00:00.000Z')} withAnchor />);
 
