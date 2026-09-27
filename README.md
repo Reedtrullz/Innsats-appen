@@ -128,6 +128,12 @@ Manual local deploy is still available:
 
 See `deploy/README.md` for prerequisites, GHCR login notes, and VPS verification commands.
 
+### Cloudflare Worker preview
+
+`npm run build:content && npm run build:sw && npm run build:vinext` builds an experimental Worker with locally bundled generated content and fonts. `npm run start:vinext` runs it locally; `wrangler.jsonc` names a separate `beredskapsboka-preview` Worker. The existing Next/VPS build remains available.
+
+This is not a complete deployment. The two PMTiles map binaries are fetched from the verified release, and the regional package exceeds Cloudflare's single static-asset limit. It needs an R2 custom-domain path with verified range requests and offline caching before a public preview or production cutover. The online context routes also need live source and Free-tier CPU checks.
+
 ## MVP boundaries
 
 See `docs/mvp-boundaries.md` for the full boundary policy. In short: no login, no backend mission sync, no live tracking, no push notifications, no patient/persondata, no central incident database, no official command-system integration, no real Nødnett/samband identifiers, and no private/skjermede tilfluktsrom data in the MVP.

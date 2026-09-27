@@ -42,3 +42,6 @@ public/content-assets/
 /sivilforsvaret_dsb_dokumenter.zip
 __pycache__/
 .pytest_cache/
+/dist/
+.vinext/
+.wrangler/

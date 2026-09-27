@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadJsonArray, parseActionCards } from '@/lib/content/load-content';
+import { loadJsonArray, parseActionCards } from '@/lib/content/load-content-file';
 
 it('throws for missing generated JSON', () => {
   expect(() => loadJsonArray('/tmp/beredskapsboka-missing.json', 'missing')).toThrow(/missing/i);
