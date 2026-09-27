@@ -132,7 +132,7 @@ See `deploy/README.md` for prerequisites, GHCR login notes, and VPS verification
 
 `npm run build:content && npm run build:sw && npm run build:vinext` builds an experimental Worker with locally bundled generated content and fonts. `npm run start:vinext` runs it locally; `wrangler.jsonc` names a separate `beredskapsboka-preview` Worker. The existing Next/VPS build remains available.
 
-This is not a complete deployment. The two PMTiles map binaries are fetched from the verified release, and the regional package exceeds Cloudflare's single static-asset limit. It needs an R2 custom-domain path with verified range requests and offline caching before a public preview or production cutover. The online context routes also need live source and Free-tier CPU checks.
+The Worker serves the two PMTiles archives from the private `beredskapsboka-maps` R2 bucket at the existing `/map-packages/` paths. Upload the SHA-256-verified release files under the `map-packages/` key prefix before deploying. `build:vinext` removes the archive copies from `dist/client`; the original Next/VPS build still uses the files under `public/`. Verify full and range reads plus offline caching on a deployed preview before production cutover. The online context routes also need live source and Free-tier CPU checks.
 
 ## MVP boundaries
 
