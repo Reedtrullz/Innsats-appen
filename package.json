@@ -44,7 +44,7 @@
     "check": "npm run check:ci",
     "check:ci": "npm run audit:ci && npm run check:workplans && npm run build:content && npm run check:generated && npm run build:sw && npm run check:sw && npm run validate:maps && npm run typecheck && npm run lint && npm run test && npm run build:app && npm run e2e:prod:no-build && npm run perf:budget && npm run perf:lighthouse",
     "dev:vinext": "vite dev --port 3001",
-    "build:vinext": "vite build && node -e \"for (const name of ['trondheim-osm', 'trondelag-osm']) require('node:fs').rmSync('dist/client/map-packages/' + name + '.pmtiles', { force: true })\"",
+    "build:vinext": "vite build && node -e \"for (const name of ['trondheim-osm', 'trondelag-osm']) require('node:fs').rmSync('dist/client/map-packages/' + name + '.pmtiles', { force: true })\" && next typegen",
     "start:vinext": "wrangler dev --config dist/server/wrangler.json",
     "deploy:vinext": "vinext-cloudflare deploy --config dist/server/wrangler.json"
   },
