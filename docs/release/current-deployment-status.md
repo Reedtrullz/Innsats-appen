@@ -1,10 +1,14 @@
 # Deployment status and verification notes
 
-Updated: 2026-06-07T11:53:07Z
+Updated: 2026-09-28
+
+## Cloudflare cutover — 2026-09-28
+
+Production `innsats.reidar.tech` serves the Cloudflare Worker as a custom domain. The former VPS A record and temporary Worker Route have been removed. The merged application SHA `750098070da6e89fe89521de190a11949cda0437` passed [CI run 36420499620](https://github.com/Reedtrullz/Innsats-appen/actions/runs/36420499620), and the live `/api/health` reported that SHA and Worker version `b4abe022-9148-4887-8cfa-b56763772fa5`. Search, quick cards, map navigation, an R2 map download, and a map archive range response were checked on the production hostname. GitHub variable `INNSATS_VPS_DEPLOY_ENABLED=0` stopped automatic VPS deployments. The VPS image is retained for rollback.
 
 ## How to verify the current production SHA
 
-Do not treat this markdown file as the source of the current live SHA. Every docs-only status commit also creates a new Git commit, runs CI/CD, and deploys a new immutable image. The source of truth for what is live is the public health endpoint plus the completed GitHub Actions run for that exact SHA.
+Do not treat this markdown file as the source of the current live SHA. The source of truth for what is live is the public health endpoint plus the completed GitHub Actions run for that exact SHA.
 
 Use:
 

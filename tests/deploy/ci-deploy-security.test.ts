@@ -485,13 +485,13 @@ describe('manual production publish script safety', () => {
     expect(selectedRunId).toBe('404');
   });
 
-  it('requires proof that the deploy job completed successfully in the selected CI run', () => {
+  it('requires proof that automatic checks completed successfully before manual VPS rollback', () => {
     const script = manualPublishScript();
 
     expect(script).toMatch(/gh run view "\$CI_RUN_ID" --json jobs/);
-    expect(script).toMatch(/select\(\.name == "Deploy to VPS with Ansible" and \.conclusion == "success"\)/);
-    expect(script).toMatch(/DEPLOY_JOB_ID=/);
-    expect(script).toMatch(/did not include a successful Deploy to VPS with Ansible job/);
+    expect(script).toMatch(/select\(\.name == "Automatic checks" and \.conclusion == "success"\)/);
+    expect(script).toMatch(/CHECK_JOB_ID=/);
+    expect(script).toMatch(/did not include successful Automatic checks/);
     expect(script.indexOf('gh run view "$CI_RUN_ID" --json jobs')).toBeLessThan(
       script.indexOf('docker buildx build'),
     );

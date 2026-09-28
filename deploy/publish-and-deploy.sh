@@ -4,6 +4,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+if [[ "${INNSATS_VPS_ROLLBACK:-}" != "1" ]]; then
+  echo "VPS publish is rollback-only; set INNSATS_VPS_ROLLBACK=1 after restoring VPS DNS/Caddy." >&2
+  exit 1
+fi
+
 IMAGE="${IMAGE:-ghcr.io/reedtrullz/innsats-appen}"
 INVENTORY="${INVENTORY:-deploy/inventory/hosts.yml}"
 PLAYBOOK="${PLAYBOOK:-deploy/playbook.yml}"
@@ -64,12 +69,12 @@ if [[ -z "$CI_RUN_ID" ]]; then
   echo "No completed successful main-branch CI / Deploy run found for $SHA. Do not manually deploy unverified code." >&2
   exit 1
 fi
-DEPLOY_JOB_ID="$(gh run view "$CI_RUN_ID" --json jobs --jq '.jobs[] | select(.name == "Deploy to VPS with Ansible" and .conclusion == "success") | .databaseId' | head -n1)"
-if [[ -z "$DEPLOY_JOB_ID" ]]; then
-  echo "CI / Deploy run $CI_RUN_ID did not include a successful Deploy to VPS with Ansible job. Do not manually deploy unverified code." >&2
+CHECK_JOB_ID="$(gh run view "$CI_RUN_ID" --json jobs --jq '.jobs[] | select(.name == "Automatic checks" and .conclusion == "success") | .databaseId' | head -n1)"
+if [[ -z "$CHECK_JOB_ID" ]]; then
+  echo "CI / Deploy run $CI_RUN_ID did not include successful Automatic checks. Do not manually deploy unverified code." >&2
   exit 1
 fi
-echo "Verified CI / Deploy run ${CI_RUN_ID} with deploy job ${DEPLOY_JOB_ID} for ${SHA}."
+echo "Verified CI / Deploy run ${CI_RUN_ID} with checks job ${CHECK_JOB_ID} for ${SHA}."
 
 echo "Installing Ansible collection requirements..."
 ansible-galaxy collection install -r deploy/requirements.yml

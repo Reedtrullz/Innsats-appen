@@ -113,6 +113,66 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+  deploy-cloudflare:
+    name: Deploy Cloudflare Worker
+    runs-on: ubuntu-24.04
+    needs: checks
+    timeout-minutes: 20
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.INNSATS_CLOUDFLARE_DEPLOY_ENABLED == '1'
+    environment:
+      name: production
+      url: https://innsats.reidar.tech
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-deps
+
+      - name: Fetch local map packages (release assets)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run map:fetch
+
+      - name: Build Cloudflare Worker
+        run: |
+          npm run build:content
+          npm run build:sw
+          npm run build:vinext
+          node -e 'const config = require("./dist/server/wrangler.json"); if (config.vars.RELEASE_SHA !== process.env.GITHUB_SHA) process.exit(1)'
+
+      - name: Deploy Worker and verify production
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN"
+          npx wrangler deploy --config dist/server/wrangler.json
+          node --input-type=module - <<'NODE'
+          const expected = process.env.GITHUB_SHA;
+          const url = 'https://innsats.reidar.tech/api/health';
+          for (let attempt = 0; attempt < 12; attempt++) {
+            try {
+              const response = await fetch(url, { headers: { 'Cache-Control': 'no-cache' } });
+              const health = await response.json();
+              if (response.ok && health.status === 'healthy' && health.version === expected && health.workerVersion) {
+                console.log(JSON.stringify(health));
+                process.exit(0);
+              }
+            } catch (error) {
+              console.error(String(error));
+            }
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+          throw new Error(`Production health did not expose ${expected}`);
+          NODE
+
   build-and-push:
     name: Build and push GHCR image
     runs-on: ubuntu-24.04
