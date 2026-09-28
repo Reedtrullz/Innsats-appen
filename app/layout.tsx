@@ -5,6 +5,7 @@ import '@fontsource/ibm-plex-sans/latin-600.css';
 import '@fontsource/ibm-plex-sans/latin-700.css';
 import '@fontsource/ibm-plex-mono/latin-400.css';
 import '@fontsource/ibm-plex-mono/latin-500.css';
+import 'maplibre-gl/dist/maplibre-gl.css';
 import '@fontsource/ibm-plex-mono/latin-600.css';
 import { RoleProviderWrapper } from '@/components/role-provider-wrapper';
 import { ServiceWorkerRegistration } from '@/components/service-worker-registration';
