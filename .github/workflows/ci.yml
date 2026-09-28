@@ -86,6 +86,12 @@ jobs:
       - name: Playwright production smoke/E2E
         run: npm run e2e:prod:no-build
 
+      - name: Build Cloudflare Worker preview
+        run: |
+          npm run build:vinext
+          node -e 'const config = require("./dist/server/wrangler.json"); if (config.vars.RELEASE_SHA !== process.env.GITHUB_SHA) process.exit(1)'
+          npx wrangler deploy --dry-run --config dist/server/wrangler.json
+
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
