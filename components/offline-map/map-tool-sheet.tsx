@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 const primaryTools = [
   { href: '#map-marker-tool', label: 'Markør' },
   { href: '#map-quick-log-tool', label: 'Hurtiglogg' },
@@ -44,7 +42,7 @@ export function MapToolSheet({ packageStatus, selectedSpecialistTool, onSelectSp
           ))}
         </div>
         <p className="mt-3 text-xs font-semibold text-[var(--text-muted)]">Kartpakke: {packageStatus}</p>
-        <Link href="/data-pa-enheten" className="mt-2 inline-flex min-h-11 items-center rounded-xl bg-[#082F49] px-4 text-sm font-black text-white">Administrer kartdata</Link>
+        <a href="/data-pa-enheten" className="mt-2 inline-flex min-h-11 items-center rounded-xl bg-[#082F49] px-4 text-sm font-black text-white">Administrer kartdata</a>
       </details>
     </section>
   );

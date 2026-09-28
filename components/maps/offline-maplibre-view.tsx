@@ -6,7 +6,6 @@ import { registerPmtilesProtocolOnce } from '@/lib/maps/maplibre-runtime';
 
 type MapInstanceLike = {
   remove: () => void;
-  on?: (event: 'error' | string, handler: () => void) => void;
 };
 
 type MapLibreLoadState = {
@@ -64,12 +63,19 @@ export function OfflineMapLibreView({
           cooperativeGestures: true,
         });
         map = mapInstance;
-        mapInstance.on?.('error', activateFallback);
-        if (disposed) return;
-        setLoadState({
-          packageId,
-          status: `Lokal kartpakke aktiv: ${packageManifest.title}.`,
-          fallbackActive: false,
+        let failed = false;
+        mapInstance.on('error', (event) => {
+          console.error('Could not load local map package:', event?.error);
+          failed = true;
+          activateFallback();
+        });
+        mapInstance.on('load', () => {
+          if (disposed || failed) return;
+          setLoadState({
+            packageId,
+            status: `Lokal kartpakke aktiv: ${packageManifest.title}.`,
+            fallbackActive: false,
+          });
         });
       } catch {
         activateFallback();

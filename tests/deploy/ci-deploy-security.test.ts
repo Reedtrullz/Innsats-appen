@@ -261,6 +261,14 @@ describe('CI workflow checks', () => {
     expect(workflow.indexOf('npm run validate:maps')).toBeLessThan(workflow.indexOf('npm run build:app'));
   });
 
+  it('checks the Cloudflare build and exact release SHA in CI', () => {
+    const workflow = readCiWorkflow();
+    expect(workflow).toContain('name: Build Cloudflare Worker preview');
+    expect(workflow).toContain('npm run build:vinext');
+    expect(workflow).toContain('config.vars.RELEASE_SHA !== process.env.GITHUB_SHA');
+    expect(workflow).toContain('wrangler deploy --dry-run --config dist/server/wrangler.json');
+  });
+
   it('fetches release map packages before staging checks and image build', () => {
     const workflow = readStagingWorkflow();
     const fetchMatches = workflow.match(/run:\s*npm run map:fetch/g) ?? [];

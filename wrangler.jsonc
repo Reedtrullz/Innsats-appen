@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "beredskapsboka-preview",
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "innsats-canary.reidar.tech", "custom_domain": true }
+  ],
+  "account_id": "1f2af581e4a2ef3a5d150cc385339d78",
+  "compatibility_date": "2026-09-27",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "main": "worker/index.ts",
+  "vars": { "MET_USER_AGENT": "Beredskapsboka/0.1 (+https://innsats.reidar.tech)" },
+  "r2_buckets": [
+    { "binding": "MAP_PACKAGES", "bucket_name": "beredskapsboka-maps" }
+  ],
+  "assets": {
+    "directory": "dist/client",
+    "not_found_handling": "404-page",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/map-packages/*.pmtiles"]
+  }
+}

@@ -1,5 +1,21 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import actionCards from '@/content/generated/action-cards.json';
+import changelog from '@/content/generated/changelog.json';
+import checklists from '@/content/generated/checklists.json';
+import equipmentTaxonomy from '@/content/generated/equipment-taxonomy.json';
+import exportTemplates from '@/content/generated/export-templates.json';
+import faq from '@/content/generated/faq.json';
+import glossary from '@/content/generated/glossary.json';
+import imageMetadata from '@/content/generated/image-metadata.json';
+import localOverlays from '@/content/generated/local-overlays.json';
+import manifest from '@/content/generated/manifest.json';
+import mustRead from '@/content/generated/must-read.json';
+import protectionMeasures from '@/content/generated/protection-measures.json';
+import referenceVideos from '@/content/generated/reference-videos.json';
+import searchIndex from '@/content/generated/search-index.json';
+import searchSynonyms from '@/content/generated/search-synonyms.json';
+import sourceDocuments from '@/content/generated/source-documents.json';
+import studyGuides from '@/content/generated/study-guides.json';
+import trainingPaths from '@/content/generated/training-paths.json';
 import {
   ActionCardSchema,
   ContentChangelogEntrySchema,
@@ -37,27 +53,35 @@ import {
   type StudyGuide,
 } from './schemas';
 
-const generatedRoot = path.join(process.cwd(), 'content/generated');
-
-export function loadJsonArray(filePath: string, label: string): unknown[] {
-  if (!fs.existsSync(filePath)) throw new Error(`Missing generated ${label}: ${filePath}`);
-  const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  if (!Array.isArray(parsed) || parsed.length === 0) throw new Error(`Generated ${label} is empty or not an array`);
-  return parsed;
-}
+const generated: Record<string, unknown> = {
+  'action-cards.json': actionCards,
+  'changelog.json': changelog,
+  'checklists.json': checklists,
+  'equipment-taxonomy.json': equipmentTaxonomy,
+  'export-templates.json': exportTemplates,
+  'faq.json': faq,
+  'glossary.json': glossary,
+  'image-metadata.json': imageMetadata,
+  'local-overlays.json': localOverlays,
+  'must-read.json': mustRead,
+  'protection-measures.json': protectionMeasures,
+  'reference-videos.json': referenceVideos,
+  'search-synonyms.json': searchSynonyms,
+  'source-documents.json': sourceDocuments,
+  'study-guides.json': studyGuides,
+  'training-paths.json': trainingPaths,
+};
 
 function loadArray<T>(fileName: string, label: string, parse: (value: unknown) => T): T[] {
-  return loadJsonArray(path.join(generatedRoot, fileName), label).map((value, index) => {
+  const values = generated[fileName];
+  if (!Array.isArray(values) || values.length === 0) throw new Error(`Generated ${label} is empty or not an array`);
+  return values.map((value, index) => {
     try {
       return parse(value);
     } catch (error) {
       throw new Error(`${label}[${index}] invalid: ${error instanceof Error ? error.message : String(error)}`);
     }
   });
-}
-
-export function parseActionCards(filePath: string): ActionCard[] {
-  return loadJsonArray(filePath, 'action cards').map((value) => ActionCardSchema.parse(value));
 }
 
 export function getActionCards(): ActionCard[] {
@@ -121,16 +145,11 @@ export function getMustReadNotices(): MustReadNotice[] {
 }
 
 export function getContentManifest(): ContentManifest {
-  const filePath = path.join(generatedRoot, 'manifest.json');
-  if (!fs.existsSync(filePath)) throw new Error(`Missing generated manifest: ${filePath}`);
-  return ContentManifestSchema.parse(JSON.parse(fs.readFileSync(filePath, 'utf8')));
+  return ContentManifestSchema.parse(manifest);
 }
 
 export function getSearchIndexGeneratedAt(): string | undefined {
-  const filePath = path.join(generatedRoot, 'search-index.json');
-  if (!fs.existsSync(filePath)) return undefined;
-  const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8')) as { generatedAt?: unknown };
-  return typeof parsed.generatedAt === 'string' ? parsed.generatedAt : undefined;
+  return typeof searchIndex.generatedAt === 'string' ? searchIndex.generatedAt : undefined;
 }
 
 export function getSearchSynonyms(): SearchSynonymGroup[] {

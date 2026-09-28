@@ -12,6 +12,7 @@ const maplibreMocks = vi.hoisted(() => ({
   protocolTile: vi.fn(),
   protocolConstructor: vi.fn(),
   errorHandler: undefined as undefined | (() => void),
+  loadHandler: undefined as undefined | (() => void),
 }));
 
 vi.mock('maplibre-gl', () => ({
@@ -45,11 +46,13 @@ const demoPackage: LocalMapPackageManifest = {
 beforeEach(() => {
   resetPmtilesRuntimeForTests();
   maplibreMocks.errorHandler = undefined;
+  maplibreMocks.loadHandler = undefined;
   maplibreMocks.addProtocol.mockReset();
   maplibreMocks.mapRemove.mockReset();
   maplibreMocks.mapOn.mockReset();
   maplibreMocks.mapOn.mockImplementation((event: string, handler: () => void) => {
     if (event === 'error') maplibreMocks.errorHandler = handler;
+    if (event === 'load') maplibreMocks.loadHandler = handler;
   });
   maplibreMocks.mapConstructor.mockReset();
   maplibreMocks.mapConstructor.mockImplementation(function MapMock() {
@@ -89,6 +92,9 @@ describe('OfflineMapLibreView', () => {
       attributionControl: { compact: true },
       cooperativeGestures: true,
     });
+    expect(screen.queryByText(/Lokal kartpakke aktiv:/i)).toBeNull();
+    act(() => maplibreMocks.loadHandler?.());
+    expect(screen.getByText(/Lokal kartpakke aktiv: Demo PMTiles/i)).toBeInTheDocument();
 
     unmount();
     expect(maplibreMocks.mapRemove).toHaveBeenCalledTimes(1);

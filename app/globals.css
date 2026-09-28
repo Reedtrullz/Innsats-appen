@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 :root {
+  --font-plex-sans: 'IBM Plex Sans';
+  --font-plex-mono: 'IBM Plex Mono';
   color-scheme: light;
   --app-bg: #f8fafc;
   --app-fg: #0f172a;

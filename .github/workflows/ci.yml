@@ -86,6 +86,15 @@ jobs:
       - name: Playwright production smoke/E2E
         run: npm run e2e:prod:no-build
 
+      - name: Build Cloudflare Worker preview
+        run: |
+          npm run build:vinext
+          node -e 'const config = require("./dist/server/wrangler.json"); if (config.vars.RELEASE_SHA !== process.env.GITHUB_SHA) process.exit(1)'
+          npx wrangler deploy --dry-run --config dist/server/wrangler.json
+
+      - name: Cloudflare static navigation smoke
+        run: npx playwright test --config playwright.cloudflare.config.ts
+
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -109,7 +118,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: checks
     timeout-minutes: 30
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.INNSATS_VPS_DEPLOY_ENABLED == '1'
     permissions:
       contents: read
       packages: write
@@ -170,7 +179,7 @@ jobs:
       - checks
       - build-and-push
     timeout-minutes: 20
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.INNSATS_VPS_DEPLOY_ENABLED == '1'
     environment:
       name: production
       url: https://innsats.reidar.tech
