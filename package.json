@@ -44,7 +44,7 @@
     "check": "npm run check:ci",
     "check:ci": "npm run audit:ci && npm run check:workplans && npm run build:content && npm run check:generated && npm run build:sw && npm run check:sw && npm run validate:maps && npm run typecheck && npm run lint && npm run test && npm run build:app && npm run e2e:prod:no-build && npm run perf:budget && npm run perf:lighthouse",
     "dev:vinext": "vite dev --port 3001",
-    "build:vinext": "vite build && node -e \"const fs = require('node:fs'); for (const name of ['trondheim-osm', 'trondelag-osm']) fs.rmSync('dist/client/map-packages/' + name + '.pmtiles', { force: true }); for (const name of ['maplibre-gl-worker.mjs', 'maplibre-gl-shared.mjs']) fs.copyFileSync('node_modules/maplibre-gl/dist/' + name, 'dist/client/_next/static/chunks/' + name)\" && next typegen",
+    "build:vinext": "node scripts/build-cloudflare-static.mjs",
     "start:vinext": "wrangler dev --config dist/server/wrangler.json",
     "deploy:vinext": "npm run build:vinext && wrangler deploy --config dist/server/wrangler.json"
   },

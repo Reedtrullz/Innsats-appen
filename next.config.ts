@@ -29,7 +29,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  output: process.env.CF_STATIC_EXPORT === '1' ? 'export' : 'standalone',
   allowedDevOrigins: ['127.0.0.1'],
   experimental: {},
   turbopack: {

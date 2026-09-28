@@ -1,5 +1,8 @@
-import handler from 'vinext/server/fetch-handler';
-import type { ExecutionContext, R2Bucket, R2ObjectBody } from '@cloudflare/workers-types';
+import type { R2Bucket, R2ObjectBody } from '@cloudflare/workers-types';
+import { GET as getHealth } from '../app/api/health/route';
+import { GET as getGeocode } from '../app/api/context/geocode/route';
+import { GET as getHazards } from '../app/api/context/hazards/route';
+import { GET as getWeather } from '../app/api/context/weather/route';
 
 const MAP_KEYS: Record<string, string> = {
   '/map-packages/trondheim-osm.pmtiles': 'map-packages/trondheim-osm.pmtiles',
@@ -51,8 +54,19 @@ export async function serveMapPackage(request: Request, bucket: MapBucket): Prom
 }
 
 const worker = {
-  async fetch(request: Request, env: { MAP_PACKAGES: R2Bucket }, ctx: ExecutionContext) {
-    return await serveMapPackage(request, env.MAP_PACKAGES) ?? handler.fetch(request, env, ctx);
+  async fetch(request: Request, env: { MAP_PACKAGES: R2Bucket; ASSETS: { fetch(request: Request): Promise<Response> } }) {
+    const mapPackage = await serveMapPackage(request, env.MAP_PACKAGES);
+    if (mapPackage) return mapPackage;
+    const pathname = new URL(request.url).pathname;
+    if (pathname.startsWith('/api/')) {
+      if (request.method !== 'GET') return new Response(null, { status: 405, headers: { Allow: 'GET' } });
+      if (pathname === '/api/health') return getHealth();
+      if (pathname === '/api/context/geocode') return getGeocode(request);
+      if (pathname === '/api/context/hazards') return getHazards(request);
+      if (pathname === '/api/context/weather') return getWeather(request);
+      return new Response(null, { status: 404 });
+    }
+    return env.ASSETS.fetch(request);
   },
 };
 

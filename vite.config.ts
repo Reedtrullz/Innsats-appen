@@ -5,12 +5,12 @@ import { cdnAdapter } from "@vinext/cloudflare/cache/cdn-adapter";
 
 export default defineConfig({
   plugins: [
-    vinext({ cache: { cdn: cdnAdapter() } }),
-    cloudflare({
+    vinext(process.env.CF_STATIC_EXPORT === '1' ? undefined : { cache: { cdn: cdnAdapter() } }),
+    ...(process.env.CF_STATIC_EXPORT === '1' ? [] : [cloudflare({
       viteEnvironment: {
         name: "rsc",
         childEnvironments: ["ssr"],
       },
-    }),
+    })]),
   ],
 });
