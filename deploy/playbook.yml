@@ -35,6 +35,7 @@
     - name: Validate deployment variables
       ansible.builtin.assert:
         that:
+          - lookup('ansible.builtin.env', 'INNSATS_VPS_ROLLBACK') == '1'
           - app_domain is match('^[a-z0-9.-]+$')
           - app_host_port | int > 1024
           - app_host_port | int < 65536
@@ -43,7 +44,8 @@
           - allow_mutable_tag | bool or docker_image is match('^ghcr.io/[a-z0-9._-]+/[a-z0-9._-]+:(?:staging-)?[0-9a-f]{7,40}$')
           - allow_mutable_tag | bool or app_version is match('^[0-9a-f]{40}$')
         fail_msg: >-
-          Invalid Beredskapsboka deployment variables. Production deploys require
+          VPS deployment is reserved for explicit Cloudflare rollback. Set
+          INNSATS_VPS_ROLLBACK=1 after restoring the VPS DNS/Caddy route. Production deploys require
           an immutable SHA-like GHCR image tag, and app_version must be the full
           40-character git SHA exposed by /api/health. Set allow_mutable_tag=true
           only for an intentional mutable-tag deploy.

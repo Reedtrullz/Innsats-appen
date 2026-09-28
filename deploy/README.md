@@ -1,8 +1,10 @@
-# Beredskapsboka VPS deploy
+# Beredskapsboka VPS rollback
 
-This deploys Beredskapsboka to the Racknerd VPS at:
+Production runs on Cloudflare Workers at `https://innsats.reidar.tech`. This directory preserves the former Racknerd deployment for an intentional rollback. `INNSATS_VPS_DEPLOY_ENABLED` must stay `0`; both the playbook and local publish script require `INNSATS_VPS_ROLLBACK=1`. Restore DNS/Caddy routing to the VPS and verify its local health before using the playbook. The original image is retained on the VPS as `beredskapsboka:cloudflare-rollback-20260928`.
 
-- Public URL: https://innsats.reidar.tech
+The former VPS deployment used:
+
+- Former public URL: https://innsats.reidar.tech
 - GitHub repository: https://github.com/Reedtrullz/Innsats-appen
 - VPS: 198.23.137.16 (`Racknerd-Deploy`, user `deploy`)
 - Container image: `ghcr.io/reedtrullz/innsats-appen:<git-sha>`
@@ -10,13 +12,13 @@ This deploys Beredskapsboka to the Racknerd VPS at:
 - Host port: `127.0.0.1:3016 -> container:3000`
 - Remote app dir: `/opt/apps/beredskapsboka`
 
-The VPS never clones this source repository. The intended flow is:
+The VPS never clones this source repository. The former flow was:
 
 ```text
 local build with generated content -> GHCR image -> Ansible pulls image on VPS -> Caddy reverse proxy
 ```
 
-The GitHub Actions version of the flow is:
+The disabled GitHub Actions VPS flow is:
 
 ```text
 push/PR -> automatic checks -> main-only Docker build/push -> main-only Ansible deploy -> exact-SHA public health verification
@@ -24,7 +26,7 @@ push/PR -> automatic checks -> main-only Docker build/push -> main-only Ansible 
 
 ## Deployment verification status
 
-Repo docs cannot hard-code the current live SHA as a permanent fact because every docs-only status commit also creates and deploys a newer immutable image. Verify the current live SHA with:
+Verify the current Cloudflare Worker SHA with:
 
 ```bash
 git rev-parse origin/main
@@ -57,7 +59,7 @@ STAGING_USER = deploy
 
 As of 2026-06-05, non-secret staging variables are configured in the GitHub `staging` environment and repository secret `STAGING_SSH_PRIVATE_KEY` is configured by name. The staging environment has no separate environment-scoped private-key secret; the workflow intentionally reads the repository secret via `secrets.STAGING_SSH_PRIVATE_KEY`.
 
-## One-time prerequisites
+## Legacy VPS prerequisites
 
 ### GitHub Actions secret and host key pin
 
@@ -102,7 +104,7 @@ The local machine needs Docker/buildx, `gh`, Ansible, and access to the Obsidian
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use 22
-./deploy/publish-and-deploy.sh
+INNSATS_VPS_ROLLBACK=1 ./deploy/publish-and-deploy.sh
 ```
 
 The script:
@@ -119,7 +121,7 @@ If `gh auth token` lacks package write permissions, refresh it or use a token wi
 ## Deploy an already-published image
 
 ```bash
-APP_VERSION=$(git rev-parse HEAD) \
+INNSATS_VPS_ROLLBACK=1 APP_VERSION=$(git rev-parse HEAD) \
 ansible-playbook -i deploy/inventory/hosts.yml deploy/playbook.yml \
   -e "docker_image=ghcr.io/reedtrullz/innsats-appen:$(git rev-parse --short=12 HEAD)"
 ```
@@ -127,7 +129,7 @@ ansible-playbook -i deploy/inventory/hosts.yml deploy/playbook.yml \
 For a manual mutable-tag recovery deploy, make the override explicit and understand that this bypasses the immutable SHA guard:
 
 ```bash
-APP_VERSION=latest ansible-playbook -i deploy/inventory/hosts.yml deploy/playbook.yml \
+INNSATS_VPS_ROLLBACK=1 APP_VERSION=latest ansible-playbook -i deploy/inventory/hosts.yml deploy/playbook.yml \
   -e "docker_image=ghcr.io/reedtrullz/innsats-appen:latest" \
   -e "allow_mutable_tag=true"
 ```

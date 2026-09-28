@@ -3,7 +3,8 @@
   "name": "beredskapsboka-preview",
   "workers_dev": true,
   "routes": [
-    { "pattern": "innsats-canary.reidar.tech", "custom_domain": true }
+    { "pattern": "innsats-canary.reidar.tech", "custom_domain": true },
+    { "pattern": "innsats.reidar.tech", "custom_domain": true }
   ],
   "account_id": "1f2af581e4a2ef3a5d150cc385339d78",
   "compatibility_date": "2026-09-27",

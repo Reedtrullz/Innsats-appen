@@ -4,7 +4,7 @@ Offline-first, mobile field-support PWA for source-backed Norwegian Civil Defenc
 
 - Repository: https://github.com/Reedtrullz/Innsats-appen
 - Production domain: https://innsats.reidar.tech
-- GHCR image namespace: `ghcr.io/reedtrullz/innsats-appen`
+- Production runtime: Cloudflare Worker `beredskapsboka-preview` with private R2 map packages
 - Current live SHA source of truth: `curl -fsS https://innsats.reidar.tech/api/health` and the completed GitHub Actions run for that exact SHA. Do not treat a markdown file as the permanent live version; docs-only commits also deploy immutable images. See `docs/release/current-deployment-status.md`.
 
 ## What this is
@@ -110,29 +110,27 @@ npm run e2e:prod -- tests/e2e/map-log-mission-flow.spec.ts tests/e2e/offline-map
 
 ## Deployment
 
-An Ansible/GHCR deploy setup for `https://innsats.reidar.tech` lives in `deploy/`.
+`https://innsats.reidar.tech` runs on Cloudflare Workers. The old Ansible/GHCR setup in `deploy/` is reserved for an explicit VPS rollback.
 
 Automatic CI/CD is configured in `.github/workflows/ci.yml`:
 
 1. Pull requests and pushes to `main` run automatic checks: high/critical npm audit, workplan freshness, content build, TypeScript, ESLint, Vitest, production build, mobile JS budget, Lighthouse mobile budget, and Playwright production E2E.
-2. While the repository variable `INNSATS_VPS_DEPLOY_ENABLED` is `1`, passing `main` checks build and push `ghcr.io/reedtrullz/innsats-appen:<12-char-sha>` plus `:latest`.
-3. With that variable enabled, the deploy job runs `deploy/playbook.yml` over SSH and verifies `https://innsats.reidar.tech/api/health` returns the exact pushed commit SHA. Set it to `0` at the Cloudflare cutover to stop automatic VPS redeploys.
+2. With `INNSATS_CLOUDFLARE_DEPLOY_ENABLED=1`, passing `main` checks build and deploy the Worker, then verify the exact commit SHA and Worker version at the public health endpoint. The `production` environment holds `CLOUDFLARE_API_TOKEN`.
+3. Keep `INNSATS_VPS_DEPLOY_ENABLED=0`. VPS deployment requires an explicit rollback flag and restored VPS routing.
 
-The deploy workflow requires the repository secret `VPS_SSH_PRIVATE_KEY` containing the private key for the `deploy@198.23.137.16` user and the configured VPS host-key pin described in `deploy/README.md`.
-
-Manual local deploy is still available:
+Manual Worker deployment is available with an authenticated Wrangler session:
 
 ```bash
-./deploy/publish-and-deploy.sh
+npm run build:content && npm run build:sw && npm run deploy:vinext
 ```
 
-See `deploy/README.md` for prerequisites, GHCR login notes, and VPS verification commands.
+See `deploy/README.md` for the VPS rollback path.
 
-### Cloudflare Worker preview
+### Cloudflare Worker
 
-`npm run build:content && npm run build:sw && npm run build:vinext` builds the Cloudflare preview. The build pre-renders public pages into static assets; only `/api/health`, the three `/api/context/*` routes, and approved PMTiles range requests invoke the Worker. `npm run start:vinext` runs it locally, and `npm run deploy:vinext` deploys the separate `beredskapsboka-preview` Worker at both its `workers.dev` URL and `innsats-canary.reidar.tech`. `/api/health` reports the built Git SHA and immutable Cloudflare Worker version ID. The existing Next/VPS build remains available. Content using Next's `revalidate` setting is refreshed by a new static build and deploy, not hourly at request time.
+`npm run build:content && npm run build:sw && npm run build:vinext` builds the Worker. The build pre-renders public pages into static assets; only `/api/health`, the three `/api/context/*` routes, and approved PMTiles range requests invoke the Worker. `npm run start:vinext` runs it locally, and `npm run deploy:vinext` deploys `beredskapsboka-preview` at its `workers.dev` URL, `innsats-canary.reidar.tech`, and the production custom domain. `/api/health` reports the built Git SHA and immutable Cloudflare Worker version ID. Content using Next's `revalidate` setting is refreshed by a new static build and deploy, not hourly at request time.
 
-The Worker serves the two PMTiles archives from the private `beredskapsboka-maps` R2 bucket at the existing `/map-packages/` paths. Upload the SHA-256-verified release files under the `map-packages/` key prefix before deploying. `build:vinext` removes the archive copies from `dist/client`; the original Next/VPS build still uses the files under `public/`. The deployed preview rendered the Trondheim vector map after a disconnected reload. Live Worker-tail samples were 0–7 ms CPU for the API and R2 requests tested; public HTML and client navigation were served as static assets without Worker invocations. Recheck source freshness, production traffic, and the free-tier budget before changing DNS. The VPS Ansible deploy remains active until the production cutover and must be disabled with a tested rollback path at that point.
+The Worker serves the two PMTiles archives from the private `beredskapsboka-maps` R2 bucket at the existing `/map-packages/` paths. Upload the SHA-256-verified release files under the `map-packages/` key prefix before deploying. `build:vinext` removes the archive copies from `dist/client`; the rollback Next/VPS build still uses the files under `public/`.
 
 ## MVP boundaries
 

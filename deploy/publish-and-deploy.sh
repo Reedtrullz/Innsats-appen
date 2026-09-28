@@ -4,6 +4,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+if [[ "${INNSATS_VPS_ROLLBACK:-}" != "1" ]]; then
+  echo "VPS publish is rollback-only; set INNSATS_VPS_ROLLBACK=1 after restoring VPS DNS/Caddy." >&2
+  exit 1
+fi
+
 IMAGE="${IMAGE:-ghcr.io/reedtrullz/innsats-appen}"
 INVENTORY="${INVENTORY:-deploy/inventory/hosts.yml}"
 PLAYBOOK="${PLAYBOOK:-deploy/playbook.yml}"
