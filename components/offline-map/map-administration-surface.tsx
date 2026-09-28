@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import type { ReactNode } from 'react';
 import {
   OFFLINE_MAP_ATTRIBUTION,
@@ -70,7 +69,7 @@ export function MapAdministrationSurface({
         <p className="text-sm font-semibold uppercase tracking-wide text-sky-200">Kartadministrasjon</p>
         <h2 className="text-2xl font-black">Kartdata og offline</h2>
         <p className="mt-2 text-sm text-sky-100">Velg lokal reserve, lagre godkjente kartpakker og håndter sanitert kartutveksling uten å belaste den operative kartflaten.</p>
-        <Link href="/kart" className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-white px-4 text-sm font-black text-sky-950">Tilbake til operativt kart</Link>
+        <a href="/kart" className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-white px-4 text-sm font-black text-sky-950">Tilbake til operativt kart</a>
       </div>
 
       {showRuntimeStatus ? (
