@@ -1,5 +1,5 @@
-import { spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, renameSync, rmSync } from 'node:fs';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { copyFileSync, existsSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 
 const config = 'wrangler.jsonc';
 const parkedConfig = 'wrangler.jsonc.static-build';
@@ -21,6 +21,10 @@ try {
   renameSync('dist/client', staticClient);
 
   run('vite', ['build']);
+  const workerConfigPath = 'dist/server/wrangler.json';
+  const workerConfig = JSON.parse(readFileSync(workerConfigPath, 'utf8'));
+  workerConfig.vars.RELEASE_SHA = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  writeFileSync(workerConfigPath, `${JSON.stringify(workerConfig, null, 2)}\n`);
   rmSync('dist/client', { recursive: true, force: true });
   renameSync(staticClient, 'dist/client');
   for (const name of ['trondheim-osm', 'trondelag-osm']) {
