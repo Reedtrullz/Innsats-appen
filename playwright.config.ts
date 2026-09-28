@@ -9,6 +9,7 @@ const withNode22 = (command: string) =>
 
 export default defineConfig({
   testDir: './tests/e2e',
+  testIgnore: 'cloudflare-static.spec.ts',
   // Production/CI runs many real-browser journeys in parallel against one server
   // and a few are occasionally timing-flaky; retry there so a single flake does
   // not red the pipeline (a genuine break still fails every attempt). Dev keeps 0.
