@@ -5,7 +5,7 @@ export default defineConfig({
   testMatch: 'cloudflare-static.spec.ts',
   retries: 0,
   webServer: {
-    command: 'npx wrangler dev --config dist/server/wrangler.json --port 8798',
+    command: 'pnpm exec wrangler dev --config dist/server/wrangler.json --port 8798',
     url: 'http://127.0.0.1:8798/api/health',
     reuseExistingServer: false,
     timeout: 120_000,

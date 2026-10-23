@@ -73,7 +73,7 @@ Use these checks when changing this flow:
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use 22
-npm run test -- tests/docs/group-14-docs.test.ts
-npm run test -- tests/mission/after-action-report.test.ts tests/mission/mission-folder-export.test.ts tests/components/mission-context-panel.test.tsx
-npm run e2e:prod -- tests/e2e/map-log-mission-flow.spec.ts tests/e2e/offline-map.spec.ts
+pnpm run test -- tests/docs/group-14-docs.test.ts
+pnpm run test -- tests/mission/after-action-report.test.ts tests/mission/mission-folder-export.test.ts tests/components/mission-context-panel.test.tsx
+pnpm run e2e:prod -- tests/e2e/map-log-mission-flow.spec.ts tests/e2e/offline-map.spec.ts
 ```

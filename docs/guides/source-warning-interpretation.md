@@ -19,7 +19,7 @@ Kildefelt har tre ulike betydninger og skal ikke tolkes som samme godkjenning:
 - `pilotReviewStatus=approved-for-pilot` betyr at kilden kan støtte operative kort og sjekklister i pilot. Manglende `pilotReviewStatus` får konservativ standardverdi `not-reviewed`.
 - `publicationStatus=approved-public` betyr at genererte offentlige kildedokumenter kan vise kildebody eller utdrag. Manglende `publicationStatus` får konservativ standardverdi `needs-permission`.
 
-Standardverdiene gjør gamle importer kompatible, men godkjenner ikke kilder. `npm run report:source-governance:strict` er derfor fortsatt forventet å feile til faktiske kildegodkjenninger er registrert eksplisitt.
+Standardverdiene gjør gamle importer kompatible, men godkjenner ikke kilder. `pnpm run report:source-governance:strict` er derfor fortsatt forventet å feile til faktiske kildegodkjenninger er registrert eksplisitt.
 
 `pilotReviewStatus=rejected-for-pilot` betyr at kilden ikke kan brukes som pilotbelegg for operative kort/sjekklister før den er erstattet eller støttet av primær autoritetskilde. Deep-research-notater er satt slik i pilotpasset 2026-06-05 fordi de er syntetiserte bakgrunnsnotater, ikke primærkilder.
 

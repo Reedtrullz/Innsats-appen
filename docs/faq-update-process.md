@@ -23,7 +23,7 @@ Every FAQ update must include:
 
 1. Add or update `content/curated/faq.yaml`.
 2. Add glossary aliases in `content/curated/glossary.yaml` only when they improve search.
-3. Run `npm run build:content`.
+3. Run `pnpm run build:content`.
 4. Run targeted content and component tests.
 5. Verify `/faq`, `/ma-leses`, and `/endringer` show the intended decision-support wording.
 

@@ -108,7 +108,7 @@ Implementer:
      reference-videos.json via writeMirroredJson (samme mønster som image-metadata).
    - I lib/content/load-content.ts: getReferenceVideos(): ReferenceVideo[] som
      leser reference-videos.json (samme loadArray-mønster som getImageMetadata).
-   - Kjør npm run build:content og npm run check:generated.
+   - Kjør pnpm run build:content og pnpm run check:generated.
 
 3) Integritets-/innholdstest (tests/content/):
    - Hver relatedCardSlug må peke på et eksisterende action card.
@@ -133,7 +133,7 @@ Akseptansekriterier:
   'needs-permission' nå, så UI-en er tom inntil noen godkjennes — det er meningen).
 - Ingen iframe/embed; kun target=_blank-utlenker; offline-merking synlig.
 - relatedCardSlugs valideres mot eksisterende kort (test).
-- npm run build:content + check:generated grønt; npm run check:ci grønt.
+- pnpm run build:content + check:generated grønt; pnpm run check:ci grønt.
 
 Begrensninger: følg CLAUDE.md. Opphavsrett: dette er SFKs filmer — ikke vis/lenke
 før permissionStatus settes 'approved' (krever bekreftet tillatelse). Ikke fyll inn

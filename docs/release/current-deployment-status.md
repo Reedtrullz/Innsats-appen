@@ -59,7 +59,7 @@ The following docs/workplan snapshot commit then deployed that application-code 
 
 That run completed with conclusion `success` for all deploy-chain jobs:
 
-- `Automatic checks`: high/critical npm audit, workplan snapshot freshness, content build, TypeScript, ESLint, Vitest, production build, Playwright Chromium install, mobile JavaScript performance budget, Lighthouse mobile budget, and Playwright production smoke/E2E.
+- `Automatic checks`: high/critical pnpm audit, workplan snapshot freshness, content build, TypeScript, ESLint, Vitest, production build, Playwright Chromium install, mobile JavaScript performance budget, Lighthouse mobile budget, and Playwright production smoke/E2E.
 - `Build and push GHCR image`: published immutable SHA image and `latest`.
 - `Deploy to VPS with Ansible`: deployed the immutable image and verified the public health endpoint returned the exact SHA.
 
@@ -67,12 +67,12 @@ Future docs-only commits may supersede the deployed snapshot SHA while leaving t
 
 ## Local validation performed for the operational map/log/Feltmodus release closeout
 
-Before pilot approval and after every content change, run `npm run report:source-governance:strict` as a regression gate. Strict source-governance gate PASS for the current local candidate: `sourceCount=61`, `referencedSourceCount=53`, `pilotApprovedReferencedSourceCount=53`, `pilotBlockingReferencedSourceCount=0`, and `publicBodyBlockingSourceCount=0`. This removes the stale source-governance blocker only; it does not prove device, staging, DNS, support-owner, CI/deploy, or live exact-SHA readiness.
+Before pilot approval and after every content change, run `pnpm run report:source-governance:strict` as a regression gate. Strict source-governance gate PASS for the current local candidate: `sourceCount=61`, `referencedSourceCount=53`, `pilotApprovedReferencedSourceCount=53`, `pilotBlockingReferencedSourceCount=0`, and `publicBodyBlockingSourceCount=0`. This removes the stale source-governance blocker only; it does not prove device, staging, DNS, support-owner, CI/deploy, or live exact-SHA readiness.
 
 Before pushing the release closeout, this local gate passed under Node 22:
 
 ```bash
-source ~/.nvm/nvm.sh && nvm use 22 && npm run check:ci
+source ~/.nvm/nvm.sh && nvm use 22 && pnpm run check:ci
 ```
 
 The local gate included workplan freshness, content build, map package validation, TypeScript, ESLint, 93 Vitest files / 603 tests, production Next build, 37 Playwright production E2E tests, mobile JavaScript performance budget, and Lighthouse mobile budget.

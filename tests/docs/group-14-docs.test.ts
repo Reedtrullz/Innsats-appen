@@ -25,9 +25,9 @@ const requiredDocs: Array<[string, string, RegExp[]]> = [
   ['408', 'docs/release/pilot-support-channel.md', [/support/i, /kontakt/i, /ikke persondata/i, /GitHub Issues/i, /pilot-support/i]],
   ['409', 'docs/roadmap.md', [/roadmap/i, /Group 14/i, /post-MVP/i]],
   ['410', 'docs/technical-debt-register.md', [/technical debt|teknisk gjeld/i, /owner|eier/i, /review/i]],
-  ['411', 'docs/content-maintenance-process.md', [/content update|innholdsoppdatering/i, /Beredskapsboka/i, /npm run build:content/i]],
-  ['412', 'docs/stale-content-notifications.md', [/stale content/i, /npm run report:stale-content/i, /ingen persondata/i, /ingen.*eier.*reviewer/i]],
-  ['413', 'docs/quarterly-dependency-review.md', [/quarterly|kvartalsvis/i, /npm audit/i, /eksakte versjoner/i]],
+  ['411', 'docs/content-maintenance-process.md', [/content update|innholdsoppdatering/i, /Beredskapsboka/i, /pnpm run build:content/i]],
+  ['412', 'docs/stale-content-notifications.md', [/stale content/i, /pnpm run report:stale-content/i, /ingen persondata/i, /ingen.*eier.*reviewer/i]],
+  ['413', 'docs/quarterly-dependency-review.md', [/quarterly|kvartalsvis/i, /pnpm audit/i, /eksakte versjoner/i]],
   ['414', 'docs/annual-security-review.md', [/annual|årlig/i, /security|sikkerhet/i, /offline/i]],
   ['415', 'docs/annual-privacy-impact-assessment.md', [/privacy impact|personvernkonsekvens/i, /DPIA/i, /ingen backend/i]],
   ['416', 'docs/language-support-evaluation.md', [/Nynorsk/i, /Bokmål/i, /etter.*stabiliser/i]],
@@ -123,7 +123,7 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(workflow).toMatch(/https:\/\/innsats\.reidar\.tech\/api\/health/);
     expect(workflow).toMatch(/https:\/\/innsats\.reidar\.tech\/generated-content\/manifest\.json/);
     expect(workflow).toMatch(/https:\/\/innsats\.reidar\.tech\/sw\.js/);
-    expect(workflow).toMatch(/npm run(?: --silent)? report:stale-content/);
+    expect(workflow).toMatch(/pnpm run(?: --silent)? report:stale-content/);
     expect(workflow).toMatch(/issues: write/);
     expect(workflow).toMatch(/title="Stale content report"/);
     expect(workflow).toMatch(/gh issue comment/);
@@ -140,8 +140,8 @@ describe('Group 14 rollout and maintenance documentation', () => {
     expect(staging).toMatch(/name: Staging Deploy/);
     expect(staging).toMatch(/STAGING_SSH_PRIVATE_KEY/);
     expect(staging).toMatch(/beredskapsboka-staging/);
-    expect(staging).toMatch(/npm run check:ci/);
-    expect(staging).toMatch(/npx playwright install --with-deps chromium/);
+    expect(staging).toMatch(/pnpm run check:ci/);
+    expect(staging).toMatch(/pnpm exec playwright install --with-deps chromium/);
     expect(staging).toMatch(/packages: write/);
     expect(staging).toMatch(/caddy_marker_name=Beredskapsboka-staging/);
 

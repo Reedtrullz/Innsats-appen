@@ -21,7 +21,7 @@ Current canonical staging verification host is `https://staging.198.23.137.16.ni
 
 Go/no-go holdes etter staging smoke, manual device evidence, supportkanal og personvernkontroll. Go krever at pilotdistrikt har avtalt team-/kanalalias for kontakt og at feil kan rapporteres uten persondata.
 
-Source governance is currently a local strict-clean regression gate, not a remaining source blocker: strict source-governance gate PASS for the current local candidate. `npm run --silent report:source-governance:strict` reports `sourceCount=61`, `referencedSourceCount=53`, `pilotApprovedReferencedSourceCount=53`, `pilotBlockingReferencedSourceCount=0`, and `publicBodyBlockingSourceCount=0`. Re-run it before pilot-go and after every content change, but do not treat this source-gate pass as proof that physical-device, DNS, staging-owner, support, or manual evidence blockers are resolved.
+Source governance is currently a local strict-clean regression gate, not a remaining source blocker: strict source-governance gate PASS for the current local candidate. `pnpm run --silent report:source-governance:strict` reports `sourceCount=61`, `referencedSourceCount=53`, `pilotApprovedReferencedSourceCount=53`, `pilotBlockingReferencedSourceCount=0`, and `publicBodyBlockingSourceCount=0`. Re-run it before pilot-go and after every content change, but do not treat this source-gate pass as proof that physical-device, DNS, staging-owner, support, or manual evidence blockers are resolved.
 
 Må fortsatt være blokkert før bredere pilot dersom evidence mangler:
 

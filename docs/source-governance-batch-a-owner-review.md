@@ -16,7 +16,7 @@ Batch A contains the cross-cutting operational sources with the highest app impa
 ## Non-negotiable rules
 
 - Do not mark a source approved because the app builds or because it exists in the local knowledge bank.
-- Do not approve by changing generated JSON directly; generated source docs come from Obsidian source-extract frontmatter via `npm run import:obsidian`.
+- Do not approve by changing generated JSON directly; generated source docs come from Obsidian source-extract frontmatter via `pnpm run import:obsidian`.
 - If a source is approved for pilot but not for public publication, it still cannot satisfy the current strict public-pilot gate. Either secure public approval, replace references with approved-public sources, or remove the pilot/public content that depends on it.
 - Removing a `sourceIds` entry is only valid when the dependent claim/card/checklist item is also removed or rewritten so it no longer relies on that source.
 - Keep raw source bodies and private approval evidence out of repo docs and public generated artifacts. Record only sanitized owner/date/disposition fields here.
@@ -642,13 +642,13 @@ Referenced labels/slugs:
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use 22 >/dev/null
-npm run build:content
-npm run --silent report:source-governance:strict
+pnpm run build:content
+pnpm run --silent report:source-governance:strict
 ```
 
 3. Confirm blocker count decreases only for sources with real approval/replacement/removal evidence.
 4. Update `docs/source-governance-remediation-queue.md` with the new sanitized disposition counts.
-5. Commit the batch separately. Include generated source artifacts only if `npm run import:obsidian` changed them.
+5. Commit the batch separately. Include generated source artifacts only if `pnpm run import:obsidian` changed them.
 
 ## Current Task 10 status
 

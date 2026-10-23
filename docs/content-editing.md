@@ -15,13 +15,13 @@ Beredskapsboka content is source-backed and generated. Do not edit `content/gene
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use 22
-npm run import:obsidian
-npm run compile:curated
-npm run build:search
-npm run sync:workplans
-npm run validate:content
+pnpm run import:obsidian
+pnpm run compile:curated
+pnpm run build:search
+pnpm run sync:workplans
+pnpm run validate:content
 # or all at once:
-npm run build:content
+pnpm run build:content
 ```
 
 `validate:content` enforces schema validity, source references, warning/status constraints, workplan snapshot shape, public mirror parity, and sensitive structured key policy.
@@ -29,7 +29,7 @@ npm run build:content
 ## Workplan artifact generation
 
 - Local planning files live under `.hermes/plans/*.md`.
-- `npm run sync:workplans` parses the H1, `**Goal:**` summary, and `### Task N:` headings into a safe workplan snapshot.
+- `pnpm run sync:workplans` parses the H1, `**Goal:**` summary, and `### Task N:` headings into a safe workplan snapshot.
 - The script writes:
   - `content/workplans/workplans.json` as the committed fallback snapshot for CI/deploy;
   - `content/generated/workplans.json` for server/build-time validation;
@@ -57,8 +57,8 @@ npm run build:content
 4. Reference only existing `sourceIds` from imported source extracts.
 5. Run:
    ```bash
-   npm run build:content
-   npm run test -- tests/content/coverage.test.ts tests/content/validate-content.test.ts
+   pnpm run build:content
+   pnpm run test -- tests/content/coverage.test.ts tests/content/validate-content.test.ts
    ```
 
 ## Add a source
@@ -74,7 +74,7 @@ npm run build:content
    - `body`
    - `warnings`
 4. Warnings must be visible user-facing caveats, not hidden metadata.
-5. Run `npm run build:content` and verify the source appears under `/kilder` and source badges on linked cards.
+5. Run `pnpm run build:content` and verify the source appears under `/kilder` and source badges on linked cards.
 
 ## Warning/status model
 
@@ -90,8 +90,8 @@ The search index must continue to find stress terms used in the regression tests
 After content edits, run:
 
 ```bash
-npm run build:content
-npm run test
-npm run build
-npm run e2e:prod -- tests/e2e/offline.spec.ts tests/e2e/core-mobile-journey.spec.ts
+pnpm run build:content
+pnpm run test
+pnpm run build
+pnpm run e2e:prod -- tests/e2e/offline.spec.ts tests/e2e/core-mobile-journey.spec.ts
 ```

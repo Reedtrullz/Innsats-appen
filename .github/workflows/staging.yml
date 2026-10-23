@@ -42,7 +42,6 @@ jobs:
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
 
       - name: Install dependencies
         uses: ./.github/actions/install-deps
@@ -50,13 +49,13 @@ jobs:
       - name: Fetch local map packages (release assets)
         env:
           GH_TOKEN: ${{ github.token }}
-        run: npm run map:fetch
+        run: pnpm run map:fetch
 
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Run CI-equivalent local gate including production E2E
-        run: npm run check:ci
+        run: pnpm run check:ci
 
   build-staging-image:
     name: Build and push staging image
@@ -73,10 +72,18 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable pnpm via Corepack (version pinned by packageManager)
+        run: corepack enable
+
       - name: Fetch local map packages (release assets)
         env:
           GH_TOKEN: ${{ github.token }}
-        run: npm run map:fetch
+        run: pnpm run map:fetch
 
       - name: Set image tag
         id: image

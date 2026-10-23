@@ -1,0 +1,12 @@
+# Only these packages may run install scripts (pnpm 10 blocks all others).
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true
+  workerd: true
+
+# Migrated from npm "overrides" in package.json.
+overrides:
+  "gray-matter>js-yaml": "3.15.2"
+  "jsdom>undici": "7.29.0"
+  "minimatch@3.1.5>brace-expansion": "1.1.18"
+  "minimatch@10.2.5>brace-expansion": "5.0.9"

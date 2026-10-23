@@ -44,7 +44,7 @@ export type LocalMapPackageManifest = z.infer<typeof LocalMapPackageManifestSche
 
 const approvedLocalMapPackageManifests: unknown[] = [
   // OSM-derived extracts from the Protomaps daily build. Binaries are GitHub
-  // release assets fetched by `npm run map:fetch` (checksums in
+  // release assets fetched by `pnpm run map:fetch` (checksums in
   // scripts/map-packages.sha256); only styles/manifests live in git. The
   // styles deliberately have no text layers yet (no glyph fetches → no false
   // fallback on missing font ranges); labelled styles are a follow-up.

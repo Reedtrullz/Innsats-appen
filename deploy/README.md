@@ -100,7 +100,7 @@ Do not commit GHCR tokens or put them in inventory. The playbook deliberately do
 
 ## Publish and deploy from local machine
 
-The local machine needs Docker/buildx, `gh`, Ansible, and access to the Obsidian source extracts used by `npm run build:content`.
+The local machine needs Docker/buildx, `gh`, Ansible, and access to the Obsidian source extracts used by `pnpm run build:content`.
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use 22
@@ -110,7 +110,7 @@ INNSATS_VPS_ROLLBACK=1 ./deploy/publish-and-deploy.sh
 The script:
 
 1. Requires a clean working tree.
-2. Runs `npm run build:content` locally.
+2. Runs `pnpm run build:content` locally.
 3. Logs Docker into GHCR with `gh auth token`.
 4. Builds a linux/amd64 Docker image tagged with the current full/short SHA.
 5. Pushes both `<short-sha>` and `latest` tags to GHCR.

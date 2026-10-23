@@ -8,7 +8,7 @@ Distriktsleder kan foreslå offentlig, godkjent innhold med kilde, eier, reviewe
 
 1. Finn offentlig kilde i Beredskapsboka eller godkjent distriktstekst.
 2. Foreslå endring i Markdown/YAML med kilde-ID.
-3. Kjør `npm run build:content` og kontroller warnings.
+3. Kjør `pnpm run build:content` og kontroller warnings.
 4. Fagansvarlig godkjenner før publisering.
 
 ## Felles grense

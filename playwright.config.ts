@@ -15,7 +15,7 @@ export default defineConfig({
   // not red the pipeline (a genuine break still fails every attempt). Dev keeps 0.
   retries: prod ? 2 : 0,
   webServer: {
-    command: prod ? withNode22('npm run start') : withNode22('npm run dev'),
+    command: prod ? withNode22('pnpm run start') : withNode22('pnpm run dev'),
     url: baseURL,
     reuseExistingServer: !prod,
     timeout: 120_000,

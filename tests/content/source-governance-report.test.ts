@@ -341,7 +341,7 @@ it('documents the source-governance remediation queue without leaking source bod
   }
 });
 
-it('exposes source governance npm scripts', () => {
+it('exposes source governance package scripts', () => {
   const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8')) as { scripts: Record<string, string> };
 
   expect(packageJson.scripts['report:source-governance']).toBe('tsx scripts/report-source-governance.ts');
@@ -351,7 +351,7 @@ it('exposes source governance npm scripts', () => {
 });
 
 it('keeps strict source-governance output as complete JSON when the gate is blocked', () => {
-  const result = spawnSync('npx', ['tsx', 'scripts/report-source-governance.ts', '--strict'], {
+  const result = spawnSync('pnpm', ['exec', 'tsx', 'scripts/report-source-governance.ts', '--strict'], {
     cwd: process.cwd(),
     encoding: 'utf8',
     maxBuffer: 1024 * 1024 * 10,

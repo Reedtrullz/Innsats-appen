@@ -36,7 +36,7 @@ type LighthouseRunSummary = {
 
 function assertBuildExists(rootDir = process.cwd()) {
   if (!fs.existsSync(path.join(rootDir, '.next', 'standalone', 'server.js'))) {
-    throw new Error('No standalone production build found. Run npm run build:app before npm run perf:lighthouse.');
+    throw new Error('No standalone production build found. Run pnpm run build:app before pnpm run perf:lighthouse.');
   }
 }
 

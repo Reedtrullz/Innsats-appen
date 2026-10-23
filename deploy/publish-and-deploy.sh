@@ -20,7 +20,7 @@ if [[ -s "$HOME/.nvm/nvm.sh" ]]; then
   nvm use 22 >/dev/null
 fi
 
-for cmd in git npm node ansible-playbook ansible-galaxy gh docker; do
+for cmd in git pnpm node ansible-playbook ansible-galaxy gh docker; do
   if ! command -v "$cmd" >/dev/null 2>&1; then
     echo "Missing required command: $cmd" >&2
     exit 1
@@ -48,7 +48,7 @@ if [[ "$SHA" != "$ORIGIN_MAIN_SHA" ]]; then
 fi
 
 echo "Running full local release gate before manual production publish..."
-npm run check:ci
+pnpm run check:ci
 
 echo "Verifying exact-SHA GitHub Actions success before manual production publish..."
 CI_RUNS_JSON="$(gh run list --commit "$SHA" --limit 50 --json databaseId,status,conclusion,headSha,workflowName,event,headBranch)"
