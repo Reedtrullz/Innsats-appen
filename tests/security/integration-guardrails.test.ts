@@ -13,14 +13,13 @@ function packageJson() {
 }
 
 function packageLockNames() {
-  const lock = JSON.parse(readDoc('package-lock.json')) as { packages?: Record<string, unknown> };
+  // Every resolved package appears as a top-level key under `packages:` in pnpm-lock.yaml,
+  // e.g. `  next@16.3.5:` or `  '@scope/name@1.2.3':`.
+  const lock = readDoc('pnpm-lock.yaml');
+  const packagesSection = lock.split(/^packages:$/m)[1]?.split(/^snapshots:$/m)[0] ?? '';
   const names = new Set<string>();
-  for (const entry of Object.keys(lock.packages ?? {})) {
-    if (!entry.includes('node_modules/')) continue;
-    const packagePath = entry.split('node_modules/').filter(Boolean).at(-1);
-    if (!packagePath) continue;
-    const parts = packagePath.split('/');
-    names.add(packagePath.startsWith('@') ? parts.slice(0, 2).join('/') : parts[0] ?? packagePath);
+  for (const match of packagesSection.matchAll(/^ {2}'?((?:@[^/@\s']+\/)?[^@\s']+)@[^:\s']+'?:/gm)) {
+    names.add(match[1]);
   }
   return names;
 }
@@ -80,7 +79,7 @@ describe('post-MVP integration architecture guardrails', () => {
     const lockedPackageNames = packageLockNames();
     for (const forbidden of forbiddenIntegrationPackages) {
       expect(installed[forbidden], `${forbidden} must stay out until the post-MVP integration gate is approved`).toBeUndefined();
-      expect(lockedPackageNames.has(forbidden), `${forbidden} must not be present transitively in package-lock before approval`).toBe(false);
+      expect(lockedPackageNames.has(forbidden), `${forbidden} must not be present transitively in pnpm-lock.yaml before approval`).toBe(false);
     }
 
     expect(apiPathsWithForbiddenSegments(), 'MVP must not add CIM/Nødnett/push/sync runtime API routes').toEqual([]);

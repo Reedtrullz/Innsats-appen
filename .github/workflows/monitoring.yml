@@ -73,13 +73,12 @@ jobs:
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
 
       - name: Install dependencies
         uses: ./.github/actions/install-deps
 
       - name: Build generated content
-        run: npm run build:content
+        run: pnpm run build:content
 
       - name: Run stale content report
         id: stale
@@ -87,7 +86,7 @@ jobs:
         run: |
           set -euo pipefail
           report_date="$(date -u +%F)"
-          REPORT_DATE="${report_date}" npm run --silent report:stale-content > stale-content-report.md
+          REPORT_DATE="${report_date}" pnpm run --silent report:stale-content > stale-content-report.md
           cat stale-content-report.md
           echo "report_date=${report_date}" >> "$GITHUB_OUTPUT"
           if grep -q '^No stale or expired content' stale-content-report.md; then

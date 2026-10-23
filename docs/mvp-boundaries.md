@@ -39,9 +39,9 @@ Run these before relaxing or extending the MVP boundary:
 
 ```bash
 source ~/.nvm/nvm.sh && nvm use 22
-npm run test -- tests/security/privacy-boundaries.test.ts
-npm run test -- tests/content/coverage.test.ts
-npm run e2e:prod -- tests/e2e/core-mobile-journey.spec.ts tests/e2e/privacy-reset.spec.ts
+pnpm run test -- tests/security/privacy-boundaries.test.ts
+pnpm run test -- tests/content/coverage.test.ts
+pnpm run e2e:prod -- tests/e2e/core-mobile-journey.spec.ts tests/e2e/privacy-reset.spec.ts
 ```
 
 If a future feature needs sensitive data, create a separate security plan first. Do not add it as an incidental MVP field.

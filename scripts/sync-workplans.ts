@@ -531,7 +531,7 @@ function describeSnapshotDrift(snapshotSourcePath: string, expectedCount: number
     `Workplan snapshot drift detected in ${snapshotSourcePath}.`,
     `Expected planSourceCount=${expectedCount} and planSourceHash=${expectedHash}.`,
     `Tracked snapshot has planSourceCount=${actualCount ?? 'missing'} and planSourceHash=${actualHash ?? 'missing'}.`,
-    'Run npm run sync:workplans and commit content/workplans/workplans.json.',
+    'Run pnpm run sync:workplans and commit content/workplans/workplans.json.',
   ].join(' ');
 }
 

@@ -57,7 +57,7 @@ jobs:
           if [ "${review_type}" = "all" ] || [ "${review_type}" = "dependency" ]; then
             create_or_comment \
               "Quarterly dependency review" \
-              "Run docs/quarterly-dependency-review.md. Boundary: no secrets/persondata in issue body. Record npm audit status, exact-version drift, CI result, accepted advisory expiry, and owner role."
+              "Run docs/quarterly-dependency-review.md. Boundary: no secrets/persondata in issue body. Record pnpm audit status, exact-version drift, CI result, accepted advisory expiry, and owner role."
           fi
 
           if [ "${review_type}" = "all" ] || [ "${review_type}" = "security-privacy" ]; then

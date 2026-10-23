@@ -26,14 +26,14 @@ Source validity, pilot use and public publication approval are separate gates:
 - `pilotReviewStatus=approved-for-pilot` means the source may support pilot operational cards and checklists. Missing `pilotReviewStatus` is parsed as `not-reviewed`.
 - `publicationStatus=approved-public` means generated public source documents may expose the source body or excerpts. Missing `publicationStatus` is parsed as `needs-permission`.
 
-The conservative defaults keep existing imports compatible, but they do not grant approval. `npm run report:source-governance:strict` is therefore still expected to fail until actual source approvals are recorded explicitly.
+The conservative defaults keep existing imports compatible, but they do not grant approval. `pnpm run report:source-governance:strict` is therefore still expected to fail until actual source approvals are recorded explicitly.
 
 ## Pilot governance snapshot — 2026-06-05
 
 Deep-research source notes are explicitly `rejected-for-pilot` for operational cards/checklists until each claim is replaced or backed by primary authority source extracts. They may remain as editorial background, but they do not count as approved pilot evidence and must not be used to claim content-governance completion.
 
-This pass did not grant pilot/public approval to any source. Official/local source extracts that still lack `pilotReviewStatus=approved-for-pilot` and `publicationStatus=approved-public` remain blockers in `npm run report:source-governance:strict` until a real source review records explicit approval.
+This pass did not grant pilot/public approval to any source. Official/local source extracts that still lack `pilotReviewStatus=approved-for-pilot` and `publicationStatus=approved-public` remain blockers in `pnpm run report:source-governance:strict` until a real source review records explicit approval.
 
 ## Remediation queue
 
-The current review queue is tracked in `docs/source-governance-remediation-queue.md`. The queue is not approval evidence by itself; each row must be closed by updating the source extract frontmatter or removing the pilot/public reference, then rerunning `npm run report:source-governance:strict`.
+The current review queue is tracked in `docs/source-governance-remediation-queue.md`. The queue is not approval evidence by itself; each row must be closed by updating the source extract frontmatter or removing the pilot/public reference, then rerunning `pnpm run report:source-governance:strict`.

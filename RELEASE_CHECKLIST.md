@@ -7,11 +7,11 @@ This checklist captures the MVP pilot release gates for Beredskapsboka.
 Run these before tagging or handing off a pilot build:
 
 ```bash
-npm run typecheck
-npm run lint
-npm run test
-npm run build:app
-npm run e2e:prod:no-build
+pnpm run typecheck
+pnpm run lint
+pnpm run test
+pnpm run build:app
+pnpm run e2e:prod:no-build
 ```
 
 ## Expected CI Workflow

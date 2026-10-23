@@ -10,26 +10,26 @@ The app is **decision support only** — no login, no backend, no patient/person
 
 ## Setup
 
-Node 22.x required. On Reidar's machine: `source ~/.nvm/nvm.sh && nvm use 22` before any npm command. Path alias `@/*` maps to repo root.
+Node 22.x required. On Reidar's machine: `source ~/.nvm/nvm.sh && nvm use 22` before any pnpm command. Path alias `@/*` maps to repo root.
 
 ## Commands
 
 ```bash
-npm run dev                 # Next dev server
-npm run build:content       # REQUIRED after any content edit — see Content pipeline below
-npm run build               # build:content + build:sw + production Next build
-npm run typecheck           # tsc --noEmit
-npm run lint                # eslint, zero-warnings gate
-npm run test                # Vitest (unit/component/integration/security/content)
-npm run e2e:prod            # build + production-mode Playwright (service worker/offline checks)
-npm run e2e:prod:no-build   # Playwright against an existing production build
-npm run check:ci            # full release gate (audit, content, typecheck, lint, test, build, e2e, perf budgets)
+pnpm run dev                 # Next dev server
+pnpm run build:content       # REQUIRED after any content edit — see Content pipeline below
+pnpm run build               # build:content + build:sw + production Next build
+pnpm run typecheck           # tsc --noEmit
+pnpm run lint                # eslint, zero-warnings gate
+pnpm run test                # Vitest (unit/component/integration/security/content)
+pnpm run e2e:prod            # build + production-mode Playwright (service worker/offline checks)
+pnpm run e2e:prod:no-build   # Playwright against an existing production build
+pnpm run check:ci            # full release gate (audit, content, typecheck, lint, test, build, e2e, perf budgets)
 ```
 
 Run a single test:
 ```bash
-npm run test -- tests/security/privacy-boundaries.test.ts        # one Vitest file
-npm run e2e:prod -- tests/e2e/offline.spec.ts                    # one Playwright spec (needs prod build)
+pnpm run test -- tests/security/privacy-boundaries.test.ts        # one Vitest file
+pnpm run e2e:prod -- tests/e2e/offline.spec.ts                    # one Playwright spec (needs prod build)
 ```
 E2E **requires a production build** (`PLAYWRIGHT_PROD=1`); set `PLAYWRIGHT_PORT=3007` if port 3000 is busy. `e2e:prod:no-build` reuses the existing `.next` build to iterate faster.
 
@@ -38,11 +38,11 @@ E2E **requires a production build** (`PLAYWRIGHT_PROD=1`); set `PLAYWRIGHT_PORT=
 Content is **generated, not hand-edited at runtime**. The flow:
 
 1. Source of truth: a private Obsidian vault (`OBSIDIAN_BEREDSKAPSBOKA_PATH`) + curated YAML in `content/curated/*.yaml`.
-2. `npm run build:content` runs: `import-obsidian` → `compile-curated` → `build-search-index` (minisearch) → `sync-workplans` → `validate-content`.
+2. `pnpm run build:content` runs: `import-obsidian` → `compile-curated` → `build-search-index` (minisearch) → `sync-workplans` → `validate-content`.
 3. Output lands in `content/generated/*` and is mirrored to `public/generated-content/*` for the browser.
 4. `lib/content/load-content.ts` reads `content/generated/*` at build/server time and **validates every record against Zod schemas** (`lib/content/schemas.ts`) — an empty or malformed generated file throws.
 
-The sanitized `content/generated/source-documents.json` + its `source-snapshot-metadata.json` sidecar are **committed** so clean CI/Docker runners can build without the private vault. `npm run check:generated` fails if these drift. After content edits: run `build:content`, then commit the regenerated files.
+The sanitized `content/generated/source-documents.json` + its `source-snapshot-metadata.json` sidecar are **committed** so clean CI/Docker runners can build without the private vault. `pnpm run check:generated` fails if these drift. After content edits: run `build:content`, then commit the regenerated files.
 
 ## Architecture
 
@@ -52,7 +52,7 @@ The sanitized `content/generated/source-documents.json` + its `source-snapshot-m
 - `lib/content/` — load/validate generated content, search, taxonomy, source governance.
 - `lib/mission/` — local mission state. `local-store.ts` is the **IndexedDB layer** (`idb`, DB `beredskapsboka-local`); missions/checklist runs are sanitized (geometry stripped) on read/write. Plus after-action reports, field log, order/comms export.
 - `lib/maps/` — MapLibre + PMTiles offline map packages, with a schematic fallback. **Never fetch external tile-provider URLs at runtime** — CSP `connect-src 'self'` enforces this.
-- `lib/offline/` — service-worker metadata + static app-shell route list. `scripts/build-service-worker.ts` injects a generated metadata block into `public/sw.js`; `npm run check:sw` verifies it matches. The CSP in `next.config.ts` is strict and intentional.
+- `lib/offline/` — service-worker metadata + static app-shell route list. `scripts/build-service-worker.ts` injects a generated metadata block into `public/sw.js`; `pnpm run check:sw` verifies it matches. The CSP in `next.config.ts` is strict and intentional.
 - `lib/privacy/` — local profile + sensitive-text scrubbing. `lib/integrations/` — external context source contracts, rate limiting, route guards.
 
 **Data flow:** generated JSON (server, Zod-validated) → React Server Components → client components hydrate and read/write IndexedDB via `lib/mission`. There is no shared server state between users.

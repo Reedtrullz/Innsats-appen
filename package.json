@@ -11,9 +11,9 @@
   "homepage": "https://innsats.reidar.tech",
   "scripts": {
     "dev": "next dev",
-    "build": "npm run build:content && npm run build:sw && npm run build:app",
+    "build": "pnpm run build:content && pnpm run build:sw && pnpm run build:app",
     "clean:next": "tsx scripts/clean-next-build.ts",
-    "build:app": "npm run clean:next && next build",
+    "build:app": "pnpm run clean:next && next build",
     "perf:budget": "tsx scripts/performance-budget.ts",
     "perf:lighthouse": "tsx scripts/lighthouse-mobile-budget.ts",
     "build:sw": "tsx scripts/build-service-worker.ts",
@@ -21,11 +21,11 @@
     "start": "mkdir -p .next/standalone/.next && rm -rf .next/standalone/public .next/standalone/.next/static && cp -R public .next/standalone/public && cp -R .next/static .next/standalone/.next/static && cd .next/standalone && node server.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
-    "audit:ci": "npm audit --audit-level=high",
+    "audit:ci": "pnpm audit --audit-level high",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "npm run build && npm run e2e:prod:no-build",
-    "e2e:prod": "npm run build && npm run e2e:prod:no-build",
+    "e2e": "pnpm run build && pnpm run e2e:prod:no-build",
+    "e2e:prod": "pnpm run build && pnpm run e2e:prod:no-build",
     "e2e:prod:no-build": "PLAYWRIGHT_PROD=1 playwright test",
     "import:obsidian": "tsx scripts/import-obsidian.ts",
     "sync:workplans": "tsx scripts/sync-workplans.ts",
@@ -39,14 +39,14 @@
     "report:source-governance": "tsx scripts/report-source-governance.ts",
     "report:source-governance:strict": "tsx scripts/report-source-governance.ts --strict",
     "build:search": "tsx scripts/build-search-index.ts",
-    "build:content": "npm run import:obsidian && npm run compile:curated && npm run build:search && npm run sync:workplans && npm run validate:content",
+    "build:content": "pnpm run import:obsidian && pnpm run compile:curated && pnpm run build:search && pnpm run sync:workplans && pnpm run validate:content",
     "check:generated": "git diff --cached --exit-code -- content/generated/source-documents.json content/generated/source-snapshot-metadata.json content/workplans/workplans.json && git diff --exit-code -- content/generated/source-documents.json content/generated/source-snapshot-metadata.json content/workplans/workplans.json",
-    "check": "npm run check:ci",
-    "check:ci": "npm run audit:ci && npm run check:workplans && npm run build:content && npm run check:generated && npm run build:sw && npm run check:sw && npm run validate:maps && npm run typecheck && npm run lint && npm run test && npm run build:app && npm run e2e:prod:no-build && npm run perf:budget && npm run perf:lighthouse",
+    "check": "pnpm run check:ci",
+    "check:ci": "pnpm run audit:ci && pnpm run check:workplans && pnpm run build:content && pnpm run check:generated && pnpm run build:sw && pnpm run check:sw && pnpm run validate:maps && pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build:app && pnpm run e2e:prod:no-build && pnpm run perf:budget && pnpm run perf:lighthouse",
     "dev:vinext": "vite dev --port 3001",
     "build:vinext": "node scripts/build-cloudflare-static.mjs",
     "start:vinext": "wrangler dev --config dist/server/wrangler.json",
-    "deploy:vinext": "npm run build:vinext && wrangler deploy --config dist/server/wrangler.json"
+    "deploy:vinext": "pnpm run build:vinext && wrangler deploy --config dist/server/wrangler.json"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "5.3.0",
@@ -87,28 +87,17 @@
     "fake-indexeddb": "6.2.5",
     "jsdom": "29.1.1",
     "lighthouse": "13.4.1",
+    "playwright-core": "1.60.0",
     "postcss": "8.5.26",
     "tailwindcss": "3.4.19",
     "tsx": "4.22.4",
     "typescript": "6.0.3",
+    "vite": "8.3.5",
     "vitest": "4.1.12",
     "wrangler": "4.152.0"
   },
   "engines": {
     "node": ">=22"
   },
-  "overrides": {
-    "gray-matter": {
-      "js-yaml": "3.15.2"
-    },
-    "jsdom": {
-      "undici": "7.30.1"
-    },
-    "minimatch@3.1.5": {
-      "brace-expansion": "1.1.21"
-    },
-    "minimatch@10.2.5": {
-      "brace-expansion": "5.0.12"
-    }
-  }
+  "packageManager": "pnpm@10.34.5"
 }

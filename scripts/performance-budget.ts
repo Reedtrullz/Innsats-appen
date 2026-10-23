@@ -85,7 +85,7 @@ export function checkPerformanceBudget(rootDir = process.cwd(), budget = default
   ].filter(Boolean) as ManifestLike[];
 
   if (manifests.length === 0) {
-    throw new Error('No .next build manifests found. Run npm run build:app before npm run perf:budget.');
+    throw new Error('No .next build manifests found. Run pnpm run build:app before pnpm run perf:budget.');
   }
 
   const chunksDir = path.join(rootDir, '.next', 'static', 'chunks');

@@ -38,7 +38,7 @@ Current production comparison point: verify the live SHA with `https://innsats.r
 
 ## Gates before broader pilot
 
-- `npm run check:ci` passes locally and in workflow, including production Playwright E2E.
+- `pnpm run check:ci` passes locally and in workflow, including production Playwright E2E.
 - Staging health endpoint returns the exact SHA from the staging deploy run.
 - Manual smoke on staging covers `/nytt`, `/release`, `/data-pa-enheten`, `/oppdrag`, `/feltmodus` and privacy reset.
 - Rollback command/owner is documented for the staging and production targets.

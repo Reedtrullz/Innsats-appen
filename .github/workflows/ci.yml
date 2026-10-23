@@ -37,7 +37,6 @@ jobs:
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
 
       - name: Install dependencies
         uses: ./.github/actions/install-deps
@@ -45,55 +44,55 @@ jobs:
       - name: Fetch local map packages (release assets)
         env:
           GH_TOKEN: ${{ github.token }}
-        run: npm run map:fetch
+        run: pnpm run map:fetch
 
       - name: Audit for high or critical vulnerabilities
-        run: npm run audit:ci
+        run: pnpm run audit:ci
 
       - name: Check workplan snapshot freshness
-        run: npm run check:workplans
+        run: pnpm run check:workplans
 
       - name: Build content artifacts
-        run: npm run build:content
+        run: pnpm run build:content
 
       - name: Check generated artifact freshness
-        run: npm run check:generated
+        run: pnpm run check:generated
 
       - name: Validate local map packages
-        run: npm run validate:maps
+        run: pnpm run validate:maps
 
       - name: TypeScript
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: ESLint
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Vitest
-        run: npm run test
+        run: pnpm run test
 
       - name: Production build
-        run: npm run build:app
+        run: pnpm run build:app
 
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Mobile JavaScript performance budget
-        run: npm run perf:budget
+        run: pnpm run perf:budget
 
       - name: Lighthouse mobile performance budget
-        run: npm run perf:lighthouse
+        run: pnpm run perf:lighthouse
 
       - name: Playwright production smoke/E2E
-        run: npm run e2e:prod:no-build
+        run: pnpm run e2e:prod:no-build
 
       - name: Build Cloudflare Worker preview
         run: |
-          npm run build:vinext
+          pnpm run build:vinext
           node -e 'const config = require("./dist/server/wrangler.json"); if (config.vars.RELEASE_SHA !== process.env.GITHUB_SHA) process.exit(1)'
-          npx wrangler deploy --dry-run --config dist/server/wrangler.json
+          pnpm exec wrangler deploy --dry-run --config dist/server/wrangler.json
 
       - name: Cloudflare static navigation smoke
-        run: npx playwright test --config playwright.cloudflare.config.ts
+        run: pnpm exec playwright test --config playwright.cloudflare.config.ts
 
       - name: Upload Playwright report on failure
         if: failure()
@@ -131,7 +130,6 @@ jobs:
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
 
       - name: Install dependencies
         uses: ./.github/actions/install-deps
@@ -139,13 +137,13 @@ jobs:
       - name: Fetch local map packages (release assets)
         env:
           GH_TOKEN: ${{ github.token }}
-        run: npm run map:fetch
+        run: pnpm run map:fetch
 
       - name: Build Cloudflare Worker
         run: |
-          npm run build:content
-          npm run build:sw
-          npm run build:vinext
+          pnpm run build:content
+          pnpm run build:sw
+          pnpm run build:vinext
           node -e 'const config = require("./dist/server/wrangler.json"); if (config.vars.RELEASE_SHA !== process.env.GITHUB_SHA) process.exit(1)'
 
       - name: Deploy Worker and verify production
@@ -153,7 +151,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           test -n "$CLOUDFLARE_API_TOKEN"
-          npx wrangler deploy --config dist/server/wrangler.json
+          pnpm exec wrangler deploy --config dist/server/wrangler.json
           node --input-type=module - <<'NODE'
           const expected = process.env.GITHUB_SHA;
           const url = 'https://innsats.reidar.tech/api/health';
@@ -191,10 +189,18 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Enable pnpm via Corepack (version pinned by packageManager)
+        run: corepack enable
+
       - name: Fetch local map packages (release assets)
         env:
           GH_TOKEN: ${{ github.token }}
-        run: npm run map:fetch
+        run: pnpm run map:fetch
 
       - name: Set image tag
         id: image

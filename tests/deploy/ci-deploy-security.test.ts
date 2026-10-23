@@ -139,10 +139,10 @@ describe('production Next build cleanup', () => {
     const checkCi = scripts['check:ci'];
 
     expect(cleanNext).toBe('tsx scripts/clean-next-build.ts');
-    expect(buildApp).toContain('npm run clean:next');
+    expect(buildApp).toContain('pnpm run clean:next');
     expect(buildApp).toContain('next build');
-    expect(buildApp.indexOf('npm run clean:next')).toBeLessThan(buildApp.indexOf('next build'));
-    expect(checkCi).toContain('npm run build:app');
+    expect(buildApp.indexOf('pnpm run clean:next')).toBeLessThan(buildApp.indexOf('next build'));
+    expect(checkCi).toContain('pnpm run build:app');
     expect(checkCi).not.toContain('next build');
   });
 });
@@ -246,32 +246,32 @@ describe('CI workflow checks', () => {
     const { scripts } = readPackageJson();
     const checkCi = scripts['check:ci'];
 
-    expect(scripts['audit:ci']).toContain('npm audit --audit-level=high');
-    expect(checkCi).toContain('npm run audit:ci');
-    expect(checkCi.indexOf('npm run audit:ci')).toBeLessThan(checkCi.indexOf('npm run build:content'));
-    expect(checkCi.indexOf('npm run audit:ci')).toBeLessThan(checkCi.indexOf('npm run build:app'));
-    expect(workflow).toMatch(/run:\s*npm run audit:ci/);
+    expect(scripts['audit:ci']).toContain('pnpm audit --audit-level high');
+    expect(checkCi).toContain('pnpm run audit:ci');
+    expect(checkCi.indexOf('pnpm run audit:ci')).toBeLessThan(checkCi.indexOf('pnpm run build:content'));
+    expect(checkCi.indexOf('pnpm run audit:ci')).toBeLessThan(checkCi.indexOf('pnpm run build:app'));
+    expect(workflow).toMatch(/run:\s*pnpm run audit:ci/);
   });
 
   it('runs map package validation in production CI before build', () => {
     const workflow = readCiWorkflow();
 
     expect(workflow).toMatch(/name:\s*Validate local map packages/i);
-    expect(workflow).toMatch(/npm run validate:maps/);
-    expect(workflow.indexOf('npm run validate:maps')).toBeLessThan(workflow.indexOf('npm run build:app'));
+    expect(workflow).toMatch(/pnpm run validate:maps/);
+    expect(workflow.indexOf('pnpm run validate:maps')).toBeLessThan(workflow.indexOf('pnpm run build:app'));
   });
 
   it('checks the Cloudflare build and exact release SHA in CI', () => {
     const workflow = readCiWorkflow();
     expect(workflow).toContain('name: Build Cloudflare Worker preview');
-    expect(workflow).toContain('npm run build:vinext');
+    expect(workflow).toContain('pnpm run build:vinext');
     expect(workflow).toContain('config.vars.RELEASE_SHA !== process.env.GITHUB_SHA');
     expect(workflow).toContain('wrangler deploy --dry-run --config dist/server/wrangler.json');
   });
 
   it('fetches release map packages before staging checks and image build', () => {
     const workflow = readStagingWorkflow();
-    const fetchMatches = workflow.match(/run:\s*npm run map:fetch/g) ?? [];
+    const fetchMatches = workflow.match(/run:\s*pnpm run map:fetch/g) ?? [];
     const stagingChecks = workflow.slice(
       workflow.indexOf('staging-checks:'),
       workflow.indexOf('build-staging-image:'),
@@ -282,11 +282,11 @@ describe('CI workflow checks', () => {
     );
 
     expect(fetchMatches).toHaveLength(2);
-    expect(stagingChecks.indexOf('npm run map:fetch')).toBeLessThan(
-      stagingChecks.indexOf('npm run check:ci'),
+    expect(stagingChecks.indexOf('pnpm run map:fetch')).toBeLessThan(
+      stagingChecks.indexOf('pnpm run check:ci'),
     );
-    expect(stagingImageBuild).toContain('npm run map:fetch');
-    expect(stagingImageBuild.indexOf('npm run map:fetch')).toBeLessThan(
+    expect(stagingImageBuild).toContain('pnpm run map:fetch');
+    expect(stagingImageBuild.indexOf('pnpm run map:fetch')).toBeLessThan(
       stagingImageBuild.indexOf('docker/build-push-action@'),
     );
     expect(stagingImageBuild).toContain('NODE_VERSION=${{ env.NODE_VERSION }}');
@@ -309,20 +309,20 @@ describe('CI workflow checks', () => {
     expect(checkGenerated).toBe(
       `git diff --cached --exit-code -- ${generatedArtifactPaths.join(' ')} && git diff --exit-code -- ${generatedArtifactPaths.join(' ')}`,
     );
-    expect(checkCi).toContain('npm run check:generated');
-    expect(checkCi.indexOf('npm run build:content')).toBeLessThan(
-      checkCi.indexOf('npm run check:generated'),
+    expect(checkCi).toContain('pnpm run check:generated');
+    expect(checkCi.indexOf('pnpm run build:content')).toBeLessThan(
+      checkCi.indexOf('pnpm run check:generated'),
     );
-    expect(checkCi.indexOf('npm run check:generated')).toBeLessThan(
-      checkCi.indexOf('npm run validate:maps'),
+    expect(checkCi.indexOf('pnpm run check:generated')).toBeLessThan(
+      checkCi.indexOf('pnpm run validate:maps'),
     );
-    expect(checkCi.indexOf('npm run check:generated')).toBeLessThan(
-      checkCi.indexOf('npm run typecheck'),
+    expect(checkCi.indexOf('pnpm run check:generated')).toBeLessThan(
+      checkCi.indexOf('pnpm run typecheck'),
     );
-    expect(checkCi.indexOf('npm run check:generated')).toBeLessThan(checkCi.indexOf('npm run lint'));
-    expect(checkCi.indexOf('npm run check:generated')).toBeLessThan(checkCi.indexOf('npm run test'));
-    expect(checkCi.indexOf('npm run check:generated')).toBeLessThan(
-      checkCi.indexOf('npm run build:app'),
+    expect(checkCi.indexOf('pnpm run check:generated')).toBeLessThan(checkCi.indexOf('pnpm run lint'));
+    expect(checkCi.indexOf('pnpm run check:generated')).toBeLessThan(checkCi.indexOf('pnpm run test'));
+    expect(checkCi.indexOf('pnpm run check:generated')).toBeLessThan(
+      checkCi.indexOf('pnpm run build:app'),
     );
   });
 
@@ -364,7 +364,7 @@ describe('CI workflow checks', () => {
       'Validate local map packages',
     );
 
-    expect(checkStep).toMatch(/run:\s*npm run check:generated/);
+    expect(checkStep).toMatch(/run:\s*pnpm run check:generated/);
     expect(workflow.indexOf('- name: Build content artifacts')).toBeLessThan(
       workflow.indexOf('- name: Check generated artifact freshness'),
     );
@@ -423,7 +423,7 @@ describe('manual production publish script safety', () => {
     expect(script).toMatch(/git fetch origin main/);
     expect(script).toMatch(/git rev-parse origin\/main/);
     expect(script).toMatch(/HEAD is not origin\/main/);
-    expect(script).toMatch(/npm run check:ci/);
+    expect(script).toMatch(/pnpm run check:ci/);
     expect(script).toMatch(/gh run list --commit "\$SHA"/);
     expect(script).toMatch(/--limit 50/);
     expect(script).toMatch(/--json databaseId,status,conclusion,headSha,workflowName,event,headBranch/);
@@ -434,7 +434,7 @@ describe('manual production publish script safety', () => {
     expect(script).toMatch(/candidate\.event === 'workflow_dispatch'/);
     expect(script).toMatch(/candidate\.status === 'completed'/);
     expect(script).toMatch(/candidate\.conclusion === 'success'/);
-    expect(script.indexOf('npm run check:ci')).toBeLessThan(script.indexOf('docker buildx build'));
+    expect(script.indexOf('pnpm run check:ci')).toBeLessThan(script.indexOf('docker buildx build'));
     expect(script.indexOf('gh run list --commit "$SHA"')).toBeLessThan(script.indexOf('docker buildx build'));
   });
 

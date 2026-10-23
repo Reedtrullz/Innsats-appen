@@ -55,7 +55,7 @@ function main() {
 
   if (checkOnly) {
     if (current !== next) {
-      console.error('public/sw.js is not generated from typed service-worker metadata. Run npm run build:sw.');
+      console.error('public/sw.js is not generated from typed service-worker metadata. Run pnpm run build:sw.');
       process.exitCode = 1;
     }
     return;

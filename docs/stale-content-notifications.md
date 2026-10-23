@@ -2,7 +2,7 @@
 
 ## Automatisk rapport
 
-Task 412 bruker `npm run report:stale-content` for å skrive stale content rapport til stdout. Rapporten inneholder kilde-ID, tittel, status, risiko og review-/expiry-datoer. Den skal ha ingen persondata, ingen private posisjoner, ingen eier-/reviewer-navn og ingen kilde-body.
+Task 412 bruker `pnpm run report:stale-content` for å skrive stale content rapport til stdout. Rapporten inneholder kilde-ID, tittel, status, risiko og review-/expiry-datoer. Den skal ha ingen persondata, ingen private posisjoner, ingen eier-/reviewer-navn og ingen kilde-body.
 
 ## Scheduled notification
 
@@ -10,7 +10,7 @@ Task 412 bruker `npm run report:stale-content` for å skrive stale content rappo
 
 ## Lokal bruk
 
-Kjør `npm run report:stale-content` før pilot/release for å se samme privacy-safe rapport lokalt. Bruk kilde-ID i repoet til å gjøre redaksjonell review; ikke kopier persondata eller skjermede opplysninger inn i saken.
+Kjør `pnpm run report:stale-content` før pilot/release for å se samme privacy-safe rapport lokalt. Bruk kilde-ID i repoet til å gjøre redaksjonell review; ikke kopier persondata eller skjermede opplysninger inn i saken.
 
 ## Felles grense
 

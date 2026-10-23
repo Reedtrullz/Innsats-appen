@@ -15,7 +15,7 @@ Ingen persondata, ingen cookies, ingen localStorage, ingen IndexedDB, ingen priv
 
 ## Varsling ved stale innhold
 
-Samme workflow kjører `npm run report:stale-content`. Hvis rapporten har funn, opprettes eller oppdateres én åpen GitHub Issue med privacy-safe innhold.
+Samme workflow kjører `pnpm run report:stale-content`. Hvis rapporten har funn, opprettes eller oppdateres én åpen GitHub Issue med privacy-safe innhold.
 
 ## Felles grense
 

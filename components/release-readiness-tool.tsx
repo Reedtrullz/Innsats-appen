@@ -240,7 +240,7 @@ export function ReleaseReadinessTool() {
     loadCoverageReport().catch(() => {
       if (!cancelled) {
         setCoverageReport(null);
-        setCoverageError('Dekningsrapport for innhold er utilgjengelig. Kjør npm run validate:content lokalt før du vurderer pilotklarhet.');
+        setCoverageError('Dekningsrapport for innhold er utilgjengelig. Kjør pnpm run validate:content lokalt før du vurderer pilotklarhet.');
       }
     });
 
@@ -470,7 +470,7 @@ export function ReleaseReadinessTool() {
                 <p className="rounded-xl bg-white px-3 py-2 text-xs font-black text-blue-700">{workplansSnapshot ? `Artefakt generert: ${workplansSnapshot.generatedAt}` : workplansError ?? 'Venter på generert lokal workplan-artefakt.'}</p>
               </div>
               {syncedWorkplans.length === 0 ? (
-                <p className="mt-4 rounded-xl bg-white p-3 text-sm font-semibold text-slate-600">Ingen genererte workplans er tilgjengelige ennå. Kjør <code>npm run sync:workplans</code> lokalt for å generere trygge metadata fra `.hermes/plans` til `content/workplans` og `/generated-content/workplans.json`; ingen backend-synk utføres.</p>
+                <p className="mt-4 rounded-xl bg-white p-3 text-sm font-semibold text-slate-600">Ingen genererte workplans er tilgjengelige ennå. Kjør <code>pnpm run sync:workplans</code> lokalt for å generere trygge metadata fra `.hermes/plans` til `content/workplans` og `/generated-content/workplans.json`; ingen backend-synk utføres.</p>
               ) : (
                 <div className="mt-4 grid gap-3 lg:grid-cols-2">
                   {syncedWorkplans.map((workplan) => (
