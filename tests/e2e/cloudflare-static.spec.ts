@@ -1,4 +1,7 @@
 import { expect, test } from '@playwright/test';
+import { registerIllustrationByteCheck } from './png-assets';
+
+registerIllustrationByteCheck();
 
 test('static map and data links keep browser URLs on HTML pages', async ({ page }) => {
   await page.goto('/kart');
