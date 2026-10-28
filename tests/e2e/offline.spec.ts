@@ -1,6 +1,9 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 import { waitForServiceWorker } from './helpers';
+import { registerIllustrationByteCheck } from './png-assets';
+
+registerIllustrationByteCheck();
 
 const routeHeadings: Record<string, RegExp> = {
   '/': /Hva trenger du nå/i,
