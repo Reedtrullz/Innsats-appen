@@ -1,11 +1,35 @@
 import assert from 'node:assert/strict';
 
-export async function waitForMapHydration(page) {
+export async function waitForMapHydration(page, { fixture, pageErrors }) {
   // The quota copy changes only after the map panel's client effect runs.
-  await page.waitForFunction(() => {
-    const copy = document.querySelector('[data-testid="offline-map-quota-copy"]')?.textContent ?? '';
-    return copy.length > 0 && !copy.includes('kvote er ukjent');
-  });
+  try {
+    await page.waitForFunction(() => {
+      const copy = document.querySelector('[data-testid="offline-map-quota-copy"]')?.textContent ?? '';
+      return copy.length > 0 && !copy.includes('kvote er ukjent');
+    });
+  } catch (error) {
+    let timer;
+    try {
+      const browser = await Promise.race([
+        page.evaluate(async () => ({
+          readyState: document.readyState,
+          quotaCopy: document.querySelector('[data-testid="offline-map-quota-copy"]')?.textContent?.slice(0, 500),
+          selectHydrated: Object.keys(document.querySelector('#offline-map-package') ?? {}).some(key => key.startsWith('__reactProps$')),
+          workerState: navigator.serviceWorker.controller?.state ?? null,
+          storage: await navigator.storage.estimate().catch(error => ({ error: String(error).slice(0, 500) })),
+          caches: await Promise.all((await caches.keys()).map(async name => ({ name, entries: (await (await caches.open(name)).keys()).length }))),
+        })),
+        new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Hydration diagnostic exceeded one second')), 1000); }),
+      ]);
+      console.error(JSON.stringify({ kind: 'o24-hydration-failure', browser }).slice(0, 4096));
+    } catch (diagnosticError) {
+      console.error(JSON.stringify({ kind: 'o24-hydration-diagnostic-failure', message: String(diagnosticError) }).slice(0, 1024));
+    } finally { clearTimeout(timer); }
+    console.error(JSON.stringify({ kind: 'o24-hydration-wire-failure', pageErrors: pageErrors.slice(0, 8).map(message => message.slice(0, 256)),
+      requests: fixture.state.requests.filter(row => row.path === '/data-pa-enheten' || row.path.startsWith('/_next/')).slice(-32),
+    }).slice(0, 8192));
+    throw error;
+  }
 }
 
 async function controlled(page) {
@@ -33,7 +57,7 @@ async function activateWaiting(page) {
   });
 }
 
-export async function exerciseAdverse({ page, context, fixture, measure }) {
+export async function exerciseAdverse({ page, context, fixture, measure, pageErrors }) {
   const routeStart = measure ? performance.now() : null;
   await controlled(page);
   await page.getByRole('heading', { name: 'Hva trenger du nå', exact: true }).waitFor();
@@ -45,7 +69,7 @@ export async function exerciseAdverse({ page, context, fixture, measure }) {
   let offlineMs = null;
   assert(fixture.state.optionalChunks.size > 0, 'No source-admitted optional chunks');
   await page.goto('/data-pa-enheten');
-  await waitForMapHydration(page);
+  await waitForMapHydration(page, { fixture, pageErrors });
   await page.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
   await page.getByRole('button', { name: 'Lagre valgt kartpakke lokalt', exact: true }).click();
   await page.getByTestId('offline-map-cache-status').filter({ hasText: 'Lagret lokalt: Trondheim lokal' }).waitFor();
@@ -71,7 +95,7 @@ export async function exerciseAdverse({ page, context, fixture, measure }) {
       Cache.prototype.put = () => Promise.reject(new DOMException('Authored storage write denial', 'QuotaExceededError'));
     });
     await denied.goto('/data-pa-enheten');
-    await waitForMapHydration(denied);
+    await waitForMapHydration(denied, { fixture, pageErrors });
     await denied.getByRole('button', { name: 'Tilbakestill kartcache', exact: true }).click();
     await denied.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
     await denied.getByRole('button', { name: 'Lagre valgt kartpakke lokalt', exact: true }).click();

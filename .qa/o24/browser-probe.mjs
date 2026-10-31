@@ -65,9 +65,9 @@ export async function cacheBodies(page) {
   });
 }
 
-async function saveMap(page) {
+async function saveMap(page, evidence) {
   await page.goto('/data-pa-enheten');
-  await waitForMapHydration(page);
+  await waitForMapHydration(page, evidence);
   await page.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
   await page.getByRole('button', { name: 'Lagre valgt kartpakke lokalt', exact: true }).click();
   try {
@@ -116,9 +116,9 @@ async function observe(config, phase, scenario) {
     });
     context.setDefaultTimeout(15000);
     context.setDefaultNavigationTimeout(15000);
-    const page = await context.newPage();
     const pageErrors = [];
-    page.on('pageerror', error => pageErrors.push(error.message));
+    context.on('page', page => page.on('pageerror', error => pageErrors.push(error.message)));
+    const page = await context.newPage();
     await page.goto(`${fixture.origin}/__o24_wire_control`);
     assert.equal((await page.locator('body').innerText()).trimEnd(), controlBody.toString().trimEnd());
     await page.waitForLoadState('networkidle');
@@ -129,12 +129,12 @@ async function observe(config, phase, scenario) {
 
     if (config.temperature === 'warm') {
       await page.goto('/'); await serviceWorkerReady(page);
-      if (config.map === 'open') await saveMap(page);
+      if (config.map === 'open') await saveMap(page, { fixture, pageErrors });
       await page.waitForLoadState('networkidle');
       fixture.reset();
     }
     if (scenario === 'failure') {
-      const adverse = await exerciseAdverse({ page, context, fixture, measure: config.mode === 'measure' });
+      const adverse = await exerciseAdverse({ page, context, fixture, measure: config.mode === 'measure', pageErrors });
       const semanticDigest = await sourceContentDigest(page, root);
       await page.waitForLoadState('networkidle');
       return { ...adverse, semanticDigest,
@@ -162,7 +162,7 @@ async function observe(config, phase, scenario) {
       assert.equal(sha(Buffer.from(actual)), sha(readFileSync(path.join(root, 'public', url))), 'Served asset source mismatch');
       assets.push(url);
     }
-    if (config.map === 'open') await saveMap(page);
+    if (config.map === 'open') await saveMap(page, { fixture, pageErrors });
     await page.waitForLoadState('networkidle');
     const semanticDigest = await sourceContentDigest(page, root);
     await page.waitForLoadState('networkidle');
