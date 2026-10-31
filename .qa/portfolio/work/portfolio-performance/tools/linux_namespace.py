@@ -340,7 +340,11 @@ def preflight() -> dict:
 
 
 def outer_argv(inner: list[str], mount: str, scratch_bytes: int, roots: list[str], limit: int, uid: int, gid: int, request: str | None = None) -> list[str]:
-    require(len(roots) in (3, 4) and all(isinstance(arg, str) and arg and '\x00' not in arg and '\n' not in arg for arg in (*inner, *roots)), 'literal argv required')
+    # Only source-bound isolation controls contain code; application arguments stay single-line.
+    trusted_control = (request is None and len(inner) >= 3 and inner[:2] == [sys.executable, '-c']
+                       and inner[2] in (BROWSER, EGRESS, PRIVATE, WRITES, PRIVS, OVERLIMIT, SLEEP, FLOOD, SURVIVOR))
+    literal_args = [*inner[:2], *inner[3:]] if trusted_control else inner
+    require(len(roots) in (3, 4) and all(isinstance(arg, str) and arg and '\x00' not in arg and '\n' not in arg for arg in (*literal_args, *roots)), 'literal argv required')
     env = [f'PATH={Path(sys.executable).parent}:/usr/bin:/bin', f'HOME={mount}/home', f'TMPDIR={mount}/tmp',
            f'XDG_CACHE_HOME={mount}/cache', f'XDG_CONFIG_HOME={mount}/config', f'XDG_RUNTIME_DIR={mount}/run',
            'LANG=C', 'PYTHONDONTWRITEBYTECODE=1']

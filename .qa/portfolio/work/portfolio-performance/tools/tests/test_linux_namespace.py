@@ -92,6 +92,34 @@ class NamespaceSourceTests(unittest.TestCase):
                 guard.run_contained(['/not-executed'], '/not-created', 8 * 1024 * 1024, [], 120)
         process.assert_not_called()
 
+    def test_internal_multiline_control_reaches_the_literal_command_unchanged(self) -> None:
+        # Given the real source-bound positive control, When argv is built, Then its bytes survive.
+        inner = [sys.executable, '-c', guard.BROWSER, str(self.browser)]
+        argv = guard.outer_argv(inner, '/run/not-created', guard.MIN_SCRATCH,
+                                list(map(str, self.roots)), 30, 1001, 1002)
+        self.assertEqual(argv[-len(inner):], inner)
+
+    def test_untrusted_multiline_arguments_cannot_impersonate_internal_controls(self) -> None:
+        # Given altered code, another interpreter, or multiline data, Then construction rejects it.
+        attempts = [
+            [sys.executable, '-c', guard.BROWSER + '\nprint("altered")'],
+            ['/other-python', '-c', guard.BROWSER],
+            [sys.executable, '-c', 'print("arbitrary")\nprint("code")'],
+            [sys.executable, '-c', guard.BROWSER, 'path\nfragment'],
+            [sys.executable, '-c', guard.BROWSER, 'path\x00fragment'],
+        ]
+        for inner in attempts:
+            with self.subTest(inner=inner):
+                with self.assertRaisesRegex(Rejected, 'literal argv required'):
+                    guard.outer_argv(inner, '/run/not-created', guard.MIN_SCRATCH,
+                                     list(map(str, self.roots)), 30, 1001, 1002)
+
+    def test_measurement_request_does_not_enable_the_internal_control_exception(self) -> None:
+        # Given an application measurement request, Then multiline control code remains disallowed.
+        with self.assertRaisesRegex(Rejected, 'literal argv required'):
+            guard.outer_argv([sys.executable, '-c', guard.BROWSER], '/run/not-created',
+                             guard.MIN_SCRATCH, list(map(str, self.roots)), 30, 1001, 1002, '{}')
+
 
 if __name__ == '__main__':
     unittest.main()
