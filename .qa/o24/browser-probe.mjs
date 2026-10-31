@@ -6,7 +6,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { once } from 'node:events';
 import { startFixture, controlBody, controlGzip } from './http-fixture.mjs';
-import { exerciseAdverse } from './browser-adverse.mjs';
+import { exerciseAdverse, waitForMapHydration } from './browser-adverse.mjs';
 
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const illustrations = [2, 3].map(index => `/content-assets/docx_7.7-Opplringsplan-for-beredskapsvakt-ved-sivilforsvarsdistriktene__image${index}.png`);
@@ -67,6 +67,7 @@ export async function cacheBodies(page) {
 
 async function saveMap(page) {
   await page.goto('/data-pa-enheten');
+  await waitForMapHydration(page);
   await page.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
   await page.getByRole('button', { name: 'Lagre valgt kartpakke lokalt', exact: true }).click();
   try {

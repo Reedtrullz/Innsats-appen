@@ -1,5 +1,13 @@
 import assert from 'node:assert/strict';
 
+export async function waitForMapHydration(page) {
+  // The quota copy changes only after the map panel's client effect runs.
+  await page.waitForFunction(() => {
+    const copy = document.querySelector('[data-testid="offline-map-quota-copy"]')?.textContent ?? '';
+    return copy.length > 0 && !copy.includes('kvote er ukjent');
+  });
+}
+
 async function controlled(page) {
   await page.goto('/');
   await page.evaluate(async () => { await navigator.serviceWorker.ready; });
@@ -37,6 +45,7 @@ export async function exerciseAdverse({ page, context, fixture, measure }) {
   let offlineMs = null;
   assert(fixture.state.optionalChunks.size > 0, 'No source-admitted optional chunks');
   await page.goto('/data-pa-enheten');
+  await waitForMapHydration(page);
   await page.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
   await page.getByRole('button', { name: 'Lagre valgt kartpakke lokalt', exact: true }).click();
   await page.getByTestId('offline-map-cache-status').filter({ hasText: 'Lagret lokalt: Trondheim lokal' }).waitFor();
@@ -62,6 +71,7 @@ export async function exerciseAdverse({ page, context, fixture, measure }) {
       Cache.prototype.put = () => Promise.reject(new DOMException('Authored storage write denial', 'QuotaExceededError'));
     });
     await denied.goto('/data-pa-enheten');
+    await waitForMapHydration(denied);
     await denied.getByRole('button', { name: 'Tilbakestill kartcache', exact: true }).click();
     await denied.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
     await denied.getByRole('button', { name: 'Lagre valgt kartpakke lokalt', exact: true }).click();
