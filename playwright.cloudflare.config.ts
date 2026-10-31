@@ -11,6 +11,7 @@ export default defineConfig({
     timeout: 120_000,
   },
   use: {
+    trace: 'retain-on-failure',
     baseURL: 'http://127.0.0.1:8798',
     browserName: 'chromium',
     viewport: { width: 390, height: 844 },
