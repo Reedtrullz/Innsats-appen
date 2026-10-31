@@ -69,7 +69,27 @@ async function saveMap(page) {
   await page.goto('/data-pa-enheten');
   await page.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
   await page.getByRole('button', { name: 'Lagre valgt kartpakke lokalt', exact: true }).click();
-  await page.getByTestId('offline-map-cache-status').filter({ hasText: 'Lagret lokalt: Trondheim lokal' }).waitFor();
+  try {
+    await page.getByTestId('offline-map-cache-status').filter({ hasText: 'Lagret lokalt: Trondheim lokal' }).waitFor();
+  } catch (error) {
+    // The app catches cache errors; retain its actual status before propagating this failed assertion.
+    let timer;
+    try {
+      const diagnostic = await Promise.race([
+        page.evaluate(async () => ({
+          status: document.querySelector('[data-testid="map-administration-status"]')?.textContent?.slice(0, 1000),
+          cached: document.querySelector('[data-testid="offline-map-cache-status"]')?.textContent?.slice(0, 1000),
+          storage: await navigator.storage.estimate(),
+          caches: await Promise.all((await caches.keys()).map(async name => ({ name, entries: (await (await caches.open(name)).keys()).length }))),
+        })),
+        new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Map diagnostic exceeded one second')), 1000); }),
+      ]);
+      console.error(JSON.stringify({ kind: 'o24-map-save-failure', diagnostic }).slice(0, 4096));
+    } catch (diagnosticError) {
+      console.error(JSON.stringify({ kind: 'o24-map-save-diagnostic-failure', message: String(diagnosticError) }).slice(0, 4096));
+    } finally { clearTimeout(timer); }
+    throw error;
+  }
   await page.goto('/kart');
   await page.getByText('Lokal kartpakke aktiv: Trondheim lokal (OSM-utdrag).', { exact: true }).waitFor();
   assert(await page.getByTestId('offline-maplibre-container').locator('canvas').isVisible(), 'No real map canvas');
