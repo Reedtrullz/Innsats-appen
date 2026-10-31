@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import test from 'node:test';
+import { test } from 'vitest';
 import { prepareStandalone } from './prepare-standalone.mjs';
 
 test('accepts existing E2E assets only when their bytes equal the actual source', () => {

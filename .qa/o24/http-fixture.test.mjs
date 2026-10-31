@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createServer, get } from 'node:http';
-import test from 'node:test';
+import { test } from 'vitest';
 import { gzipSync, gunzipSync } from 'node:zlib';
 import { controlBody, controlGzip, startFixture } from './http-fixture.mjs';
 
