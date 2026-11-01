@@ -181,4 +181,120 @@ describe('service worker offline behavior', () => {
     });
     expect(crossOriginHandled).toBe(false);
   });
+
+  describe('storage denial on live fetches', () => {
+    const origin = 'https://example.test';
+    const denied = () => Promise.reject(new DOMException('quota', 'QuotaExceededError'));
+    const sw = fs.readFileSync(path.join(process.cwd(), 'public', 'sw.js'), 'utf8');
+
+    async function dispatch(options: {
+      fetchImpl: () => Promise<Response>;
+      cache?: Record<string, unknown>;
+      open?: () => Promise<unknown>;
+      url: string;
+      headers?: Record<string, string>;
+    }) {
+      let handler: ServiceWorkerFetchHandler | undefined;
+      const cache = { put: vi.fn(async () => undefined), match: vi.fn(async () => undefined), ...options.cache };
+      vm.runInNewContext(sw, {
+        self: {
+          location: new URL(origin),
+          clients: { matchAll: vi.fn(async () => []) },
+          registration: { waiting: null },
+          addEventListener: (type: string, h: ServiceWorkerFetchHandler) => {
+            if (type === 'fetch') handler = h;
+          },
+        },
+        caches: { open: options.open ?? vi.fn(async () => cache), keys: vi.fn(async () => []), delete: vi.fn() },
+        fetch: options.fetchImpl,
+        Headers, Request, Response, URL, Date, JSON, Promise, Set,
+      });
+      let result: Promise<Response> | Response | undefined;
+      handler!({ request: new Request(options.url, { headers: options.headers }), respondWith: (p) => { result = p; } });
+      return { cache, response: result as Promise<Response> };
+    }
+    const fresh = async () => new Response('fresh', { status: 200 });
+    const offline = async (): Promise<Response> => { throw new TypeError('offline'); };
+
+    it.each([
+      ['rejected put without stale data', { put: denied }],
+      ['rejected put with stale data', { put: denied, match: async () => new Response('stale') }],
+      ['rejected match', { match: denied }],
+    ])('returns the fresh generic asset on %s', async (_name, cache) => {
+      const { response } = await dispatch({ fetchImpl: fresh, cache, url: origin + '/_next/static/a.js' });
+      await expect((await response).text()).resolves.toBe('fresh');
+    });
+
+    it('returns the fresh generic asset when cache open is denied', async () => {
+      const { response } = await dispatch({ fetchImpl: fresh, open: denied, url: origin + '/content-assets/a.png' });
+      await expect((await response).text()).resolves.toBe('fresh');
+    });
+
+    it.each(['/_next/static/a.js', '/map-packages/a.pmtiles'])('keeps last-good %s when the fetched body errors during put', async (route) => {
+      const interrupted = () => new Response(new ReadableStream({ start: (c) => c.error(new TypeError('interrupted')) }));
+      const { response } = await dispatch({
+        fetchImpl: async () => interrupted(),
+        cache: { put: async (_r: unknown, res: Response) => { await res.arrayBuffer(); }, match: async () => new Response('last-good') },
+        url: origin + route,
+      });
+      await expect((await response).text()).resolves.toBe('last-good');
+    });
+
+    it('keeps the cached fallback on network failure and does not fake success when storage is denied', async () => {
+      const cached = await dispatch({ fetchImpl: offline, cache: { match: async () => new Response('stale') }, url: origin + '/_next/static/a.js' });
+      const fallback = await cached.response;
+      expect(fallback.headers.get('x-beredskapsboka-cache-reason')).toBe('network-error');
+      await expect(fallback.text()).resolves.toBe('stale');
+
+      const noOpen = await dispatch({ fetchImpl: offline, open: denied, url: origin + '/_next/static/a.js' });
+      await expect(noOpen.response).rejects.toThrow('offline');
+      const noMatch = await dispatch({ fetchImpl: offline, cache: { match: denied }, url: origin + '/_next/static/a.js' });
+      await expect(noMatch.response).rejects.toThrow('offline');
+    });
+
+    it.each([
+      ['rejected put with stale archive', { put: denied, match: async () => new Response('stale') }],
+      ['rejected match', { match: denied }],
+    ])('returns the fresh full map package on %s', async (_name, cache) => {
+      const { response } = await dispatch({ fetchImpl: fresh, cache, url: origin + '/map-packages/a.pmtiles' });
+      const body = await response;
+      expect(body.status).toBe(200);
+      await expect(body.text()).resolves.toBe('fresh');
+    });
+
+    it('serves a range from fresh bytes when put is rejected, and never caches 206', async () => {
+      const ranged = await dispatch({
+        fetchImpl: async () => new Response('0123456789', { status: 200 }),
+        cache: { put: denied, match: async () => new Response('stale-stale') },
+        url: origin + '/map-packages/a.pmtiles',
+        headers: { range: 'bytes=2-5' },
+      });
+      const slice = await ranged.response;
+      expect(slice.status).toBe(206);
+      expect(slice.headers.get('Content-Range')).toBe('bytes 2-5/10');
+      await expect(slice.text()).resolves.toBe('2345');
+
+      const partial = await dispatch({
+        fetchImpl: async () => new Response('23', { status: 206 }),
+        url: origin + '/map-packages/a.pmtiles',
+        headers: { range: 'bytes=2-3' },
+      });
+      expect((await partial.response).status).toBe(206);
+      expect(partial.cache.put).not.toHaveBeenCalled();
+    });
+
+    it('keeps the map offline fallback from cache and rejects when storage is denied', async () => {
+      const cached = await dispatch({
+        fetchImpl: offline,
+        cache: { match: async () => new Response('0123456789') },
+        url: origin + '/map-packages/a.pmtiles',
+        headers: { range: 'bytes=1-3' },
+      });
+      const slice = await cached.response;
+      expect(slice.status).toBe(206);
+      await expect(slice.text()).resolves.toBe('123');
+      const denial = await dispatch({ fetchImpl: offline, open: denied, url: origin + '/map-packages/a.pmtiles' });
+      await expect(denial.response).rejects.toThrow('offline');
+    });
+  });
 });

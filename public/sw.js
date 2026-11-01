@@ -303,16 +303,36 @@ self.addEventListener('message', (event) => {
   }
 });
 
+// Storage denial keeps the fresh response; other put errors (e.g. interrupted body) take the caller's fallback.
+async function putUnlessDenied(cache, request, response) {
+  try {
+    await cache.put(request, response);
+  } catch (error) {
+    if (error?.name !== 'QuotaExceededError' && error?.name !== 'SecurityError') throw error;
+  }
+}
+
 async function networkThenCache(request) {
-  const cache = await caches.open(CACHE_NAME);
+  // Storage is best-effort: a denied open/match/put must not discard a fresh response.
+  let cache = null;
+  try {
+    cache = await caches.open(CACHE_NAME);
+  } catch (_) {
+    cache = null;
+  }
   const url = new URL(request.url);
   const generatedContent = url.pathname.startsWith('/generated-content/');
   try {
     const response = await fetch(request);
-    if (response.ok) await cache.put(request, response.clone());
+    if (response.ok && cache) await putUnlessDenied(cache, request, response.clone());
     return response;
   } catch (error) {
-    const cached = await cache.match(request);
+    let cached;
+    try {
+      cached = cache ? await cache.match(request) : undefined;
+    } catch (_) {
+      cached = undefined;
+    }
     if (cached) {
       await notifyFallback(request.url, 'network-error', generatedContent);
       return cachedFallbackResponse(cached, 'network-error', generatedContent);
@@ -334,14 +354,20 @@ self.addEventListener('fetch', (event) => {
     event.respondWith((async () => {
       const request = event.request;
       const rangeHeader = request.headers.get('range');
-      const cache = await caches.open(MAP_PACKAGE_CACHE_NAME);
-      // Match by URL so a Range request finds the cached full archive.
-      const cached = await cache.match(request.url);
+      let cache = null;
+      let cached;
+      try {
+        cache = await caches.open(MAP_PACKAGE_CACHE_NAME);
+        // Match by URL so a Range request finds the cached full archive.
+        cached = await cache.match(request.url);
+      } catch (_) {
+        // Storage denied: live fetch still works; offline fallback is unavailable.
+      }
       try {
         const response = await fetch(request);
         // Never cache.put partial (206) responses — the Cache API rejects
         // them; the full archive is stored by the explicit save flow.
-        if (response.status === 200 && !rangeHeader) await cache.put(request, response.clone());
+        if (response.status === 200 && !rangeHeader && cache) await putUnlessDenied(cache, request, response.clone());
         // Some servers/proxies (and the Next dev server) ignore Range and
         // return 200; PMTiles clients abort on that. Synthesize the 206.
         if (response.status === 200 && rangeHeader) {
