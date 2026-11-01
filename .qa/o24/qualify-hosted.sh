@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Reuse the existing CI install/build/browser setup; no package install runs here.
 test "${GITHUB_ACTIONS:-}" = true
-test "${GITHUB_REF:-}" = refs/heads/codex/qa-innsats-stream-native-20261101
+test "${GITHUB_REF:-}" = refs/heads/codex/qa-innsats-save-diagnostics-20261101
 test -n "${O24_DEADLINE:-}"
 test -n "${RUNNER_TEMP:-}"
 test -f .next/standalone/server.js

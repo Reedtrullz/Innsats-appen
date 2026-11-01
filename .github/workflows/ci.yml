@@ -91,13 +91,15 @@ jobs:
         run: pnpm run e2e:prod:no-build
 
       - name: Qualify O24 browser fixture within the existing runtime
-        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/codex/qa-innsats-stream-native-20261101' && inputs.o24_deadline != ''
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/codex/qa-innsats-save-diagnostics-20261101' && inputs.o24_deadline != ''
         env:
           O24_DEADLINE: ${{ inputs.o24_deadline }}
-        run: bash .qa/o24/qualify-hosted.sh
+        run: |
+          node --test .qa/o24/save-diagnostics.test.mjs
+          bash .qa/o24/qualify-hosted.sh
 
       - name: Preserve bounded O24 qualification evidence
-        if: always() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/codex/qa-innsats-stream-native-20261101' && inputs.o24_deadline != ''
+        if: always() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/codex/qa-innsats-save-diagnostics-20261101' && inputs.o24_deadline != ''
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: o24-browser-qualification

@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { once } from 'node:events';
 import { startFixture, controlBody, controlGzip } from './http-fixture.mjs';
 import { exerciseAdverse, waitForMapHydration } from './browser-adverse.mjs';
@@ -65,14 +66,48 @@ export async function cacheBodies(page) {
   });
 }
 
+const mapAssetPaths = ['/map-packages/trondheim-osm.pmtiles', '/map-packages/trondheim-osm-style.json'];
+
+const text = (value, max, pattern) => (typeof value === 'string' && value.length <= max && pattern.test(value) ? value : null);
+const count = value => (Number.isSafeInteger(value) && value >= 0 ? value : null);
+
+// Number of fixture rows recorded so far; null when unavailable.
+export function requestBoundary(fixture) {
+  try { return count(fixture.state.requests.length); } catch { return null; }
+}
+
+// Synchronous, read-only view of rows the fixture recorded at or after index `start`: latest 4 for the two map assets.
+// An invalid start yields null (unavailable) instead of older rows.
+export function mapAssetRows(fixture, start = 0) {
+  try {
+    if (!Number.isSafeInteger(start) || start < 0 || start > fixture.state.requests.length) return null;
+    const rows = [];
+    const all = fixture.state.requests;
+    for (let i = start; i < all.length; i++) { const row = all[i]; try { if (mapAssetPaths.includes(row.path)) rows.push(row); } catch { /* skip unreadable row */ } }
+    return rows.slice(-4).map(row => {
+      try {
+        return { path: row.path, status: count(row.status), encodedBytes: count(row.encodedBytes), encoding: text(row.encoding, 16, /^[a-z0-9-]*$/),
+          complete: typeof row.complete === 'boolean' ? row.complete : null,
+          fault: row.fault == null ? null : (text(row.fault, 32, /^[A-Za-z0-9_-]+$/) ?? 'unavailable') };
+      } catch { return { path: row?.path ?? null, status: null, encodedBytes: null, encoding: null, complete: null, fault: 'unavailable' }; }
+    });
+  } catch { return null; }
+}
+
+export function logMapAssetRows(fixture, start, log = console.error) {
+  try { log(JSON.stringify({ kind: 'o24-map-save-http', rows: mapAssetRows(fixture, start) }).slice(0, 4096)); } catch { /* logging must not mask the save failure */ }
+}
+
 async function saveMap(page, evidence) {
   await page.goto('/data-pa-enheten');
   await waitForMapHydration(page, evidence);
   await page.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
+  const saveBoundary = requestBoundary(evidence.fixture);
   await page.getByRole('button', { name: 'Lagre valgt kartpakke lokalt', exact: true }).click();
   try {
     await page.getByTestId('offline-map-cache-status').filter({ hasText: 'Lagret lokalt: Trondheim lokal' }).waitFor();
   } catch (error) {
+    logMapAssetRows(evidence.fixture, saveBoundary);
     // The app catches cache errors; retain its actual status before propagating this failed assertion.
     let timer;
     try {
@@ -239,4 +274,4 @@ async function main() {
     observation, cleanup: 'Browser, HTTP sockets and Next child closed; namespace cleanup must independently pass' }));
 }
 
-main().catch(error => { console.error(error instanceof Error ? error.stack : String(error)); process.exitCode = 1; });
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main().catch(error => { console.error(error instanceof Error ? error.stack : String(error)); process.exitCode = 1; });
