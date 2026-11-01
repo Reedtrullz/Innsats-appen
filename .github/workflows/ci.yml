@@ -95,7 +95,7 @@ jobs:
         env:
           O24_DEADLINE: ${{ inputs.o24_deadline }}
         run: |
-          node --test .qa/o24/save-diagnostics.test.mjs
+          node --test .qa/o24/save-diagnostics.contract.mjs
           bash .qa/o24/qualify-hosted.sh
 
       - name: Preserve bounded O24 qualification evidence
