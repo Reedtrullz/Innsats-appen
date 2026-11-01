@@ -54,7 +54,8 @@ describe('map package CacheStorage helper', () => {
   });
 
   it('streams assets with byte progress when a progress consumer is provided', async () => {
-    const cache = { addAll: vi.fn(async () => undefined), put: vi.fn(async () => undefined) };
+    // Consume the body like the real Cache API does.
+    const cache = { addAll: vi.fn(async () => undefined), put: vi.fn(async (_url: string, response: Response) => { await response.arrayBuffer(); }) };
     const caches = { open: vi.fn(async () => cache) };
     const chunk = new Uint8Array(1024);
     const fetchImpl = vi.fn(async () => new Response(
@@ -89,5 +90,130 @@ describe('map package CacheStorage helper', () => {
     await expect(cacheLocalMapPackageAssets(demoPackage, { caches, fetchImpl, onProgress: () => undefined }))
       .rejects.toThrow(/request failed/i);
     expect(cache.put).not.toHaveBeenCalled();
+  });
+
+  describe('streaming into the cache consumer', () => {
+    // Fresh demand-driven upstream per fetch; `state` tracks the latest one.
+    function upstream(chunks: Uint8Array[], init: ResponseInit = {}, failAt = -1, cancelError?: Error) {
+      const state = { pulls: 0, cancelled: undefined as unknown, body: undefined as ReadableStream<Uint8Array> | undefined };
+      const fetchImpl = vi.fn(async () => {
+        state.pulls = 0;
+        state.cancelled = undefined;
+        const body = new ReadableStream<Uint8Array>({
+          pull(controller) {
+            if (state.pulls === failAt) throw new Error('upstream broke');
+            if (state.pulls >= chunks.length) return controller.close();
+            controller.enqueue(chunks[state.pulls++]);
+          },
+          cancel(reason) {
+            state.cancelled = reason ?? 'cancelled';
+            if (cancelError) throw cancelError;
+          },
+        }, { highWaterMark: 0 });
+        state.body = body;
+        return new Response(body, init);
+      }) as unknown as typeof fetch;
+      return { state, fetchImpl };
+    }
+
+    const chunks = [1, 2, 3, 4].map((n) => new Uint8Array(1024).fill(n));
+    const run = (
+      put: (url: string, response: Response) => Promise<void>,
+      fetchImpl: typeof fetch,
+      onProgress: (p: { loadedBytes: number }) => void = () => undefined,
+    ) => cacheLocalMapPackageAssets(demoPackage, {
+      caches: { open: async () => ({ addAll: async () => undefined, put }) },
+      fetchImpl,
+      onProgress,
+    });
+
+    it('reads upstream only on consumer demand and delivers exact bytes, status and headers', async () => {
+      const { state, fetchImpl } = upstream(chunks, { status: 200, statusText: 'Fine', headers: { 'content-length': '4096', etag: 'abc' } });
+      const seen: Array<{ pullsBeforeRead: number; status: number; statusText: string; etag: string | null; bytes: number[] }> = [];
+      const loaded: number[] = [];
+      await run(async (_url, response) => {
+        const reader = response.body!.getReader();
+        const pullsBeforeRead = state.pulls;
+        const bytes: number[] = [];
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          bytes.push(...value);
+          expect(state.pulls).toBeLessThanOrEqual(bytes.length / 1024 + 1);
+        }
+        seen.push({ pullsBeforeRead, status: response.status, statusText: response.statusText, etag: response.headers.get('etag'), bytes });
+      }, fetchImpl, (p) => loaded.push(p.loadedBytes));
+      expect(seen).toHaveLength(2);
+      expect(seen[0]).toMatchObject({ pullsBeforeRead: 0, status: 200, statusText: 'Fine', etag: 'abc' });
+      expect(seen[0].bytes).toEqual(chunks.flatMap((c) => [...c]));
+      expect(loaded.slice(0, 4)).toEqual([1024, 2048, 3072, 4096]);
+    });
+
+    it('rejects the cache write when an upstream read fails mid-stream', async () => {
+      const { fetchImpl } = upstream(chunks, {}, 2);
+      await expect(run(async (_url, response) => { await response.arrayBuffer(); }, fetchImpl)).rejects.toThrow('upstream broke');
+    });
+
+    it('forwards consumer cancellation to the upstream body', async () => {
+      const { state, fetchImpl } = upstream(chunks);
+      await expect(run(async (_url, response) => {
+        const reader = response.body!.getReader();
+        await reader.read();
+        await reader.cancel('stop');
+        throw new Error('consumer cancelled');
+      }, fetchImpl)).rejects.toThrow('consumer cancelled');
+      expect(state.cancelled).toBe('stop');
+      expect(state.pulls).toBe(1);
+      expect(state.body!.locked).toBe(false);
+    });
+
+    it('releases the original body lock when upstream cancellation rejects, surfacing that rejection', async () => {
+      const { state, fetchImpl } = upstream(chunks, {}, -1, new Error('cancel failed'));
+      await expect(run(async (_url, response) => {
+        const reader = response.body!.getReader();
+        await reader.read();
+        await expect(reader.cancel('stop')).rejects.toThrow('cancel failed');
+        throw new Error('consumer cancelled');
+      }, fetchImpl)).rejects.toThrow('consumer cancelled');
+      expect(state.cancelled).toBe('stop');
+      expect(state.body!.locked).toBe(false);
+    });
+
+    it('releases the original body lock when cancelled while an upstream read is pending', async () => {
+      let release!: () => void;
+      const gate = new Promise<void>((resolve) => { release = resolve; });
+      let started!: () => void;
+      const pullStarted = new Promise<void>((resolve) => { started = resolve; });
+      let body!: ReadableStream<Uint8Array>;
+      const fetchImpl = vi.fn(async () => {
+        body = new ReadableStream<Uint8Array>({
+          async pull(controller) { started(); await gate; controller.enqueue(chunks[0]); },
+        }, { highWaterMark: 0 });
+        return new Response(body);
+      }) as unknown as typeof fetch;
+      await run(async (_url, response) => {
+        const reader = response.body!.getReader();
+        const pending = reader.read();
+        await pullStarted;
+        await reader.cancel('stop');
+        release();
+        await pending;
+        expect(body.locked).toBe(false);
+      }, fetchImpl);
+    });
+
+    it('cancels the unread upstream body when cache.put rejects, and never reports success', async () => {
+      const { state, fetchImpl } = upstream(chunks);
+      await expect(run(async () => { throw new Error('quota exceeded'); }, fetchImpl)).rejects.toThrow('quota exceeded');
+      expect(state.cancelled).toBeDefined();
+      expect(state.pulls).toBe(0);
+    });
+
+    it('passes a null body through and reports its declared length', async () => {
+      const fetchImpl = vi.fn(async () => new Response(null, { status: 200, headers: { 'content-length': '7' } })) as unknown as typeof fetch;
+      const loaded: number[] = [];
+      await run(async (_url, response) => { expect(response.body).toBeNull(); }, fetchImpl, (p) => loaded.push(p.loadedBytes));
+      expect(loaded).toEqual([7, 7]);
+    });
   });
 });

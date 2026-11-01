@@ -78,22 +78,35 @@ async function fetchAssetWithProgress(
     return response;
   }
   const reader = response.body.getReader();
-  const chunks: Uint8Array[] = [];
   let loadedBytes = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-    loadedBytes += value.byteLength;
-    report(loadedBytes, totalBytes);
-  }
-  const combined = new Uint8Array(loadedBytes);
-  let offset = 0;
-  for (const chunk of chunks) {
-    combined.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  return new Response(combined, { status: response.status, statusText: response.statusText, headers: response.headers });
+  // Pull one upstream chunk per consumer read (highWaterMark 0) so the body is
+  // never accumulated or copied; cache.put drives the download pace.
+  const body = new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      try {
+        const { done, value } = await reader.read();
+        if (done) {
+          reader.releaseLock();
+          controller.close();
+          return;
+        }
+        loadedBytes += value.byteLength;
+        report(loadedBytes, totalBytes);
+        controller.enqueue(value);
+      } catch (error) {
+        reader.releaseLock();
+        throw error;
+      }
+    },
+    async cancel(reason) {
+      try {
+        await reader.cancel(reason);
+      } finally {
+        reader.releaseLock();
+      }
+    },
+  }, { highWaterMark: 0 });
+  return new Response(body, { status: response.status, statusText: response.statusText, headers: response.headers });
 }
 
 export async function cacheLocalMapPackageAssets(
@@ -126,7 +139,13 @@ export async function cacheLocalMapPackageAssets(
         percent: totalBytes ? Math.min(100, Math.round((loadedBytes / totalBytes) * 100)) : null,
       });
     });
-    await cache.put(asset, response);
+    try {
+      await cache.put(asset, response);
+    } catch (error) {
+      // A put that failed before reading must not leave the upstream download open.
+      await response.body?.cancel(error).catch(() => undefined);
+      throw error;
+    }
   }
   return { cached: urls.length };
 }
