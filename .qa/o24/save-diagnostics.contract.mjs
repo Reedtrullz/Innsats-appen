@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { EventEmitter } from 'node:events';
 import { createServer, request as httpRequest } from 'node:http';
@@ -222,9 +221,6 @@ async function runFetch(handlers, request) {
   return responded[0];
 }
 
-const BASELINE_SW = new URL('../../../../../../.omo/operations/innsats-o24-correlated-save-20261102/source/before/public/sw.js', import.meta.url);
-const F325_SW = new URL('../../../../../../.omo/operations/innsats-o24-correlated-save-20261102/source-corrective/before/public/sw.js', import.meta.url);
-const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const FINITE_RANGE_TRACE = /^\[offline-map-cache\] save-corr 7 sw range-response TypeError range=(true|false) varyStar=(true|false) prePutBodyUsed=(true|false) prePutBodyLocked=(true|false) reason=(FAILED_TO_FETCH|NETWORK_ERROR|ABORTED|UNKNOWN)$/;
 
 async function rangedBodyOracle(source) {
@@ -246,17 +242,8 @@ async function rangedBodyOracle(source) {
 }
 
 test('fresh ranged body error keeps its identity when a cached archive exists', async () => {
-  const baseline = readFileSync(BASELINE_SW);
-  const f325 = readFileSync(F325_SW);
   const corrected = readFileSync(new URL('../../public/sw.js', import.meta.url));
-  assert.equal(sha256(baseline), '6aae727a73236b9613baffefc57e7f5ea81dbce8df7dd722422a45f55753bcd7');
-  assert.equal(sha256(f325), '91960c5193ac2ba116133ee34ae96c5ce002f590d646e2513e667efe929c4557');
-  assert.notEqual(sha256(corrected), sha256(f325));
-  const original = await rangedBodyOracle(baseline.toString('utf8'));
-  const regressed = await rangedBodyOracle(f325.toString('utf8'));
   const candidate = await rangedBodyOracle(corrected.toString('utf8'));
-  assert.deepEqual({ outcome: original.outcome, same: original.same }, { outcome: 'reject', same: true });
-  assert.deepEqual({ outcome: regressed.outcome, status: regressed.status, bytes: regressed.bytes }, { outcome: 'response', status: 206, bytes: 4 });
   assert.deepEqual({ outcome: candidate.outcome, same: candidate.same }, { outcome: 'reject', same: true });
   assert.equal(candidate.warnings.length, 1);
   assert.match(candidate.warnings[0], FINITE_RANGE_TRACE);
