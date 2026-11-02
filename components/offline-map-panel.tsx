@@ -107,6 +107,18 @@ const specialistPlannerTarget: Record<SpecialistMapTool, string> = {
   mre: 'map-mre-planner',
 };
 
+const SAVE_ERROR_CLASSES = new Set(['AbortError', 'DataCloneError', 'InvalidStateError', 'NetworkError', 'NotAllowedError', 'NotFoundError', 'QuotaExceededError', 'SecurityError', 'TimeoutError', 'TypeError', 'RangeError', 'Error']);
+
+// Only allowlisted standard names are logged; anything else (or a throwing getter) is 'UnknownError'.
+function safeSaveErrorClass(error: unknown): string {
+  try {
+    const name = (error as { name?: unknown } | null)?.name;
+    return typeof name === 'string' && SAVE_ERROR_CLASSES.has(name) ? name : 'UnknownError';
+  } catch {
+    return 'UnknownError';
+  }
+}
+
 function operationMeasurement(drawing: MissionMapDrawing | undefined) {
   if (!drawing) return 'Ingen tegning målt ennå.';
   const distance = measureDrawingDistance(drawing.points, drawing.kind === 'polygon' || drawing.kind === 'sector').toFixed(1);
@@ -361,7 +373,8 @@ export function OfflineMapPanel({ variant = 'operations' }: { variant?: 'operati
       }
       writeCachedOfflineMapPackage(packageToCache.id);
       setStatusMessage('Lokal kartpakke er lagret og aktivert offline.');
-    } catch {
+    } catch (error) {
+      try { console.warn('[offline-map-cache] save-failed', safeSaveErrorClass(error)); } catch { /* logging must not change the fallback */ }
       setStatusMessage('Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline.');
     } finally {
       mapPackageCacheSavingRef.current = false;

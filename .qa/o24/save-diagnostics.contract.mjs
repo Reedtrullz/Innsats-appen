@@ -106,3 +106,22 @@ test('a throwing logger or broken fixture never masks the primary failure', () =
   const run = () => { try { throw primary; } catch (error) { logMapAssetRows(undefined, undefined, () => { throw new Error('log'); }); logMapAssetRows({ get state() { throw new Error('x'); } }, undefined, () => { throw new Error('log'); }); throw error; } };
   assert.throws(run, e => e === primary);
 });
+
+test('warning recorder keeps approved classes only, ignores forged tags/names/secrets, caps at four', () => {
+  const classes = [];
+  const { recordSaveWarning } = probe;
+  recordSaveWarning(classes, 'warning', '[offline-map-cache] save-failed QuotaExceededError');
+  recordSaveWarning(classes, 'warning', '[offline-map-cache] save-failed SyntheticPrivateSentinelError');
+  recordSaveWarning(classes, 'warning', '[offline-map-cache] save-failed TypeError token=secret');
+  recordSaveWarning(classes, 'warning', 'x [offline-map-cache] save-failed TypeError');
+  recordSaveWarning(classes, 'error', '[offline-map-cache] save-failed TypeError');
+  recordSaveWarning(classes, 'warning', { toString() { return '[offline-map-cache] save-failed TypeError'; } });
+  assert.deepEqual(classes, ['QuotaExceededError']);
+  for (let i = 0; i < 6; i++) recordSaveWarning(classes, 'warning', '[offline-map-cache] save-failed UnknownError');
+  assert.deepEqual(classes, ['QuotaExceededError', 'UnknownError', 'UnknownError', 'UnknownError']);
+});
+
+test('warning listener is installed before the save boundary and removed on both paths', () => {
+  assert(/page\.on\('console', onConsole\);\n  const saveBoundary/.test(source));
+  assert.equal(source.match(/page\.off\('console', onConsole\)/g)?.length, 2);
+});
