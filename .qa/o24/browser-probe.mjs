@@ -106,19 +106,13 @@ export function recordSaveWarning(classes, type, text) {
   if (match && classes.length < 4) classes.push(match[1]);
 }
 
-async function saveMap(page, evidence) {
-  await page.goto('/data-pa-enheten');
-  await waitForMapHydration(page, evidence);
-  await page.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
-  const warningClasses = [];
-  const onConsole = message => { try { recordSaveWarning(warningClasses, message.type(), message.text()); } catch { /* diagnostics only */ } };
-  page.on('console', onConsole);
+// Click the save button and await the stored status; the caller owns the console listener's lifetime.
+async function clickSaveAndAwait(page, evidence, warningClasses) {
   const saveBoundary = requestBoundary(evidence.fixture);
   await page.getByRole('button', { name: 'Lagre valgt kartpakke lokalt', exact: true }).click();
   try {
     await page.getByTestId('offline-map-cache-status').filter({ hasText: 'Lagret lokalt: Trondheim lokal' }).waitFor();
   } catch (error) {
-    page.off('console', onConsole);
     logMapAssetRows(evidence.fixture, saveBoundary);
     try { console.error(JSON.stringify({ kind: 'o24-map-save-warning-classes', classes: warningClasses })); } catch { /* logging must not mask the save failure */ }
     // The app catches cache errors; retain its actual status before propagating this failed assertion.
@@ -139,7 +133,16 @@ async function saveMap(page, evidence) {
     } finally { clearTimeout(timer); }
     throw error;
   }
-  page.off('console', onConsole);
+}
+
+export async function saveMap(page, evidence) {
+  await page.goto('/data-pa-enheten');
+  await waitForMapHydration(page, evidence);
+  await page.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
+  const warningClasses = [];
+  const onConsole = message => { try { recordSaveWarning(warningClasses, message.type(), message.text()); } catch { /* diagnostics only */ } };
+  page.on('console', onConsole);
+  try { await clickSaveAndAwait(page, evidence, warningClasses); } finally { page.off('console', onConsole); }
   await page.goto('/kart');
   await page.getByText('Lokal kartpakke aktiv: Trondheim lokal (OSM-utdrag).', { exact: true }).waitFor();
   assert(await page.getByTestId('offline-maplibre-container').locator('canvas').isVisible(), 'No real map canvas');

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { EventEmitter } from 'node:events';
 import test from 'node:test';
 import * as probe from './browser-probe.mjs';
 
@@ -121,7 +122,47 @@ test('warning recorder keeps approved classes only, ignores forged tags/names/se
   assert.deepEqual(classes, ['QuotaExceededError', 'UnknownError', 'UnknownError', 'UnknownError']);
 });
 
-test('warning listener is installed before the save boundary and removed on both paths', () => {
-  assert(/page\.on\('console', onConsole\);\n  const saveBoundary/.test(source));
-  assert.equal(source.match(/page\.off\('console', onConsole\)/g)?.length, 2);
+function fakePage({ click, waitFor, evidence }) {
+  const page = new EventEmitter();
+  const warn = text => page.emit('console', { type: () => 'warning', text: () => '[offline-map-cache] save-failed ' + text });
+  const node = { filter: () => node, locator: () => node, waitFor, isVisible: async () => true, selectOption: async () => warn('QuotaExceededError'), click: () => click(warn) };
+  Object.assign(page, {
+    goto: async () => {}, waitForFunction: async () => {}, evaluate: async () => ({ status: 'x' }),
+    getByLabel: () => node, getByRole: () => node, getByTestId: () => node, getByText: () => node,
+  });
+  return { page, warn, evidence: { fixture: { state: { requests: [] } }, pageErrors: [] } };
+}
+
+async function lifecycle(options) {
+  const { page, evidence } = fakePage(options);
+  const lines = [], original = console.error, timers = () => process.getActiveResourcesInfo().filter(n => n === 'Timeout').length;
+  const before = timers();
+  console.error = line => lines.push(line);
+  let result;
+  try { result = await probe.saveMap(page, evidence).then(() => null, error => error); } finally { console.error = original; }
+  assert.equal(page.listenerCount('console'), 0);
+  assert.equal(timers(), before);
+  return { result, lines };
+}
+
+test('saveMap success: listener removed, nothing logged', async () => {
+  const { result, lines } = await lifecycle({ click: async () => {}, waitFor: async () => {} });
+  assert.equal(result, null); assert.deepEqual(lines, []);
+});
+
+test('saveMap status failure: original error rethrown, listener removed, only current bounded approved classes logged', async () => {
+  const primary = new Error('status');
+  const { result, lines } = await lifecycle({
+    click: async warn => { warn('TypeError'); warn('SyntheticPrivateSentinelError'); for (let i = 0; i < 5; i++) warn('RangeError'); },
+    waitFor: async () => { throw primary; } });
+  assert.equal(result, primary);
+  const classes = JSON.parse(lines.find(l => l.includes('o24-map-save-warning-classes'))).classes;
+  assert.deepEqual(classes, ['TypeError', 'RangeError', 'RangeError', 'RangeError']);
+  assert(!lines.join().includes('Synthetic'));
+});
+
+test('saveMap click failure: original error rethrown and listener removed', async () => {
+  const primary = new Error('click');
+  const { result } = await lifecycle({ click: async warn => { warn('TypeError'); throw primary; }, waitFor: async () => {} });
+  assert.equal(result, primary);
 });
