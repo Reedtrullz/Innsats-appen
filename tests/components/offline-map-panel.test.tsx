@@ -456,6 +456,42 @@ it('keeps schematic fallback when CacheStorage rejects while precaching an appro
   expect(localStorage.getItem(OFFLINE_MAP_CACHE_STORAGE_KEY)).toBeNull();
 });
 
+function namedError(ErrorType: ErrorConstructor, name: string, message: string) {
+  const error = new ErrorType(message);
+  error.name = name;
+  return error;
+}
+
+it.each([
+  ['QuotaExceededError', namedError(Error, 'QuotaExceededError', 'synthetic quota detail'), 'QuotaExceededError'],
+  ['TypeError', namedError(TypeError, 'TypeError', 'synthetic-private-sentinel /private/path'), 'TypeError'],
+  ['unrecognized name', namedError(Error, 'SyntheticPrivateSentinelError', 'synthetic-private-sentinel /private/path'), 'UnknownError'],
+])('logs only the privacy-safe error class when map package precache rejects with %s', async (_label, error, expectedClass) => {
+  const user = userEvent.setup();
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+  try {
+    mockApprovedLocalMapPackages();
+    mockMapPackageCache(error);
+
+    await renderOfflineMapPanel();
+
+    await user.selectOptions(screen.getByLabelText('Velg lokal kartpakke'), 'trondheim-demo-pmtiles');
+    await user.click(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }));
+
+    await waitFor(() => {
+      expect(warn).toHaveBeenCalledWith('[offline-map-cache] save-failed', expectedClass);
+    });
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(warn.mock.calls)).not.toMatch(/synthetic-private-sentinel|private\/path|SyntheticPrivateSentinelError|synthetic quota detail/);
+    expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline/i);
+    expect(screen.getByTestId('offline-map-cache-status')).toHaveTextContent(/Ingen kartpakke/i);
+    expect(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toBeEnabled();
+    expect(localStorage.getItem(OFFLINE_MAP_CACHE_STORAGE_KEY)).toBeNull();
+  } finally {
+    warn.mockRestore();
+  }
+});
+
 it('keeps the schematic fallback when an approved PMTiles package is selected but not cached', async () => {
   const user = userEvent.setup();
   mockApprovedLocalMapPackages();
