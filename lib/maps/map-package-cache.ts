@@ -31,6 +31,8 @@ type CacheLocalMapPackageAssetsDeps = {
   /** When provided (and the cache supports put), assets stream with byte progress. */
   onProgress?: (progress: MapPackageCacheProgress) => void;
   fetchImpl?: typeof fetch;
+  /** Disposable 1..999999 id for this Save. Omitted values add no header and no correlation fields. */
+  saveId?: number;
   /** Privacy-safe failure attribution; called only on failure and never alters the thrown error. */
   onTrace?: (record: MapPackageSaveTraceRecord) => void;
 };
@@ -44,12 +46,41 @@ export type MapPackageSaveTraceRecord = {
   varyStar?: boolean;
   bodyUsed?: boolean;
   bodyLocked?: boolean;
+  saveId?: number;
+  layer?: 'page';
+  operation?: MapPackageSavePhase;
+  rangePresent?: boolean;
+  prePutBodyUsed?: boolean;
+  prePutBodyLocked?: boolean;
+  reason?: 'FAILED_TO_FETCH' | 'NETWORK_ERROR' | 'ABORTED' | 'UNKNOWN';
 };
 
 const TRACE_ERROR_CLASSES = new Set([
   'AbortError', 'DataCloneError', 'InvalidStateError', 'NetworkError', 'NotAllowedError', 'NotFoundError',
   'QuotaExceededError', 'SecurityError', 'TimeoutError', 'TypeError', 'RangeError', 'Error',
 ]);
+
+const SAVE_ID_MAX = 999999;
+const REASON_BY_MESSAGE: Record<string, NonNullable<MapPackageSaveTraceRecord['reason']>> = {
+  'Failed to fetch': 'FAILED_TO_FETCH',
+  'NetworkError when attempting to fetch resource.': 'NETWORK_ERROR',
+  'The operation was aborted.': 'ABORTED',
+};
+
+export function boundedSaveId(value: unknown) {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 1 && value <= SAVE_ID_MAX ? value : undefined;
+}
+
+// shortcut: only these three exact platform strings, add a code when a new full message is tested
+export function finiteReasonCode(error: unknown): NonNullable<MapPackageSaveTraceRecord['reason']> {
+  try {
+    const message = (error as { message?: unknown } | null)?.message;
+    if (typeof message !== 'string' || !Object.prototype.hasOwnProperty.call(REASON_BY_MESSAGE, message)) return 'UNKNOWN';
+    return REASON_BY_MESSAGE[message] ?? 'UNKNOWN';
+  } catch {
+    return 'UNKNOWN';
+  }
+}
 
 function traceErrorClass(error: unknown) {
   try {
@@ -60,15 +91,42 @@ function traceErrorClass(error: unknown) {
   }
 }
 
-type Trace = (phase: MapPackageSavePhase, error: unknown, response?: Response) => void;
+type PrePut = { rangePresent: boolean; varyStar: boolean; prePutBodyUsed: boolean; prePutBodyLocked: boolean };
+type Trace = (phase: MapPackageSavePhase, error: unknown, response?: Response, pre?: PrePut) => void;
 
-function createTrace(onTrace: CacheLocalMapPackageAssetsDeps['onTrace']): Trace {
-  return (phase, error, response) => {
+function varyStarOf(response: Response | undefined) {
+  try {
+    const value = response?.headers.get('vary');
+    return typeof value === 'string' && value.split(',').some((token) => token.trim() === '*');
+  } catch {
+    return false;
+  }
+}
+
+function prePutOf(response: Response, rangePresent: boolean): PrePut {
+  let prePutBodyUsed = false;
+  let prePutBodyLocked = false;
+  try { prePutBodyUsed = response.bodyUsed === true; } catch { prePutBodyUsed = false; }
+  try { prePutBodyLocked = response.body?.locked === true; } catch { prePutBodyLocked = false; }
+  return { rangePresent, varyStar: varyStarOf(response), prePutBodyUsed, prePutBodyLocked };
+}
+
+function createTrace(onTrace: CacheLocalMapPackageAssetsDeps['onTrace'], saveId: number | undefined): Trace {
+  return (phase, error, response, pre) => {
     if (!onTrace) return;
     try {
       const record: MapPackageSaveTraceRecord = { phase, errorClass: traceErrorClass(error) };
-      if (phase === 'put' && response) {
-        record.varyStar = response.headers.get('vary')?.split(',').some((token) => token.trim() === '*') === true;
+      if (saveId !== undefined) {
+        record.saveId = saveId;
+        record.layer = 'page';
+        record.operation = phase;
+        record.rangePresent = pre?.rangePresent === true;
+        record.varyStar = pre?.varyStar === true;
+        record.prePutBodyUsed = pre?.prePutBodyUsed === true;
+        record.prePutBodyLocked = pre?.prePutBodyLocked === true;
+        record.reason = finiteReasonCode(error);
+      } else if (phase === 'put' && response) {
+        record.varyStar = varyStarOf(response);
         record.bodyUsed = response.bodyUsed === true;
         record.bodyLocked = response.body?.locked === true;
       }
@@ -113,10 +171,13 @@ async function fetchAssetWithProgress(
   fetchImpl: typeof fetch,
   report: (loadedBytes: number, totalBytes: number | null) => void,
   trace: Trace,
+  saveId: number | undefined,
 ): Promise<Response> {
   let response: Response;
   try {
-    response = await fetchImpl(url);
+    response = saveId === undefined
+      ? await fetchImpl(url)
+      : await fetchImpl(url, { headers: { 'x-o24-save': String(saveId) } });
     if (!response.ok) throw new Error(`Map package asset request failed (${response.status}): ${url}`);
   } catch (error) {
     trace('fetch', error);
@@ -174,7 +235,8 @@ export async function cacheLocalMapPackageAssets(
   const cacheStorage = resolveCacheStorage(deps);
   if (!cacheStorage) return { cached: 0 };
 
-  const trace = createTrace(deps.onTrace);
+  const saveId = boundedSaveId(deps.saveId);
+  const trace = createTrace(deps.onTrace, saveId);
   let cache: CacheLike;
   try {
     cache = await cacheStorage.open(deps.cacheName ?? MAP_PACKAGE_CACHE_NAME);
@@ -207,11 +269,12 @@ export async function cacheLocalMapPackageAssets(
         totalBytes,
         percent: totalBytes ? Math.min(100, Math.round((loadedBytes / totalBytes) * 100)) : null,
       });
-    }, trace);
+    }, trace, saveId);
+    const prePut = saveId === undefined ? undefined : prePutOf(response, false);
     try {
       await cache.put(asset, response);
     } catch (error) {
-      trace('put', error, response);
+      trace('put', error, response, prePut);
       // A put that failed before reading must not leave the upstream download open.
       await response.body?.cancel(error).catch(() => undefined);
       throw error;

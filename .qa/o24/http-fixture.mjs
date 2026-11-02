@@ -5,6 +5,13 @@ import { gzipSync, gunzipSync, brotliCompressSync, brotliDecompressSync } from '
 export const controlBody = Buffer.from('o24-wire-control\n'.repeat(1024));
 export const controlGzip = gzipSync(controlBody);
 
+function finiteSaveIdHeader(headers) {
+  const raw = headers['x-o24-save'];
+  if (typeof raw !== 'string' || !/^[1-9][0-9]{0,5}$/.test(raw)) return undefined;
+  const id = Number(raw);
+  return Number.isSafeInteger(id) && id <= 999999 ? id : undefined;
+}
+
 // Count encoded response bodies at the actual loopback HTTP boundary, including SW fetches.
 export async function startFixture(upstreamPort) {
   assert(Number.isInteger(upstreamPort) && upstreamPort > 0 && upstreamPort < 65536);
@@ -13,6 +20,8 @@ export async function startFixture(upstreamPort) {
   const server = createServer((incoming, outgoing) => {
     const path = new URL(incoming.url ?? '/', 'http://127.0.0.1').pathname;
     const row = { path, status: 0, encodedBytes: 0, encoding: '', complete: false, fault: null };
+    const saveId = finiteSaveIdHeader(incoming.headers);
+    if (saveId !== undefined) row.saveId = saveId;
     state.requests.push(row);
     state.pending++;
     outgoing.once('close', () => { state.pending--; });

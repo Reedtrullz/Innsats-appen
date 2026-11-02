@@ -1,8 +1,11 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { EventEmitter } from 'node:events';
+import { createServer, request as httpRequest } from 'node:http';
 import test from 'node:test';
+import vm from 'node:vm';
 import * as probe from './browser-probe.mjs';
+import { startFixture } from './http-fixture.mjs';
 
 const { mapAssetRows, logMapAssetRows, requestBoundary } = probe;
 const PMT = '/map-packages/trondheim-osm.pmtiles';
@@ -57,7 +60,7 @@ test('selects the LATEST four rows for the two map assets only, in order', () =>
   rows.push({ path: '/other', status: 1 });
   const out = mapAssetRows({ state: { requests: rows } });
   assert.deepEqual(out.map(r => r.status), [404, 405, 406, 407]);
-  assert.deepEqual(Object.keys(out[0]), ['path', 'status', 'encodedBytes', 'encoding', 'complete', 'fault']);
+  assert.deepEqual(Object.keys(out[0]), ['path', 'status', 'encodedBytes', 'encoding', 'complete', 'fault', 'saveId']);
   assert(out.every(r => r.path === PMT || r.path === STYLE));
 });
 
@@ -70,7 +73,7 @@ test('does not mutate fixture rows or the request array', () => {
 
 test('malformed values become null/unavailable, never fabricated', () => {
   const out = mapAssetRows({ state: { requests: [{ path: PMT, status: 'bad', encodedBytes: -1, encoding: 5, complete: 'yes', fault: {} }] } });
-  assert.deepEqual(out[0], { path: PMT, status: null, encodedBytes: null, encoding: null, complete: null, fault: 'unavailable' });
+  assert.deepEqual(out[0], { path: PMT, status: null, encodedBytes: null, encoding: null, complete: null, fault: 'unavailable', saveId: null });
   assert.equal(mapAssetRows(null), null);
   assert.equal(mapAssetRows({}), null);
 });
@@ -180,4 +183,210 @@ test('phase recorder keeps only exact finite rows, rejects forged/mismatched one
   assert.deepEqual(rows, [{ phase: 'fetch', errorClass: 'TypeError' }, { phase: 'put', errorClass: 'QuotaExceededError', varyStar: true, bodyUsed: false, bodyLocked: true }]);
   for (let i = 0; i < 6; i++) recordSavePhase(rows, 'warning', tag + 'read Error');
   assert.equal(rows.length, 4);
+});
+
+function correlationLine(id, layer, operation, errorClass = 'TypeError', reason = 'UNKNOWN') {
+  return '[offline-map-cache] save-corr ' + id + ' ' + layer + ' ' + operation + ' ' + errorClass + ' range=false varyStar=true prePutBodyUsed=false prePutBodyLocked=false reason=' + reason;
+}
+
+function loadServiceWorker(fetchImpl, putImpl) {
+  const warnings = [];
+  const handlers = new Map();
+  const puts = [];
+  vm.runInNewContext(readFileSync(new URL('../../public/sw.js', import.meta.url), 'utf8'), {
+    console: { warn: (...args) => warnings.push(args.map(String).join(' ')) },
+    self: {
+      location: new URL('https://example.test/'),
+      clients: { matchAll: async () => [] },
+      registration: { waiting: null },
+      skipWaiting() {},
+      addEventListener: (type, handler) => handlers.set(type, handler),
+    },
+    caches: {
+      open: async () => ({ match: async () => undefined, put: async (request, response) => { puts.push([request, response]); return putImpl(request, response); } }),
+      keys: async () => [],
+      delete: async () => true,
+    },
+    fetch: fetchImpl,
+    Headers, Request, Response, URL, Date, JSON, Promise, Set, ReadableStream,
+  });
+  return { warnings, handlers, puts };
+}
+
+async function runFetch(handlers, request) {
+  const responded = [];
+  handlers.get('fetch')({ request, respondWith: promise => responded.push(promise) });
+  return responded[0];
+}
+
+test('correlation: one save id across page, worker and proxy, pre-put flags, and rejected raw text', async () => {
+  const cache = await import('../../lib/maps/map-package-cache.ts');
+  const mapPackage = { url: '/map-packages/trondheim-osm.pmtiles', styleUrl: '/map-packages/trondheim-osm-style.json' };
+  const secret = Object.assign(new TypeError('SECRET https://user:pass@private.example/a?token=1'), { name: 'TypeError' });
+  const calls = [];
+  const puts = [];
+  let traced;
+  let thrown;
+  try {
+    await cache.cacheLocalMapPackageAssets(mapPackage, {
+      saveId: 7,
+      caches: { open: async () => ({ put: async (url, response) => {
+        puts.push({ url, beforeUsed: response.bodyUsed, beforeLocked: response.body.locked });
+        await response.arrayBuffer();
+        puts[0].afterUsed = response.bodyUsed;
+        throw secret;
+      } }) },
+      fetchImpl: async (url, init) => {
+        calls.push({ url, init });
+        return new Response(new Uint8Array([1, 2, 3, 4]), { status: 200, headers: { vary: 'accept-encoding, *' } });
+      },
+      onProgress: () => {},
+      onTrace: record => { traced = record; },
+    });
+  } catch (error) { thrown = error; }
+  assert.equal(thrown, secret);
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0], { url: mapPackage.url, init: { headers: { 'x-o24-save': '7' } } });
+  assert.equal(puts[0].url, mapPackage.url);
+  assert.equal(puts[0].beforeUsed, false);
+  assert.equal(puts[0].afterUsed, true);
+  assert.equal(traced.prePutBodyUsed, false);
+  assert.equal(traced.prePutBodyLocked, false);
+  assert.equal(traced.varyStar, true);
+  assert.equal(traced.rangePresent, false);
+  assert.equal(traced.reason, 'UNKNOWN');
+  assert.equal(traced.bodyUsed, undefined);
+  assert.equal(JSON.stringify(traced).includes('SECRET'), false);
+
+  const fetchError = Object.assign(new TypeError('Failed to fetch'), { name: 'TypeError' });
+  let fetchTrace;
+  let fetchThrown;
+  const fetchCalls = [];
+  try {
+    await cache.cacheLocalMapPackageAssets(mapPackage, {
+      saveId: 1000000,
+      caches: { open: async () => ({ put: async () => {} }) },
+      fetchImpl: async (url, init) => { fetchCalls.push(init); throw fetchError; },
+      onProgress: () => {},
+      onTrace: record => { fetchTrace = record; },
+    });
+  } catch (error) { fetchThrown = error; }
+  assert.equal(fetchThrown, fetchError);
+  assert.deepEqual(fetchCalls, [undefined]);
+  assert.equal(fetchTrace.saveId, undefined);
+  assert.equal(fetchTrace.phase, 'fetch');
+  assert.equal(cache.finiteReasonCode(fetchError), 'FAILED_TO_FETCH');
+  assert.equal(cache.finiteReasonCode({ get message() { throw new Error('SECRET'); } }), 'UNKNOWN');
+
+  const allowedFetchError = Object.assign(new TypeError('Failed to fetch'), { name: 'TypeError' });
+  let allowedTrace;
+  let allowedThrown;
+  const allowedCalls = [];
+  try {
+    await cache.cacheLocalMapPackageAssets(mapPackage, {
+      saveId: 8,
+      caches: { open: async () => ({ put: async () => {} }) },
+      fetchImpl: async (url, init) => { allowedCalls.push(init); throw allowedFetchError; },
+      onProgress: () => {},
+      onTrace: record => { allowedTrace = record; },
+    });
+  } catch (error) { allowedThrown = error; }
+  assert.equal(allowedThrown, allowedFetchError);
+  assert.equal(allowedCalls.length, 1);
+  assert.equal(allowedTrace.operation, 'fetch');
+  assert.equal(allowedTrace.reason, 'FAILED_TO_FETCH');
+  assert.equal(allowedTrace.prePutBodyUsed, false);
+
+  const putError = Object.assign(new TypeError('body secret'), { name: 'TypeError' });
+  let swThrown;
+  const sw = loadServiceWorker(async () => new Response(new Uint8Array([9, 8, 7]), { status: 200, headers: { vary: '*' } }), async (_request, response) => {
+    await response.arrayBuffer();
+    throw putError;
+  });
+  const swRequest = new Request('https://example.test/map-packages/trondheim-osm.pmtiles', { headers: { 'x-o24-save': '7' } });
+  try { await runFetch(sw.handlers, swRequest); } catch (error) { swThrown = error; }
+  assert.equal(swThrown, putError);
+  assert.equal(sw.puts.length, 1);
+  assert.equal(sw.puts[0][0], swRequest);
+  assert.equal(sw.warnings.length, 1);
+  assert.equal(sw.warnings[0], correlationLine(7, 'sw', 'cache-put'));
+  assert.equal(sw.warnings.join('').includes('secret'), false);
+
+  const quota = Object.assign(new Error('quota secret'), { name: 'QuotaExceededError' });
+  const swallowed = loadServiceWorker(async () => new Response(new Uint8Array([1]), { status: 200 }), async () => { throw quota; });
+  const swallowedResponse = await runFetch(swallowed.handlers, new Request('https://example.test/map-packages/trondheim-osm.pmtiles', { headers: { 'x-o24-save': '7' } }));
+  assert.equal(swallowedResponse.status, 200);
+  assert.deepEqual(swallowed.warnings, []);
+  assert.equal((await swallowedResponse.arrayBuffer()).byteLength, 1);
+
+  const bare = loadServiceWorker(async () => { throw secret; }, async () => {});
+  let bareThrown;
+  try { await runFetch(bare.handlers, new Request('https://example.test/map-packages/trondheim-osm.pmtiles')); } catch (error) { bareThrown = error; }
+  assert.equal(bareThrown, secret);
+  assert.deepEqual(bare.warnings, []);
+
+  const body = Buffer.from('pmtiles-bytes');
+  const seenIds = [];
+  const upstream = createServer((incoming, outgoing) => {
+    const raw = incoming.headers['x-o24-save'];
+    seenIds.push(typeof raw === 'string' && /^[1-9][0-9]{0,5}$/.test(raw) ? Number(raw) : null);
+    outgoing.writeHead(200, { 'content-type': 'application/octet-stream', 'content-length': String(body.length) });
+    outgoing.end(body);
+  });
+  await new Promise(resolve => upstream.listen(0, '127.0.0.1', resolve));
+  const address = upstream.address();
+  const fixture = await startFixture(address.port);
+  try {
+    const send = (headers) => new Promise((resolve, reject) => {
+      const outgoing = httpRequest({ hostname: '127.0.0.1', port: new URL(fixture.origin).port, path: '/map-packages/trondheim-osm.pmtiles', method: 'GET', headers }, response => {
+        const parts = [];
+        response.on('data', part => parts.push(part));
+        response.once('end', () => resolve(Buffer.concat(parts)));
+        response.once('error', reject);
+      });
+      outgoing.once('error', reject);
+      outgoing.end();
+    });
+    const plainBody = await send({});
+    const taggedBody = await send({ 'x-o24-save': '42' });
+    const badBody = await send({ 'x-o24-save': '42 SECRET' });
+    assert.deepEqual(plainBody, body);
+    assert.deepEqual(taggedBody, body);
+    assert.deepEqual(badBody, body);
+    assert.deepEqual(seenIds, [null, 42, null]);
+    const rows = probe.mapAssetRows(fixture);
+    assert.deepEqual(rows.map(row => row.saveId), [null, 42, null]);
+    assert.equal(JSON.stringify(rows).includes('SECRET'), false);
+    assert.equal(JSON.stringify(fixture.state.requests).includes('SECRET'), false);
+    assert.equal(fixture.state.requests.length, 3);
+  } finally {
+    await fixture.close();
+    await new Promise((resolve, reject) => upstream.close(error => error ? reject(error) : resolve()));
+  }
+
+  const state = { current: 0, rows: [] };
+  probe.recordSaveCorrelation(state, 'warning', correlationLine(3, 'page', 'fetch', 'TypeError', 'FAILED_TO_FETCH'));
+  probe.recordSaveCorrelation(state, 'warning', correlationLine(3, 'page', 'fetch') + ' token=secret');
+  probe.recordSaveCorrelation(state, 'warning', '[offline-map-cache] save-corr 3 page cache-put TypeError range=false varyStar=false prePutBodyUsed=false prePutBodyLocked=false reason=UNKNOWN');
+  probe.recordSaveCorrelation(state, 'warning', { toString: () => correlationLine(3, 'page', 'fetch') });
+  probe.recordSaveCorrelation(state, 'warning', correlationLine(9, 'sw', 'fetch', 'TypeError', 'NETWORK_ERROR'));
+  probe.recordSaveCorrelation(state, 'warning', correlationLine(3, 'page', 'put'));
+  assert.equal(state.current, 9);
+  assert.equal(state.rows.length, 1);
+  assert.equal(state.rows[0].reason, 'NETWORK_ERROR');
+  for (let i = 0; i < 6; i++) probe.recordSaveCorrelation(state, 'warning', correlationLine(9, 'sw', 'clone', 'TypeError', 'ABORTED'));
+  assert.equal(state.rows.length, 4);
+  assert.equal(JSON.stringify(state).includes('secret'), false);
+
+  const capacity = probe.ownedCapacity();
+  const encoded = JSON.stringify(capacity);
+  assert.equal(encoded.includes('/'), false);
+  assert.equal(encoded.includes('HOME'), false);
+  for (const side of [capacity.profile, capacity.scratch]) {
+    if (side) {
+      assert.equal(Number.isSafeInteger(side.capacityBytes), true);
+      assert.equal(Number.isSafeInteger(side.freeBytes), true);
+      assert.equal(side.freeBytes <= side.capacityBytes, true);
+    }
+  }
 });

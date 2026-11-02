@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, statfsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -70,6 +70,35 @@ const mapAssetPaths = ['/map-packages/trondheim-osm.pmtiles', '/map-packages/tro
 
 const text = (value, max, pattern) => (typeof value === 'string' && value.length <= max && pattern.test(value) ? value : null);
 const count = value => (Number.isSafeInteger(value) && value >= 0 ? value : null);
+const finiteSaveId = value => (Number.isSafeInteger(value) && value >= 1 && value <= 999999 ? value : null);
+
+function finiteByteProduct(blockCount, bsize) {
+  try {
+    const product = BigInt(blockCount) * BigInt(bsize);
+    if (product < 0n || product > BigInt(Number.MAX_SAFE_INTEGER)) return null;
+    return Number(product);
+  } catch { return null; }
+}
+
+function physicalCapacity(dir) {
+  try {
+    const stat = statfsSync(dir);
+    const capacityBytes = finiteByteProduct(stat.blocks, stat.bsize);
+    const freeBytes = finiteByteProduct(stat.bavail, stat.bsize);
+    if (capacityBytes === null || freeBytes === null) return null;
+    return { capacityBytes, freeBytes };
+  } catch { return null; }
+}
+
+// Filesystem capacity of the owned profile home and scratch. Numbers only; no paths or listings.
+export function ownedCapacity() {
+  const home = process.env.HOME;
+  const scratch = process.env.TMPDIR;
+  return {
+    profile: typeof home === 'string' && home.length > 0 ? physicalCapacity(home) : null,
+    scratch: typeof scratch === 'string' && scratch.length > 0 ? physicalCapacity(scratch) : null,
+  };
+}
 
 // Number of fixture rows recorded so far; null when unavailable.
 export function requestBoundary(fixture) {
@@ -88,8 +117,9 @@ export function mapAssetRows(fixture, start = 0) {
       try {
         return { path: row.path, status: count(row.status), encodedBytes: count(row.encodedBytes), encoding: text(row.encoding, 16, /^[a-z0-9-]*$/),
           complete: typeof row.complete === 'boolean' ? row.complete : null,
-          fault: row.fault == null ? null : (text(row.fault, 32, /^[A-Za-z0-9_-]+$/) ?? 'unavailable') };
-      } catch { return { path: row?.path ?? null, status: null, encodedBytes: null, encoding: null, complete: null, fault: 'unavailable' }; }
+          fault: row.fault == null ? null : (text(row.fault, 32, /^[A-Za-z0-9_-]+$/) ?? 'unavailable'),
+          saveId: finiteSaveId(row.saveId) };
+      } catch { return { path: row?.path ?? null, status: null, encodedBytes: null, encoding: null, complete: null, fault: 'unavailable', saveId: null }; }
     });
   } catch { return null; }
 }
@@ -117,8 +147,33 @@ export function recordSavePhase(rows, type, text) {
   rows.push(row);
 }
 
+const SAVE_CORR = new RegExp('^\\[offline-map-cache\\] save-corr ([1-9][0-9]{0,5}) (page|sw) ([A-Za-z-]+) (AbortError|DataCloneError|InvalidStateError|NetworkError|NotAllowedError|NotFoundError|QuotaExceededError|SecurityError|TimeoutError|TypeError|RangeError|Error|UnknownError) range=(true|false) varyStar=(true|false) prePutBodyUsed=(true|false) prePutBodyLocked=(true|false) reason=(FAILED_TO_FETCH|NETWORK_ERROR|ABORTED|UNKNOWN)$');
+const PAGE_OPS = new Set(['open', 'fetch', 'wrap', 'read', 'put', 'addAll', 'after']);
+const SW_OPS = new Set(['fetch', 'clone', 'cache-put', 'range-response']);
+
+// Current Save only: a newer id replaces older rows, a stale id is ignored, and raw text never matches.
+export function recordSaveCorrelation(state, type, text) {
+  const match = type === 'warning' && typeof text === 'string' ? SAVE_CORR.exec(text) : null;
+  if (!match || !state || !Array.isArray(state.rows)) return;
+  const saveId = Number(match[1]);
+  const layer = match[2];
+  const operation = match[3];
+  if (layer === 'page' ? !PAGE_OPS.has(operation) : !SW_OPS.has(operation)) return;
+  if (!state.current || saveId > state.current) {
+    state.current = saveId;
+    state.rows.length = 0;
+  }
+  if (saveId !== state.current || state.rows.length >= 4) return;
+  state.rows.push({
+    saveId, layer, operation, errorClass: match[4],
+    rangePresent: match[5] === 'true', varyStar: match[6] === 'true',
+    prePutBodyUsed: match[7] === 'true', prePutBodyLocked: match[8] === 'true', reason: match[9],
+  });
+}
+
 // Click the save button and await the stored status; the caller owns the console listener's lifetime.
-async function clickSaveAndAwait(page, evidence, warningClasses, phaseRows) {
+async function clickSaveAndAwait(page, evidence, warningClasses, phaseRows, correlation) {
+  const capacityBefore = ownedCapacity();
   const saveBoundary = requestBoundary(evidence.fixture);
   await page.getByRole('button', { name: 'Lagre valgt kartpakke lokalt', exact: true }).click();
   try {
@@ -127,6 +182,8 @@ async function clickSaveAndAwait(page, evidence, warningClasses, phaseRows) {
     logMapAssetRows(evidence.fixture, saveBoundary);
     try { console.error(JSON.stringify({ kind: 'o24-map-save-warning-classes', classes: warningClasses })); } catch { /* logging must not mask the save failure */ }
     try { console.error(JSON.stringify({ kind: 'o24-map-save-phases', rows: phaseRows })); } catch { /* logging must not mask the save failure */ }
+    try { console.error(JSON.stringify({ kind: 'o24-map-save-correlation', saveId: correlation && correlation.current ? correlation.current : null, rows: correlation && correlation.rows ? correlation.rows : [] })); } catch { /* logging must not mask the save failure */ }
+    try { console.error(JSON.stringify({ kind: 'o24-map-save-capacity', before: capacityBefore, atFailure: ownedCapacity() })); } catch { /* logging must not mask the save failure */ }
     // The app catches cache errors; retain its actual status before propagating this failed assertion.
     let timer;
     try {
@@ -153,9 +210,27 @@ export async function saveMap(page, evidence) {
   await page.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
   const warningClasses = [];
   const phaseRows = [];
-  const onConsole = message => { try { recordSaveWarning(warningClasses, message.type(), message.text()); recordSavePhase(phaseRows, message.type(), message.text()); } catch { /* diagnostics only */ } };
+  const correlation = { current: 0, rows: [] };
+  const onConsole = message => { try { recordSaveWarning(warningClasses, message.type(), message.text()); recordSavePhase(phaseRows, message.type(), message.text()); recordSaveCorrelation(correlation, message.type(), message.text()); } catch { /* diagnostics only */ } };
+  const workers = new Set();
+  const onServiceWorker = worker => {
+    if (!worker || workers.has(worker)) return;
+    workers.add(worker);
+    try { worker.on('console', onConsole); } catch { /* page console remains available */ }
+  };
+  let context;
+  try { context = typeof page.context === 'function' ? page.context() : undefined; } catch { context = undefined; }
+  try {
+    if (context && context.serviceWorkers) for (const worker of context.serviceWorkers()) onServiceWorker(worker);
+    if (context && context.on) context.on('serviceworker', onServiceWorker);
+  } catch { /* diagnostics only */ }
   page.on('console', onConsole);
-  try { await clickSaveAndAwait(page, evidence, warningClasses, phaseRows); } finally { page.off('console', onConsole); }
+  try { await clickSaveAndAwait(page, evidence, warningClasses, phaseRows, correlation); }
+  finally {
+    page.off('console', onConsole);
+    try { if (context && context.off) context.off('serviceworker', onServiceWorker); } catch { /* diagnostics only */ }
+    for (const worker of workers) { try { worker.off('console', onConsole); } catch { /* diagnostics only */ } }
+  }
   await page.goto('/kart');
   await page.getByText('Lokal kartpakke aktiv: Trondheim lokal (OSM-utdrag).', { exact: true }).waitFor();
   assert(await page.getByTestId('offline-maplibre-container').locator('canvas').isVisible(), 'No real map canvas');

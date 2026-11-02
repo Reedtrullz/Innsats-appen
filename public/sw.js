@@ -303,6 +303,79 @@ self.addEventListener('message', (event) => {
   }
 });
 
+const SAVE_ERROR_CLASSES = new Set(['AbortError', 'DataCloneError', 'InvalidStateError', 'NetworkError', 'NotAllowedError', 'NotFoundError', 'QuotaExceededError', 'SecurityError', 'TimeoutError', 'TypeError', 'RangeError', 'Error']);
+const SAVE_REASONS = {
+  'Failed to fetch': 'FAILED_TO_FETCH',
+  'NetworkError when attempting to fetch resource.': 'NETWORK_ERROR',
+  'The operation was aborted.': 'ABORTED',
+};
+
+function finiteSaveId(request) {
+  try {
+    const raw = request.headers.get('x-o24-save');
+    if (typeof raw !== 'string' || !/^[1-9][0-9]{0,5}$/.test(raw)) return 0;
+    const id = Number(raw);
+    return Number.isSafeInteger(id) && id <= 999999 ? id : 0;
+  } catch (_) {
+    return 0;
+  }
+}
+
+function saveErrorClass(error) {
+  try {
+    const name = error && error.name;
+    return typeof name === 'string' && SAVE_ERROR_CLASSES.has(name) ? name : 'UnknownError';
+  } catch (_) {
+    return 'UnknownError';
+  }
+}
+
+// shortcut: only these three exact platform strings, add a code when a new full message is tested
+function saveReasonCode(error) {
+  try {
+    const message = error && error.message;
+    return typeof message === 'string' && Object.prototype.hasOwnProperty.call(SAVE_REASONS, message) ? SAVE_REASONS[message] : 'UNKNOWN';
+  } catch (_) {
+    return 'UNKNOWN';
+  }
+}
+
+function boolText(value) {
+  return value === true ? 'true' : 'false';
+}
+
+function prePutFlags(response, rangePresent) {
+  let bodyUsed = false;
+  let bodyLocked = false;
+  let varyStar = false;
+  try { bodyUsed = response.bodyUsed === true; } catch (_) { bodyUsed = false; }
+  try { bodyLocked = response.body && response.body.locked === true; } catch (_) { bodyLocked = false; }
+  try {
+    const vary = response.headers.get('vary');
+    varyStar = typeof vary === 'string' && vary.split(',').some((token) => token.trim() === '*');
+  } catch (_) { varyStar = false; }
+  return { rangePresent: rangePresent === true, varyStar, prePutBodyUsed: bodyUsed, prePutBodyLocked: bodyLocked };
+}
+
+function traceSave(request, operation, error, flags) {
+  const saveId = finiteSaveId(request);
+  if (!saveId) return;
+  try {
+    console.warn(
+      '[offline-map-cache] save-corr',
+      String(saveId),
+      'sw',
+      operation,
+      saveErrorClass(error),
+      'range=' + boolText(flags.rangePresent),
+      'varyStar=' + boolText(flags.varyStar),
+      'prePutBodyUsed=' + boolText(flags.prePutBodyUsed),
+      'prePutBodyLocked=' + boolText(flags.prePutBodyLocked),
+      'reason=' + saveReasonCode(error),
+    );
+  } catch (_) { /* diagnostics must not change the fetch */ }
+}
+
 // Storage denial keeps the fresh response; other put errors (e.g. interrupted body) take the caller's fallback.
 async function putUnlessDenied(cache, request, response) {
   try {
@@ -364,14 +437,40 @@ self.addEventListener('fetch', (event) => {
         // Storage denied: live fetch still works; offline fallback is unavailable.
       }
       try {
-        const response = await fetch(request);
+        let response;
+        try {
+          response = await fetch(request);
+        } catch (error) {
+          traceSave(request, 'fetch', error, { rangePresent: rangeHeader !== null, varyStar: false, prePutBodyUsed: false, prePutBodyLocked: false });
+          throw error;
+        }
         // Never cache.put partial (206) responses — the Cache API rejects
         // them; the full archive is stored by the explicit save flow.
-        if (response.status === 200 && !rangeHeader && cache) await putUnlessDenied(cache, request, response.clone());
+        if (response.status === 200 && !rangeHeader && cache) {
+          let stored;
+          try {
+            stored = response.clone();
+          } catch (error) {
+            traceSave(request, 'clone', error, prePutFlags(response, false));
+            throw error;
+          }
+          const prePut = prePutFlags(stored, false);
+          try {
+            await putUnlessDenied(cache, request, stored);
+          } catch (error) {
+            traceSave(request, 'cache-put', error, prePut);
+            throw error;
+          }
+        }
         // Some servers/proxies (and the Next dev server) ignore Range and
         // return 200; PMTiles clients abort on that. Synthesize the 206.
         if (response.status === 200 && rangeHeader) {
-          return sliceCachedMapPackageResponse(response, rangeHeader);
+          try {
+            return await sliceCachedMapPackageResponse(response, rangeHeader);
+          } catch (error) {
+            traceSave(request, 'range-response', error, prePutFlags(response, true));
+            throw error;
+          }
         }
         return response;
       } catch (error) {

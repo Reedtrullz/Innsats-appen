@@ -230,6 +230,7 @@ export function OfflineMapPanel({ variant = 'operations' }: { variant?: 'operati
   const mapLogSavingRef = useRef(false);
   const mapPackageCacheSavingRef = useRef(false);
   const latestSelectedPackageIdRef = useRef(selectedPmtilesPackageId);
+  const saveCorrelationRef = useRef(0);
 
   const selectedSchematicPackage = getOfflineMapPackage(selectedSchematicPackageId) ?? OFFLINE_MAP_PACKAGES[0];
   const selectedPmtilesPackage = approvedLocalMapPackages.find((mapPackage) => mapPackage.id === selectedPmtilesPackageId) ?? approvedLocalMapPackages[0];
@@ -353,9 +354,28 @@ export function OfflineMapPanel({ variant = 'operations' }: { variant?: 'operati
       // Field 3G + a 30-40 MB PMTiles package looks hung without feedback;
       // stream the download and surface throttled percent/MB progress.
       let lastReportedStep = -1;
+      saveCorrelationRef.current = saveCorrelationRef.current >= 999999 ? 1 : saveCorrelationRef.current + 1;
+      const saveId = saveCorrelationRef.current;
       const result = await cacheLocalMapPackageAssets(localPackage, {
-        onTrace: ({ phase, errorClass, ...flags }) => {
-          console.warn('[offline-map-cache] save-phase', phase, errorClass, ...Object.entries(flags).map(([key, value]) => `${key}=${value}`));
+        saveId,
+        onTrace: (record) => {
+          try {
+            const pageOps = new Set(['open', 'fetch', 'wrap', 'read', 'put', 'addAll', 'after']);
+            const reasons = new Set(['FAILED_TO_FETCH', 'NETWORK_ERROR', 'ABORTED', 'UNKNOWN']);
+            if (record.saveId !== saveId || record.layer !== 'page' || !pageOps.has(record.operation ?? '') || !reasons.has(record.reason ?? '')) return;
+            console.warn(
+              '[offline-map-cache] save-corr',
+              String(record.saveId),
+              'page',
+              record.operation,
+              record.errorClass,
+              'range=' + (record.rangePresent === true),
+              'varyStar=' + (record.varyStar === true),
+              'prePutBodyUsed=' + (record.prePutBodyUsed === true),
+              'prePutBodyLocked=' + (record.prePutBodyLocked === true),
+              'reason=' + record.reason,
+            );
+          } catch { /* diagnostics only */ }
         },
         onProgress: ({ loadedBytes, totalBytes, percent }) => {
           const step = percent !== null ? percent : Math.floor(loadedBytes / (512 * 1024));
