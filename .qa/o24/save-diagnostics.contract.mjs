@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { EventEmitter } from 'node:events';
 import { createServer, request as httpRequest } from 'node:http';
 import test from 'node:test';
+import { register } from 'node:module';
 import vm from 'node:vm';
 import * as probe from './browser-probe.mjs';
 import { startFixture } from './http-fixture.mjs';
@@ -127,8 +129,9 @@ test('warning recorder keeps approved classes only, ignores forged tags/names/se
 
 function fakePage({ click, waitFor, evidence }) {
   const page = new EventEmitter();
-  const warn = text => page.emit('console', { type: () => 'warning', text: () => '[offline-map-cache] save-failed ' + text });
-  const node = { filter: () => node, locator: () => node, waitFor, isVisible: async () => true, selectOption: async () => warn('QuotaExceededError'), click: () => click(warn) };
+  const emit = (type, text) => page.emit('console', { type: () => type, text: () => text });
+  const warn = text => emit('warning', '[offline-map-cache] save-failed ' + text);
+  const node = { filter: () => node, locator: () => node, waitFor, isVisible: async () => true, selectOption: async () => warn('QuotaExceededError'), click: () => click(warn, emit) };
   Object.assign(page, {
     goto: async () => {}, waitForFunction: async () => {}, evaluate: async () => ({ status: 'x' }),
     getByLabel: () => node, getByRole: () => node, getByTestId: () => node, getByText: () => node,
@@ -189,11 +192,11 @@ function correlationLine(id, layer, operation, errorClass = 'TypeError', reason 
   return '[offline-map-cache] save-corr ' + id + ' ' + layer + ' ' + operation + ' ' + errorClass + ' range=false varyStar=true prePutBodyUsed=false prePutBodyLocked=false reason=' + reason;
 }
 
-function loadServiceWorker(fetchImpl, putImpl) {
+function loadServiceWorker(fetchImpl, putImpl, source = readFileSync(new URL('../../public/sw.js', import.meta.url), 'utf8'), match = async () => undefined) {
   const warnings = [];
   const handlers = new Map();
   const puts = [];
-  vm.runInNewContext(readFileSync(new URL('../../public/sw.js', import.meta.url), 'utf8'), {
+  vm.runInNewContext(source, {
     console: { warn: (...args) => warnings.push(args.map(String).join(' ')) },
     self: {
       location: new URL('https://example.test/'),
@@ -203,7 +206,7 @@ function loadServiceWorker(fetchImpl, putImpl) {
       addEventListener: (type, handler) => handlers.set(type, handler),
     },
     caches: {
-      open: async () => ({ match: async () => undefined, put: async (request, response) => { puts.push([request, response]); return putImpl(request, response); } }),
+      open: async () => ({ match, put: async (request, response) => { puts.push([request, response]); return putImpl(request, response); } }),
       keys: async () => [],
       delete: async () => true,
     },
@@ -218,6 +221,92 @@ async function runFetch(handlers, request) {
   handlers.get('fetch')({ request, respondWith: promise => responded.push(promise) });
   return responded[0];
 }
+
+const BASELINE_SW = new URL('../../../../../../.omo/operations/innsats-o24-correlated-save-20261102/source/before/public/sw.js', import.meta.url);
+const F325_SW = new URL('../../../../../../.omo/operations/innsats-o24-correlated-save-20261102/source-corrective/before/public/sw.js', import.meta.url);
+const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
+const FINITE_RANGE_TRACE = /^\[offline-map-cache\] save-corr 7 sw range-response TypeError range=(true|false) varyStar=(true|false) prePutBodyUsed=(true|false) prePutBodyLocked=(true|false) reason=(FAILED_TO_FETCH|NETWORK_ERROR|ABORTED|UNKNOWN)$/;
+
+async function rangedBodyOracle(source) {
+  const bodyError = Object.assign(new TypeError('O24_RANGE_BODY'), { name: 'TypeError' });
+  const cached = new Response(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]), { status: 200, headers: { 'content-type': 'application/octet-stream' } });
+  const sw = loadServiceWorker(
+    async () => new Response(new ReadableStream({ pull(controller) { controller.error(bodyError); } }), { status: 200, headers: { 'content-type': 'application/octet-stream' } }),
+    async () => {},
+    source,
+    async () => cached.clone(),
+  );
+  const request = new Request('https://example.test/map-packages/trondheim-osm.pmtiles', { headers: { range: 'bytes=0-3', 'x-o24-save': '7' } });
+  try {
+    const response = await runFetch(sw.handlers, request);
+    return { outcome: 'response', status: response.status, bytes: (await response.arrayBuffer()).byteLength, warnings: sw.warnings };
+  } catch (error) {
+    return { outcome: 'reject', same: error === bodyError, warnings: sw.warnings };
+  }
+}
+
+test('fresh ranged body error keeps its identity when a cached archive exists', async () => {
+  const baseline = readFileSync(BASELINE_SW);
+  const f325 = readFileSync(F325_SW);
+  const corrected = readFileSync(new URL('../../public/sw.js', import.meta.url));
+  assert.equal(sha256(baseline), '6aae727a73236b9613baffefc57e7f5ea81dbce8df7dd722422a45f55753bcd7');
+  assert.equal(sha256(f325), '91960c5193ac2ba116133ee34ae96c5ce002f590d646e2513e667efe929c4557');
+  assert.notEqual(sha256(corrected), sha256(f325));
+  const original = await rangedBodyOracle(baseline.toString('utf8'));
+  const regressed = await rangedBodyOracle(f325.toString('utf8'));
+  const candidate = await rangedBodyOracle(corrected.toString('utf8'));
+  assert.deepEqual({ outcome: original.outcome, same: original.same }, { outcome: 'reject', same: true });
+  assert.deepEqual({ outcome: regressed.outcome, status: regressed.status, bytes: regressed.bytes }, { outcome: 'response', status: 206, bytes: 4 });
+  assert.deepEqual({ outcome: candidate.outcome, same: candidate.same }, { outcome: 'reject', same: true });
+  assert.equal(candidate.warnings.length, 1);
+  assert.match(candidate.warnings[0], FINITE_RANGE_TRACE);
+  assert.equal(candidate.warnings[0].includes('O24_RANGE_BODY'), false);
+  const loader = 'export async function resolve(specifier, context, nextResolve) { if ((specifier.startsWith("./") || specifier.startsWith("../")) && !/\\.(?:js|mjs|cjs|json|ts|tsx|node)$/.test(specifier)) return nextResolve(specifier + ".ts", context); return nextResolve(specifier, context); }';
+  const registered = register('data:text/javascript,' + encodeURIComponent(loader));
+  if (registered && registered.then) await registered;
+  const { buildServiceWorkerSource } = await import('../../scripts/build-service-worker.ts');
+  assert.equal(buildServiceWorkerSource(corrected.toString('utf8')), corrected.toString('utf8'));
+});
+
+test('first accepted save correlation keeps the capacity snapshot taken then, not the later UI wait', async () => {
+  const home = process.env.HOME;
+  const secret = 'SECRET_UNMATCHED_TEXT';
+  const primary = new Error('status');
+  const accepted = correlationLine(4, 'sw', 'range-response');
+  try {
+    const { result, lines } = await lifecycle({
+      click: async (_warn, emit) => {
+        process.env.HOME = '';
+        emit('warning', 'malformed ' + secret);
+        emit('warning', correlationLine(4, 'sw', 'not-an-op'));
+        emit('error', accepted);
+        process.env.HOME = home;
+        emit('warning', accepted);
+        process.env.HOME = '';
+        emit('warning', correlationLine(3, 'sw', 'fetch'));
+        for (let i = 0; i < 5; i++) emit('warning', correlationLine(4, 'sw', 'clone', 'TypeError', 'ABORTED'));
+      },
+      waitFor: async () => { throw primary; },
+    });
+    assert.equal(result, primary);
+    const capacity = JSON.parse(lines.find(line => line.includes('o24-map-save-capacity')));
+    assert.notEqual(capacity.atFirstError, null);
+    assert.notEqual(capacity.atFirstError.profile, null);
+    assert.equal(Number.isSafeInteger(capacity.atFirstError.profile.capacityBytes), true);
+    assert.equal(Number.isSafeInteger(capacity.atFirstError.profile.freeBytes), true);
+    assert.equal(capacity.atFailure.profile, null);
+    assert.notDeepEqual(capacity.atFirstError, capacity.atFailure);
+    const recorded = JSON.parse(lines.find(line => line.includes('o24-map-save-correlation')));
+    assert.equal(recorded.saveId, 4);
+    assert.equal(recorded.rows.length, 4);
+    assert.equal(lines.join('\n').includes(secret), false);
+    assert.equal(JSON.stringify(capacity).includes('/'), false);
+    assert.equal(JSON.stringify(capacity).includes(String(home)), false);
+  } finally {
+    if (home === undefined) delete process.env.HOME;
+    else process.env.HOME = home;
+  }
+});
 
 test('correlation: one save id across page, worker and proxy, pre-put flags, and rejected raw text', async () => {
   const cache = await import('../../lib/maps/map-package-cache.ts');

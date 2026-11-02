@@ -465,12 +465,11 @@ self.addEventListener('fetch', (event) => {
         // Some servers/proxies (and the Next dev server) ignore Range and
         // return 200; PMTiles clients abort on that. Synthesize the 206.
         if (response.status === 200 && rangeHeader) {
-          try {
-            return await sliceCachedMapPackageResponse(response, rangeHeader);
-          } catch (error) {
+          // Rejection must stay on the returned promise so the cached fallback catch does not see it.
+          return sliceCachedMapPackageResponse(response, rangeHeader).catch((error) => {
             traceSave(request, 'range-response', error, prePutFlags(response, true));
             throw error;
-          }
+          });
         }
         return response;
       } catch (error) {

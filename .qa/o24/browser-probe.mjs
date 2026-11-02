@@ -183,7 +183,7 @@ async function clickSaveAndAwait(page, evidence, warningClasses, phaseRows, corr
     try { console.error(JSON.stringify({ kind: 'o24-map-save-warning-classes', classes: warningClasses })); } catch { /* logging must not mask the save failure */ }
     try { console.error(JSON.stringify({ kind: 'o24-map-save-phases', rows: phaseRows })); } catch { /* logging must not mask the save failure */ }
     try { console.error(JSON.stringify({ kind: 'o24-map-save-correlation', saveId: correlation && correlation.current ? correlation.current : null, rows: correlation && correlation.rows ? correlation.rows : [] })); } catch { /* logging must not mask the save failure */ }
-    try { console.error(JSON.stringify({ kind: 'o24-map-save-capacity', before: capacityBefore, atFailure: ownedCapacity() })); } catch { /* logging must not mask the save failure */ }
+    try { console.error(JSON.stringify({ kind: 'o24-map-save-capacity', before: capacityBefore, atFirstError: correlation && Object.hasOwn(correlation, 'atFirstError') ? correlation.atFirstError : null, atFailure: ownedCapacity() })); } catch { /* logging must not mask the save failure */ }
     // The app catches cache errors; retain its actual status before propagating this failed assertion.
     let timer;
     try {
@@ -210,8 +210,19 @@ export async function saveMap(page, evidence) {
   await page.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
   const warningClasses = [];
   const phaseRows = [];
-  const correlation = { current: 0, rows: [] };
-  const onConsole = message => { try { recordSaveWarning(warningClasses, message.type(), message.text()); recordSavePhase(phaseRows, message.type(), message.text()); recordSaveCorrelation(correlation, message.type(), message.text()); } catch { /* diagnostics only */ } };
+  const correlation = { current: 0, rows: [], atFirstError: null, firstErrorSaveId: 0 };
+  const onConsole = message => {
+    try {
+      recordSaveWarning(warningClasses, message.type(), message.text());
+      recordSavePhase(phaseRows, message.type(), message.text());
+      recordSaveCorrelation(correlation, message.type(), message.text());
+      const row = correlation.rows.length ? correlation.rows[correlation.rows.length - 1] : null;
+      if (row && row.saveId === correlation.current && correlation.firstErrorSaveId !== correlation.current) {
+        correlation.atFirstError = ownedCapacity();
+        correlation.firstErrorSaveId = correlation.current;
+      }
+    } catch { /* diagnostics only */ }
+  };
   const workers = new Set();
   const onServiceWorker = worker => {
     if (!worker || workers.has(worker)) return;
