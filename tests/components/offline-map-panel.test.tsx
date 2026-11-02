@@ -494,6 +494,41 @@ it.each([
 
 it('keeps the schematic fallback when an approved PMTiles package is selected but not cached', async () => {
   const user = userEvent.setup();
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+  try {
+    mockApprovedLocalMapPackages();
+    const cacheLocalMapPackageAssets = mockMapPackageCache({ cached: 2 });
+    // The cache call succeeds; persisting the selection afterwards throws.
+    vi.doMock('@/lib/maps/offline-map', async (importOriginal) => ({
+      ...(await importOriginal<typeof import('@/lib/maps/offline-map')>()),
+      writeCachedOfflineMapPackage: () => { throw namedError(Error, 'QuotaExceededError', 'synthetic-private-sentinel /private/path'); },
+    }));
+
+    await renderOfflineMapPanel();
+
+    await user.selectOptions(screen.getByLabelText('Velg lokal kartpakke'), 'trondheim-demo-pmtiles');
+    await user.click(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i }));
+
+    await waitFor(() => {
+      expect(warn).toHaveBeenCalledWith('[offline-map-cache] save-failed', 'QuotaExceededError');
+    });
+    expect(cacheLocalMapPackageAssets).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls).toEqual([
+      ['[offline-map-cache] save-phase', 'after', 'QuotaExceededError'],
+      ['[offline-map-cache] save-failed', 'QuotaExceededError'],
+    ]);
+    expect(JSON.stringify(warn.mock.calls)).not.toMatch(/synthetic-private-sentinel|private\/path/);
+    expect(screen.getByTestId('operations-map-status')).toHaveTextContent(/Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline/i);
+    expect(screen.getByRole('button', { name: /Lagre valgt kartpakke lokalt/i })).toBeEnabled();
+    expect(localStorage.getItem(OFFLINE_MAP_CACHE_STORAGE_KEY)).toBeNull();
+  } finally {
+    warn.mockRestore();
+    vi.doUnmock('@/lib/maps/offline-map');
+  }
+});
+
+it('keeps the schematic fallback when an approved PMTiles package is selected but not cached', async () => {
+  const user = userEvent.setup();
   mockApprovedLocalMapPackages();
 
   await renderOfflineMapPanel();

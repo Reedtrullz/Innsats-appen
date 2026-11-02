@@ -68,7 +68,7 @@ function createTrace(onTrace: CacheLocalMapPackageAssetsDeps['onTrace']): Trace 
     try {
       const record: MapPackageSaveTraceRecord = { phase, errorClass: traceErrorClass(error) };
       if (phase === 'put' && response) {
-        record.varyStar = response.headers.get('vary')?.includes('*') === true;
+        record.varyStar = response.headers.get('vary')?.split(',').some((token) => token.trim() === '*') === true;
         record.bodyUsed = response.bodyUsed === true;
         record.bodyLocked = response.body?.locked === true;
       }

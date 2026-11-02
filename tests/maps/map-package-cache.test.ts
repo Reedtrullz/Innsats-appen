@@ -251,6 +251,22 @@ describe('map package CacheStorage helper', () => {
       ]);
     });
 
+    it.each([
+      ['x-a*b', false],
+      ['accept-encoding, x*', false],
+      ['*', true],
+      ['accept-encoding, *', true],
+      ['origin ,  * , accept', true],
+    ])('reports varyStar for Vary %j as %s using a real Response', async (vary, expected) => {
+      const onTrace = vi.fn();
+      const error = named('QuotaExceededError');
+      const fetchImpl = vi.fn(async () => new Response(new Uint8Array(8), { headers: { vary } })) as unknown as typeof fetch;
+      await expect(cacheLocalMapPackageAssets(demoPackage, {
+        caches: caches(async () => { throw error; }), fetchImpl, onProgress: () => undefined, onTrace,
+      })).rejects.toBe(error);
+      expect(onTrace).toHaveBeenCalledWith(expect.objectContaining({ phase: 'put', errorClass: 'QuotaExceededError', varyStar: expected }));
+    });
+
     it('attributes addAll failures and ignores a throwing trace callback', async () => {
       const error = named('InvalidStateError');
       const onTrace = vi.fn(() => { throw new Error('logger'); });
