@@ -82,6 +82,33 @@ describe('map package CacheStorage helper', () => {
     expect(progress).toContain(100);
   });
 
+  it('keeps an explicit save out of the HTTP cache and still stores each asset once', async () => {
+    const cache = { addAll: vi.fn(async () => undefined), put: vi.fn(async () => undefined) };
+    const fetchImpl = vi.fn(async () => new Response('x', { status: 200 })) as unknown as typeof fetch;
+    await expect(cacheLocalMapPackageAssets(demoPackage, {
+      caches: { open: async () => cache },
+      fetchImpl,
+      onProgress: () => undefined,
+      saveId: 1,
+    })).resolves.toEqual({ cached: 2 });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(fetchImpl).toHaveBeenNthCalledWith(1, '/map-packages/demo.pmtiles', { cache: 'no-store', headers: { 'x-o24-save': '1' } });
+    expect(fetchImpl).toHaveBeenNthCalledWith(2, '/map-packages/demo-style.json', { cache: 'no-store', headers: { 'x-o24-save': '1' } });
+    expect(cache.put).toHaveBeenCalledTimes(2);
+  });
+
+  it('rethrows an explicit save cache.put error without reporting success', async () => {
+    const error = Object.assign(new Error('quota exceeded'), { name: 'QuotaExceededError' });
+    const fetchImpl = vi.fn(async () => new Response('x', { status: 200 })) as unknown as typeof fetch;
+    await expect(cacheLocalMapPackageAssets(demoPackage, {
+      caches: { open: async () => ({ addAll: async () => undefined, put: async () => { throw error; } }) },
+      fetchImpl,
+      onProgress: () => undefined,
+      saveId: 1,
+    })).rejects.toBe(error);
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
   it('fails the streamed path on a non-OK asset response', async () => {
     const cache = { addAll: vi.fn(async () => undefined), put: vi.fn(async () => undefined) };
     const caches = { open: vi.fn(async () => cache) };

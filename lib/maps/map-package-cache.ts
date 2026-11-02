@@ -177,7 +177,7 @@ async function fetchAssetWithProgress(
   try {
     response = saveId === undefined
       ? await fetchImpl(url)
-      : await fetchImpl(url, { headers: { 'x-o24-save': String(saveId) } });
+      : await fetchImpl(url, { cache: 'no-store', headers: { 'x-o24-save': String(saveId) } });
     if (!response.ok) throw new Error(`Map package asset request failed (${response.status}): ${url}`);
   } catch (error) {
     trace('fetch', error);

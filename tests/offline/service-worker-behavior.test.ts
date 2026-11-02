@@ -296,5 +296,33 @@ describe('service worker offline behavior', () => {
       const denial = await dispatch({ fetchImpl: offline, open: denied, url: origin + '/map-packages/a.pmtiles' });
       await expect(denial.response).rejects.toThrow('offline');
     });
+
+    it('does not cache.put an explicit save, and a normal put NetworkError still rejects', async () => {
+      const body = 'archive-bytes';
+      const network = new DOMException('cache put failed', 'NetworkError');
+      const fetches: Request[] = [];
+      const saved = await dispatch({
+        fetchImpl: async (input: Request) => {
+          fetches.push(input);
+          return new Response(body, { status: 200 });
+        },
+        cache: { put: vi.fn(async () => { throw network; }) },
+        url: origin + '/map-packages/a.pmtiles',
+        headers: { 'x-o24-save': '1' },
+      });
+      expect(saved.cache.put).not.toHaveBeenCalled();
+      await expect((await saved.response).text()).resolves.toBe(body);
+      expect(fetches).toHaveLength(1);
+      expect(fetches[0].cache).toBe('no-store');
+      expect(fetches[0].headers.get('x-o24-save')).toBe('1');
+
+      const ordinary = await dispatch({
+        fetchImpl: async () => new Response(body, { status: 200 }),
+        cache: { put: vi.fn(async () => { throw network; }) },
+        url: origin + '/map-packages/a.pmtiles',
+      });
+      await expect(ordinary.response).rejects.toBe(network);
+      expect(ordinary.cache.put).toHaveBeenCalledTimes(1);
+    });
   });
 });

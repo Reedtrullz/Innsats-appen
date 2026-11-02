@@ -322,7 +322,7 @@ test('correlation: one save id across page, worker and proxy, pre-put flags, and
   } catch (error) { thrown = error; }
   assert.equal(thrown, secret);
   assert.equal(calls.length, 1);
-  assert.deepEqual(calls[0], { url: mapPackage.url, init: { headers: { 'x-o24-save': '7' } } });
+  assert.deepEqual(calls[0], { url: mapPackage.url, init: { cache: 'no-store', headers: { 'x-o24-save': '7' } } });
   assert.equal(puts[0].url, mapPackage.url);
   assert.equal(puts[0].beforeUsed, false);
   assert.equal(puts[0].afterUsed, true);
@@ -369,6 +369,7 @@ test('correlation: one save id across page, worker and proxy, pre-put flags, and
   } catch (error) { allowedThrown = error; }
   assert.equal(allowedThrown, allowedFetchError);
   assert.equal(allowedCalls.length, 1);
+  assert.deepEqual(allowedCalls[0], { cache: 'no-store', headers: { 'x-o24-save': '8' } });
   assert.equal(allowedTrace.operation, 'fetch');
   assert.equal(allowedTrace.reason, 'FAILED_TO_FETCH');
   assert.equal(allowedTrace.prePutBodyUsed, false);
@@ -380,20 +381,35 @@ test('correlation: one save id across page, worker and proxy, pre-put flags, and
     throw putError;
   });
   const swRequest = new Request('https://example.test/map-packages/trondheim-osm.pmtiles', { headers: { 'x-o24-save': '7' } });
-  try { await runFetch(sw.handlers, swRequest); } catch (error) { swThrown = error; }
+  const ordinaryRequest = new Request('https://example.test/map-packages/trondheim-osm.pmtiles');
+  try { await runFetch(sw.handlers, ordinaryRequest); } catch (error) { swThrown = error; }
   assert.equal(swThrown, putError);
   assert.equal(sw.puts.length, 1);
-  assert.equal(sw.puts[0][0], swRequest);
-  assert.equal(sw.warnings.length, 1);
-  assert.equal(sw.warnings[0], correlationLine(7, 'sw', 'cache-put'));
+  assert.equal(sw.puts[0][0], ordinaryRequest);
   assert.equal(sw.warnings.join('').includes('secret'), false);
 
   const quota = Object.assign(new Error('quota secret'), { name: 'QuotaExceededError' });
   const swallowed = loadServiceWorker(async () => new Response(new Uint8Array([1]), { status: 200 }), async () => { throw quota; });
-  const swallowedResponse = await runFetch(swallowed.handlers, new Request('https://example.test/map-packages/trondheim-osm.pmtiles', { headers: { 'x-o24-save': '7' } }));
+  const swallowedResponse = await runFetch(swallowed.handlers, new Request('https://example.test/map-packages/trondheim-osm.pmtiles'));
   assert.equal(swallowedResponse.status, 200);
+  assert.equal(swallowed.puts.length, 1);
   assert.deepEqual(swallowed.warnings, []);
   assert.equal((await swallowedResponse.arrayBuffer()).byteLength, 1);
+  assert.equal(JSON.stringify(swallowed.warnings).includes('quota secret'), false);
+
+  const explicitPuts = [];
+  const explicit = loadServiceWorker(async (input) => {
+    const request = input instanceof Request ? input : new Request(input);
+    explicitPuts.push(request.cache);
+    assert.equal(request.headers.get('x-o24-save'), '7');
+    return new Response(new Uint8Array([9, 8, 7]), { status: 200 });
+  }, async () => { throw putError; });
+  const explicitResponse = await runFetch(explicit.handlers, swRequest);
+  assert.equal(explicitResponse.status, 200);
+  assert.deepEqual([...new Uint8Array(await explicitResponse.arrayBuffer())], [9, 8, 7]);
+  assert.equal(explicit.puts.length, 0);
+  assert.deepEqual(explicit.warnings, []);
+  assert.deepEqual(explicitPuts, ['no-store']);
 
   const bare = loadServiceWorker(async () => { throw secret; }, async () => {});
   let bareThrown;

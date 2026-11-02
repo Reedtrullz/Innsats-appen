@@ -439,14 +439,15 @@ self.addEventListener('fetch', (event) => {
       try {
         let response;
         try {
-          response = await fetch(request);
+          // Explicit save persists this body in CacheStorage; bypass the HTTP cache.
+          response = finiteSaveId(request) ? await fetch(new Request(request, { cache: 'no-store' })) : await fetch(request);
         } catch (error) {
           traceSave(request, 'fetch', error, { rangePresent: rangeHeader !== null, varyStar: false, prePutBodyUsed: false, prePutBodyLocked: false });
           throw error;
         }
         // Never cache.put partial (206) responses — the Cache API rejects
         // them; the full archive is stored by the explicit save flow.
-        if (response.status === 200 && !rangeHeader && cache) {
+        if (response.status === 200 && !rangeHeader && cache && !finiteSaveId(request)) {
           let stored;
           try {
             stored = response.clone();
