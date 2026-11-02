@@ -188,7 +188,7 @@ describe('service worker offline behavior', () => {
     const sw = fs.readFileSync(path.join(process.cwd(), 'public', 'sw.js'), 'utf8');
 
     async function dispatch(options: {
-      fetchImpl: () => Promise<Response>;
+      fetchImpl: (request: Request) => Promise<Response>;
       cache?: Record<string, unknown>;
       open?: () => Promise<unknown>;
       url: string;
