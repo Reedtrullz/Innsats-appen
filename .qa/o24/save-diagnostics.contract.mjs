@@ -166,3 +166,18 @@ test('saveMap click failure: original error rethrown and listener removed', asyn
   const { result } = await lifecycle({ click: async warn => { warn('TypeError'); throw primary; }, waitFor: async () => {} });
   assert.equal(result, primary);
 });
+
+test('phase recorder keeps only exact finite rows, rejects forged/mismatched ones, caps at four', () => {
+  const rows = [];
+  const tag = '[offline-map-cache] save-phase ';
+  const { recordSavePhase } = probe;
+  recordSavePhase(rows, 'warning', tag + 'fetch TypeError');
+  recordSavePhase(rows, 'warning', tag + 'put QuotaExceededError varyStar=true bodyUsed=false bodyLocked=true');
+  for (const bad of [tag + 'put TypeError', tag + 'fetch TypeError varyStar=true bodyUsed=false bodyLocked=false', tag + 'put Weird varyStar=true bodyUsed=false bodyLocked=false',
+    tag + 'other TypeError', tag + 'fetch TypeError token=secret', 'x ' + tag + 'fetch TypeError', tag + 'put TypeError varyStar=1 bodyUsed=false bodyLocked=false', { toString: () => tag + 'fetch TypeError' }])
+    recordSavePhase(rows, 'warning', bad);
+  recordSavePhase(rows, 'error', tag + 'fetch TypeError');
+  assert.deepEqual(rows, [{ phase: 'fetch', errorClass: 'TypeError' }, { phase: 'put', errorClass: 'QuotaExceededError', varyStar: true, bodyUsed: false, bodyLocked: true }]);
+  for (let i = 0; i < 6; i++) recordSavePhase(rows, 'warning', tag + 'read Error');
+  assert.equal(rows.length, 4);
+});

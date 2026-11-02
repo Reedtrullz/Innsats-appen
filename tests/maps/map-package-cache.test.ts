@@ -216,4 +216,52 @@ describe('map package CacheStorage helper', () => {
       expect(loaded).toEqual([7, 7]);
     });
   });
+  describe('phase trace', () => {
+    const named = (name: string, message = 'SECRET https://private.example/x?token=1') => Object.assign(new Error(message), { name });
+    const caches = (put?: (url: string, response: Response) => Promise<void>, open?: () => Promise<never>) => ({
+      open: open ?? (async () => ({ addAll: async () => undefined, put })),
+    });
+    const body = () => new Response(new ReadableStream<Uint8Array>({ pull() { throw named('Boom'); } }, { highWaterMark: 0 }), { headers: { vary: '*' } });
+
+    it('attributes open failures and rethrows the original error', async () => {
+      const error = named('TypeError');
+      const onTrace = vi.fn();
+      await expect(cacheLocalMapPackageAssets(demoPackage, { caches: caches(undefined, async () => { throw error; }), onTrace })).rejects.toBe(error);
+      expect(onTrace.mock.calls).toEqual([[{ phase: 'open', errorClass: 'TypeError' }]]);
+    });
+
+    it('attributes fetch failures and maps unknown names to UnknownError without leaking text', async () => {
+      const error = named('SyntheticPrivateSentinelError');
+      const onTrace = vi.fn();
+      const fetchImpl = vi.fn(async () => { throw error; }) as unknown as typeof fetch;
+      await expect(cacheLocalMapPackageAssets(demoPackage, { caches: caches(async () => undefined), fetchImpl, onProgress: () => undefined, onTrace })).rejects.toBe(error);
+      expect(onTrace.mock.calls).toEqual([[{ phase: 'fetch', errorClass: 'UnknownError' }]]);
+      expect(JSON.stringify(onTrace.mock.calls)).not.toMatch(/SECRET|private|token|Synthetic/);
+    });
+
+    it('attributes a body read failure to read, then the put with put-only booleans', async () => {
+      const onTrace = vi.fn();
+      const fetchImpl = vi.fn(async () => body()) as unknown as typeof fetch;
+      await expect(cacheLocalMapPackageAssets(demoPackage, {
+        caches: caches(async (_url, response) => { await response.arrayBuffer(); }), fetchImpl, onProgress: () => undefined, onTrace,
+      })).rejects.toMatchObject({ name: 'Boom' });
+      expect(onTrace.mock.calls).toEqual([
+        [{ phase: 'read', errorClass: 'UnknownError' }],
+        [{ phase: 'put', errorClass: 'UnknownError', varyStar: true, bodyUsed: true, bodyLocked: true }],
+      ]);
+    });
+
+    it('attributes addAll failures and ignores a throwing trace callback', async () => {
+      const error = named('InvalidStateError');
+      const onTrace = vi.fn(() => { throw new Error('logger'); });
+      await expect(cacheLocalMapPackageAssets(demoPackage, { caches: { open: async () => ({ addAll: async () => { throw error; } }) }, onTrace })).rejects.toBe(error);
+      expect(onTrace).toHaveBeenCalledWith({ phase: 'addAll', errorClass: 'InvalidStateError' });
+    });
+
+    it('emits nothing on success', async () => {
+      const onTrace = vi.fn();
+      await expect(cacheLocalMapPackageAssets(demoPackage, { caches: { open: async () => ({ addAll: async () => undefined }) }, onTrace })).resolves.toEqual({ cached: 2 });
+      expect(onTrace).not.toHaveBeenCalled();
+    });
+  });
 });

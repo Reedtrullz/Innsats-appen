@@ -106,8 +106,19 @@ export function recordSaveWarning(classes, type, text) {
   if (match && classes.length < 4) classes.push(match[1]);
 }
 
+const SAVE_PHASE = /^\[offline-map-cache\] save-phase (open|fetch|wrap|read|put|addAll|after) (AbortError|DataCloneError|InvalidStateError|NetworkError|NotAllowedError|NotFoundError|QuotaExceededError|SecurityError|TimeoutError|TypeError|RangeError|Error|UnknownError)(?: varyStar=(true|false) bodyUsed=(true|false) bodyLocked=(true|false))?$/;
+
+// Keeps at most four finite phase rows from the product's exact tag; unknown fields and raw text are dropped.
+export function recordSavePhase(rows, type, text) {
+  const m = type === 'warning' && typeof text === 'string' ? SAVE_PHASE.exec(text) : null;
+  if (!m || rows.length >= 4 || (m[1] === 'put') !== (m[3] !== undefined)) return;
+  const row = { phase: m[1], errorClass: m[2] };
+  if (m[3] !== undefined) Object.assign(row, { varyStar: m[3] === 'true', bodyUsed: m[4] === 'true', bodyLocked: m[5] === 'true' });
+  rows.push(row);
+}
+
 // Click the save button and await the stored status; the caller owns the console listener's lifetime.
-async function clickSaveAndAwait(page, evidence, warningClasses) {
+async function clickSaveAndAwait(page, evidence, warningClasses, phaseRows) {
   const saveBoundary = requestBoundary(evidence.fixture);
   await page.getByRole('button', { name: 'Lagre valgt kartpakke lokalt', exact: true }).click();
   try {
@@ -115,6 +126,7 @@ async function clickSaveAndAwait(page, evidence, warningClasses) {
   } catch (error) {
     logMapAssetRows(evidence.fixture, saveBoundary);
     try { console.error(JSON.stringify({ kind: 'o24-map-save-warning-classes', classes: warningClasses })); } catch { /* logging must not mask the save failure */ }
+    try { console.error(JSON.stringify({ kind: 'o24-map-save-phases', rows: phaseRows })); } catch { /* logging must not mask the save failure */ }
     // The app catches cache errors; retain its actual status before propagating this failed assertion.
     let timer;
     try {
@@ -140,9 +152,10 @@ export async function saveMap(page, evidence) {
   await waitForMapHydration(page, evidence);
   await page.getByLabel('Velg lokal kartpakke', { exact: true }).selectOption('trondheim-osm');
   const warningClasses = [];
-  const onConsole = message => { try { recordSaveWarning(warningClasses, message.type(), message.text()); } catch { /* diagnostics only */ } };
+  const phaseRows = [];
+  const onConsole = message => { try { recordSaveWarning(warningClasses, message.type(), message.text()); recordSavePhase(phaseRows, message.type(), message.text()); } catch { /* diagnostics only */ } };
   page.on('console', onConsole);
-  try { await clickSaveAndAwait(page, evidence, warningClasses); } finally { page.off('console', onConsole); }
+  try { await clickSaveAndAwait(page, evidence, warningClasses, phaseRows); } finally { page.off('console', onConsole); }
   await page.goto('/kart');
   await page.getByText('Lokal kartpakke aktiv: Trondheim lokal (OSM-utdrag).', { exact: true }).waitFor();
   assert(await page.getByTestId('offline-maplibre-container').locator('canvas').isVisible(), 'No real map canvas');

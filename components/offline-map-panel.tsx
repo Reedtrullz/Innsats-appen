@@ -348,11 +348,15 @@ export function OfflineMapPanel({ variant = 'operations' }: { variant?: 'operati
       setMapPackageCacheSaving(false);
       return;
     }
+    let cacheReturned = false;
     try {
       // Field 3G + a 30-40 MB PMTiles package looks hung without feedback;
       // stream the download and surface throttled percent/MB progress.
       let lastReportedStep = -1;
       const result = await cacheLocalMapPackageAssets(localPackage, {
+        onTrace: ({ phase, errorClass, ...flags }) => {
+          console.warn('[offline-map-cache] save-phase', phase, errorClass, ...Object.entries(flags).map(([key, value]) => `${key}=${value}`));
+        },
         onProgress: ({ loadedBytes, totalBytes, percent }) => {
           const step = percent !== null ? percent : Math.floor(loadedBytes / (512 * 1024));
           if (step === lastReportedStep) return;
@@ -363,6 +367,7 @@ export function OfflineMapPanel({ variant = 'operations' }: { variant?: 'operati
             : `Lagrer lokal kartpakke … ${loadedMb} MB lastet`);
         },
       });
+      cacheReturned = true;
       if (result.cached === 0) {
         setStatusMessage('Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline.');
         return;
@@ -374,6 +379,7 @@ export function OfflineMapPanel({ variant = 'operations' }: { variant?: 'operati
       writeCachedOfflineMapPackage(packageToCache.id);
       setStatusMessage('Lokal kartpakke er lagret og aktivert offline.');
     } catch (error) {
+      if (cacheReturned) { try { console.warn('[offline-map-cache] save-phase', 'after', safeSaveErrorClass(error)); } catch { /* diagnostics only */ } }
       try { console.warn('[offline-map-cache] save-failed', safeSaveErrorClass(error)); } catch { /* logging must not change the fallback */ }
       setStatusMessage('Kartpakken kunne ikke forhåndscaches; skjematisk fallback brukes offline.');
     } finally {
